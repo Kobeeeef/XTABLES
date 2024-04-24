@@ -52,11 +52,12 @@ public class SocketClient {
     }
     private void auto_reconnect() {
         final long INITIAL_DELAY_MS = 1000;
-        final long MAX_DELAY_MS = 60000;
+        final long MAX_DELAY_MS = 120000;
         long delay = INITIAL_DELAY_MS;
 
         while (true) {
             if (!isConnected()) {
+                logger.warning("Disconnected from the server. Reconnecting...");
                 this.connect();
                 delay = Math.min(delay * 2, MAX_DELAY_MS);
             } else {
@@ -65,6 +66,7 @@ public class SocketClient {
             try {
                 TimeUnit.MILLISECONDS.sleep(delay);
             } catch (InterruptedException e) {
+                logger.severe("Failed to connect to server. Exiting...");
                 Thread.currentThread().interrupt();
             }
         }
