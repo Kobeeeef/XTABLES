@@ -25,8 +25,8 @@ public class XTablesClient {
         return new RequestAction<>(client, "PUT " + key + " " + parsedValue, String.class);
     }
 
-    public RequestAction<Integer> putInteger(String key, Integer value) {
-        return new RequestAction<>(client, "PUT " + key + " " + value, Integer.class);
+    public RequestAction<String> putInteger(String key, Integer value) {
+        return new RequestAction<>(client, "PUT " + key + " " + value, String.class);
     }
 
     public RequestAction<String> delete(String key) {
