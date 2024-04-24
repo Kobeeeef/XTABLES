@@ -8,12 +8,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.net.Socket;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
+import java.util.logging.Logger;
 
 public class SocketClient {
+    private final Logger logger = Logger.getLogger(SocketClient.class.getName());
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private final long RECONNECT_DELAY_MS;
@@ -31,14 +31,16 @@ public class SocketClient {
     public void connect() {
         while (true) {
             try {
+                logger.info(String.format("Connecting to server: %1$s:%2$s", SERVER_ADDRESS, SERVER_PORT));
                 socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
                 if (!socket.isConnected()) throw new IOException();
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                System.out.println("Connected to server");
+                logger.info(String.format("Connected to server: %1$s:%2$s", SERVER_ADDRESS, SERVER_PORT));
+                executor.submit(this::auto_reconnect);
                 break;
             } catch (IOException e) {
-                System.err.println("Failed to connect to server. Retrying...");
+                logger.warning("Failed to connect to server. Retrying...");
                 try {
                     // Wait before attempting reconnection
                     TimeUnit.MILLISECONDS.sleep(RECONNECT_DELAY_MS);
@@ -48,6 +50,26 @@ public class SocketClient {
             }
         }
     }
+    private void auto_reconnect() {
+        final long INITIAL_DELAY_MS = 1000;
+        final long MAX_DELAY_MS = 60000;
+        long delay = INITIAL_DELAY_MS;
+
+        while (true) {
+            if (!isConnected()) {
+                this.connect();
+                delay = Math.min(delay * 2, MAX_DELAY_MS);
+            } else {
+                delay = INITIAL_DELAY_MS;
+            }
+            try {
+                TimeUnit.MILLISECONDS.sleep(delay);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
 
     public Socket getSocket() {
         return socket;
@@ -105,16 +127,7 @@ public class SocketClient {
         }
     }
 
-    public void disconnect() {
-        if (socket != null && !socket.isClosed()) {
-            try {
-                socket.close();
-                System.out.println("Disconnected from server");
-            } catch (IOException e) {
-                System.err.println("Error occurred: " + e.getMessage());
-            }
-        }
-    }
+
 
 }
 
