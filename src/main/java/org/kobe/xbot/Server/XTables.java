@@ -78,7 +78,7 @@ public class XTables {
                         String value = tokens[2];
                         boolean response = table.put(key, value);
                         out.println(response ? "OK" : "FAIL");
-                    }else if (tokens.length == 2 && tokens[0].equals("DELETE")) {
+                    } else if (tokens.length == 2 && tokens[0].equals("DELETE")) {
                         // Handle PUT requests
                         String key = tokens[1];
                         boolean response = table.delete(key);
