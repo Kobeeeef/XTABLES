@@ -1,9 +1,12 @@
 package org.kobe.xbot.Client;
 
+import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -69,9 +72,34 @@ public class SocketClient {
         return future;
     }
 
-    public String sendComplete(String message) {
+    public <T> CompletableFuture<T> sendAsync(String message, Type type) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        new Thread(() -> {
+            try {
+                out.println(message);
+                String response = in.readLine();
+                if (type == null) {
+                    future.complete((T) response);
+                } else {
+                    T parsed = new Gson().fromJson(response, type);
+                    future.complete(parsed);
+                }
+            } catch (IOException e) {
+                future.completeExceptionally(e);
+            }
+        }).start();
+        return future;
+    }
+
+
+    public <T> T sendComplete(String message, Type type) {
         try {
-            return sendAsync(message).get(5000, TimeUnit.SECONDS);
+            String response = sendAsync(message).get(5000, TimeUnit.SECONDS);
+            if (type == null) {
+                return (T) response;
+            } else {
+                return new Gson().fromJson(response, type);
+            }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             return null;
         }

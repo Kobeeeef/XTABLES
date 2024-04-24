@@ -1,28 +1,48 @@
 package org.kobe.xbot.Client;
 
+import com.google.gson.Gson;
+
+import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public class RequestAction {
+public class RequestAction<T> {
     private final SocketClient client;
     private final String value;
+    private final Gson gson = new Gson();
+    private final Type type;
 
+    public RequestAction(SocketClient client, String value, Type type) {
+        this.client = client;
+        this.value = value;
+        this.type = type;
+    }
     public RequestAction(SocketClient client, String value) {
         this.client = client;
         this.value = value;
+        this.type = null;
     }
 
-    public void async(Consumer<String> onSuccess, Consumer<Throwable> onFailure) {
-        CompletableFuture<String> future = client.sendAsync(value);
+    public void queue(Consumer<T> onSuccess, Consumer<Throwable> onFailure) {
+        CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(onSuccess)
                 .exceptionally(ex -> {
                     onFailure.accept(ex);
                     return null;
                 });
+
+    }
+    public void queue(Consumer<T> onSuccess) {
+        CompletableFuture<T> future = client.sendAsync(value, type);
+        future.thenAccept(onSuccess);
+    }
+    public void queue() {
+        client.sendAsync(value, type);
     }
 
-    public String complete() {
-        return client.sendComplete(value);
+    public T complete() {
+        return client.sendComplete(value, type);
     }
+
 }
 

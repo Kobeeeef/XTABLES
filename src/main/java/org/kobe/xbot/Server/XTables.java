@@ -31,8 +31,7 @@ public class XTables {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                logger.info("New client connected: " + clientSocket.getInetAddress());
-
+                logger.info(String.format("Client connected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
                 // Handle each client connection in a separate thread
                 new ClientHandler(clientSocket).start();
             }
@@ -64,6 +63,9 @@ public class XTables {
                         String key = tokens[1];
                         String result = gson.toJson(table.get(key));
                         out.println(result);
+                    } else if (tokens.length == 1 && tokens[0].equals("GET_RAW_JSON")) {
+                        // Handle GET requests
+                        out.println(table.toJSON());
                     } else if (tokens.length == 2 && tokens[0].equals("GET_TABLES")) {
                         // Handle GET requests
                         String key = tokens[1];
@@ -88,13 +90,18 @@ public class XTables {
                         out.println("UNKNOWN_OPTION!");
                     }
                 }
-
                 // Close the streams and socket when done
                 out.close();
                 in.close();
                 clientSocket.close();
             } catch (IOException e) {
-                logger.severe("Error occurred: " + e.getMessage());
+                String message = e.getMessage();
+                if(message.contains("Connection reset")) {
+
+                    logger.info(String.format("Client disconnected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
+                } else {
+                    logger.severe("Error occurred: " + e.getMessage());
+                }
             }
         }
     }
