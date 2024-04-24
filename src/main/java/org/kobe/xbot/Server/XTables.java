@@ -55,19 +55,14 @@ public class XTables {
 
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
-                    // Process client commands
                     String[] tokens = inputLine.split(" ");
-
                     if (tokens.length == 2 && tokens[0].equals("GET")) {
-                        // Handle GET requests
                         String key = tokens[1];
                         String result = gson.toJson(table.get(key));
                         out.println(result);
                     } else if (tokens.length == 1 && tokens[0].equals("GET_RAW_JSON")) {
-                        // Handle GET requests
                         out.println(table.toJSON());
                     } else if (tokens.length == 2 && tokens[0].equals("GET_TABLES")) {
-                        // Handle GET requests
                         String key = tokens[1];
                         String result = gson.toJson(table.getTables(key));
                         out.println(result);
@@ -75,13 +70,11 @@ public class XTables {
                         String result = gson.toJson(table.getTables(""));
                         out.println(result);
                     } else if (tokens.length == 3 && tokens[0].equals("PUT")) {
-                        // Handle PUT requests
                         String key = tokens[1];
                         String value = tokens[2];
                         boolean response = table.put(key, value);
                         out.println(response ? "OK" : "FAIL");
                     } else if (tokens.length == 2 && tokens[0].equals("DELETE")) {
-                        // Handle PUT requests
                         String key = tokens[1];
                         boolean response = table.delete(key);
                         out.println(response ? "OK" : "FAIL");

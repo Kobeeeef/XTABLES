@@ -76,10 +76,19 @@ public class SocketClient {
     public Socket getSocket() {
         return socket;
     }
+    private boolean isConnected() {
+        if (this.socket == null || this.socket.isClosed()) {
+            return false;
+        }
 
-    public boolean isConnected() {
-        return this.socket.isConnected();
+        try {
+            this.in.read();
+            return true; // Able to read, socket is connected
+        } catch (IOException e) {
+            return false; // Unable to read, socket is likely not connected
+        }
     }
+
 
 
     public CompletableFuture<String> sendAsync(String message) {
