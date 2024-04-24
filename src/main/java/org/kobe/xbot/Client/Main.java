@@ -11,7 +11,6 @@ public class Main {
         String result = client.put("test.test2", 12).complete();
         System.out.println(result);
 
-
         String result2 = client.getRaw("test.test2").complete();
         System.out.println(result2);
 
