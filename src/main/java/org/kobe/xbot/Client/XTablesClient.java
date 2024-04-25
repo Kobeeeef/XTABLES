@@ -3,8 +3,10 @@ package org.kobe.xbot.Client;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 
 public class XTablesClient {
@@ -18,6 +20,7 @@ public class XTablesClient {
         this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000);
         Thread thread = new Thread(() -> {
             client.connect();
+            client.setUpdateConsumer(this::on_update);
             latch.countDown();
         });
         thread.start();
@@ -25,6 +28,30 @@ public class XTablesClient {
             latch.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        }
+    }
+
+    private final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
+
+    public <T> RequestAction<T> subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
+        List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
+        consumers.add(new UpdateConsumer<>(type, consumer));
+        return new RequestAction<>(client, "SUBSCRIBE_UPDATE " + key, type);
+    }
+
+    private <T> void on_update(SocketClient.KeyValuePair keyValuePair) {
+        List<UpdateConsumer<?>> consumers = update_consumers.get(keyValuePair.getKey());
+        for (UpdateConsumer<?> updateConsumer : consumers) {
+            if (updateConsumer.type().equals(String.class)) {
+                // Special handling for String type
+                Consumer<String> consumer = (Consumer<String>) updateConsumer.consumer();
+                consumer.accept(keyValuePair.getValue());
+            } else {
+                // General case
+                T parsed = new Gson().fromJson(keyValuePair.getValue(), (Class<T>) updateConsumer.type());
+                Consumer<T> consumer = (Consumer<T>) updateConsumer.consumer();
+                consumer.accept(parsed);
+            }
         }
     }
 
@@ -40,10 +67,12 @@ public class XTablesClient {
     public RequestAction<String> putInteger(String key, Integer value) {
         return new RequestAction<>(client, "PUT " + key + " " + value, String.class);
     }
+
     public RequestAction<String> putObject(String key, Object value) {
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, "PUT " + key + " " + parsedValue, String.class);
     }
+
     public RequestAction<String> delete(String key) {
         return new RequestAction<>(client, "DELETE " + key, String.class);
     }
@@ -59,12 +88,15 @@ public class XTablesClient {
     public RequestAction<String> getString(String key) {
         return new RequestAction<>(client, "GET " + key, String.class);
     }
+
     public <T> RequestAction<T> getObject(String key, Class<T> type) {
         return new RequestAction<>(client, "GET " + key, type);
     }
+
     public RequestAction<Integer> getInteger(String key) {
         return new RequestAction<>(client, "GET " + key, Integer.class);
     }
+
     public <T> RequestAction<ArrayList<T>> getArray(String key, Class<T> type) {
         return new RequestAction<>(client, "GET " + key, type);
     }
@@ -73,7 +105,11 @@ public class XTablesClient {
         return new RequestAction<>(client, "GET_TABLES " + key, ArrayList.class);
     }
 
+
     public SocketClient getSocketClient() {
         return client;
+    }
+
+    public record UpdateConsumer<T>(Class<T> type, Consumer<T> consumer) {
     }
 }

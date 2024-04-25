@@ -8,12 +8,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.net.Socket;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class SocketClient {
     private final Logger logger = Logger.getLogger(SocketClient.class.getName());
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private final long RECONNECT_DELAY_MS;
@@ -21,12 +24,18 @@ public class SocketClient {
     private PrintWriter out = null;
     private BufferedReader in = null;
     private Socket socket;
+    private Consumer<KeyValuePair> updateConsumer;
 
     public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS) {
         this.socket = null;
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         this.SERVER_PORT = SERVER_PORT;
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
+    }
+
+
+    public void setUpdateConsumer(Consumer<KeyValuePair> updateConsumer) {
+        this.updateConsumer = updateConsumer;
     }
 
     public void connect() {
@@ -38,7 +47,7 @@ public class SocketClient {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 logger.info(String.format("Connected to server: %1$s:%2$s", SERVER_ADDRESS, SERVER_PORT));
-                executor.submit(this::auto_reconnect);
+                new Thread(this::auto_reconnect).start();
                 break;
             } catch (IOException e) {
                 logger.warning("Failed to connect to server. Retrying...");
@@ -49,6 +58,36 @@ public class SocketClient {
                     Thread.currentThread().interrupt();
                 }
             }
+        }
+    }
+
+    public class ClientMessageListener extends Thread {
+        private final Socket socket;
+
+        public ClientMessageListener(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String message;
+                while ((message = bufferedReader.readLine()) != null) {
+                    System.out.println(message);
+                    String[] tokens = message.split(" ");
+                    if (tokens.length == 3 && tokens[0].equals("UPDATE")) {
+                        String key = tokens[1];
+                        String value = tokens[2];
+                        if (updateConsumer != null) {
+                            KeyValuePair keyValuePair = new KeyValuePair(key, value);
+                            updateConsumer.accept(keyValuePair);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("Error reading message from server: " + e.getMessage());
+            }
+
         }
     }
 
@@ -86,7 +125,8 @@ public class SocketClient {
             out.flush();
             String response = in.readLine();
             if (response.equals("ACTIVE")) serverResponded = true;
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         boolean connected = socket != null && !socket.isClosed() && socket.isConnected() && serverResponded;
         this.isConnected = connected;
         return connected;
@@ -131,7 +171,7 @@ public class SocketClient {
 
     public <T> T sendComplete(String message, Type type) {
         try {
-            String response = sendAsync(message).get(5000, TimeUnit.SECONDS);
+            String response = sendAsync(message).get(5, TimeUnit.SECONDS);
             if (type == null) {
                 return (T) response;
             } else {
@@ -142,6 +182,31 @@ public class SocketClient {
         }
     }
 
+    public static class KeyValuePair {
+        private String key;
+        private String value;
+
+        public KeyValuePair(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+    }
 
 }
 
