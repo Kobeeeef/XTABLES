@@ -40,7 +40,10 @@ public class XTablesClient {
     public RequestAction<String> putInteger(String key, Integer value) {
         return new RequestAction<>(client, "PUT " + key + " " + value, String.class);
     }
-
+    public RequestAction<String> putObject(String key, Object value) {
+        String parsedValue = gson.toJson(value);
+        return new RequestAction<>(client, "PUT " + key + " " + parsedValue, String.class);
+    }
     public RequestAction<String> delete(String key) {
         return new RequestAction<>(client, "DELETE " + key, String.class);
     }
@@ -56,6 +59,9 @@ public class XTablesClient {
     public RequestAction<String> getString(String key) {
         return new RequestAction<>(client, "GET " + key, String.class);
     }
+    public <T> RequestAction<T> getObject(String key, Class<T> type) {
+        return new RequestAction<>(client, "GET " + key, type);
+    }
     public RequestAction<Integer> getInteger(String key) {
         return new RequestAction<>(client, "GET " + key, Integer.class);
     }
@@ -66,4 +72,5 @@ public class XTablesClient {
     public RequestAction<ArrayList<String>> getTables(String key) {
         return new RequestAction<>(client, "GET_TABLES " + key, ArrayList.class);
     }
+
 }
