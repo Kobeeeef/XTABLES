@@ -1,7 +1,5 @@
 package org.kobe.xbot.Client;
 
-import com.google.gson.Gson;
-
 import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -9,7 +7,6 @@ import java.util.function.Consumer;
 public class RequestAction<T> {
     private final SocketClient client;
     private final String value;
-    private final Gson gson = new Gson();
     private final Type type;
 
     public RequestAction(SocketClient client, String value, Type type) {
