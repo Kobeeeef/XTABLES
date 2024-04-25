@@ -73,4 +73,7 @@ public class XTablesClient {
         return new RequestAction<>(client, "GET_TABLES " + key, ArrayList.class);
     }
 
+    public SocketClient getSocketClient() {
+        return client;
+    }
 }

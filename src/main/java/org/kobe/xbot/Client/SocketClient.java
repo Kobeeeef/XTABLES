@@ -87,7 +87,9 @@ public class SocketClient {
             String response = in.readLine();
             if (response.equals("ACTIVE")) serverResponded = true;
         } catch (IOException ignored) {}
-        return socket != null && !socket.isClosed() && socket.isConnected() && serverResponded;
+        boolean connected = socket != null && !socket.isClosed() && socket.isConnected() && serverResponded;
+        this.isConnected = connected;
+        return connected;
     }
 
 
