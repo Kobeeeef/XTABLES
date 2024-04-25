@@ -78,6 +78,8 @@ public class XTables {
                         String key = tokens[1];
                         boolean response = table.delete(key);
                         out.println(response ? "OK" : "FAIL");
+                    } else if (tokens.length == 1 && tokens[0].equals("PING")) {
+                        out.println("ACTIVE");
                     } else {
                         // Invalid command
                         out.println("UNKNOWN_OPTION!");
@@ -89,7 +91,7 @@ public class XTables {
                 clientSocket.close();
             } catch (IOException e) {
                 String message = e.getMessage();
-                if(message.contains("Connection reset")) {
+                if (message.contains("Connection reset")) {
 
                     logger.info(String.format("Client disconnected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
                 } else {

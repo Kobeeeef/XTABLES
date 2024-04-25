@@ -17,6 +17,7 @@ public class SocketClient {
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private final long RECONNECT_DELAY_MS;
+    public Boolean isConnected = null;
     private PrintWriter out = null;
     private BufferedReader in = null;
     private Socket socket;
@@ -50,6 +51,7 @@ public class SocketClient {
             }
         }
     }
+
     private void auto_reconnect() {
         final long INITIAL_DELAY_MS = 1000;
         final long MAX_DELAY_MS = 120000;
@@ -76,19 +78,17 @@ public class SocketClient {
     public Socket getSocket() {
         return socket;
     }
+
     private boolean isConnected() {
-        if (this.socket == null || this.socket.isClosed()) {
-            return false;
-        }
-
+        boolean serverResponded = false;
         try {
-            this.in.read();
-            return true; // Able to read, socket is connected
-        } catch (IOException e) {
-            return false; // Unable to read, socket is likely not connected
-        }
+            out.println("PING");
+            out.flush();
+            String response = in.readLine();
+            if (response.equals("ACTIVE")) serverResponded = true;
+        } catch (IOException ignored) {}
+        return socket != null && !socket.isClosed() && socket.isConnected() && serverResponded;
     }
-
 
 
     public CompletableFuture<String> sendAsync(String message) {
@@ -96,6 +96,7 @@ public class SocketClient {
         new Thread(() -> {
             try {
                 out.println(message);
+                out.flush();
                 String response = in.readLine();
                 future.complete(response);
             } catch (IOException e) {
@@ -110,6 +111,7 @@ public class SocketClient {
         new Thread(() -> {
             try {
                 out.println(message);
+                out.flush();
                 String response = in.readLine();
                 if (type == null) {
                     future.complete((T) response);
@@ -137,7 +139,6 @@ public class SocketClient {
             return null;
         }
     }
-
 
 
 }

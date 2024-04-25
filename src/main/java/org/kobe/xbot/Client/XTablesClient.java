@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 
 public class XTablesClient {
@@ -11,9 +12,20 @@ public class XTablesClient {
     private final Gson gson = new Gson();
 
 
+    private final CountDownLatch latch = new CountDownLatch(1);
+
     public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT) {
         this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000);
-        this.client.connect();
+        Thread thread = new Thread(() -> {
+            client.connect();
+            latch.countDown();
+        });
+        thread.start();
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public RequestAction<String> putRaw(String key, String value) {
@@ -44,7 +56,9 @@ public class XTablesClient {
     public RequestAction<String> getString(String key) {
         return new RequestAction<>(client, "GET " + key, String.class);
     }
-
+    public RequestAction<Integer> getInteger(String key) {
+        return new RequestAction<>(client, "GET " + key, Integer.class);
+    }
     public <T> RequestAction<ArrayList<T>> getArray(String key, Class<T> type) {
         return new RequestAction<>(client, "GET " + key, type);
     }
