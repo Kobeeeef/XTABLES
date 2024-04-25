@@ -1,96 +1,78 @@
 # XTablesClient Documentation
 
-`XTablesClient` is part of the `org.kobe.xbot.Client` package and provides an interface for interacting with a server to store and retrieve data in various formats. Below are the methods provided by the `XTablesClient` class, along with their descriptions and usage examples.
+`XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing and retrieving data in various formats. This document details the methods available in the `XTablesClient` class, including their synchronous and asynchronous usage.
 
 ## Constructor
 
 - **XTablesClient(String SERVER_ADDRESS, int SERVER_PORT)**
-  - Constructs an instance of `XTablesClient` which connects to the specified server address and port.
+  - Initializes a connection to the specified server address and port.
   - **Parameters:**
-    - `SERVER_ADDRESS`: The address of the server.
+    - `SERVER_ADDRESS`: The IP address or hostname of the server.
     - `SERVER_PORT`: The port number on which the server is listening.
 
 ## Methods
 
 ### Put Methods
-These methods store data on the server under a specified key.
+Store data on the server under a specified key.
 
 - **putRaw(String key, String value)**
-  - Stores a raw string value under the given key.
-  - **Parameters:**
-    - `key`: Key under which the value is stored.
-    - `value`: Raw string to be stored.
+  - Stores a raw string under the given key.
+  - **Synchronous**: `complete()` blocks until the operation is completed, with a timeout of 5 seconds.
+  - **Asynchronous**: `queue()` accepts success and failure callbacks.
 
 - **putArray(String key, List<T> value)**
-  - Stores an array under the given key, converting it to JSON format.
-  - **Type Parameters:**
-    - `<T>`: The type of elements in the array.
-  - **Parameters:**
-    - `key`: Key under which the array is stored.
-    - `value`: List of type T to be stored.
+  - Stores an array under the given key, serialized to JSON format.
+  - **Synchronous/Asynchronous**: Same as above.
 
 - **putInteger(String key, Integer value)**
   - Stores an integer value under the specified key.
-  - **Parameters:**
-    - `key`: Key under which the value is stored.
-    - `value`: Integer to be stored.
+  - **Synchronous/Asynchronous**: Same as above.
 
 - **putObject(String key, Object value)**
-  - Stores any object under the given key by converting it to JSON.
-  - **Parameters:**
-    - `key`: Key under which the object is stored.
-    - `value`: Object to be stored.
+  - Stores any serializable object under the given key by converting it to JSON.
+  - **Synchronous/Asynchronous**: Same as above.
 
 ### Get Methods
-These methods retrieve data from the server using the specified key.
+Retrieve data from the server using the specified key.
 
 - **getRaw(String key)**
-  - Retrieves a raw string value from the server.
-  - **Parameters:**
-    - `key`: Key for which the value is retrieved.
+  - Retrieves a raw string value.
+  - **Synchronous/Asynchronous**: Same as above.
 
 - **getString(String key)**
-  - Retrieves a string value from the server.
-  - **Parameters:**
-    - `key`: Key for which the string is retrieved.
+  - Retrieves a string value.
+  - **Synchronous/Asynchronous**: Same as above.
 
 - **getInteger(String key)**
-  - Retrieves an integer value from the server.
-  - **Parameters:**
-    - `key`: Key for which the integer is retrieved.
+  - Retrieves an integer value.
+  - **Synchronous/Asynchronous**: Same as above.
 
 - **getObject(String key, Class<T> type)**
-  - Retrieves an object of type T from the server.
-  - **Type Parameters:**
-    - `<T>`: The expected type of the returned object.
-  - **Parameters:**
-    - `key`: Key for which the object is retrieved.
-    - `type`: Class object of type T.
+  - Retrieves an object of type T.
+  - **Synchronous/Asynchronous**: Same as above.
 
 - **getArray(String key, Class<T> type)**
-  - Retrieves an array of type T from the server.
-  - **Type Parameters:**
-    - `<T>`: The component type of the array.
-  - **Parameters:**
-    - `key`: Key for which the array is retrieved.
-    - `type`: Class object of type T indicating the component type of the array.
+  - Retrieves an array of type T.
+  - **Synchronous/Asynchronous**: Same as above.
 
 ### Delete Method
 - **delete(String key)**
-  - Deletes the value associated with the specified key from the server.
-  - **Parameters:**
-    - `key`: Key for which the value is to be deleted.
+  - Deletes the value associated with the specified key.
+  - **Synchronous/Asynchronous**: Same as above.
 
 ### Miscellaneous
 - **getTables(String key)**
-  - Retrieves a list of table names or similar structures from the server.
-  - **Parameters:**
-    - `key`: Key used to query the server for tables.
+  - Retrieves a list of table names or similar structures.
+  - **Synchronous/Asynchronous**: Same as above.
 
-## Usage Example
+## Usage Examples
 
 ```java
 XTablesClient client = new XTablesClient("localhost", 8000);
+// Synchronous use
 client.putInteger("session_id", 1001).complete();
-Integer sessionId = client.getInteger("session_id").complete();
-System.out.println("Session ID: " + sessionId);
+// Asynchronous use
+client.getInteger("session_id").queue(
+    result -> System.out.println("Session ID: " + result),
+    error -> System.err.println("Error retrieving session ID")
+);
