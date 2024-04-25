@@ -56,18 +56,25 @@ class SocketClient:
         except IOError:
             return False
 
-    def send_async(self, message):
+    def send_async(self, message, response_type=None):
         future = Future()
-        threading.Thread(target=self._send, args=(message, future)).start()
+        threading.Thread(target=self._send, args=(message, future, response_type)).start()
         return future
 
-    def _send(self, message, future):
+    def _send(self, message, future, response_type=None):
         try:
             self.out.write(message + "\n")
             self.out.flush()
-            response = self.inp.readline()
+            response = self.inp.readline().strip()
+            if response_type:
+                if response_type == int:
+                    response = int(response)
+                elif response_type == float:
+                    response = float(response)
+                else:
+                    response = json.loads(response)
             future.set_result(response)
-        except IOError as e:
+        except Exception as e:
             future.set_exception(e)
 
     def send_complete(self, message, response_type=None):

@@ -11,13 +11,12 @@ import java.net.Socket;
 import java.util.logging.Logger;
 
 public class XTables {
-    private static final int PORT = 1735;
     private final Gson gson = new Gson();
     private final XTablesData<String> table = new XTablesData<>();
     private final Logger logger = Logger.getLogger(XTables.class.getName());
     private static XTables instance = null;
 
-    public XTables() {
+    public XTables(int PORT) {
         if (instance != null) {
             logger.severe("There is an already existing instance!");
             logger.severe("Exiting instance!");

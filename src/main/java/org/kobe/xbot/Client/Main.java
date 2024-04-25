@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
         XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT);
-        String response = client.putInteger("SmartDashboard.test", 25).complete();
+        String response = client.getRawJSON().complete();
         System.out.println(response);
     }
 }
