@@ -38,7 +38,7 @@ public class XTablesClient {
     public <T> RequestAction<T> subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
         List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
         consumers.add(new UpdateConsumer<>(type, consumer));
-        return new RequestAction<>(client, "SUBSCRIBE_UPDATE " + key, type);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), type);
     }
 
     private <T> void on_update(SocketClient.KeyValuePair keyValuePair) {
@@ -58,26 +58,25 @@ public class XTablesClient {
     }
 
     public RequestAction<String> putRaw(String key, String value) {
-
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), String.class);
     }
 
     public <T> RequestAction<String> putArray(String key, List<T> value) {
         String parsedValue = gson.toJson(value);
-        return new RequestAction<>(client, "PUT " + key + " " + parsedValue, String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), String.class);
     }
 
     public RequestAction<String> putInteger(String key, Integer value) {
-        return new RequestAction<>(client, "PUT " + key + " " + value, String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), String.class);
     }
 
     public RequestAction<String> putObject(String key, Object value) {
         String parsedValue = gson.toJson(value);
-        return new RequestAction<>(client, "PUT " + key + " " + parsedValue, String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), String.class);
     }
 
     public RequestAction<String> delete(String key) {
-        return new RequestAction<>(client, "DELETE " + key, String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.DELETE, key).parsed(), String.class);
     }
 
     public RequestAction<String> getRaw(String key) {
@@ -85,27 +84,27 @@ public class XTablesClient {
     }
 
     public RequestAction<String> getRawJSON() {
-        return new RequestAction<>(client, "GET_RAW_JSON", null);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_RAW_JSON).parsed(), null);
     }
 
     public RequestAction<String> getString(String key) {
-        return new RequestAction<>(client, "GET " + key, String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
     }
 
     public <T> RequestAction<T> getObject(String key, Class<T> type) {
-        return new RequestAction<>(client, "GET " + key, type);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);
     }
 
     public RequestAction<Integer> getInteger(String key) {
-        return new RequestAction<>(client, "GET " + key, Integer.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Integer.class);
     }
 
     public <T> RequestAction<ArrayList<T>> getArray(String key, Class<T> type) {
-        return new RequestAction<>(client, "GET " + key, type);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);
     }
 
     public RequestAction<ArrayList<String>> getTables(String key) {
-        return new RequestAction<>(client, "GET_TABLES " + key, ArrayList.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_TABLES, key).parsed(), ArrayList.class);
     }
 
 

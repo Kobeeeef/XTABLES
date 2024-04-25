@@ -65,6 +65,10 @@ Retrieve data from the server using the specified key.
   - Retrieves a list of table names or similar structures.
   - **Synchronous/Asynchronous**: Same as above.
 
+- **subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer)**
+  - Subscribes to updates for a specific key, invoking the provided consumer when updates are received.
+  - Returns a `RequestAction` for further handling.
+
 ## Usage Examples
 
 ```java
@@ -76,3 +80,17 @@ client.getInteger("session_id").queue(
     result -> System.out.println("Session ID: " + result),
     error -> System.err.println("Error retrieving session ID")
 );
+
+// Subscribe to updates
+client.subscribeUpdateEvent("key", String.class, System.out::println);
+
+// Define a consumer for update events
+Consumer<String> updateConsumer = update -> {
+    // Handle update
+    System.out.println("Update received: " + update);
+};
+
+// Subscribe to updates for a specific key
+RequestAction<String> subscription = client.subscribeUpdateEvent("key", String.class, updateConsumer);
+// Unsubscribe after a certain condition is met
+subscription.complete();

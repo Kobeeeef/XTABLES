@@ -11,11 +11,9 @@ public class Main {
         // Initialize a new client with address and port
         XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT);
         // Thread blocks until connection is successful
-        String c = client.putRaw("test", "ok").complete();
-        System.out.println(c);
-        c = client.getRaw("test").complete();
-        System.out.println(c);
-        if(1==1) return;
+
+
+
         // Get raw JSON from server
         String response = client.getRawJSON().complete();
         System.out.println(response);
