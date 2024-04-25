@@ -68,7 +68,7 @@ Retrieve data from the server using the specified key.
 ## Usage Examples
 
 ```java
-XTablesClient client = new XTablesClient("localhost", 8000);
+XTablesClient client = new XTablesClient("localhost", 1735);
 // Synchronous use
 client.putInteger("session_id", 1001).complete();
 // Asynchronous use
