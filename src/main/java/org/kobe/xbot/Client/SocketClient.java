@@ -1,6 +1,9 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
+import org.kobe.xbot.Server.MethodType;
+import org.kobe.xbot.Server.RequestInfo;
+import org.kobe.xbot.Server.ResponseInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,10 +11,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.net.Socket;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -20,6 +22,7 @@ public class SocketClient {
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private final long RECONNECT_DELAY_MS;
+    private static final BlockingQueue<RequestInfo> MESSAGES = new LinkedBlockingQueue<>();
     public Boolean isConnected = null;
     private PrintWriter out = null;
     private BufferedReader in = null;
@@ -47,7 +50,9 @@ public class SocketClient {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 logger.info(String.format("Connected to server: %1$s:%2$s", SERVER_ADDRESS, SERVER_PORT));
+                new ClientMessageListener(socket).start();
                 new Thread(this::auto_reconnect).start();
+
                 break;
             } catch (IOException e) {
                 logger.warning("Failed to connect to server. Retrying...");
@@ -70,14 +75,13 @@ public class SocketClient {
 
         public void run() {
             try {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String message;
-                while ((message = bufferedReader.readLine()) != null) {
-                    System.out.println(message);
-                    String[] tokens = message.split(" ");
-                    if (tokens.length == 3 && tokens[0].equals("UPDATE")) {
-                        String key = tokens[1];
-                        String value = tokens[2];
+                while ((message = in.readLine()) != null) {
+                    RequestInfo requestInfo = new RequestInfo(message);
+                    MESSAGES.add(requestInfo);
+                    if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
+                        String key = requestInfo.getTokens()[1];
+                        String value = requestInfo.getTokens()[2];
                         if (updateConsumer != null) {
                             KeyValuePair keyValuePair = new KeyValuePair(key, value);
                             updateConsumer.accept(keyValuePair);
@@ -89,6 +93,27 @@ public class SocketClient {
             }
 
         }
+    }
+
+    public RequestInfo waitForMessage(String ID, long timeout, TimeUnit unit) throws InterruptedException {
+        RequestInfo message = MESSAGES.poll(timeout, unit);
+        while (message != null) {
+            if (message.getID().equals(ID)) {
+                return message;
+            }
+            // If the message doesn't contain the desired ID, wait for the next message
+            message = MESSAGES.poll(timeout / 2, unit);
+        }
+        return null; // Timeout reached
+    }
+
+    public RequestInfo sendMessageAndWaitForReply(ResponseInfo responseInfo, long timeout, TimeUnit unit) throws InterruptedException {
+        sendMessage(responseInfo);
+        return waitForMessage(responseInfo.getID(), timeout, unit);
+    }
+    public void sendMessage(ResponseInfo responseInfo) {
+        out.println(responseInfo.parsed());
+        out.flush();
     }
 
     private void auto_reconnect() {
@@ -121,11 +146,10 @@ public class SocketClient {
     private boolean isConnected() {
         boolean serverResponded = false;
         try {
-            out.println("PING");
-            out.flush();
-            String response = in.readLine();
-            if (response.equals("ACTIVE")) serverResponded = true;
-        } catch (IOException ignored) {
+            RequestInfo info = sendMessageAndWaitForReply(new ResponseInfo(UUID.randomUUID().toString(), MethodType.PING), 2, TimeUnit.SECONDS);
+            if (info != null && info.getTokens()[1].equals("ACTIVE")) serverResponded = true;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
         boolean connected = socket != null && !socket.isClosed() && socket.isConnected() && serverResponded;
         this.isConnected = connected;
@@ -137,11 +161,10 @@ public class SocketClient {
         CompletableFuture<String> future = new CompletableFuture<>();
         new Thread(() -> {
             try {
-                out.println(message);
-                out.flush();
-                String response = in.readLine();
-                future.complete(response);
-            } catch (IOException e) {
+                RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
+                String[] tokens = requestInfo.getTokens();
+                future.complete(String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)));
+            } catch (InterruptedException e) {
                 future.completeExceptionally(e);
             }
         }).start();
@@ -152,16 +175,17 @@ public class SocketClient {
         CompletableFuture<T> future = new CompletableFuture<>();
         new Thread(() -> {
             try {
-                out.println(message);
-                out.flush();
-                String response = in.readLine();
+
+                RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
+
                 if (type == null) {
-                    future.complete((T) response);
+                    future.complete((T) requestInfo.getRaw());
                 } else {
-                    T parsed = new Gson().fromJson(response, type);
+                    String[] tokens = requestInfo.getTokens();
+                    T parsed = new Gson().fromJson(String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)), type);
                     future.complete(parsed);
                 }
-            } catch (IOException e) {
+            } catch (InterruptedException e) {
                 future.completeExceptionally(e);
             }
         }).start();

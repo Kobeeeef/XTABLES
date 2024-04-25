@@ -1,6 +1,8 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
+import org.kobe.xbot.Server.MethodType;
+import org.kobe.xbot.Server.ResponseInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +58,8 @@ public class XTablesClient {
     }
 
     public RequestAction<String> putRaw(String key, String value) {
-        return new RequestAction<>(client, "PUT " + key + " " + value, String.class);
+
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), String.class);
     }
 
     public <T> RequestAction<String> putArray(String key, List<T> value) {
@@ -78,7 +81,7 @@ public class XTablesClient {
     }
 
     public RequestAction<String> getRaw(String key) {
-        return new RequestAction<>(client, "GET " + key, String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
     }
 
     public RequestAction<String> getRawJSON() {

@@ -68,44 +68,62 @@ public class XTables {
             try {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
-                    String[] tokens = inputLine.split(" ");
-                    if (tokens.length == 2 && tokens[0].equals("GET")) {
-                        String key = tokens[1];
+                    RequestInfo requestInfo = new RequestInfo(inputLine);
+                    System.out.println(requestInfo.getRaw());
+                    if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
+                        String key = requestInfo.getTokens()[1];
                         String result = gson.toJson(table.get(key));
-                        out.println(result);
-                    } else if (tokens.length == 1 && tokens[0].equals("GET_RAW_JSON")) {
-                        out.println(table.toJSON());
-                    } else if (tokens.length == 2 && tokens[0].equals("GET_TABLES")) {
-                        String key = tokens[1];
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET, result);
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_RAW_JSON)) {
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_RAW_JSON, table.toJSON());
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
+                        String key = requestInfo.getTokens()[1];
                         String result = gson.toJson(table.getTables(key));
-                        out.println(result);
-                    } else if (tokens.length == 1 && tokens[0].equals("GET_TABLES")) {
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_TABLES, result);
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
                         String result = gson.toJson(table.getTables(""));
-                        out.println(result);
-                    } else if (tokens.length >= 3 && tokens[0].equals("PUT")) {
-                        String key = tokens[1];
-                        String value = tokens[2];
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_TABLES, result);
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    } else if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.PUT)) {
+                        String key = requestInfo.getTokens()[1];
+                        String value = requestInfo.getTokens()[2];
                         boolean response = table.put(key, value);
-                        out.println(response ? "OK" : "FAIL");
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, response ? "OK" : "FAIL");
+                        out.println(responseInfo.parsed());
+                        out.flush();
                         if (response) {
                             notifyClients(key, value);
                         }
-                    } else if (tokens.length == 2 && tokens[0].equals("DELETE")) {
-                        String key = tokens[1];
+                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.DELETE)) {
+                        String key = requestInfo.getTokens()[1];
                         boolean response = table.delete(key);
-                        out.println(response ? "OK" : "FAIL");
-                    } else if (tokens.length == 2 && tokens[0].equals("SUBSCRIBE_UPDATE")) {
-                        String key = tokens[1];
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
+                        String key = requestInfo.getTokens()[1];
                         boolean success = updateEvents.add(key);
-                        out.println(success ? "OK" : "FAIL");
-                    } else if (tokens.length == 1 && tokens[0].equals("PING")) {
-                        out.println("ACTIVE");
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.PING)) {
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PING, "ACTIVE");
+                        out.println(responseInfo.parsed());
+                        out.flush();
                     } else {
                         // Invalid command
-                        out.println("UNKNOWN_OPTION");
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN);
+                        out.println(responseInfo.parsed());
+                        out.flush();
                     }
                 }
                 // Close the streams and socket when done
