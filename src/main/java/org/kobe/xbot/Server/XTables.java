@@ -68,7 +68,7 @@ public class XTables {
                     } else if (tokens.length == 1 && tokens[0].equals("GET_TABLES")) {
                         String result = gson.toJson(table.getTables(""));
                         out.println(result);
-                    } else if (tokens.length == 3 && tokens[0].equals("PUT")) {
+                    } else if (tokens.length >= 3 && tokens[0].equals("PUT")) {
                         String key = tokens[1];
                         String value = tokens[2];
                         boolean response = table.put(key, value);
