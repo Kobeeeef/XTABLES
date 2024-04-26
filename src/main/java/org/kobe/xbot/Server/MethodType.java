@@ -8,6 +8,7 @@ public enum MethodType {
     GET_TABLES,
     DELETE,
     SUBSCRIBE_UPDATE,
+    UNSUBSCRIBE_UPDATE,
     PING,
     UNKNOWN
 }

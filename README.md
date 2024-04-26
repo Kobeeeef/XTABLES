@@ -60,14 +60,23 @@ Retrieve data from the server using the specified key.
   - Deletes the value associated with the specified key.
   - **Synchronous/Asynchronous**: Same as above.
 
+### Subscription Methods
+- **subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer)**
+  - Subscribes to updates for a specific key, invoking the provided consumer when updates are received.
+  - **Synchronous/Asynchronous**: Same as above.
+
+- **unsubscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer)**
+  - Unsubscribes from updates for a specific key.
+  - **Synchronous/Asynchronous**: Same as above.
+
 ### Miscellaneous
 - **getTables(String key)**
   - Retrieves a list of table names or similar structures.
   - **Synchronous/Asynchronous**: Same as above.
 
-- **subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer)**
-  - Subscribes to updates for a specific key, invoking the provided consumer when updates are received.
-  - Returns a `RequestAction` for further handling.
+- **sendCustomMessage(MethodType method, String message, Class<T> type)**
+  - Sends a custom request to the server using the specified method and message, expecting a return type as specified by `Class<T>`.
+  - **Synchronous/Asynchronous**: Same as above.
 
 ## Usage Examples
 

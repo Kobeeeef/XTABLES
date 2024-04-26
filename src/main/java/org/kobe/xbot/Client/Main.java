@@ -1,7 +1,10 @@
 package org.kobe.xbot.Client;
 // EXAMPLE SETUP
 
+import org.kobe.xbot.Server.ResponseStatus;
+
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Main {
     private static final String SERVER_ADDRESS = "localhost"; // Server address
@@ -21,12 +24,12 @@ public class Main {
         // "FAIL" - Failed to update
 
         // Put a string value into server
-        response = client.putRaw("SmartDashboard", "Some Value").complete();
-        System.out.println(response);
+        ResponseStatus status = client.putRaw("SmartDashboard", "Some Value").complete();
+        System.out.println(status);
 
         // Put a string value into a sub table
-        response = client.putRaw("SmartDashboard.sometable", "Some Value").complete();
-        System.out.println(response);
+        status = client.putRaw("SmartDashboard.sometable", "Some Value").complete();
+        System.out.println(status);
 
         // Put a string value into server asynchronously
         client.putRaw("SmartDashboard", "Some Value").queue();
@@ -38,8 +41,8 @@ public class Main {
         client.putRaw("SmartDashboard", "Some Value").queue(System.out::println, System.err::println);
 
         // Put an object value into server thread block
-        response = client.putObject("SmartDashboard", new String("OK")).complete();
-        System.out.println(response);
+        status = client.putObject("SmartDashboard", new String("OK")).complete();
+        System.out.println(status);
 
         // Put an integer value on sub table  asynchronously
         client.putInteger("SmartDashboard.somevalue", 488).queue();
@@ -69,5 +72,17 @@ public class Main {
                         System.out.println("New Value: " + new_value)
                 )
                 .complete();
+
+
+        // Define a consumer for update events
+        Consumer<String> updateConsumer = update -> {
+            System.out.println("Update received: " + update);
+        };
+        // Subscribe to updates for a specific key
+        status = client.subscribeUpdateEvent("key", String.class, updateConsumer).complete();
+        System.out.println(status);
+        // Unsubscribe after a certain condition is met
+        status = client.unsubscribeUpdateEvent("key", String.class, updateConsumer).complete();
+        System.out.println(status);
     }
 }

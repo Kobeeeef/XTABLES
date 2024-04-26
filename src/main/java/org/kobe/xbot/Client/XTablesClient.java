@@ -3,6 +3,7 @@ package org.kobe.xbot.Client;
 import com.google.gson.Gson;
 import org.kobe.xbot.Server.MethodType;
 import org.kobe.xbot.Server.ResponseInfo;
+import org.kobe.xbot.Server.ResponseStatus;
 import org.kobe.xbot.Server.Utilities;
 
 import java.util.ArrayList;
@@ -36,13 +37,36 @@ public class XTablesClient {
 
     private final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
 
-    public <T> RequestAction<String> subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
+    public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
         Utilities.validateKey(key);
-        List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
-        consumers.add(new UpdateConsumer<>(type, consumer));
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
+            /**
+             * When request was fully successful
+             */
+            @Override
+            public void onResponse(ResponseStatus result) {
+                if(result.equals(ResponseStatus.OK)) {
+                    List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
+                    consumers.add(new UpdateConsumer<>(type, consumer));
+                }
+            }
+        };
     }
-
+    public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
+        Utilities.validateKey(key);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class){
+            /**
+             * When request was fully successful
+             */
+            @Override
+            public void onResponse(ResponseStatus result) {
+                if(result.equals(ResponseStatus.OK)) {
+                    List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
+                    consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                }
+            }
+        };
+    }
     private <T> void on_update(SocketClient.KeyValuePair keyValuePair) {
         List<UpdateConsumer<?>> consumers = update_consumers.get(keyValuePair.getKey());
         for (UpdateConsumer<?> updateConsumer : consumers) {
@@ -59,31 +83,31 @@ public class XTablesClient {
         }
     }
 
-    public RequestAction<String> putRaw(String key, String value) {
+    public RequestAction<ResponseStatus> putRaw(String key, String value) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class);
     }
 
-    public <T> RequestAction<String> putArray(String key, List<T> value) {
+    public <T> RequestAction<ResponseStatus> putArray(String key, List<T> value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
 
-    public RequestAction<String> putInteger(String key, Integer value) {
+    public RequestAction<ResponseStatus> putInteger(String key, Integer value) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class);
     }
 
-    public RequestAction<String> putObject(String key, Object value) {
+    public RequestAction<ResponseStatus> putObject(String key, Object value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
 
-    public RequestAction<String> delete(String key) {
+    public RequestAction<ResponseStatus> delete(String key) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.DELETE, key).parsed(), String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.DELETE, key).parsed(), ResponseStatus.class);
     }
 
     public RequestAction<String> getRaw(String key) {
