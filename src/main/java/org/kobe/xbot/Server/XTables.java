@@ -140,7 +140,7 @@ public class XTables {
             }
         }
         public void sendUpdate(String key, String value) {
-            out.println("UPDATE " + key + " " + value);
+            out.println("null:UPDATE " + key + " " + value);
         }
     }
 }

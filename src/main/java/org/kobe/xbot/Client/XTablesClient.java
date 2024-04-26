@@ -35,10 +35,10 @@ public class XTablesClient {
 
     private final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
 
-    public <T> RequestAction<T> subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
+    public <T> RequestAction<String> subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
         List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
         consumers.add(new UpdateConsumer<>(type, consumer));
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), type);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), String.class);
     }
 
     private <T> void on_update(SocketClient.KeyValuePair keyValuePair) {

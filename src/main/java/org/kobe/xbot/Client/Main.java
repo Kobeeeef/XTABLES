@@ -2,8 +2,6 @@ package org.kobe.xbot.Client;
 // EXAMPLE SETUP
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 public class Main {
     private static final String SERVER_ADDRESS = "10.0.0.92"; // Server address
@@ -43,7 +41,7 @@ public class Main {
         response = client.putObject("SmartDashboard", new String("OK")).complete();
         System.out.println(response);
 
-        // Put a integer value on sub table  asynchronously
+        // Put an integer value on sub table  asynchronously
         client.putInteger("SmartDashboard.somevalue", 488).queue();
 
         // -------- GET VALUES --------
@@ -66,9 +64,10 @@ public class Main {
         Integer integer = client.getInteger("SmartDashboard.somevalue").complete();
         System.out.println(integer);
 
-        // Subscribe to a update event on key
-        client.subscribeUpdateEvent("SmartDashboard", Integer.class, integer -> {
-            System.out.println("New Value: "+ integer);
-        }).complete();
+        // Subscribe to an update event on key
+        client.subscribeUpdateEvent("SmartDashboard", Integer.class, new_value ->
+                        System.out.println("New Value: " + new_value)
+                )
+                .complete();
     }
 }
