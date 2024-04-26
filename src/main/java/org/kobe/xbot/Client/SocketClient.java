@@ -11,7 +11,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -22,7 +24,7 @@ public class SocketClient {
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private final long RECONNECT_DELAY_MS;
-    private static final BlockingQueue<RequestInfo> MESSAGES = new LinkedBlockingQueue<>();
+    private static final List<RequestInfo> MESSAGES = new ArrayList<>();
     public Boolean isConnected = null;
     private PrintWriter out = null;
     private BufferedReader in = null;
@@ -95,17 +97,21 @@ public class SocketClient {
         }
     }
 
-    public RequestInfo waitForMessage(String ID, long timeout, TimeUnit unit) throws InterruptedException {
-        RequestInfo message = MESSAGES.poll(timeout, unit);
-        while (message != null) {
-            if (message.getID().equals(ID)) {
-                return message;
-            }
-            // If the message doesn't contain the desired ID, wait for the next message
-            message = MESSAGES.poll(timeout / 2, unit);
+    public RequestInfo waitForMessage(String ID, long timeout, TimeUnit unit) {
+        long startTime = System.currentTimeMillis();
+        long timeoutMillis = unit.toMillis(timeout);
+
+        while (System.currentTimeMillis() - startTime < timeoutMillis) {
+                for (RequestInfo message : new ArrayList<>(MESSAGES)) {
+                    if (message.getID().equals(ID)) {
+                        return message;
+                    }
+                }
         }
-        return null; // Timeout reached
+        return null;
     }
+
+
 
     public RequestInfo sendMessageAndWaitForReply(ResponseInfo responseInfo, long timeout, TimeUnit unit) throws InterruptedException {
         sendMessage(responseInfo);

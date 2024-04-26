@@ -12,8 +12,6 @@ public class Main {
         XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT);
         // Thread blocks until connection is successful
 
-
-
         // Get raw JSON from server
         String response = client.getRawJSON().complete();
         System.out.println(response);

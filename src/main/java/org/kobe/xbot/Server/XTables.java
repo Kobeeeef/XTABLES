@@ -71,7 +71,6 @@ public class XTables {
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
                     RequestInfo requestInfo = new RequestInfo(inputLine);
-                    System.out.println(requestInfo.getRaw());
                     if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
                         String key = requestInfo.getTokens()[1];
                         String result = gson.toJson(table.get(key));
