@@ -8,9 +8,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -71,7 +73,7 @@ public class XTables {
 
         @Override
         public void run() {
-            Executors.newSingleThreadScheduledExecutor(r -> {
+             ScheduledFuture<?> messages_log = Executors.newSingleThreadScheduledExecutor(r -> {
                 Thread thread = new Thread(r);
                 thread.setDaemon(true);
                 return thread;
@@ -95,24 +97,15 @@ public class XTables {
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET, result);
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_RAW_JSON)) {
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_RAW_JSON, table.toJSON());
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
+                    }  else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
                         String key = requestInfo.getTokens()[1];
                         String result = gson.toJson(table.getTables(key));
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_TABLES, result);
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
-                        String result = gson.toJson(table.getTables(""));
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_TABLES, result);
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.PUT)) {
+                    }  else if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.PUT)) {
                         String key = requestInfo.getTokens()[1];
-                        String value = requestInfo.getTokens()[2];
+                        String value = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (value.equals(table.get(key))) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, "OK");
                             out.println(responseInfo.parsed());
@@ -142,6 +135,15 @@ public class XTables {
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PING, "ACTIVE");
                         out.println(responseInfo.parsed());
                         out.flush();
+                    }else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
+                        String result = gson.toJson(table.getTables(""));
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_TABLES, result);
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    }else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_RAW_JSON)) {
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_RAW_JSON, table.toJSON());
+                        out.println(responseInfo.parsed());
+                        out.flush();
                     } else {
                         // Invalid command
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN);
@@ -153,13 +155,15 @@ public class XTables {
                 out.close();
                 in.close();
                 clientSocket.close();
+                messages_log.cancel(true);
             } catch (IOException e) {
                 String message = e.getMessage();
                 if (message.contains("Connection reset")) {
-
                     logger.info(String.format("Client disconnected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
+                    messages_log.cancel(true);
                 } else {
                     logger.severe("Error occurred: " + e.getMessage());
+                    messages_log.cancel(true);
                 }
             }
         }

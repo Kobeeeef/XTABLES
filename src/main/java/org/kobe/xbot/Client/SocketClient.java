@@ -180,15 +180,16 @@ public class SocketClient {
     }
 
     public <T> CompletableFuture<T> sendAsync(String message, Type type) {
+        System.out.println("OK");
         CompletableFuture<T> future = new CompletableFuture<>();
         new Thread(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
                 if(requestInfo == null) throw new ClosedConnectionException();
+                String[] tokens = requestInfo.getTokens();
                 if (type == null) {
-                    future.complete((T) requestInfo.getRaw());
+                    future.complete((T) String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)));
                 } else {
-                    String[] tokens = requestInfo.getTokens();
                     T parsed = new Gson().fromJson(String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)), type);
                     future.complete(parsed);
                 }
