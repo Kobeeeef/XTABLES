@@ -39,8 +39,12 @@ public class RequestAction<T> {
         client.sendAsync(value, type);
     }
 
-    public T complete() throws ExecutionException, InterruptedException, TimeoutException {
-        return client.sendComplete(value, type);
+    public T complete() {
+        try {
+            return client.sendComplete(value, type);
+        } catch (ExecutionException | TimeoutException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
