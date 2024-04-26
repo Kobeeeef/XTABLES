@@ -44,11 +44,13 @@ public class XTables {
             logger.severe("Error occurred: " + e.getMessage());
         }
     }
+
     private void notifyClients(String key, String value) {
         for (ClientHandler client : clients.stream().filter(clientHandler -> clientHandler.getUpdateEvents().contains(key)).toList()) {
             client.sendUpdate(key, value);
         }
     }
+
     // Thread to handle each client connection
     private class ClientHandler extends Thread {
         private final Socket clientSocket;
@@ -95,12 +97,18 @@ public class XTables {
                     } else if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.PUT)) {
                         String key = requestInfo.getTokens()[1];
                         String value = requestInfo.getTokens()[2];
-                        boolean response = table.put(key, value);
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, response ? "OK" : "FAIL");
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                        if (response) {
-                            notifyClients(key, value);
+                        if (value.equals(table.get(key))) {
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, "OK");
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                        } else {
+                            boolean response = table.put(key, value);
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, response ? "OK" : "FAIL");
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                            if (response) {
+                                notifyClients(key, value);
+                            }
                         }
                     } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.DELETE)) {
                         String key = requestInfo.getTokens()[1];
@@ -139,8 +147,9 @@ public class XTables {
                 }
             }
         }
+
         public void sendUpdate(String key, String value) {
-            out.println("null:UPDATE " + key + " " + value);
+            out.println(new ResponseInfo(null, MethodType.UPDATE, key + " " + value).parsed());
         }
     }
 }
