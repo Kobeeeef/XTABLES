@@ -2,6 +2,8 @@ package org.kobe.xbot.Client;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 public class RequestAction<T> {
@@ -37,7 +39,7 @@ public class RequestAction<T> {
         client.sendAsync(value, type);
     }
 
-    public T complete() {
+    public T complete() throws ExecutionException, InterruptedException, TimeoutException {
         return client.sendComplete(value, type);
     }
 

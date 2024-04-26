@@ -1,6 +1,7 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
+import com.sun.jdi.connect.spi.ClosedConnectionException;
 import org.kobe.xbot.Server.MethodType;
 import org.kobe.xbot.Server.RequestInfo;
 import org.kobe.xbot.Server.ResponseInfo;
@@ -168,9 +169,10 @@ public class SocketClient {
         new Thread(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
+                if(requestInfo == null) throw new ClosedConnectionException();
                 String[] tokens = requestInfo.getTokens();
                 future.complete(String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)));
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ClosedConnectionException e) {
                 future.completeExceptionally(e);
             }
         }).start();
@@ -181,9 +183,8 @@ public class SocketClient {
         CompletableFuture<T> future = new CompletableFuture<>();
         new Thread(() -> {
             try {
-
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
-
+                if(requestInfo == null) throw new ClosedConnectionException();
                 if (type == null) {
                     future.complete((T) requestInfo.getRaw());
                 } else {
@@ -191,7 +192,7 @@ public class SocketClient {
                     T parsed = new Gson().fromJson(String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)), type);
                     future.complete(parsed);
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ClosedConnectionException e) {
                 future.completeExceptionally(e);
             }
         }).start();
@@ -199,17 +200,13 @@ public class SocketClient {
     }
 
 
-    public <T> T sendComplete(String message, Type type) {
-        try {
+    public <T> T sendComplete(String message, Type type) throws ExecutionException, InterruptedException, TimeoutException {
             String response = sendAsync(message).get(5, TimeUnit.SECONDS);
             if (type == null) {
                 return (T) response;
             } else {
                 return new Gson().fromJson(response, type);
             }
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            return null;
-        }
     }
 
     public static class KeyValuePair {
