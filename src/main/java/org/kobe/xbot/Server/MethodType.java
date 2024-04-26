@@ -9,6 +9,7 @@ public enum MethodType {
     DELETE,
     SUBSCRIBE_UPDATE,
     UNSUBSCRIBE_UPDATE,
+    REBOOT_SERVER,
     PING,
     UNKNOWN
 }

@@ -17,35 +17,69 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class XTables {
-    private final Gson gson = new Gson();
-    private final XTablesData<String> table = new XTablesData<>();
-    private final Logger logger = Logger.getLogger(XTables.class.getName());
     private static XTables instance = null;
-    private final Set<ClientHandler> clients = new HashSet<>(); // Store connected clients
+    private final Gson gson = new Gson();
+    private final Logger logger = Logger.getLogger(XTables.class.getName());
+    private final Set<ClientHandler> clients = new HashSet<>();
+    private final XTablesData<String> table = new XTablesData<>();
+    private ServerSocket serverSocket;
+    private final int port;
 
-
-    public XTables(int PORT) {
-        if (instance != null) {
-            logger.severe("There is an already existing instance!");
-            logger.severe("Exiting instance!");
-            return;
+    public static XTables startInstance(int PORT) {
+        if (instance == null) {
+            instance = new XTables(PORT);
         }
-        instance = this;
+        return instance;
+    }
 
-        logger.info(String.format("Starting server on port %1$s.", PORT));
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            logger.info("Server started. Listening on port " + PORT + "...");
+    private XTables(int PORT) {
+        this.port = PORT;
+        startServer();
+    }
 
-            while (true) {
+    private void startServer() {
+        try {
+            serverSocket = new ServerSocket(port);
+            logger.info("Server started. Listening on port " + port + "...");
+
+            while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
                 logger.info(String.format("Client connected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
-                // Handle each client connection in a separate thread
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
-                clients.add(clientHandler); // Add client handler to the set of clients
+                clients.add(clientHandler);
                 clientHandler.start();
             }
         } catch (IOException e) {
             logger.severe("Error occurred: " + e.getMessage());
+            if (!serverSocket.isClosed()) {
+                try {
+                    serverSocket.close();
+                } catch (IOException ex) {
+                    logger.severe("Error closing server socket: " + ex.getMessage());
+                }
+            }
+        }
+    }
+
+    public void rebootServer() {
+        try {
+            logger.info("Closing connections to all clients...");
+            for (ClientHandler client : clients) {
+                client.clientSocket.close();
+            }
+            clients.clear();
+            logger.info("Closing socket server...");
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+            table.delete("");
+            logger.info("Starting socket server in 3 seconds...");
+            Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+                logger.info("Starting server...");
+                startServer();
+            }, 3, TimeUnit.SECONDS);
+        } catch (IOException e) {
+            logger.severe("Error occurred during server reboot: " + e.getMessage());
         }
     }
 
@@ -150,7 +184,12 @@ public class XTables {
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_RAW_JSON, table.toJSON());
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else {
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.REBOOT_SERVER)) {
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REBOOT_SERVER, ResponseStatus.OK.name());
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                        rebootServer();
+                    }else {
                         // Invalid command
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN);
                         out.println(responseInfo.parsed());

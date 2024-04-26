@@ -12,14 +12,14 @@ public class Main {
                 if (port < 0 || port > 65535) {
                     logger.severe("Error: The specified port '" + args[0] + "' is outside the specified range of valid port values.");
                 } else {
-                    new XTables(port);
+                    XTables.startInstance(port);
                 }
             } catch (NumberFormatException e) {
                 logger.severe("Error: The specified port '" + args[0] + "' is not a valid integer.");
             }
         } else {
             logger.info("No port number provided. Default port 1735 is being used.");
-            new XTables(1735);
+            XTables.startInstance(1735);
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.kobe.xbot.Client;
 // EXAMPLE SETUP
 
+import org.kobe.xbot.Server.MethodType;
 import org.kobe.xbot.Server.ResponseStatus;
 
 import java.util.List;
