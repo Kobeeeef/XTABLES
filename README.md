@@ -78,6 +78,10 @@ Retrieve data from the server using the specified key.
   - Sends a custom request to the server using the specified method and message, expecting a return type as specified by `Class<T>`.
   - **Synchronous/Asynchronous**: Same as above.
 
+- **rebootServer()**
+  - Reboots the server after 3 seconds of the request.
+  - **Synchronous/Asynchronous**: Same as above.
+
 ## Usage Examples
 
 ```java
