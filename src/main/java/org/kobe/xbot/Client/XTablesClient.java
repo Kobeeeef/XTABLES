@@ -3,6 +3,7 @@ package org.kobe.xbot.Client;
 import com.google.gson.Gson;
 import org.kobe.xbot.Server.MethodType;
 import org.kobe.xbot.Server.ResponseInfo;
+import org.kobe.xbot.Server.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ public class XTablesClient {
     private final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
 
     public <T> RequestAction<String> subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
+        Utilities.validateKey(key);
         List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
         consumers.add(new UpdateConsumer<>(type, consumer));
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), String.class);
@@ -58,28 +60,34 @@ public class XTablesClient {
     }
 
     public RequestAction<String> putRaw(String key, String value) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), String.class);
     }
 
     public <T> RequestAction<String> putArray(String key, List<T> value) {
+        Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), String.class);
     }
 
     public RequestAction<String> putInteger(String key, Integer value) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), String.class);
     }
 
     public RequestAction<String> putObject(String key, Object value) {
+        Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), String.class);
     }
 
     public RequestAction<String> delete(String key) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.DELETE, key).parsed(), String.class);
     }
 
     public RequestAction<String> getRaw(String key) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
     }
 
@@ -88,26 +96,33 @@ public class XTablesClient {
     }
 
     public RequestAction<String> getString(String key) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
     }
 
     public <T> RequestAction<T> getObject(String key, Class<T> type) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);
     }
 
     public RequestAction<Integer> getInteger(String key) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Integer.class);
     }
 
     public <T> RequestAction<ArrayList<T>> getArray(String key, Class<T> type) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);
     }
 
     public RequestAction<ArrayList<String>> getTables(String key) {
+        Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_TABLES, key).parsed(), ArrayList.class);
     }
 
-
+    public <T> RequestAction<T> sendCustomMessage(MethodType method, String message, Class<T> type) {
+        return new RequestAction<>(client, new ResponseInfo(null, method, message).parsed(), type);
+    }
     public SocketClient getSocketClient() {
         return client;
     }
