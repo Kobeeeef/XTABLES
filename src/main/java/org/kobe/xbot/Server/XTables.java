@@ -10,6 +10,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class XTables {
@@ -56,6 +58,7 @@ public class XTables {
         private final Socket clientSocket;
         private final PrintWriter out;
         private final Set<String> updateEvents = new HashSet<>();
+        private int totalMessages = 0;
 
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
@@ -66,13 +69,26 @@ public class XTables {
             return updateEvents;
         }
 
+        @Override
         public void run() {
+            Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread thread = new Thread(r);
+                thread.setDaemon(true);
+                return thread;
+            }).scheduleAtFixedRate(() -> {
+                if (totalMessages != 0) {
+                    logger.info("Received " + totalMessages + " messages from IP " + clientSocket.getInetAddress()+ ":" + clientSocket.getPort() + " in the last minute.");
+                    totalMessages = 0;
+                }
+            }, 1, 60, TimeUnit.SECONDS);
+
             try {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
                     RequestInfo requestInfo = new RequestInfo(inputLine);
+                    totalMessages++;
                     if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
                         String key = requestInfo.getTokens()[1];
                         String result = gson.toJson(table.get(key));

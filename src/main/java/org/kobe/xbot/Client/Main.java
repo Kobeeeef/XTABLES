@@ -4,7 +4,7 @@ package org.kobe.xbot.Client;
 import java.util.List;
 
 public class Main {
-    private static final String SERVER_ADDRESS = "10.0.0.92"; // Server address
+    private static final String SERVER_ADDRESS = "localhost"; // Server address
     private static final int SERVER_PORT = 1735; // Server port
 
     public static void main(String[] args) {
