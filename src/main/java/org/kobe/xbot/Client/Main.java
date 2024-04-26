@@ -65,5 +65,10 @@ public class Main {
         // Get integer from sub-table
         Integer integer = client.getInteger("SmartDashboard.somevalue").complete();
         System.out.println(integer);
+
+        // Subscribe to a update event on key
+        client.subscribeUpdateEvent("SmartDashboard", Integer.class, integer -> {
+            System.out.println("New Value: "+ integer);
+        }).complete();
     }
 }
