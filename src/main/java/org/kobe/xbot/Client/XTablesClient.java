@@ -24,6 +24,7 @@ public class XTablesClient {
             client.setUpdateConsumer(this::on_update);
             latch.countDown();
         });
+        thread.setDaemon(true);
         thread.start();
         try {
             latch.await();

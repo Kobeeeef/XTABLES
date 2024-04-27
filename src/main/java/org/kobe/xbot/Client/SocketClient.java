@@ -15,19 +15,34 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class SocketClient {
     private final Logger logger = Logger.getLogger(SocketClient.class.getName());
+    private final ExecutorService executor = Executors.newFixedThreadPool(3);
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private final long RECONNECT_DELAY_MS;
-    private static final List<RequestInfo> MESSAGES = new ArrayList<>();
+    private static final List<RequestInfo> MESSAGES = new ArrayList<>() {
+        private final Logger logger = Logger.getLogger(ArrayList.class.getName());
+        private boolean hasLogged = false;
+
+        @Override
+        public boolean add(RequestInfo requestInfo) {
+            boolean added = super.add(requestInfo);
+            while (added && size() > 50) {
+                if (!hasLogged) {
+                    logger.info("Dumping all old cached messages...");
+                    hasLogged = true;
+                }
+                super.remove(0);
+            }
+            return added;
+        }
+    };
+
     public Boolean isConnected = null;
     private PrintWriter out = null;
     private BufferedReader in = null;
@@ -106,7 +121,8 @@ public class SocketClient {
 
         while (System.currentTimeMillis() - startTime < timeoutMillis) {
             for (RequestInfo message : new ArrayList<>(MESSAGES)) {
-                if (message.getID().equals(ID)) {
+                if (message != null && message.getID().equals(ID)) {
+                    MESSAGES.remove(message);
                     return message;
                 }
             }
@@ -168,7 +184,7 @@ public class SocketClient {
 
     public CompletableFuture<String> sendAsync(String message) {
         CompletableFuture<String> future = new CompletableFuture<>();
-        new Thread(() -> {
+        executor.submit(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
                 if (requestInfo == null) throw new ClosedConnectionException();
@@ -177,13 +193,13 @@ public class SocketClient {
             } catch (InterruptedException | ClosedConnectionException e) {
                 future.completeExceptionally(e);
             }
-        }).start();
+        });
         return future;
     }
 
     public <T> CompletableFuture<T> sendAsync(String message, Type type) {
         CompletableFuture<T> future = new CompletableFuture<>();
-        new Thread(() -> {
+        executor.submit(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
                 if (requestInfo == null) throw new ClosedConnectionException();
@@ -197,7 +213,7 @@ public class SocketClient {
             } catch (InterruptedException | ClosedConnectionException e) {
                 future.completeExceptionally(e);
             }
-        }).start();
+        });
         return future;
     }
 
