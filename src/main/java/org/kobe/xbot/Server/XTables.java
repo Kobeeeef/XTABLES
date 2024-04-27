@@ -40,7 +40,7 @@ public class XTables {
     private void startServer() {
         try {
             serverSocket = new ServerSocket(port);
-            logger.info("Server started. Listening on port " + port + "...");
+            logger.info("Server started. Listening on " + serverSocket.getLocalSocketAddress() + "...");
 
             while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();

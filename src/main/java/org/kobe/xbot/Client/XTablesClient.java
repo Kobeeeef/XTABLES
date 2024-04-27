@@ -143,7 +143,9 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_TABLES, key).parsed(), ArrayList.class);
     }
-
+    public RequestAction<ArrayList<String>> getTables() {
+        return getTables("");
+    }
     public RequestAction<ResponseStatus> rebootServer() {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.REBOOT_SERVER).parsed(), ResponseStatus.class);
     }
