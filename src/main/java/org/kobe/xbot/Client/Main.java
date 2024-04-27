@@ -75,7 +75,7 @@ public class Main {
 
 
         // Define a consumer for update events
-        Consumer<String> updateConsumer = update -> {
+        Consumer<SocketClient.KeyValuePair<String>> updateConsumer = update -> {
             System.out.println("Update received: " + update);
         };
         // Subscribe to updates for a specific key

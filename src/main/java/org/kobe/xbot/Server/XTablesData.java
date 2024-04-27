@@ -1,6 +1,7 @@
 package org.kobe.xbot.Server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -98,6 +99,6 @@ public class XTablesData<V> {
     }
 
     public String toJSON() {
-        return new Gson().toJson(this.data);
+        return new GsonBuilder().setPrettyPrinting().create().toJson(this.data);
     }
 }

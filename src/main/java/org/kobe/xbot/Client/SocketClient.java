@@ -47,7 +47,7 @@ public class SocketClient {
     private PrintWriter out = null;
     private BufferedReader in = null;
     private Socket socket;
-    private Consumer<KeyValuePair> updateConsumer;
+    private Consumer<KeyValuePair<String>> updateConsumer;
 
     public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS) {
         this.socket = null;
@@ -57,7 +57,7 @@ public class SocketClient {
     }
 
 
-    public void setUpdateConsumer(Consumer<KeyValuePair> updateConsumer) {
+    public void setUpdateConsumer(Consumer<KeyValuePair<String>> updateConsumer) {
         this.updateConsumer = updateConsumer;
     }
 
@@ -101,9 +101,9 @@ public class SocketClient {
                     MESSAGES.add(requestInfo);
                     if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
                         String key = requestInfo.getTokens()[1];
-                        String value = requestInfo.getTokens()[2];
+                        String value = String.join(" ",Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (updateConsumer != null) {
-                            KeyValuePair keyValuePair = new KeyValuePair(key, value);
+                            KeyValuePair<String> keyValuePair = new KeyValuePair<>(key, value);
                             updateConsumer.accept(keyValuePair);
                         }
                     }
@@ -227,11 +227,11 @@ public class SocketClient {
         }
     }
 
-    public static class KeyValuePair {
+    public static class KeyValuePair<T> {
         private String key;
-        private String value;
+        private T value;
 
-        public KeyValuePair(String key, String value) {
+        public KeyValuePair(String key, T value) {
             this.key = key;
             this.value = value;
         }
@@ -244,11 +244,11 @@ public class SocketClient {
             this.key = key;
         }
 
-        public String getValue() {
+        public T getValue() {
             return value;
         }
 
-        public void setValue(String value) {
+        public void setValue(T value) {
             this.value = value;
         }
     }

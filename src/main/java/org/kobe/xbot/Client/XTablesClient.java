@@ -35,12 +35,9 @@ public class XTablesClient {
 
     private final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
 
-    public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
+    public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
-            /**
-             * When request was fully successful
-             */
             @Override
             public void onResponse(ResponseStatus result) {
                 if (result.equals(ResponseStatus.OK)) {
@@ -51,12 +48,22 @@ public class XTablesClient {
         };
     }
 
-    public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
+    public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
+        String key = " ";
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
+            @Override
+            public void onResponse(ResponseStatus result) {
+                if (result.equals(ResponseStatus.OK)) {
+                    List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
+                    consumers.add(new UpdateConsumer<>(type, consumer));
+                }
+            }
+        };
+    }
+
+    public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
-            /**
-             * When request was fully successful
-             */
             @Override
             public void onResponse(ResponseStatus result) {
                 if (result.equals(ResponseStatus.OK)) {
@@ -67,21 +74,28 @@ public class XTablesClient {
         };
     }
 
-    private <T> void on_update(SocketClient.KeyValuePair keyValuePair) {
-        List<UpdateConsumer<?>> consumers = update_consumers.get(keyValuePair.getKey());
-        for (UpdateConsumer<?> updateConsumer : consumers) {
-            if (updateConsumer.type().equals(String.class)) {
-                // Special handling for String type
-                Consumer<String> consumer = (Consumer<String>) updateConsumer.consumer();
-                consumer.accept(keyValuePair.getValue());
-            } else {
-                // General case
-                T parsed = new Gson().fromJson(keyValuePair.getValue(), (Class<T>) updateConsumer.type());
-                Consumer<T> consumer = (Consumer<T>) updateConsumer.consumer();
-                consumer.accept(parsed);
-            }
+    public record UpdateConsumer<T>(Class<T> type, Consumer<? super SocketClient.KeyValuePair<T>> consumer) {
+    }
+
+
+    private <T> void on_update(SocketClient.KeyValuePair<String> keyValuePair) {
+        processUpdate(keyValuePair, keyValuePair.getKey());
+        if (update_consumers.containsKey(" ")) {
+            processUpdate(keyValuePair, " ");
         }
     }
+
+    private <T> void processUpdate(SocketClient.KeyValuePair<String> keyValuePair, String key) {
+        List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
+        for (UpdateConsumer<?> updateConsumer : consumers) {
+            UpdateConsumer<T> typedUpdateConsumer = (UpdateConsumer<T>) updateConsumer;
+            Consumer<? super SocketClient.KeyValuePair<T>> consumer = typedUpdateConsumer.consumer();
+            Class<T> type = typedUpdateConsumer.type();
+            T parsed = new Gson().fromJson(keyValuePair.getValue(), type);
+            consumer.accept(new SocketClient.KeyValuePair<>(keyValuePair.getKey(), parsed));
+        }
+    }
+
 
     public RequestAction<ResponseStatus> putRaw(String key, String value) {
         Utilities.validateKey(key);
@@ -143,9 +157,11 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_TABLES, key).parsed(), ArrayList.class);
     }
+
     public RequestAction<ArrayList<String>> getTables() {
         return getTables("");
     }
+
     public RequestAction<ResponseStatus> rebootServer() {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.REBOOT_SERVER).parsed(), ResponseStatus.class);
     }
@@ -168,7 +184,7 @@ public class XTablesClient {
                     long currentTime = System.nanoTime();
                     long networkLatency = Math.abs(currentTime - serverTime);
                     long roundTripLatency = Math.abs(currentTime - startTime);
-                    return new LatencyInfo(networkLatency/1e6, roundTripLatency/1e6);
+                    return new LatencyInfo(networkLatency / 1e6, roundTripLatency / 1e6);
                 } else {
                     return null;
                 }
@@ -178,8 +194,6 @@ public class XTablesClient {
 
     }
 
-    public record UpdateConsumer<T>(Class<T> type, Consumer<T> consumer) {
-    }
 
     public record LatencyInfo(double networkLatencyMS, double roundTripLatencyMS) {
     }

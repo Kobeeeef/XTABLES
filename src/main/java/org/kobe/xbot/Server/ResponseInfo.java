@@ -33,7 +33,7 @@ public class ResponseInfo {
     }
 
     public String parsed() {
-        return String.format("%1$s:%2$s %3$s", this.ID, this.method.toString(), this.response);
+        return String.format("%1$s:%2$s %3$s", this.ID, this.method.toString(), this.response.replaceAll("\n", ""));
     }
 
     public static ResponseInfo from(String raw) {

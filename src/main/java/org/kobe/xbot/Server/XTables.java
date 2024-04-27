@@ -84,10 +84,13 @@ public class XTables {
     }
 
     private void notifyClients(String key, String value) {
-        for (ClientHandler client : clients.stream().filter(clientHandler -> clientHandler.getUpdateEvents().contains(key)).toList()) {
-            client.sendUpdate(key, value);
+        for (ClientHandler client : clients) {
+            if (client.getUpdateEvents().contains("") || client.getUpdateEvents().contains(key)) {
+                client.sendUpdate(key, value);
+            }
         }
     }
+
 
     // Thread to handle each client connection
     private class ClientHandler extends Thread {
@@ -165,9 +168,19 @@ public class XTables {
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
                         out.println(responseInfo.parsed());
                         out.flush();
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
+                        boolean success = updateEvents.add("");
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
+                        out.println(responseInfo.parsed());
+                        out.flush();
                     } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_UPDATE)) {
                         String key = requestInfo.getTokens()[1];
                         boolean success = updateEvents.remove(key);
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_UPDATE)) {
+                        boolean success = updateEvents.remove("");
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
                         out.println(responseInfo.parsed());
                         out.flush();
