@@ -17,8 +17,8 @@ public class XTablesClient {
 
     private final CountDownLatch latch = new CountDownLatch(1);
 
-    public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT) {
-        this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000);
+    public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS) {
+        this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS);
         Thread thread = new Thread(() -> {
             client.connect();
             client.setUpdateConsumer(this::on_update);

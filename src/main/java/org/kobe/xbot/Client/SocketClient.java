@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 public class SocketClient {
     private final Logger logger = Logger.getLogger(SocketClient.class.getName());
-    private final ExecutorService executor = Executors.newFixedThreadPool(3);
+    private final ExecutorService executor;
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private final long RECONNECT_DELAY_MS;
@@ -49,11 +49,12 @@ public class SocketClient {
     private Socket socket;
     private Consumer<KeyValuePair<String>> updateConsumer;
 
-    public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS) {
+    public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS, int MAX_THREADS) {
         this.socket = null;
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         this.SERVER_PORT = SERVER_PORT;
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
+        this.executor = Executors.newFixedThreadPool(MAX_THREADS);
     }
 
 

@@ -12,12 +12,17 @@ public class Main {
 
     public static void main(String[] args) {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT);
+        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 3);
         // Thread blocks until connection is successful
 
         // Get raw JSON from server
         String response = client.getRawJSON().complete();
         System.out.println(response);
+
+        // Get latency from server
+        XTablesClient.LatencyInfo info = client.ping_latency().complete();
+        System.out.println("Network Latency: " + info.networkLatencyMS() + "ms");
+        System.out.println("Round Trip Latency: " + info.roundTripLatencyMS() + "ms");
 
         // -------- PUT VALUES --------
         // "OK" - Value updated
