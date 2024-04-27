@@ -1,3 +1,5 @@
+
+
 # XTablesClient Documentation
 
 `XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing and retrieving data in various formats. This document details the methods available in the `XTablesClient` class, including their synchronous and asynchronous usage.
@@ -11,6 +13,8 @@
     - `SERVER_PORT`: The port number on which the server is listening.
 
 ## Methods
+
+---
 
 ### Put Methods
 Store data on the server under a specified key.
@@ -91,6 +95,8 @@ Manage update subscriptions for specific keys.
 
 ## Usage Examples
 
+---
+
 ```java
 XTablesClient client = new XTablesClient("localhost", 1735);
 // Synchronous use
@@ -102,7 +108,8 @@ client.getInteger("session_id").queue(
 );
 
 // Subscribe to updates
-client.subscribeUpdateEvent("key", String.class, System.out::println);
+client.subscribeUpdateEvent("key", String.class, System.out::println)
+        .complete();
 
 // Define a consumer for update events
 Consumer<String> updateConsumer = update -> {
@@ -111,4 +118,7 @@ Consumer<String> updateConsumer = update -> {
 };
 
 // Subscribe to updates for a specific key
-RequestAction<String> subscription = client.subscribeUpdateEvent("key", String.class
+RequestAction<String> subscription = client.subscribeUpdateEvent("key", String.class, updateConsumer)
+        .complete();
+```
+---
