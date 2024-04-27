@@ -6,7 +6,7 @@
 
 - **XTablesClient(String SERVER_ADDRESS, int SERVER_PORT)**
   - Initializes a connection to the specified server address and port.
-  - **Parameters:**
+  - **Parameters**:
     - `SERVER_ADDRESS`: The IP address or hostname of the server.
     - `SERVER_PORT`: The port number on which the server is listening.
 
@@ -61,12 +61,19 @@ Retrieve data from the server using the specified key.
   - **Synchronous/Asynchronous**: Same as above.
 
 ### Subscription Methods
+Manage update subscriptions for specific keys.
+
 - **subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer)**
-  - Subscribes to updates for a specific key, invoking the provided consumer when updates are received.
+  - Subscribes to updates for a specific key, invoking the provided consumer when updates are received. Utilizes a hashmap to manage multiple consumers per key.
   - **Synchronous/Asynchronous**: Same as above.
 
 - **unsubscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer)**
-  - Unsubscribes from updates for a specific key.
+  - Unsubscribes from updates for a specific key by removing the consumer from the list.
+  - **Synchronous/Asynchronous**: Same as above.
+
+### Latency Measurement
+- **ping_latency()**
+  - Measures the network and round-trip latency in milliseconds.
   - **Synchronous/Asynchronous**: Same as above.
 
 ### Miscellaneous
@@ -104,6 +111,4 @@ Consumer<String> updateConsumer = update -> {
 };
 
 // Subscribe to updates for a specific key
-RequestAction<String> subscription = client.subscribeUpdateEvent("key", String.class, updateConsumer);
-// Unsubscribe after a certain condition is met
-subscription.complete();
+RequestAction<String> subscription = client.subscribeUpdateEvent("key", String.class
