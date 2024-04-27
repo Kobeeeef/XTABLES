@@ -1,10 +1,7 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
-import org.kobe.xbot.Server.MethodType;
-import org.kobe.xbot.Server.ResponseInfo;
-import org.kobe.xbot.Server.ResponseStatus;
-import org.kobe.xbot.Server.Utilities;
+import org.kobe.xbot.Server.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,28 +42,30 @@ public class XTablesClient {
              */
             @Override
             public void onResponse(ResponseStatus result) {
-                if(result.equals(ResponseStatus.OK)) {
+                if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                     consumers.add(new UpdateConsumer<>(type, consumer));
                 }
             }
         };
     }
+
     public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class){
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
             /**
              * When request was fully successful
              */
             @Override
             public void onResponse(ResponseStatus result) {
-                if(result.equals(ResponseStatus.OK)) {
+                if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                     consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
                 }
             }
         };
     }
+
     private <T> void on_update(SocketClient.KeyValuePair keyValuePair) {
         List<UpdateConsumer<?>> consumers = update_consumers.get(keyValuePair.getKey());
         for (UpdateConsumer<?> updateConsumer : consumers) {
@@ -143,16 +142,42 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_TABLES, key).parsed(), ArrayList.class);
     }
+
     public RequestAction<ResponseStatus> rebootServer() {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.REBOOT_SERVER).parsed(), ResponseStatus.class);
     }
+
     public <T> RequestAction<T> sendCustomMessage(MethodType method, String message, Class<T> type) {
         return new RequestAction<>(client, new ResponseInfo(null, method, message).parsed(), type);
     }
+
     public SocketClient getSocketClient() {
         return client;
     }
 
+    public RequestAction<LatencyInfo> ping_latency() {
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PING).parsed()) {
+            @Override
+            public LatencyInfo parseResponse(long startTime, Object result) {
+                RequestInfo info = new RequestInfo(result.toString());
+                if (info.getTokens().length == 2 && info.getTokens()[0].equals("OK")) {
+                    long serverTime = Long.parseLong(info.getTokens()[1]);
+                    long currentTime = System.nanoTime();
+                    long networkLatency = Math.abs(currentTime - serverTime);
+                    long roundTripLatency = Math.abs(currentTime - startTime);
+                    return new LatencyInfo(networkLatency/1e6, roundTripLatency/1e6);
+                } else {
+                    return null;
+                }
+
+            }
+        };
+
+    }
+
     public record UpdateConsumer<T>(Class<T> type, Consumer<T> consumer) {
+    }
+
+    public record LatencyInfo(double networkLatencyMS, double roundTripLatencyMS) {
     }
 }

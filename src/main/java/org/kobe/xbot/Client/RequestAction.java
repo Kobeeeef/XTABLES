@@ -24,10 +24,12 @@ public class RequestAction<T> {
     }
 
     public void queue(Consumer<T> onSuccess, Consumer<Throwable> onFailure) {
+        long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(t -> {
-                    onResponse(t);
-                    onSuccess.accept(t);
+                    T parsed = parseResponse(startTime, t);
+                    onResponse(parsed == null ? t : parsed);
+                    onSuccess.accept(parsed == null ? t : parsed);
                 })
                 .exceptionally(ex -> {
                     onFailure.accept(ex);
@@ -37,29 +39,41 @@ public class RequestAction<T> {
     }
 
     public void queue(Consumer<T> onSuccess) {
+        long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(t -> {
-            onResponse(t);
-            onSuccess.accept(t);
+            T parsed = parseResponse(startTime, t);
+            onResponse(parsed == null ? t : parsed);
+            onSuccess.accept(parsed == null ? t : parsed);
         });
     }
 
     public void queue() {
+        long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
-        future.thenAccept(this::onResponse);
+        future.thenAccept(t -> {
+            T parsed = parseResponse(startTime, t);
+            onResponse(parsed == null ? t : parsed);
+        });
     }
 
     public T complete() {
+        long startTime = System.nanoTime();
         try {
             T result = client.sendComplete(value, type);
-            onResponse(result);
-            return result;
+            T parsed = parseResponse(startTime, result);
+            onResponse(parsed == null ? result : parsed);
+            return parsed == null ? result : parsed;
         } catch (ExecutionException | TimeoutException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void onResponse(T result) {
+    }
+
+    public T parseResponse(long startTime, Object result) {
+        return null;
     }
 }
 

@@ -15,8 +15,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -103,21 +105,21 @@ public class SocketClient {
         long timeoutMillis = unit.toMillis(timeout);
 
         while (System.currentTimeMillis() - startTime < timeoutMillis) {
-                for (RequestInfo message : new ArrayList<>(MESSAGES)) {
-                    if (message.getID().equals(ID)) {
-                        return message;
-                    }
+            for (RequestInfo message : new ArrayList<>(MESSAGES)) {
+                if (message.getID().equals(ID)) {
+                    return message;
                 }
+            }
         }
         return null;
     }
-
 
 
     public RequestInfo sendMessageAndWaitForReply(ResponseInfo responseInfo, long timeout, TimeUnit unit) throws InterruptedException {
         sendMessage(responseInfo);
         return waitForMessage(responseInfo.getID(), timeout, unit);
     }
+
     public void sendMessage(ResponseInfo responseInfo) {
         out.println(responseInfo.parsed());
         out.flush();
@@ -153,8 +155,8 @@ public class SocketClient {
     private boolean isConnected() {
         boolean serverResponded = false;
         try {
-            RequestInfo info = sendMessageAndWaitForReply(new ResponseInfo(UUID.randomUUID().toString(), MethodType.PING), 2, TimeUnit.SECONDS);
-            if (info != null && info.getTokens()[1].equals("ACTIVE")) serverResponded = true;
+            RequestInfo info = sendMessageAndWaitForReply(new ResponseInfo(null, MethodType.PING), 2, TimeUnit.SECONDS);
+            if (info != null && info.getTokens()[1].equals("OK")) serverResponded = true;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -169,9 +171,9 @@ public class SocketClient {
         new Thread(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
-                if(requestInfo == null) throw new ClosedConnectionException();
+                if (requestInfo == null) throw new ClosedConnectionException();
                 String[] tokens = requestInfo.getTokens();
-                future.complete(String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)));
+                future.complete(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)));
             } catch (InterruptedException | ClosedConnectionException e) {
                 future.completeExceptionally(e);
             }
@@ -180,17 +182,16 @@ public class SocketClient {
     }
 
     public <T> CompletableFuture<T> sendAsync(String message, Type type) {
-        System.out.println("OK");
         CompletableFuture<T> future = new CompletableFuture<>();
         new Thread(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
-                if(requestInfo == null) throw new ClosedConnectionException();
+                if (requestInfo == null) throw new ClosedConnectionException();
                 String[] tokens = requestInfo.getTokens();
                 if (type == null) {
-                    future.complete((T) String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)));
+                    future.complete((T) String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)));
                 } else {
-                    T parsed = new Gson().fromJson(String.join(" ",Arrays.copyOfRange(tokens, 1, tokens.length)), type);
+                    T parsed = new Gson().fromJson(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)), type);
                     future.complete(parsed);
                 }
             } catch (InterruptedException | ClosedConnectionException e) {
@@ -202,12 +203,12 @@ public class SocketClient {
 
 
     public <T> T sendComplete(String message, Type type) throws ExecutionException, InterruptedException, TimeoutException {
-            String response = sendAsync(message).get(5, TimeUnit.SECONDS);
-            if (type == null) {
-                return (T) response;
-            } else {
-                return new Gson().fromJson(response, type);
-            }
+        String response = sendAsync(message).get(5, TimeUnit.SECONDS);
+        if (type == null) {
+            return (T) response;
+        } else {
+            return new Gson().fromJson(response, type);
+        }
     }
 
     public static class KeyValuePair {
