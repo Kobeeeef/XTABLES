@@ -126,6 +126,7 @@ public class XTables {
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
+                    System.out.println(inputLine);
                     RequestInfo requestInfo = new RequestInfo(inputLine);
                     totalMessages++;
                     if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
