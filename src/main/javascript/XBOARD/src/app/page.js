@@ -11,8 +11,8 @@ import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
 import {Toast} from 'primereact/toast';
 import {InputText} from "primereact/inputtext";
-const net = require('net');
-export default function RowExpansionDemo() {
+
+export default function Main() {
     const [products, setProducts] = useState([]);
     const [expandedRows, setExpandedRows] = useState(null);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -23,30 +23,6 @@ export default function RowExpansionDemo() {
         name: {value: null, matchMode: FilterMatchMode.STARTS_WITH},
         key: {value: null, matchMode: FilterMatchMode.STARTS_WITH}
     });
-    useEffect(() => {
-        const client = new net.Socket();
-
-        client.connect(1735, 'localhost', () => {
-            console.log('Connected to server');
-
-            // Send data to the server
-            client.write('Hello, server!');
-
-            // Handle data received from the server
-            client.on('data', (data) => {
-                console.log('Received data from server:', data.toString());
-            });
-
-            // Handle connection close
-            client.on('close', () => {
-                console.log('Connection closed');
-            });
-        });
-
-        client.on('error', (err) => {
-            console.error('Connection error:', err);
-        });
-    }, []);
 
     useEffect(() => {
         const originalJSON = {
@@ -75,9 +51,21 @@ export default function RowExpansionDemo() {
                 },
                 "value": "OK"
             },
+            "AnotherTaqble": {
+                "data": {
+                    "somevalue": {
+                        "value": Math.random()
+                    },
+                    "sometable": {
+                        "value": Math.random()
+                    }
+                },
+                "value": "OK"
+            },
         };
         let formatted = convertJSON(originalJSON);
-        setProducts([])
+        setProducts(formatted)
+        setLoading(false)
     }, []);
 
     function convertJSON(json) {
@@ -121,20 +109,25 @@ export default function RowExpansionDemo() {
     };
     const onCellEditComplete = (e) => {
         let {rowData, newValue, field, originalEvent: event} = e;
+
         if (field === "value") {
             let key = rowData.key;
+            toast.current.show({ severity: 'info', summary: 'Request Sent!', detail:newValue, life: 5000 })
         }
+        return true;
     }
+
     const rowExpansionTemplate = (data) => {
         return (
             <div className="p-3">
-                <DataTable value={data.data} editMode={"cell"} expandedRows={expandedRows}
+                <DataTable showGridlines value={data.data} editMode={"cell"} expandedRows={expandedRows}
                            onRowToggle={(e) => setExpandedRows(e.data)}
                            rowExpansionTemplate={rowExpansionTemplate}
-                           dataKey="key" tableStyle={{minWidth: '60rem'}}>
+                           dataKey="key">
                     <Column expander={allowExpansion} style={{width: '5rem'}}/>
                     <Column field="name" header="" sortable/>
-                    <Column field="value" header="" editor={textEditor} onCellEditComplete={onCellEditComplete}
+                    <Column field="value" header="" frozen={true} className="font-bold" editor={textEditor}
+                            onCellEditComplete={onCellEditComplete}
                             sortable/>
                 </DataTable>
             </div>
@@ -174,17 +167,19 @@ export default function RowExpansionDemo() {
     };
     const header = renderHeader();
     return (
-        <div className="card">
+        <div className="w-1/2 h-screen bg-gray-300">
             <Toast ref={toast}/>
-            <DataTable value={products} editMode={"cell"} globalFilterFields={['name', 'value']} filters={filters}
+            <DataTable value={products} showGridlines editMode={"cell"} globalFilterFields={['name', 'value']}
+                       filters={filters}
                        filterDisplay={"row"} expandedRows={expandedRows} loading={loading}
                        onRowToggle={(e) => setExpandedRows(e.data)}
                        rowExpansionTemplate={rowExpansionTemplate}
-                       dataKey="key" header={header} tableStyle={{minWidth: '60rem'}}
+                       dataKey="key" header={header} tableStyle={{minWidth: '15rem'}}
                        emptyMessage={"No Data Found"}>
                 <Column expander={allowExpansion} style={{width: '5rem'}}/>
                 <Column field="name" header="Name" sortable/>
-                <Column field="value" header="Value" editor={textEditor} onCellEditComplete={onCellEditComplete}
+                <Column field="value" header="Value" className="font-bold" frozen={true} editor={textEditor}
+                        onCellEditComplete={onCellEditComplete}
                         sortable/>
             </DataTable>
         </div>
