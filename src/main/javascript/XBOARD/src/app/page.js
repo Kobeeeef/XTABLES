@@ -11,6 +11,7 @@ import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
 import {Toast} from 'primereact/toast';
 import {InputText} from "primereact/inputtext";
+import {Client} from '@stomp/stompjs';
 
 export default function Main() {
     const [products, setProducts] = useState([]);
@@ -25,47 +26,25 @@ export default function Main() {
     });
 
     useEffect(() => {
-        const originalJSON = {
-            "SmartDashboard": {
-                "data": {
-                    "somevalue": {
-                        "value": "488",
-                        "data": {
-                            "anothersubtable": {"value": "488"}
-                        }
-                    },
-                    "sometable": {
-                        "value": "Some Value"
-                    }
-                },
-                "value": "OK"
-            },
-            "AnotherTable": {
-                "data": {
-                    "somevalue": {
-                        "value": Math.random()
-                    },
-                    "sometable": {
-                        "value": Math.random()
-                    }
-                },
-                "value": "OK"
-            },
-            "AnotherTaqble": {
-                "data": {
-                    "somevalue": {
-                        "value": Math.random()
-                    },
-                    "sometable": {
-                        "value": Math.random()
-                    }
-                },
-                "value": "OK"
-            },
-        };
-        let formatted = convertJSON(originalJSON);
-        setProducts(formatted)
-        setLoading(false)
+        function connect() {
+            const client = new Client({
+                brokerURL: 'ws://localhost:8080/websocket',
+                onConnect: () => {
+                    client.subscribe('/topic/update', message =>
+                        console.log(`Received: ${message.body}`)
+                    );
+                }
+            })
+            client.onDisconnect(() => {
+                console.log("Disconnected from client. Reconnecting")
+                client.deactivate({force: true}).then(r =>{
+                    return connect();
+                }) ;
+            })
+            client.activate();
+        }
+
+        connect();
     }, []);
 
     function convertJSON(json) {
@@ -112,7 +91,7 @@ export default function Main() {
 
         if (field === "value") {
             let key = rowData.key;
-            toast.current.show({ severity: 'info', summary: 'Request Sent!', detail:newValue, life: 5000 })
+            toast.current.show({severity: 'info', summary: 'Request Sent!', detail: newValue, life: 5000})
         }
         return true;
     }
@@ -174,6 +153,7 @@ export default function Main() {
                        filterDisplay={"row"} expandedRows={expandedRows} loading={loading}
                        onRowToggle={(e) => setExpandedRows(e.data)}
                        rowExpansionTemplate={rowExpansionTemplate}
+                       className={"w-full h-full"}
                        dataKey="key" header={header} tableStyle={{minWidth: '15rem'}}
                        emptyMessage={"No Data Found"}>
                 <Column expander={allowExpansion} style={{width: '5rem'}}/>
