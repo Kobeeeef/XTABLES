@@ -32,7 +32,7 @@ public class SocketClient {
         @Override
         public boolean add(RequestInfo requestInfo) {
             boolean added = super.add(requestInfo);
-            while (added && size() > 50) {
+            while (added && size() > 100) {
                 if (!hasLogged) {
                     logger.info("Dumping all old cached messages...");
                     hasLogged = true;
@@ -57,6 +57,9 @@ public class SocketClient {
         this.executor = Executors.newFixedThreadPool(MAX_THREADS);
     }
 
+    public List<RequestInfo> getMessages() {
+        return MESSAGES;
+    }
 
     public void setUpdateConsumer(Consumer<KeyValuePair<String>> updateConsumer) {
         this.updateConsumer = updateConsumer;
@@ -100,12 +103,13 @@ public class SocketClient {
                 while ((message = in.readLine()) != null) {
                     RequestInfo requestInfo = new RequestInfo(message);
                     MESSAGES.add(requestInfo);
-                    if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
+                    if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
                         String key = requestInfo.getTokens()[1];
                         String value = String.join(" ",Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (updateConsumer != null) {
                             KeyValuePair<String> keyValuePair = new KeyValuePair<>(key, value);
                             updateConsumer.accept(keyValuePair);
+                            MESSAGES.remove(requestInfo);
                         }
                     }
                 }
@@ -172,10 +176,9 @@ public class SocketClient {
     private boolean isConnected() {
         boolean serverResponded = false;
         try {
-            RequestInfo info = sendMessageAndWaitForReply(new ResponseInfo(null, MethodType.PING), 2, TimeUnit.SECONDS);
-            if (info != null && info.getTokens()[1].equals("OK")) serverResponded = true;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            sendMessage(new ResponseInfo(null, MethodType.PING));
+            serverResponded = true;
+        } catch (Exception ignored) {
         }
         boolean connected = socket != null && !socket.isClosed() && socket.isConnected() && serverResponded;
         this.isConnected = connected;

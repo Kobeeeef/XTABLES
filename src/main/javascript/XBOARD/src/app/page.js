@@ -11,41 +11,99 @@ import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
 import {Toast} from 'primereact/toast';
 import {InputText} from "primereact/inputtext";
-import {Client} from '@stomp/stompjs';
+import Terminal from "../Components/Terminal";
 
 export default function Main() {
+    const [rawJSON, setRawJSON] = useState({});
     const [products, setProducts] = useState([]);
     const [expandedRows, setExpandedRows] = useState(null);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const toast = useRef(null);
     const [loading, setLoading] = useState(true);
+    const [messages, setMessages] = useState(["Type \"help\" to begin."]);
     const [filters, setFilters] = useState({
         global: {value: null, matchMode: FilterMatchMode.CONTAINS},
         name: {value: null, matchMode: FilterMatchMode.STARTS_WITH},
         key: {value: null, matchMode: FilterMatchMode.STARTS_WITH}
     });
 
+
     useEffect(() => {
         function connect() {
-            const client = new Client({
-                brokerURL: 'ws://localhost:8080/websocket',
-                onConnect: () => {
-                    client.subscribe('/topic/update', message =>
-                        console.log(`Received: ${message.body}`)
-                    );
+            setLoading(true)
+            const socket = new WebSocket('ws://localhost:8080/websocket');
+
+            socket.onopen = () => {
+                setLoading(false)
+                console.log('WebSocket connection established');
+            }
+            socket.onmessage = (event) => {
+                //let formatted = convertJSON(originalJSON);
+                let parsed = JSON.parse(event.data);
+                let parsedValue = JSON.parse(parsed.value);
+                let type = parsed.type;
+                if (type === "ALL") {
+                    if (parsedValue == null) parsedValue = [];
+                    setRawJSON(parsedValue)
+                } else if (type === "UPDATE") {
+                    let key = parsedValue.key;
+                    let value = parsedValue.value;
+
+                    setRawJSON(prev => {
+                        console.log(prev)
+                        return editJSONObject(prev, key, value)
+                    });
+                } else if (type === "MESSAGES") {
+                    if (parsedValue.length > 0) {
+                        setMessages([...new Set(parsedValue)].reverse().slice(-20));
+                    }
                 }
-            })
-            client.onDisconnect(() => {
-                console.log("Disconnected from client. Reconnecting")
-                client.deactivate({force: true}).then(r =>{
-                    return connect();
-                }) ;
-            })
-            client.activate();
+
+            }
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                socket.close()
+            }
+            socket.onclose = () => {
+                setLoading(true)
+                console.log('WebSocket connection closed');
+                return connect();
+            }
         }
 
         connect();
     }, []);
+
+    function editJSONObject(obj, key, value) {
+        const keys = key.split('.');
+        let currentObj = JSON.parse(JSON.stringify(obj));
+
+        let temp = currentObj; // Keep a reference to the original object
+
+        for (let i = 0; i < keys.length; i++) {
+            const currentKey = keys[i];
+            if (!temp[currentKey]) {
+                // If the key doesn't exist, create a new object
+                temp[currentKey] = {};
+            }
+            if (i === keys.length - 1) {
+                // If it's the last key, update the value
+                temp[currentKey].value = value;
+            } else {
+                // If it's not the last key, traverse deeper into the object
+                if (!temp[currentKey].data) {
+                    temp[currentKey].data = {};
+                }
+                temp = temp[currentKey].data; // Update the reference to the current level
+            }
+        }
+
+        return currentObj; // Return the updated object
+    }
+
+    useEffect(() => {
+        setProducts(convertJSON(rawJSON));
+    }, [rawJSON]);
 
     function convertJSON(json) {
         const transformRecursively = (obj, parentKey = '') => {
@@ -102,7 +160,7 @@ export default function Main() {
                 <DataTable showGridlines value={data.data} editMode={"cell"} expandedRows={expandedRows}
                            onRowToggle={(e) => setExpandedRows(e.data)}
                            rowExpansionTemplate={rowExpansionTemplate}
-                           dataKey="key">
+                           dataKey="key" removableSort>
                     <Column expander={allowExpansion} style={{width: '5rem'}}/>
                     <Column field="name" header="" sortable/>
                     <Column field="value" header="" frozen={true} className="font-bold" editor={textEditor}
@@ -146,22 +204,45 @@ export default function Main() {
     };
     const header = renderHeader();
     return (
-        <div className="w-1/2 h-screen bg-gray-300">
-            <Toast ref={toast}/>
-            <DataTable value={products} showGridlines editMode={"cell"} globalFilterFields={['name', 'value']}
-                       filters={filters}
-                       filterDisplay={"row"} expandedRows={expandedRows} loading={loading}
-                       onRowToggle={(e) => setExpandedRows(e.data)}
-                       rowExpansionTemplate={rowExpansionTemplate}
-                       className={"w-full h-full"}
-                       dataKey="key" header={header} tableStyle={{minWidth: '15rem'}}
-                       emptyMessage={"No Data Found"}>
-                <Column expander={allowExpansion} style={{width: '5rem'}}/>
-                <Column field="name" header="Name" sortable/>
-                <Column field="value" header="Value" className="font-bold" frozen={true} editor={textEditor}
+        <div className="flex bg-gray-200">
+            <div className="w-1/2 h-screen">
+                <Toast ref={toast}/>
+                <DataTable
+                    value={products}
+                    showGridlines
+                    editMode="cell"
+                    globalFilterFields={['name', 'value']}
+                    filters={filters}
+                    removableSort
+                    filterDisplay="row"
+                    expandedRows={expandedRows}
+                    loading={loading}
+                    onRowToggle={(e) => setExpandedRows(e.data)}
+                    rowExpansionTemplate={rowExpansionTemplate}
+                    className="h-full w-full"
+                    dataKey="key"
+                    header={header}
+                    tableStyle={{minWidth: '15rem'}}
+                    emptyMessage="No Data Found"
+                >
+                    <Column expander={allowExpansion} style={{width: '5rem'}}/>
+                    <Column field="name" header="Name" sortable/>
+                    <Column
+                        field="value"
+                        header="Value"
+                        className="font-bold"
+                        frozen={true}
+                        editor={textEditor}
                         onCellEditComplete={onCellEditComplete}
-                        sortable/>
-            </DataTable>
+                        sortable
+                    />
+                </DataTable>
+            </div>
+            <div className="border-l border-2 border-gray-500"></div>
+            <div className="flex-1">
+                <Terminal initialOutput={messages}/>
+            </div>
         </div>
+
     );
 }

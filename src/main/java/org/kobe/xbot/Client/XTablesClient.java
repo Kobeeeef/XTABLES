@@ -101,7 +101,11 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class);
     }
-
+    public RequestAction<ResponseStatus> putString(String key, String value) {
+        Utilities.validateKey(key);
+        String parsedValue = gson.toJson(value);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
+    }
     public <T> RequestAction<ResponseStatus> putArray(String key, List<T> value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);

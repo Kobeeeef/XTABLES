@@ -228,6 +228,7 @@ public class XTables {
 
         public void sendUpdate(String key, String value) {
             out.println(new ResponseInfo(null, MethodType.UPDATE, key + " " + value).parsed());
+            out.flush();
         }
     }
 }

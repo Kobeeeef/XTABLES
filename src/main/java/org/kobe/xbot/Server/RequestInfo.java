@@ -8,7 +8,7 @@ public class RequestInfo {
     }
 
     public RequestInfo(String raw) {
-        this.raw = raw;
+        this.raw = raw.replaceAll("\n", "");
     }
     public String getID() {
         String[] requestTokens = getTokens()[0].split(":");

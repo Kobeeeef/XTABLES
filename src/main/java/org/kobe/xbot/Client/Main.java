@@ -8,11 +8,11 @@ import java.util.function.Consumer;
 
 public class Main {
     private static final String SERVER_ADDRESS = "localhost"; // Server address
-    private static final int SERVER_PORT = 1735; // Server port
+    private static final int SERVER_PORT = 488; // Server port
 
     public static void main(String[] args) {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 3);
+        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5);
         // Thread blocks until connection is successful
 
         // Get raw JSON from server
@@ -29,28 +29,28 @@ public class Main {
         // "FAIL" - Failed to update
 
         // Put a string value into server
-        ResponseStatus status = client.putRaw("SmartDashboard", "Some Value").complete();
+        ResponseStatus status = client.putString("SmartDashboard", "Some Value" + Math.random()).complete();
         System.out.println(status);
 
         // Put a string value into a sub table
-        status = client.putRaw("SmartDashboard.sometable", "Some Value").complete();
+        status = client.putString("SmartDashboard.sometable", "Some Value").complete();
         System.out.println(status);
 
         // Put a string value into server asynchronously
-        client.putRaw("SmartDashboard", "Some Value").queue();
+        client.putString("SmartDashboard", "Some Value").queue();
 
         // Put a string value into server asynchronously with response
-        client.putRaw("SmartDashboard", "Some Value").queue(System.out::println);
+        client.putString("SmartDashboard", "Some Value").queue(System.out::println);
 
         // Put a string value into server asynchronously with response & fail
-        client.putRaw("SmartDashboard", "Some Value").queue(System.out::println, System.err::println);
+        client.putString("SmartDashboard", "Some Value").queue(System.out::println, System.err::println);
 
         // Put an object value into server thread block
         status = client.putObject("SmartDashboard", new String("OK")).complete();
         System.out.println(status);
 
         // Put an integer value on sub table  asynchronously
-        client.putInteger("SmartDashboard.somevalue", 488).queue();
+        client.putInteger("SmartDashboard.somevalue.awdwadawd", 488).queue();
 
         // -------- GET VALUES --------
         // value - Value retrieved
