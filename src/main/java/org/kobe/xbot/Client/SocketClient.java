@@ -5,6 +5,7 @@ import com.sun.jdi.connect.spi.ClosedConnectionException;
 import org.kobe.xbot.Server.MethodType;
 import org.kobe.xbot.Server.RequestInfo;
 import org.kobe.xbot.Server.ResponseInfo;
+import org.kobe.xbot.Server.ResponseStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -77,11 +78,15 @@ public class SocketClient {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 logger.info(String.format("Connected to server: %1$s:%2$s", SERVER_ADDRESS, SERVER_PORT));
-                xTablesClient.completeAll(xTablesClient.resubscribeToAllUpdateEvents());
                 socketExecutor.shutdownNow();
                 socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
-                socketExecutor.execute(new ClientMessageListener(socket));
-                socketExecutor.execute(this::auto_reconnect);
+                socketExecutor.submit(new ClientMessageListener(socket));
+                List<RequestAction<ResponseStatus>> requestActions = xTablesClient.resubscribeToAllUpdateEvents();
+                if (!requestActions.isEmpty()) {
+                    logger.info("Resubscribing to all previously submitted update events.");
+                    xTablesClient.queueAll(requestActions);
+                    logger.info("Queued " + requestActions.size() + " subscriptions successfully!");
+                }
                 break;
             } catch (IOException e) {
                 logger.warning("Failed to connect to server. Retrying...");
@@ -121,6 +126,8 @@ public class SocketClient {
                 }
             } catch (IOException e) {
                 System.err.println("Error reading message from server: " + e.getMessage());
+                logger.warning("Disconnected from the server. Reconnecting...");
+                reconnect();
             }
 
         }
@@ -152,30 +159,14 @@ public class SocketClient {
         out.flush();
     }
 
-    private void auto_reconnect() {
-        final long INITIAL_DELAY_MS = 1000;
-        final long MAX_DELAY_MS = 120000;
-        long delay = INITIAL_DELAY_MS;
-
-        while (true) {
-            if (!isConnected()) {
-                logger.warning("Disconnected from the server. Reconnecting...");
-                try {
-                    socket.close();
-                } catch (Exception ignored) {
-                }
-                this.connect();
-                delay = Math.min(delay * 2, MAX_DELAY_MS);
-            } else {
-                delay = INITIAL_DELAY_MS;
-            }
-            try {
-                TimeUnit.MILLISECONDS.sleep(delay);
-            } catch (InterruptedException e) {
-                logger.severe("Failed to connect to server. Exiting...");
-                Thread.currentThread().interrupt();
-            }
+    private void reconnect() {
+        try {
+            socket.close();
+        } catch (Exception ignored) {
         }
+        this.connect();
+
+
     }
 
 
@@ -186,8 +177,8 @@ public class SocketClient {
     private boolean isConnected() {
         boolean serverResponded = false;
         try {
-            sendMessage(new ResponseInfo(null, MethodType.PING));
-            serverResponded = true;
+            RequestInfo info = sendMessageAndWaitForReply(new ResponseInfo(null, MethodType.PING), 3, TimeUnit.SECONDS);
+            serverResponded = info != null;
         } catch (Exception ignored) {
         }
         boolean connected = socket != null && !socket.isClosed() && socket.isConnected() && serverResponded;
@@ -198,7 +189,7 @@ public class SocketClient {
 
     public CompletableFuture<String> sendAsync(String message) {
         CompletableFuture<String> future = new CompletableFuture<>();
-        executor.execute(() -> {
+        executor.submit(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
                 if (requestInfo == null) throw new ClosedConnectionException();
@@ -233,7 +224,7 @@ public class SocketClient {
 
 
     public <T> T sendComplete(String message, Type type) throws ExecutionException, InterruptedException, TimeoutException {
-        String response = sendAsync(message).get(5, TimeUnit.SECONDS);
+        String response = sendAsync(message).get(3, TimeUnit.SECONDS);
         if (type == null) {
             return (T) response;
         } else {

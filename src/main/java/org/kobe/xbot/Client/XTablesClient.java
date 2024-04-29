@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 
 public class XTablesClient {
@@ -60,12 +59,19 @@ public class XTablesClient {
         }
         return all;
     }
-    public <T> List<T> completeAll(List<RequestAction<T>> requestActions) {
-        return requestActions.stream()
-                .map(RequestAction::complete)
-                .collect(Collectors.toList());
+    public <T>  List<T> completeAll(List<RequestAction<T>> requestActions) {
+        List<T> responses = new ArrayList<>();
+        for(RequestAction<T> requestAction : requestActions) {
+            T response = requestAction.complete();
+            responses.add(response);
+        }
+        return responses;
     }
-
+    public <T> void queueAll(List<RequestAction<T>> requestActions) {
+        for(RequestAction<T> requestAction : requestActions) {
+            requestAction.queue();
+        }
+    }
     public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         String key = " ";
         return subscribeUpdateEventNoCheck(key, type, consumer);
