@@ -78,7 +78,6 @@ public class Main {
                 )
                 .complete();
 
-
         // Define a consumer for update events
         Consumer<SocketClient.KeyValuePair<String>> updateConsumer = update -> {
             System.out.println("Update received: " + update);

@@ -24,6 +24,7 @@ public class RequestAction<T> {
     }
 
     public void queue(Consumer<T> onSuccess, Consumer<Throwable> onFailure) {
+        if (doNotRun()) return;
         long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(t -> {
@@ -39,6 +40,7 @@ public class RequestAction<T> {
     }
 
     public void queue(Consumer<T> onSuccess) {
+        if (doNotRun()) return;
         long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(t -> {
@@ -49,6 +51,7 @@ public class RequestAction<T> {
     }
 
     public void queue() {
+        if (doNotRun()) return;
         long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(t -> {
@@ -58,6 +61,7 @@ public class RequestAction<T> {
     }
 
     public T complete() {
+        if (doNotRun()) return null;
         long startTime = System.nanoTime();
         try {
             T result = client.sendComplete(value, type);
@@ -70,6 +74,9 @@ public class RequestAction<T> {
     }
 
     public void onResponse(T result) {
+    }
+    public boolean doNotRun(){
+        return false;
     }
 
     public T parseResponse(long startTime, Object result) {

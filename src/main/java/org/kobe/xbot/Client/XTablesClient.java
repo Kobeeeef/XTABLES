@@ -85,11 +85,40 @@ public class XTablesClient {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                     consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                    if(consumers.isEmpty()) {
+                        update_consumers.remove(key);
+                    }
                 }
+            }
+            @Override
+            public boolean doNotRun(){
+                List<UpdateConsumer<?>> consumers = new ArrayList<>(update_consumers.computeIfAbsent(key, k -> new ArrayList<>()));
+                consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                return !consumers.isEmpty();
             }
         };
     }
-
+    public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
+        String key = " ";
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
+            @Override
+            public void onResponse(ResponseStatus result) {
+                if (result.equals(ResponseStatus.OK)) {
+                    List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
+                    consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                    if(consumers.isEmpty()) {
+                        update_consumers.remove(key);
+                    }
+                }
+            }
+            @Override
+            public boolean doNotRun(){
+                List<UpdateConsumer<?>> consumers = new ArrayList<>(update_consumers.computeIfAbsent(key, k -> new ArrayList<>()));
+                consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                return !consumers.isEmpty();
+            }
+        };
+    }
     public record UpdateConsumer<T>(Class<T> type, Consumer<? super SocketClient.KeyValuePair<T>> consumer) {
     }
 
