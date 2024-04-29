@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 
 public class XTablesClient {
@@ -18,7 +19,7 @@ public class XTablesClient {
     private final CountDownLatch latch = new CountDownLatch(1);
 
     public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS) {
-        this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS);
+        this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS, this);
         Thread thread = new Thread(() -> {
             client.connect();
             client.setUpdateConsumer(this::on_update);
@@ -33,10 +34,14 @@ public class XTablesClient {
         }
     }
 
-    private final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
+    public static final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
 
     public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         Utilities.validateKey(key);
+        return subscribeUpdateEventNoCheck(key, type, consumer);
+    }
+
+    private <T> RequestAction<ResponseStatus> subscribeUpdateEventNoCheck(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
             @Override
             public void onResponse(ResponseStatus result) {
@@ -48,17 +53,22 @@ public class XTablesClient {
         };
     }
 
+    public List<RequestAction<ResponseStatus>> resubscribeToAllUpdateEvents() {
+        List<RequestAction<ResponseStatus>> all = new ArrayList<>();
+        for(String key : update_consumers.keySet()) {
+            all.add(new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class));
+        }
+        return all;
+    }
+    public <T> List<T> completeAll(List<RequestAction<T>> requestActions) {
+        return requestActions.stream()
+                .map(RequestAction::complete)
+                .collect(Collectors.toList());
+    }
+
     public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         String key = " ";
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
-            @Override
-            public void onResponse(ResponseStatus result) {
-                if (result.equals(ResponseStatus.OK)) {
-                    List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
-                    consumers.add(new UpdateConsumer<>(type, consumer));
-                }
-            }
-        };
+        return subscribeUpdateEventNoCheck(key, type, consumer);
     }
 
     public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
@@ -101,11 +111,13 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class);
     }
+
     public RequestAction<ResponseStatus> putString(String key, String value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
+
     public <T> RequestAction<ResponseStatus> putArray(String key, List<T> value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);

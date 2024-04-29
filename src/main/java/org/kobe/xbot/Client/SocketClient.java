@@ -22,15 +22,16 @@ import java.util.logging.Logger;
 public class SocketClient {
     private final Logger logger = Logger.getLogger(SocketClient.class.getName());
     private final ExecutorService executor;
+    private ThreadPoolExecutor socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private final long RECONNECT_DELAY_MS;
     private static final List<RequestInfo> MESSAGES = new ArrayList<>() {
         private final Logger logger = Logger.getLogger(ArrayList.class.getName());
-        private boolean hasLogged = false;
 
         @Override
         public boolean add(RequestInfo requestInfo) {
+            boolean hasLogged = false;
             boolean added = super.add(requestInfo);
             while (added && size() > 100) {
                 if (!hasLogged) {
@@ -48,13 +49,15 @@ public class SocketClient {
     private BufferedReader in = null;
     private Socket socket;
     private Consumer<KeyValuePair<String>> updateConsumer;
+    private final XTablesClient xTablesClient;
 
-    public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS, int MAX_THREADS) {
+    public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS, int MAX_THREADS, XTablesClient xTablesClient) {
         this.socket = null;
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         this.SERVER_PORT = SERVER_PORT;
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
         this.executor = Executors.newFixedThreadPool(MAX_THREADS);
+        this.xTablesClient = xTablesClient;
     }
 
     public List<RequestInfo> getMessages() {
@@ -74,9 +77,11 @@ public class SocketClient {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 logger.info(String.format("Connected to server: %1$s:%2$s", SERVER_ADDRESS, SERVER_PORT));
-                new ClientMessageListener(socket).start();
-                new Thread(this::auto_reconnect).start();
-
+                xTablesClient.completeAll(xTablesClient.resubscribeToAllUpdateEvents());
+                socketExecutor.shutdownNow();
+                socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
+                socketExecutor.execute(new ClientMessageListener(socket));
+                socketExecutor.execute(this::auto_reconnect);
                 break;
             } catch (IOException e) {
                 logger.warning("Failed to connect to server. Retrying...");
@@ -90,13 +95,14 @@ public class SocketClient {
         }
     }
 
-    public class ClientMessageListener extends Thread {
+    public class ClientMessageListener implements Runnable {
         private final Socket socket;
 
         public ClientMessageListener(Socket socket) {
             this.socket = socket;
         }
 
+        @Override
         public void run() {
             try {
                 String message;
@@ -105,7 +111,7 @@ public class SocketClient {
                     MESSAGES.add(requestInfo);
                     if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
                         String key = requestInfo.getTokens()[1];
-                        String value = String.join(" ",Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
+                        String value = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (updateConsumer != null) {
                             KeyValuePair<String> keyValuePair = new KeyValuePair<>(key, value);
                             updateConsumer.accept(keyValuePair);
@@ -154,6 +160,10 @@ public class SocketClient {
         while (true) {
             if (!isConnected()) {
                 logger.warning("Disconnected from the server. Reconnecting...");
+                try {
+                    socket.close();
+                } catch (Exception ignored) {
+                }
                 this.connect();
                 delay = Math.min(delay * 2, MAX_DELAY_MS);
             } else {
@@ -188,7 +198,7 @@ public class SocketClient {
 
     public CompletableFuture<String> sendAsync(String message) {
         CompletableFuture<String> future = new CompletableFuture<>();
-        executor.submit(() -> {
+        executor.execute(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
                 if (requestInfo == null) throw new ClosedConnectionException();
@@ -203,7 +213,7 @@ public class SocketClient {
 
     public <T> CompletableFuture<T> sendAsync(String message, Type type) {
         CompletableFuture<T> future = new CompletableFuture<>();
-        executor.submit(() -> {
+        executor.execute(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
                 if (requestInfo == null) throw new ClosedConnectionException();
