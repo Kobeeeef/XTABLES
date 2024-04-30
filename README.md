@@ -1,28 +1,29 @@
-
-
 # XTablesClient Documentation
 
-`XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing and retrieving data in various formats. This document details the methods available in the `XTablesClient` class, including their synchronous and asynchronous usage.
+`XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing, retrieving, and managing data updates in various formats. This document details the methods available in the `XTablesClient` class, including their synchronous and asynchronous usage.
 
 ## Constructor
 
-- **XTablesClient(String SERVER_ADDRESS, int SERVER_PORT)**
-  - Initializes a connection to the specified server address and port.
+- **XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS)**
+  - Initializes a connection to the specified server address and port with support for multithreading.
   - **Parameters**:
     - `SERVER_ADDRESS`: The IP address or hostname of the server.
     - `SERVER_PORT`: The port number on which the server is listening.
+    - `MAX_THREADS`: The maximum number of threads to handle concurrent operations.
 
 ## Methods
-
----
 
 ### Put Methods
 Store data on the server under a specified key.
 
 - **putRaw(String key, String value)**
   - Stores a raw string under the given key.
-  - **Synchronous**: `complete()` blocks until the operation is completed, with a timeout of 5 seconds.
-  - **Asynchronous**: `queue()` accepts success and failure callbacks.
+  - **Synchronous**: `complete()` returns the operation result.
+  - **Asynchronous**: `queue()` initiates the operation without blocking.
+
+- **putString(String key, String value)**
+  - Stores a string value after converting it to JSON format.
+  - **Synchronous/Asynchronous**: Same as above.
 
 - **putArray(String key, List<T> value)**
   - Stores an array under the given key, serialized to JSON format.
@@ -67,22 +68,22 @@ Retrieve data from the server using the specified key.
 ### Subscription Methods
 Manage update subscriptions for specific keys.
 
-- **subscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer)**
+- **subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer)**
   - Subscribes to updates for a specific key, invoking the provided consumer when updates are received. Utilizes a hashmap to manage multiple consumers per key.
   - **Synchronous/Asynchronous**: Same as above.
 
-- **unsubscribeUpdateEvent(String key, Class<T> type, Consumer<T> consumer)**
+- **unsubscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer)**
   - Unsubscribes from updates for a specific key by removing the consumer from the list.
   - **Synchronous/Asynchronous**: Same as above.
 
 ### Latency Measurement
 - **ping_latency()**
   - Measures the network and round-trip latency in milliseconds.
-  - **Synchronous/Asynchronous**: Same as above.
+  - **Synchronous**: Returns latency information.
 
 ### Miscellaneous
 - **getTables(String key)**
-  - Retrieves a list of table names or similar structures.
+  - Retrieves a list of table names or similar structures using the specified key.
   - **Synchronous/Asynchronous**: Same as above.
 
 - **sendCustomMessage(MethodType method, String message, Class<T> type)**
@@ -90,15 +91,13 @@ Manage update subscriptions for specific keys.
   - **Synchronous/Asynchronous**: Same as above.
 
 - **rebootServer()**
-  - Reboots the server after 3 seconds of the request.
+  - Sends a command to reboot the server, effective after 3 seconds of the request.
   - **Synchronous/Asynchronous**: Same as above.
 
 ## Usage Examples
 
----
-
 ```java
-XTablesClient client = new XTablesClient("localhost", 1735);
+XTablesClient client = new XTablesClient("localhost", 1735, 10);
 // Synchronous use
 client.putInteger("session_id", 1001).complete();
 // Asynchronous use
@@ -107,18 +106,19 @@ client.getInteger("session_id").queue(
     error -> System.err.println("Error retrieving session ID")
 );
 
-// Subscribe to updates
-client.subscribeUpdateEvent("key", String.class, System.out::println)
+// Subscribe to
+
+ updates
+client.subscribeUpdateEvent("key", String.class, kv -> System.out.println("Update received: " + kv.getValue()))
         .complete();
 
 // Define a consumer for update events
-Consumer<String> updateConsumer = update -> {
+Consumer<SocketClient.KeyValuePair<String>> updateConsumer = kv -> {
     // Handle update
-    System.out.println("Update received: " + update);
+    System.out.println("Update received: " + kv.getValue());
 };
 
 // Subscribe to updates for a specific key
-RequestAction<String> subscription = client.subscribeUpdateEvent("key", String.class, updateConsumer)
+RequestAction<ResponseStatus> subscription = client.subscribeUpdateEvent("key", String.class, updateConsumer)
         .complete();
 ```
----
