@@ -16,6 +16,10 @@ import validateKey from '../Utilities/KeyValidator'
 import {Terminal} from 'primereact/terminal';
 import {TerminalService} from 'primereact/terminalservice';
 
+import { Menubar } from 'primereact/menubar';
+
+import { Splitter, SplitterPanel } from 'primereact/splitter';
+
 import {BlockUI} from 'primereact/blockui';
 
 export default function Main() {
@@ -33,7 +37,7 @@ export default function Main() {
         key: {value: null, matchMode: FilterMatchMode.STARTS_WITH}
     });
 
-    const helpMessage = `Available Commands: - clear: Clear the terminal screen. - put {key} {value}: Update a specific key value. - get {key}: Retrieve a value from the server. - refresh: Retrieves all data from server to refresh. - help: Show available commands and their descriptions.
+    const helpMessage = `Available Commands: - clear: Clear the terminal screen. - put {key} {value}: Update a specific key value. - get {key}: Retrieve a value from the server. - sync: Syncs all data from server to refresh. - help: Show available commands and their descriptions.
 `;
     useEffect(() => {
         function connect() {
@@ -97,8 +101,18 @@ export default function Main() {
                     } else if (validateKey(tokens[1]) !== null) {
                         TerminalService.emit('response', validateKey(tokens[1]));
                     } else {
-                        socket.send(JSON.stringify({type: "UPDATE", value: tokens.slice(2).join(" "), key: tokens[1]}));
-                        TerminalService.emit('response', "PUT command sent!");
+                        setLoading(true)
+                        TerminalService.emit('response', "Sending put request...");
+                        sendMessageAndWaitForCondition({type: "UPDATE", value: tokens.slice(2).join(" "), key: tokens[1]}, (response) =>
+                            response.type === "UPDATE_RESPONSE"
+                        ).then(response => {
+                            setLoading(false)
+                            let value = response.value;
+                            TerminalService.emit('response', "Server responded with: " + value);
+                        }).catch(error => {
+                            setLoading(false)
+                            TerminalService.emit('response', "Failed to put data: " + error);
+                        });
                     }
                     break;
                 case 'get':
@@ -107,20 +121,32 @@ export default function Main() {
                     } else if (validateKey(tokens[1]) !== null) {
                         TerminalService.emit('response', validateKey(tokens[1]));
                     } else {
-                        TerminalService.emit('response', "Sending request...");
+                        setLoading(true)
+                        TerminalService.emit('response', "Sending get request...");
                         sendMessageAndWaitForCondition({type: "GET", key: tokens[1]}, (response) =>
                             response.type === "GET"
                         ).then(response => {
+                            setLoading(false)
                             let value = response.value;
                             TerminalService.emit('response', "" + value);
                         }).catch(error => {
+                            setLoading(false)
                             TerminalService.emit('response', "Failed to get data: " + error);
                         });
                     }
                     break;
-                case 'refresh':
-                    socket.send(JSON.stringify({type: "ALL"}));
-                    TerminalService.emit('response', "Refresh message sent!");
+                case 'sync':
+                    setLoading(true)
+                    TerminalService.emit('response', "Syncing data...");
+                    sendMessageAndWaitForCondition({type: "ALL"}, (response) =>
+                        response.type === "ALL"
+                    ).then(response => {
+                        setLoading(false)
+                        TerminalService.emit('response', "Data synced!");
+                    }).catch(error => {
+                        setLoading(false)
+                        TerminalService.emit('response', "Failed to sync data: " + error);
+                    });
                     break;
                 default:
                     TerminalService.emit('response', 'Unknown command: ' + command);
@@ -296,58 +322,86 @@ const renderHeader = () => {
 };
 const header = renderHeader();
 return (
-    <BlockUI blocked={loading}>
-        <div className="flex bg-gray-200">
-            <div className="w-1/2 h-screen">
-                <Toast ref={toast} position="bottom-center"/>
-                <DataTable
-                    value={products}
-                    showGridlines
-                    editMode="cell"
-                    globalFilterFields={['name', 'value']}
-                    filters={filters}
-                    removableSort
-                    filterDisplay="row"
-                    expandedRows={expandedRows}
-                    loading={loading}
-                    onRowToggle={(e) => setExpandedRows(e.data)}
-                    rowExpansionTemplate={rowExpansionTemplate}
-                    className="h-screen w-full"
-                    dataKey="key"
-                    header={header}
-                    scrollable
-                    scrollHeight={"80vh"}
-                    tableStyle={{minWidth: '15rem'}}
-                    emptyMessage="No Data Found"
-                >
-                    <Column expander={allowExpansion} style={{width: '5rem'}}/>
-                    <Column field="name" header="Name" sortable/>
-                    <Column
-                        field="value"
-                        header="Value"
-                        className="font-bold"
-                        frozen={true}
-                        editor={textEditor}
-                        onCellEditComplete={onCellEditComplete}
-                        sortable
+    <BlockUI blocked={loading} screenFill>
+        <Toast ref={toast} position="bottom-center"/>
+            <div className="flex bg-gray-200">
+                <Menubar model={[{
+                    label: 'Sync',
+                    icon: 'pi pi-sync',
+                    command: () => {
+                        setLoading(true)
+                        socket.send(JSON.stringify({type: "ALL"}));
+                        sendMessageAndWaitForCondition({type: "ALL"}, (a) => a.type === "ALL").then((a) => {
+                            setLoading(false)
+                            toast.current.show({
+                                severity: 'info',
+                                summary: 'Data Synced!',
+                                detail: "The data was synced!",
+                                life: 3000
+                            })
+                        }).catch((e) => {
+                            setLoading(false)
+                            toast.current.show({
+                                severity: 'error',
+                                summary: 'Failed To Sync!',
+                                detail: "The data could not be synced!",
+                                life: 3000
+                            })
+                        });
+                    }
+                },]}/>
+                <Splitter step={10} className={"w-screen"}>
+                    <SplitterPanel size={60} className="flex align-items-center justify-content-center">
+                    <DataTable
+                        value={products}
+                        showGridlines
+                        editMode="cell"
+                        globalFilterFields={['name', 'value']}
+                        filters={filters}
+                        removableSort
+                        filterDisplay="row"
+                        expandedRows={expandedRows}
+                        loading={loading}
+                        onRowToggle={(e) => setExpandedRows(e.data)}
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        className="h-screen w-full"
+                        dataKey="key"
+                        header={header}
+                        scrollable
+                        scrollHeight={"80vh"}
+                        tableStyle={{minWidth: '15rem'}}
+                        emptyMessage="No Data Found"
+                    >
+                        <Column expander={allowExpansion} style={{width: '5rem'}}/>
+                        <Column field="name" header="Name" sortable/>
+                        <Column
+                            field="value"
+                            header="Value"
+                            className="font-bold"
+                            frozen={true}
+                            editor={textEditor}
+                            onCellEditComplete={onCellEditComplete}
+                            sortable
+                        />
+                    </DataTable>
+                    </SplitterPanel>
+                    <SplitterPanel size={40} className="flex-1 align-items-center justify-content-center">
+                <div className="flex-1">
+                    <Terminal
+                        welcomeMessage="Welcome to XBOARD! Type help to begin."
+                        prompt="XTABLES $"
+                        pt={{
+                            root: 'bg-gray-900 text-white border-round h-[50vh]',
+                            prompt: 'text-gray-400 mr-2',
+                            command: 'text-primary-300',
+                            response: 'text-primary-300'
+                        }}
                     />
-                </DataTable>
+                    <Logs initialOutput={messages}></Logs>
+                </div>
+                </SplitterPanel>
+                </Splitter>
             </div>
-            <div className="border-l border-2 border-gray-500"></div>
-            <div className="flex-1">
-                <Terminal
-                    welcomeMessage="Welcome to XBOARD! Type help to begin."
-                    prompt="XTABLES $"
-                    pt={{
-                        root: 'bg-gray-900 text-white border-round h-[50vh]',
-                        prompt: 'text-gray-400 mr-2',
-                        command: 'text-primary-300',
-                        response: 'text-primary-300'
-                    }}
-                />
-                <Logs initialOutput={messages}></Logs>
-            </div>
-        </div>
     </BlockUI>
 );
 }

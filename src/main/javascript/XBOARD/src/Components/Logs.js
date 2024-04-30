@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './Terminal.css'; // Import CSS file with terminal styles
+import React, {useState, useEffect, useRef} from 'react';
 
-const Logs = ({ initialOutput }) => {
+
+const Logs = ({initialOutput}) => {
     const [terminalOutput, setTerminalOutput] = useState('');
     const terminalOutputRef = useRef(null);
 
@@ -15,11 +15,10 @@ const Logs = ({ initialOutput }) => {
     }, [initialOutput]);
 
 
-
     return (
-        <div className="terminal border border-black p-4 w-full h-[50vh] overflow-auto" ref={terminalOutputRef}>
-            <pre>{terminalOutput}</pre>
-            <pre className="terminal-input-output"></pre>
+
+        <div className="border border-black p-4 w-full h-[50vh]" ref={terminalOutputRef}>
+            <pre className={"absolute"}>{terminalOutput}</pre>
         </div>
     );
 };

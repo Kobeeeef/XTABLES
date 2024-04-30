@@ -27,6 +27,7 @@ public class SocketClient {
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
     private long RECONNECT_DELAY_MS;
+    private boolean CLEAR_UPDATE_MESSAGES = true;
     private static final List<RequestInfo> MESSAGES = new ArrayList<>() {
         private final Logger logger = Logger.getLogger(ArrayList.class.getName());
 
@@ -76,6 +77,15 @@ public class SocketClient {
 
     public void setUpdateConsumer(Consumer<KeyValuePair<String>> updateConsumer) {
         this.updateConsumer = updateConsumer;
+    }
+
+    public boolean isCLEAR_UPDATE_MESSAGES() {
+        return CLEAR_UPDATE_MESSAGES;
+    }
+
+    public SocketClient setCLEAR_UPDATE_MESSAGES(boolean CLEAR_UPDATE_MESSAGES) {
+        this.CLEAR_UPDATE_MESSAGES = CLEAR_UPDATE_MESSAGES;
+        return this;
     }
 
     public void connect() {
@@ -129,7 +139,7 @@ public class SocketClient {
                         if (updateConsumer != null) {
                             KeyValuePair<String> keyValuePair = new KeyValuePair<>(key, value);
                             updateConsumer.accept(keyValuePair);
-                            MESSAGES.remove(requestInfo);
+                            if (CLEAR_UPDATE_MESSAGES) MESSAGES.remove(requestInfo);
                         }
                     }
                 }
