@@ -1,7 +1,7 @@
 package org.kobe.xbot.Client;
 // EXAMPLE SETUP
 
-import org.kobe.xbot.Server.ResponseStatus;
+import org.kobe.xbot.Utilites.ResponseStatus;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,7 +29,7 @@ public class Main {
         // "FAIL" - Failed to update
 
         // Put a string value into server
-        ResponseStatus status = client.putString("SmartDashboard", "Some Value" + Math.random()).complete();
+        ResponseStatus status = client.putString("SmartDashboard", "Some Value1" + Math.random()).complete();
         System.out.println(status);
 
         // Put a string value into a sub table

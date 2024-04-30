@@ -1,4 +1,6 @@
-package org.kobe.xbot.Server;
+package org.kobe.xbot.Utilites;
+
+import org.kobe.xbot.Utilites.MethodType;
 
 public class RequestInfo {
     private final String raw;

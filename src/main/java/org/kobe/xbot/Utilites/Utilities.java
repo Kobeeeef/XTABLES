@@ -1,4 +1,4 @@
-package org.kobe.xbot.Server;
+package org.kobe.xbot.Utilites;
 
 public class Utilities {
     public static boolean validateKey(String key) {

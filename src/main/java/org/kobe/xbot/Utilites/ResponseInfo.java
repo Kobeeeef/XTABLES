@@ -1,4 +1,4 @@
-package org.kobe.xbot.Server;
+package org.kobe.xbot.Utilites;
 
 import java.util.Arrays;
 import java.util.UUID;

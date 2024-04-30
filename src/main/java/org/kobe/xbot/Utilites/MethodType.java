@@ -1,4 +1,4 @@
-package org.kobe.xbot.Server;
+package org.kobe.xbot.Utilites;
 
 public enum MethodType {
     GET,

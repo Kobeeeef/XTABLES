@@ -1,7 +1,7 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
-import org.kobe.xbot.Server.*;
+import org.kobe.xbot.Utilites.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

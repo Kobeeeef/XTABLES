@@ -2,10 +2,10 @@ package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
 import com.sun.jdi.connect.spi.ClosedConnectionException;
-import org.kobe.xbot.Server.MethodType;
-import org.kobe.xbot.Server.RequestInfo;
-import org.kobe.xbot.Server.ResponseInfo;
-import org.kobe.xbot.Server.ResponseStatus;
+import org.kobe.xbot.Utilites.MethodType;
+import org.kobe.xbot.Utilites.RequestInfo;
+import org.kobe.xbot.Utilites.ResponseInfo;
+import org.kobe.xbot.Utilites.ResponseStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;

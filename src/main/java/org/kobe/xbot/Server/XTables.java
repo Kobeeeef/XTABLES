@@ -1,6 +1,10 @@
 package org.kobe.xbot.Server;
 
 import com.google.gson.Gson;
+import org.kobe.xbot.Utilites.MethodType;
+import org.kobe.xbot.Utilites.RequestInfo;
+import org.kobe.xbot.Utilites.ResponseInfo;
+import org.kobe.xbot.Utilites.ResponseStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;
