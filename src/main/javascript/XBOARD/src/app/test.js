@@ -25,18 +25,20 @@ function editJSONObject(obj, key, value) {
 
 // Example usage:
 const json = {
-    "SmartDashboard": {
-        "data": {
-            "sometable": {
-                "value": "Some Value3"
-            }
-        },
-        "value": "Some Value6"
-    },
     "SMartDashboard": {
-        "value": "58"
+        "value": "ok",
+        "data": {
+            "12": {
+                "data": {
+                    "1212": {
+                        "value": "28"
+                    }
+                }
+            }
+        }
     }
-};
+}
 
-const updatedJson = editJSONObject(json, "SMartDashboard", "28");
+
+const updatedJson = editJSONObject(json, "SMartDashboard", "281");
 console.log(JSON.stringify(updatedJson, null, 2));

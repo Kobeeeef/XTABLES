@@ -6,34 +6,40 @@ import 'primeicons/primeicons.css';
 
 
 import React, {useEffect, useRef, useState} from 'react';
-import {DataTable,} from 'primereact/datatable';
+import {DataTable} from 'primereact/datatable';
 import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
 import {Toast} from 'primereact/toast';
 import {InputText} from "primereact/inputtext";
-import Terminal from "../Components/Terminal";
+import Logs from '../Components/Logs';
+import validateKey from '../Utilities/KeyValidator'
+import {Terminal} from 'primereact/terminal';
+import {TerminalService} from 'primereact/terminalservice';
 
 export default function Main() {
     const [rawJSON, setRawJSON] = useState({});
     const [products, setProducts] = useState([]);
     const [expandedRows, setExpandedRows] = useState(null);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
+    const [socket, setSocket] = useState(null);
     const toast = useRef(null);
     const [loading, setLoading] = useState(true);
-    const [messages, setMessages] = useState(["Type \"help\" to begin."]);
+    const [messages, setMessages] = useState(["Waiting for message..."]);
     const [filters, setFilters] = useState({
         global: {value: null, matchMode: FilterMatchMode.CONTAINS},
         name: {value: null, matchMode: FilterMatchMode.STARTS_WITH},
         key: {value: null, matchMode: FilterMatchMode.STARTS_WITH}
     });
 
-
+    const helpMessage = `Available Commands: - clear: Clear the terminal screen. - put {key} {value}: Update a specific key value. - get {key}: Retrieve a value from the server. - refresh: Retrieves all data from server to refresh. - help: Show available commands and their descriptions.
+`;
     useEffect(() => {
         function connect() {
             setLoading(true)
             const socket = new WebSocket('ws://localhost:8080/websocket');
 
             socket.onopen = () => {
+                setSocket(socket)
                 setLoading(false)
                 console.log('WebSocket connection established');
             }
@@ -43,22 +49,19 @@ export default function Main() {
                 let parsedValue = JSON.parse(parsed.value);
                 let type = parsed.type;
                 if (type === "ALL") {
-                    if (parsedValue == null) parsedValue = [];
+                    if (parsedValue == null) parsedValue = {};
                     setRawJSON(parsedValue)
                 } else if (type === "UPDATE") {
                     let key = parsedValue.key;
                     let value = parsedValue.value;
-
                     setRawJSON(prev => {
-                        console.log(prev)
                         return editJSONObject(prev, key, value)
                     });
                 } else if (type === "MESSAGES") {
                     if (parsedValue.length > 0) {
-                        setMessages([...new Set(parsedValue)].reverse().slice(-20));
+                        setMessages([...new Set(parsedValue)].reverse());
                     }
                 }
-
             }
             socket.onerror = (error) => {
                 console.error('WebSocket error:', error);
@@ -73,6 +76,51 @@ export default function Main() {
 
         connect();
     }, []);
+
+    useEffect(() => {
+        const commandHandler = (text) => {
+            let response;
+            let argsIndex = text.indexOf(' ');
+            let command = argsIndex !== -1 ? text.substring(0, argsIndex) : text;
+            let tokens = text.split(" ");
+            switch (command) {
+                case 'help':
+                case 'ls':
+                    response = helpMessage;
+                    break;
+                case 'clear':
+                    response = null;
+                    break;
+                case 'put':
+                    if (!(tokens.length >= 3)) {
+                        response = "Invalid command usage!";
+                    } else if (validateKey(tokens[1]) !== null) {
+                        response = validateKey(tokens[1]);
+                    } else {
+                        socket.send(JSON.stringify({type: "UPDATE", value: tokens.slice(2).join(" "), key: tokens[1]}));
+                        response = "PUT command sent!"
+                    }
+                    break;
+                case 'refresh':
+                    socket.send(JSON.stringify({type: "ALL"}));
+                    response = "Refresh message sent!"
+                    break;
+                default:
+                    response = 'Unknown command: ' + command;
+                    break;
+            }
+
+            if (response)
+                TerminalService.emit('response', response);
+            else
+                TerminalService.emit('clear');
+        };
+        TerminalService.on('command', commandHandler);
+
+        return () => {
+            TerminalService.off('command', commandHandler);
+        };
+    }, [socket]);
 
     function editJSONObject(obj, key, value) {
         const keys = key.split('.');
@@ -149,7 +197,13 @@ export default function Main() {
 
         if (field === "value") {
             let key = rowData.key;
-            toast.current.show({severity: 'info', summary: 'Request Sent!', detail: newValue, life: 5000})
+            socket.send(JSON.stringify({type: "UPDATE", value: newValue, key: key}));
+            toast.current.show({
+                severity: 'info',
+                summary: 'Request Sent!',
+                detail: "The request is now queued!",
+                life: 3000
+            })
         }
         return true;
     }
@@ -180,6 +234,8 @@ export default function Main() {
         setFilters(_filters);
         setGlobalFilterValue(value);
     };
+
+
     const renderHeader = () => {
         return (
             <div>
@@ -206,7 +262,7 @@ export default function Main() {
     return (
         <div className="flex bg-gray-200">
             <div className="w-1/2 h-screen">
-                <Toast ref={toast}/>
+                <Toast ref={toast} position="bottom-center"/>
                 <DataTable
                     value={products}
                     showGridlines
@@ -219,9 +275,11 @@ export default function Main() {
                     loading={loading}
                     onRowToggle={(e) => setExpandedRows(e.data)}
                     rowExpansionTemplate={rowExpansionTemplate}
-                    className="h-full w-full"
+                    className="h-screen w-full"
                     dataKey="key"
                     header={header}
+                    scrollable
+                    scrollHeight={"80vh"}
                     tableStyle={{minWidth: '15rem'}}
                     emptyMessage="No Data Found"
                 >
@@ -240,7 +298,17 @@ export default function Main() {
             </div>
             <div className="border-l border-2 border-gray-500"></div>
             <div className="flex-1">
-                <Terminal initialOutput={messages}/>
+                <Terminal
+                    welcomeMessage="Welcome to XBOARD! Type help to begin."
+                    prompt="XTABLES $"
+                    pt={{
+                        root: 'bg-gray-900 text-white border-round h-[50vh]',
+                        prompt: 'text-gray-400 mr-2',
+                        command: 'text-primary-300',
+                        response: 'text-primary-300'
+                    }}
+                />
+                <Logs initialOutput={messages}></Logs>
             </div>
         </div>
 

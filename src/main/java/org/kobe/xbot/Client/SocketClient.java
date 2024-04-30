@@ -26,7 +26,7 @@ public class SocketClient {
     private ThreadPoolExecutor socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
     private final String SERVER_ADDRESS;
     private final int SERVER_PORT;
-    private final long RECONNECT_DELAY_MS;
+    private long RECONNECT_DELAY_MS;
     private static final List<RequestInfo> MESSAGES = new ArrayList<>() {
         private final Logger logger = Logger.getLogger(ArrayList.class.getName());
 
@@ -59,6 +59,15 @@ public class SocketClient {
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
         this.executor = Executors.newFixedThreadPool(MAX_THREADS);
         this.xTablesClient = xTablesClient;
+    }
+
+    public long getRECONNECT_DELAY_MS() {
+        return RECONNECT_DELAY_MS;
+    }
+
+    public SocketClient setRECONNECT_DELAY_MS(long RECONNECT_DELAY_MS) {
+        this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
+        return this;
     }
 
     public List<RequestInfo> getMessages() {
