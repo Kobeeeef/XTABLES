@@ -38,6 +38,16 @@ public class XTablesData<V> {
         return true; // Operation successful
     }
 
+    public int size() {
+        int count = (value != null) ? 1 : 0;
+        if (data != null) {
+            for (XTablesData<V> child : data.values()) {
+                count += child.size();
+            }
+        }
+        return count;
+    }
+
     // Method to get a value from the nested structure
     public V get(String key) {
         XTablesData<V> current = getLevelxTablesData(key);
@@ -65,6 +75,7 @@ public class XTablesData<V> {
         }
         return current;
     }
+
     public boolean renameKey(String oldKey, String newKeyName) {
         if (oldKey == null || newKeyName == null || oldKey.isEmpty() || newKeyName.isEmpty()) {
             return false; // Invalid parameters
@@ -101,6 +112,7 @@ public class XTablesData<V> {
 
         return true; // Successfully renamed
     }
+
     // Method to get all tables at a given level
     public Set<String> getTables(String key) {
         if (key.isEmpty()) {
