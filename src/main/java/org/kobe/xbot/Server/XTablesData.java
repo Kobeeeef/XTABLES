@@ -3,11 +3,13 @@ package org.kobe.xbot.Server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class XTablesData<V> {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Map<String, XTablesData<V>> data;
     private V value;
 
@@ -63,7 +65,42 @@ public class XTablesData<V> {
         }
         return current;
     }
+    public boolean renameKey(String oldKey, String newKeyName) {
+        if (oldKey == null || newKeyName == null || oldKey.isEmpty() || newKeyName.isEmpty()) {
+            return false; // Invalid parameters
+        }
 
+        String[] oldKeys = oldKey.split("\\.");
+        if (oldKeys.length == 0) {
+            return false; // No key to rename
+        }
+
+        // Split the old key and construct the new key
+        String parentKey = String.join(".", Arrays.copyOf(oldKeys, oldKeys.length - 1));
+        String newKey = parentKey.isEmpty() ? newKeyName : parentKey + "." + newKeyName;
+
+        XTablesData<V> parentNode = getLevelxTablesData(parentKey);
+        if (parentNode == null || !parentNode.data.containsKey(oldKeys[oldKeys.length - 1])) {
+            return false; // Old key does not exist
+        }
+
+        // Get the old node
+        XTablesData<V> oldNode = parentNode.data.get(oldKeys[oldKeys.length - 1]);
+        if (oldNode == null) {
+            return false;
+        }
+
+        // Check if new key already exists
+        if (parentNode.data.containsKey(newKeyName)) {
+            return false; // New key already exists
+        }
+
+        // Rename by moving the node
+        parentNode.data.put(newKeyName, oldNode);
+        parentNode.data.remove(oldKeys[oldKeys.length - 1]);
+
+        return true; // Successfully renamed
+    }
     // Method to get all tables at a given level
     public Set<String> getTables(String key) {
         if (key.isEmpty()) {
@@ -99,6 +136,6 @@ public class XTablesData<V> {
     }
 
     public String toJSON() {
-        return new GsonBuilder().setPrettyPrinting().create().toJson(this.data);
+        return gson.toJson(this.data);
     }
 }

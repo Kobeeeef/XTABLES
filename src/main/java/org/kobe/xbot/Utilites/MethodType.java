@@ -6,6 +6,7 @@ public enum MethodType {
     GET_RAW_JSON,
     UPDATE,
     GET_TABLES,
+    UPDATE_KEY,
     DELETE,
     SUBSCRIBE_UPDATE,
     UNSUBSCRIBE_UPDATE,

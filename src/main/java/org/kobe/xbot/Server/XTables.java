@@ -1,10 +1,7 @@
 package org.kobe.xbot.Server;
 
 import com.google.gson.Gson;
-import org.kobe.xbot.Utilites.MethodType;
-import org.kobe.xbot.Utilites.RequestInfo;
-import org.kobe.xbot.Utilites.ResponseInfo;
-import org.kobe.xbot.Utilites.ResponseStatus;
+import org.kobe.xbot.Utilites.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -160,7 +157,20 @@ public class XTables {
                                 notifyClients(key, value);
                             }
                         }
-                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.DELETE)) {
+                    } else if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.UPDATE_KEY)) {
+                        String key = requestInfo.getTokens()[1];
+                        String value =requestInfo.getTokens()[2];
+                        if (!Utilities.validateName(value,false)) {
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UPDATE_KEY, "FAIL");
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                        } else {
+                            boolean response = table.renameKey(key, value);
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UPDATE_KEY, response ? "OK" : "FAIL");
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                        }
+                    }else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.DELETE)) {
                         String key = requestInfo.getTokens()[1];
                         boolean response = table.delete(key);
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");

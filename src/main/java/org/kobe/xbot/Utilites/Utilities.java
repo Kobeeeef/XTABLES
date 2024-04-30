@@ -33,4 +33,27 @@ public class Utilities {
         }
         return true;
     }
+
+    public static boolean validateName(String name, boolean throwError) {
+        // Check if name is null or empty
+        if (name == null) {
+            if (throwError) throw new IllegalArgumentException("Name cannot be null.");
+            else return false;
+        }
+
+        // Check if name contains spaces
+        if (name.contains(" ")) {
+            if (throwError) throw new IllegalArgumentException("Name cannot contain spaces.");
+            else return false;
+        }
+
+        // Check if name contains '.'
+        if (name.contains(".")) {
+            if (throwError) throw new IllegalArgumentException("Name cannot contain '.'");
+            else return false;
+        }
+
+
+        return true;
+    }
 }

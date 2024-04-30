@@ -152,7 +152,16 @@ public class XTablesClient {
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
-
+    public RequestAction<ResponseStatus> renameKey(String key, String newName) {
+        Utilities.validateKey(key);
+        Utilities.validateName(newName, true);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + newName).parsed(), ResponseStatus.class);
+    }
+    public RequestAction<ResponseStatus> putBoolean(String key, Boolean value) {
+        Utilities.validateKey(key);
+        String parsedValue = gson.toJson(value);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
+    }
     public <T> RequestAction<ResponseStatus> putArray(String key, List<T> value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
@@ -188,7 +197,10 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
     }
-
+    public RequestAction<Boolean> getBoolean(String key) {
+        Utilities.validateKey(key);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Boolean.class);
+    }
     public <T> RequestAction<T> getObject(String key, Class<T> type) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);
