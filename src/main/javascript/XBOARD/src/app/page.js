@@ -14,6 +14,7 @@ import Image from 'next/image'
 import {Message} from 'primereact/message';
 
 
+import { Tag } from 'primereact/tag';
 import {InputText} from "primereact/inputtext";
 import Logs from '../Components/Logs';
 import validateKey from '../Utilities/KeyValidator'
@@ -29,7 +30,9 @@ import Swal from 'sweetalert2'
 export default function Main() {
     const [pingEvents, setPingEvents] = useState([]);
     const [pingDialogShown, setPingDialogShown] = useState(false);
+    const [serverStatus, setServerStatus] = useState(3);
     const [rawJSON, setRawJSON] = useState({});
+    const [XTABLESState, setXTABLESState] = useState(false);
     const [products, setProducts] = useState([]);
     const [expandedRows, setExpandedRows] = useState(null);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -48,12 +51,15 @@ export default function Main() {
         function connect() {
             setLoading(true)
             const socket = new WebSocket('ws://localhost:8080/websocket');
+            setServerStatus(socket.readyState)
             socket.onopen = () => {
+                setServerStatus(socket.readyState)
                 setSocket(socket)
                 setLoading(false)
                 console.log('WebSocket connection established');
             }
             socket.onmessage = (event) => {
+                setServerStatus(socket.readyState)
                 //let formatted = convertJSON(originalJSON);
                 let parsed = JSON.parse(event.data);
                 let parsedValue = JSON.parse(parsed.value);
@@ -64,8 +70,10 @@ export default function Main() {
                 } else if (type === "STATUS") {
                     if (parsedValue === true) {
                         setLoading(false)
+                        setXTABLESState(true)
                     } else {
                         setLoading(true)
+                        setXTABLESState(false)
                     }
                 } else if (type === "UPDATE") {
                     let key = parsedValue.key;
@@ -80,10 +88,12 @@ export default function Main() {
                 }
             }
             socket.onerror = (error) => {
+                setServerStatus(socket.readyState)
                 console.error('WebSocket error:', error);
                 socket.close()
             }
             socket.onclose = () => {
+                setServerStatus(socket.readyState)
                 setLoading(true)
                 console.log('WebSocket connection closed');
                 return connect();
@@ -285,7 +295,7 @@ export default function Main() {
                 timer: 3000,
                 icon: "success",
                 timerProgressBar: true,
-                position: "top-right",
+                position: "top",
             });
 
         }
@@ -343,7 +353,10 @@ export default function Main() {
     return (<BlockUI blocked={loading}>
 
 
-        <Menubar start={<img width={35} className="mr-2 rounded-xl" alt="logo" src={"/favicon.ico"}/>} model={[{
+        <Menubar end={<>
+            <Tag className="mr-2" icon={serverStatus === WebSocket.OPEN ? "pi pi-check" : serverStatus === WebSocket.CONNECTING ? "pi pi-info-circle" : serverStatus === WebSocket.CLOSING ? "pi pi-exclamation-triangle" : "pi pi-times"} severity={serverStatus === WebSocket.OPEN ? "success" : serverStatus === WebSocket.CONNECTING ? "info" : serverStatus === WebSocket.CLOSING ? "warning" : "danger"} value={serverStatus === WebSocket.OPEN ? "Server Connected" : serverStatus === WebSocket.CONNECTING ? "Connecting Server" : serverStatus === WebSocket.CLOSING ? "Server Disconnecting" : "Server Disconnected"}/>
+            <Tag className="mr-2" icon={XTABLESState && serverStatus === WebSocket.OPEN ? "pi pi-check" : "pi pi-times"} severity={XTABLESState && serverStatus === WebSocket.OPEN ? "success" : "danger"} value={XTABLESState && serverStatus === WebSocket.OPEN ? "XTABLES Connected" : "XTABLES Disconnected"}/>
+        </>} start={<img width={35} className="mr-2 rounded-xl" alt="logo" src={"/favicon.ico"}/>} model={[{
             label: 'Sync', icon: 'pi pi-sync', command: () => {
                 setLoading(true)
                 socket.send(JSON.stringify({type: "ALL"}));
@@ -357,7 +370,7 @@ export default function Main() {
                         timer: 3000,
                         icon: "success",
                         timerProgressBar: true,
-                        position: "top-right",
+                        position: "top",
                     });
                 }).catch((e) => {
                     setLoading(false)
@@ -369,7 +382,7 @@ export default function Main() {
                         timer: 3000,
                         icon: "error",
                         timerProgressBar: true,
-                        position: "top-right",
+                        position: "top",
                     });
                 });
             }
@@ -410,7 +423,7 @@ export default function Main() {
                         timer: 3000,
                         icon: "error",
                         timerProgressBar: true,
-                        position: "top-right",
+                        position: "top",
                     });
                     setLoading(false)
                 });
@@ -439,10 +452,10 @@ export default function Main() {
                                 title: 'Reboot Command Sent!',
                                 text: "The server is now rebooting!",
                                 showConfirmButton: false,
-                                timer: 3000,
+                                timer: 2000,
                                 icon: "success",
                                 timerProgressBar: true,
-                                position: "top-right",
+                                position: "top",
                             }); else Swal.fire({
                                 toast: true,
                                 title: 'Failed To Reboot!',
@@ -451,7 +464,7 @@ export default function Main() {
                                 timer: 3000,
                                 icon: "error",
                                 timerProgressBar: true,
-                                position: "top-right",
+                                position: "top",
                             })
                         }).catch(error => {
                             Swal.fire({
@@ -462,7 +475,7 @@ export default function Main() {
                                 timer: 3000,
                                 icon: "error",
                                 timerProgressBar: true,
-                                position: "top-right",
+                                position: "top",
                             })
                         });
                     }
@@ -488,8 +501,8 @@ export default function Main() {
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.networkLatencyMS}</span>
                                 <div className="flex justify-center mt-2">
                                     <Message
-                                        severity={pingEvents.networkLatencyMS < 0.3 ? "success" : pingEvents.networkLatencyMS < 0.5 ? "warn" : "error"}
-                                        text={pingEvents.networkLatencyMS < 0.3 ? "OKAY" : pingEvents.networkLatencyMS < 0.5 ? "DELAYED" : "SLOW"}/>
+                                        severity={pingEvents.networkLatencyMS < 0.4 ? "success" : pingEvents.networkLatencyMS < 0.6 ? "warn" : "error"}
+                                        text={pingEvents.networkLatencyMS < 0.4 ? "GOOD" : pingEvents.networkLatencyMS < 0.6 ? "DELAYED" : "SLOW"}/>
                                 </div>
                             </div>
                         </div>
@@ -504,7 +517,7 @@ export default function Main() {
                                 <div className="flex justify-center mt-2">
                                     <Message
                                         severity={pingEvents.roundTripLatencyMS < 0.9 ? "success" : pingEvents.roundTripLatencyMS < 1.5 ? "warn" : "error"}
-                                        text={pingEvents.roundTripLatencyMS < 0.9 ? "OKAY" : pingEvents.roundTripLatencyMS < 1.5 ? "DELAYED" : "SLOW"}/>
+                                        text={pingEvents.roundTripLatencyMS < 0.9 ? "GOOD" : pingEvents.roundTripLatencyMS < 1.5 ? "DELAYED" : "SLOW"}/>
                                 </div>
                             </div>
 
