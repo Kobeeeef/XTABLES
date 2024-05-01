@@ -74,12 +74,13 @@ public class XTables {
                 serverSocket.close();
             }
             table.delete("");
-            logger.info("Starting socket server in 3 seconds...");
-            TimeUnit.SECONDS.sleep(3);
+            logger.info("Starting socket server in 1 second...");
+            TimeUnit.SECONDS.sleep(1);
             logger.info("Starting server...");
             startServer();
 
         } catch (IOException | InterruptedException e) {
+            System.err.println(e);
             logger.severe("Error occurred during server reboot: " + e.getMessage());
         }
     }
@@ -120,13 +121,13 @@ public class XTables {
                     logger.info("Received " + totalMessages + " messages from IP " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " in the last minute.");
                     totalMessages = 0;
                 }
-            }, 1, 60, TimeUnit.SECONDS);
+            }, 0, 60, TimeUnit.SECONDS);
 
             try {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String inputLine;
-                while ((inputLine = in.readLine()) != null) {
+                while ((inputLine = in.readLine()) != null && !this.isInterrupted()) {
                     RequestInfo requestInfo = new RequestInfo(inputLine);
                     totalMessages++;
                     if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
