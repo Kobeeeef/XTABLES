@@ -75,11 +75,11 @@ public class XTables {
             }
             table.delete("");
             logger.info("Starting socket server in 3 seconds...");
-            Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-                logger.info("Starting server...");
-                startServer();
-            }, 3, TimeUnit.SECONDS);
-        } catch (IOException e) {
+            TimeUnit.SECONDS.sleep(3);
+            logger.info("Starting server...");
+            startServer();
+
+        } catch (IOException | InterruptedException e) {
             logger.severe("Error occurred during server reboot: " + e.getMessage());
         }
     }

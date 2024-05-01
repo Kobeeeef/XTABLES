@@ -128,9 +128,11 @@ public class SocketClient {
 
         @Override
         public void run() {
+            isConnected = true;
             try {
                 String message;
-                while ((message = in.readLine()) != null) {
+                while ((message = in.readLine()) != null && !socket.isClosed() && socket.isConnected() && socket.isBound()) {
+                    isConnected = true;
                     RequestInfo requestInfo = new RequestInfo(message);
                     MESSAGES.add(requestInfo);
                     if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
@@ -143,7 +145,11 @@ public class SocketClient {
                         }
                     }
                 }
+                isConnected = false;
+                logger.warning("Disconnected from the server. Reconnecting...");
+                reconnect();
             } catch (IOException e) {
+                isConnected = false;
                 System.err.println("Error reading message from server: " + e.getMessage());
                 logger.warning("Disconnected from the server. Reconnecting...");
                 reconnect();
@@ -193,17 +199,7 @@ public class SocketClient {
         return socket;
     }
 
-    private boolean isConnected() {
-        boolean serverResponded = false;
-        try {
-            RequestInfo info = sendMessageAndWaitForReply(new ResponseInfo(null, MethodType.PING), 3, TimeUnit.SECONDS);
-            serverResponded = info != null;
-        } catch (Exception ignored) {
-        }
-        boolean connected = socket != null && !socket.isClosed() && socket.isConnected() && serverResponded;
-        this.isConnected = connected;
-        return connected;
-    }
+
 
 
     public CompletableFuture<String> sendAsync(String message) {

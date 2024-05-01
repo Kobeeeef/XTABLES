@@ -14,7 +14,6 @@ import Image from 'next/image'
 import {Message} from 'primereact/message';
 
 
-import {Toast} from 'primereact/toast';
 import {InputText} from "primereact/inputtext";
 import Logs from '../Components/Logs';
 import validateKey from '../Utilities/KeyValidator'
@@ -25,6 +24,7 @@ import {Menubar} from 'primereact/menubar';
 import {Splitter, SplitterPanel} from 'primereact/splitter';
 import {Timeline} from 'primereact/timeline';
 import {BlockUI} from 'primereact/blockui';
+import Swal from 'sweetalert2'
 
 export default function Main() {
     const [pingEvents, setPingEvents] = useState([]);
@@ -34,7 +34,6 @@ export default function Main() {
     const [expandedRows, setExpandedRows] = useState(null);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [socket, setSocket] = useState(null);
-    const toast = useRef(null);
     const [loading, setLoading] = useState(true);
     const [messages, setMessages] = useState(["Waiting for message..."]);
     const [filters, setFilters] = useState({
@@ -62,6 +61,12 @@ export default function Main() {
                 if (type === "ALL") {
                     if (parsedValue == null) parsedValue = {};
                     setRawJSON(parsedValue)
+                } else if (type === "STATUS") {
+                    if (parsedValue === true) {
+                        setLoading(false)
+                    } else {
+                        setLoading(true)
+                    }
                 } else if (type === "UPDATE") {
                     let key = parsedValue.key;
                     let value = parsedValue.value;
@@ -272,9 +277,17 @@ export default function Main() {
         if (field === "value") {
             let key = rowData.key;
             socket.send(JSON.stringify({type: "UPDATE", value: newValue, key: key}));
-            toast.current.show({
-                severity: 'info', summary: 'Request Sent!', detail: "The request is now queued!", life: 3000
-            })
+            Swal.fire({
+                toast: true,
+                title: 'Request Sent!',
+                text: "The request is now queued!",
+                showConfirmButton: false,
+                timer: 3000,
+                icon: "success",
+                timerProgressBar: true,
+                position: "top-right",
+            });
+
         }
         return true;
     }
@@ -328,31 +341,44 @@ export default function Main() {
     const header = renderHeader();
 
     return (<BlockUI blocked={loading}>
-        <Toast ref={toast} position="bottom-center"/>
+
+
         <Menubar start={<img width={35} className="mr-2 rounded-xl" alt="logo" src={"/favicon.ico"}/>} model={[{
             label: 'Sync', icon: 'pi pi-sync', command: () => {
                 setLoading(true)
                 socket.send(JSON.stringify({type: "ALL"}));
                 sendMessageAndWaitForCondition({type: "ALL"}, (a) => a.type === "ALL").then((a) => {
                     setLoading(false)
-                    toast.current.show({
-                        severity: 'info', summary: 'Data Synced!', detail: "The data was synced!", life: 3000
-                    })
+                    Swal.fire({
+                        toast: true,
+                        title: 'Data Synced!',
+                        text: "The data was synced!",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        icon: "success",
+                        timerProgressBar: true,
+                        position: "top-right",
+                    });
                 }).catch((e) => {
                     setLoading(false)
-                    toast.current.show({
-                        severity: 'error',
-                        summary: 'Failed To Sync!',
-                        detail: "The data could not be synced!",
-                        life: 3000
-                    })
+                    Swal.fire({
+                        toast: true,
+                        title: 'Failed To Sync!',
+                        text: "The data could not be synced!",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        icon: "error",
+                        timerProgressBar: true,
+                        position: "top-right",
+                    });
                 });
             }
         }, {
             label: 'Ping', icon: 'pi pi-server', command: () => {
                 const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
-
+                setLoading(true)
                 sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
+                    setLoading(false)
                     let value = JSON.parse(response.value);
                     let networkLatencyMS = value.networkLatencyMS;
                     let roundTripLatencyMS = value.roundTripLatencyMS;
@@ -376,14 +402,78 @@ export default function Main() {
                     setPingDialogShown(true)
 
                 }).catch(error => {
-                    // Handle error
+                    Swal.fire({
+                        toast: true,
+                        title: 'Failed To Ping!',
+                        text: "The server is offline or unresponsive!",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        icon: "error",
+                        timerProgressBar: true,
+                        position: "top-right",
+                    });
+                    setLoading(false)
                 });
 
 
             }
-        },]}/>
+        }, {
+            label: 'Reboot', icon: 'pi pi-refresh', command: () => {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This will reboot the XTABLES server!",
+                    confirmButtonText: "Reboot",
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonColor: "#d33",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+
+                        sendMessageAndWaitForCondition({type: "REBOOT"}, (response) => response.type === "REBOOT_RESPONSE").then(response => {
+
+                            let value = JSON.parse(response.value);
+                            if (value == "OK") Swal.fire({
+                                toast: true,
+                                title: 'Reboot Command Sent!',
+                                text: "The server is now rebooting!",
+                                showConfirmButton: false,
+                                timer: 3000,
+                                icon: "success",
+                                timerProgressBar: true,
+                                position: "top-right",
+                            }); else Swal.fire({
+                                toast: true,
+                                title: 'Failed To Reboot!',
+                                text: "The server responded with: " + value,
+                                showConfirmButton: false,
+                                timer: 3000,
+                                icon: "error",
+                                timerProgressBar: true,
+                                position: "top-right",
+                            })
+                        }).catch(error => {
+                            Swal.fire({
+                                toast: true,
+                                title: 'Failed To Reboot!',
+                                text: "The server did not respond in time!",
+                                showConfirmButton: false,
+                                timer: 3000,
+                                icon: "error",
+                                timerProgressBar: true,
+                                position: "top-right",
+                            })
+                        });
+                    }
+                });
+
+            }
+
+
+        }]}/>
         <div className="flex bg-gray-200">
-            <Dialog header="Ping Latency Statistics" visible={pingDialogShown} style={{width: '50vw'}}
+            <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShown} style={{width: '50vw'}}
                     onHide={() => setPingDialogShown(false)}>
                 <Timeline value={pingEvents.events} opposite={(item) => item.status}
                           content={(item) => <small className="text-color-secondary">{item.date}</small>}/>
@@ -393,11 +483,13 @@ export default function Main() {
                     <div className="card h-full">
                         <span className="font-semibold text-lg flex justify-center">Network Latency</span>
                         <div className="flex justify-center mt-1">
-                            <div >
+                            <div>
                                     <span
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.networkLatencyMS}</span>
                                 <div className="flex justify-center mt-2">
-                                    <Message severity={pingEvents.networkLatencyMS < 0.3 ? "success" : pingEvents.networkLatencyMS < 0.5 ? "warn" : "error"} text={pingEvents.networkLatencyMS < 0.3 ? "OKAY" : pingEvents.networkLatencyMS < 0.5 ? "DELAYED" : "SLOW"}/>
+                                    <Message
+                                        severity={pingEvents.networkLatencyMS < 0.3 ? "success" : pingEvents.networkLatencyMS < 0.5 ? "warn" : "error"}
+                                        text={pingEvents.networkLatencyMS < 0.3 ? "OKAY" : pingEvents.networkLatencyMS < 0.5 ? "DELAYED" : "SLOW"}/>
                                 </div>
                             </div>
                         </div>
@@ -410,7 +502,9 @@ export default function Main() {
                                     <span
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.roundTripLatencyMS}</span>
                                 <div className="flex justify-center mt-2">
-                                    <Message severity={pingEvents.roundTripLatencyMS < 0.9 ? "success" : pingEvents.roundTripLatencyMS < 1.5 ? "warn" : "error"} text={pingEvents.roundTripLatencyMS < 0.9 ? "OKAY" : pingEvents.roundTripLatencyMS < 1.5 ? "DELAYED" : "SLOW"}/>
+                                    <Message
+                                        severity={pingEvents.roundTripLatencyMS < 0.9 ? "success" : pingEvents.roundTripLatencyMS < 1.5 ? "warn" : "error"}
+                                        text={pingEvents.roundTripLatencyMS < 0.9 ? "OKAY" : pingEvents.roundTripLatencyMS < 1.5 ? "DELAYED" : "SLOW"}/>
                                 </div>
                             </div>
 

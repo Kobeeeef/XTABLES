@@ -1,7 +1,7 @@
 import { PrimeReactProvider } from 'primereact/api';
-import 'primereact/resources/themes/saga-blue/theme.css';  //theme
-import 'primereact/resources/primereact.min.css';          //core css
-import 'primeicons/primeicons.css';                        //icons
+import 'primereact/resources/themes/saga-blue/theme.css'; // Theme
+import 'primereact/resources/primereact.min.css'; // Core CSS
+import 'primeicons/primeicons.css'; // Icons
 
 function MyApp({ Component, pageProps }) {
     return (
