@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 public class Main {
     private static final String SERVER_ADDRESS = "localhost"; // Server address
-    private static final int SERVER_PORT = 488; // Server port
+    private static final int SERVER_PORT = 1735; // Server port
 
     public static void main(String[] args) {
         // Initialize a new client with address and port
