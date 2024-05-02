@@ -50,6 +50,7 @@ export default function Main() {
 
     const helpMessage = `Available Commands: - clear: Clear the terminal screen. - put {key} {value}: Update a specific key value. - get {key}: Retrieve a value from the server. - sync: Syncs all data from server to refresh. - help: Show available commands and their descriptions.
 `;
+
     useEffect(() => {
         function connect() {
             setLoading(true)
@@ -352,7 +353,6 @@ export default function Main() {
         </div>);
     };
     const header = renderHeader();
-
     return (<BlockUI blocked={loading}>
         <div className={"h-screen"}>
 
@@ -487,6 +487,10 @@ export default function Main() {
             }
 
 
+        }, {
+            label: 'Full Screen', icon: 'pi pi-window-maximize', command: () => {
+                document.documentElement.requestFullscreen().catch(() => {}) || document.documentElement.webkitRequestFullscreen().catch(() => {}) || document.documentElement.msRequestFullscreen().catch(() => {})
+            }
         }]}/>
         <div className="flex bg-gray-200">
             <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShownState} style={{width: '50vw'}}
