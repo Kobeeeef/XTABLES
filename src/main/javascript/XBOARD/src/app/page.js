@@ -9,14 +9,9 @@ import React, {useEffect, useRef, useState} from 'react';
 import {DataTable} from 'primereact/datatable';
 import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
-import Image from 'next/image'
-
-import { Skeleton } from 'primereact/skeleton';
 
 import {Message} from 'primereact/message';
-
-import { Button } from 'primereact/button';
-import { Tag } from 'primereact/tag';
+import {Tag} from 'primereact/tag';
 import {InputText} from "primereact/inputtext";
 import Logs from '../Components/Logs';
 import validateKey from '../Utilities/KeyValidator'
@@ -30,6 +25,7 @@ import {BlockUI} from 'primereact/blockui';
 import Swal from 'sweetalert2'
 
 export default function Main() {
+    const dt = useRef(null);
     const [pingEvents, setPingEvents] = useState([]);
     const pingDialogShown = useRef(false);
     const [pingDialogShownState, setPingDialogShownState] = useState(pingDialogShown.current);
@@ -314,7 +310,8 @@ export default function Main() {
                        dataKey="key" removableSort>
                 <Column expander={allowExpansion} style={{width: '5rem'}}/>
                 <Column field="name" header="" sortable/>
-                <Column field="value" header="" frozen={true} className="font-bold max-w-1 overflow-hidden whitespace-nowrap" editor={textEditor}
+                <Column field="value" header="" frozen={true}
+                        className="font-bold max-w-1 overflow-hidden whitespace-nowrap" editor={textEditor}
                         onCellEditComplete={onCellEditComplete}
                         sortable/>
             </DataTable>
@@ -356,73 +353,37 @@ export default function Main() {
     return (<BlockUI blocked={loading}>
         <div className={"h-screen"}>
 
-        <Menubar end={<>
-            <Tag className="mr-2" icon={serverStatus === WebSocket.OPEN ? "pi pi-check" : serverStatus === WebSocket.CONNECTING ? "pi pi-info-circle" : serverStatus === WebSocket.CLOSING ? "pi pi-exclamation-triangle" : "pi pi-times"} severity={serverStatus === WebSocket.OPEN ? "success" : serverStatus === WebSocket.CONNECTING ? "info" : serverStatus === WebSocket.CLOSING ? "warning" : "danger"} value={serverStatus === WebSocket.OPEN ? "Server Connected" : serverStatus === WebSocket.CONNECTING ? "Connecting Server" : serverStatus === WebSocket.CLOSING ? "Server Disconnecting" : "Server Disconnected"}/>
-            <Tag className="mr-2" icon={XTABLESState && serverStatus === WebSocket.OPEN ? "pi pi-check" : "pi pi-times"} severity={XTABLESState && serverStatus === WebSocket.OPEN ? "success" : "danger"} value={XTABLESState && serverStatus === WebSocket.OPEN ? "XTABLES Connected" : "XTABLES Disconnected"}/>
-        </>} start={<img width={35} className="mr-2 rounded-xl" alt="logo" src={"/favicon.ico"}/>} model={[{
-            label: 'Sync', icon: 'pi pi-sync', command: () => {
-                setLoading(true)
-                socket.send(JSON.stringify({type: "ALL"}));
-                sendMessageAndWaitForCondition({type: "ALL"}, (a) => a.type === "ALL").then((a) => {
-                    setLoading(false)
-                    Swal.fire({
-                        toast: true,
-                        title: 'Data Synced!',
-                        text: "The data was synced!",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        icon: "success",
-                        timerProgressBar: true,
-                        position: "top",
-                    });
-                }).catch((e) => {
-                    setLoading(false)
-                    Swal.fire({
-                        toast: true,
-                        title: 'Failed To Sync!',
-                        text: "The data could not be synced!",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        icon: "error",
-                        timerProgressBar: true,
-                        position: "top",
-                    });
-                });
-            }
-        }, {
-            label: 'Ping', icon: 'pi pi-server', command: () => {
-                const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
-                pingShowDialog();
-                function pingShowDialog() {
-                    sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
-                        let value = JSON.parse(response.value);
-                        let networkLatencyMS = value.networkLatencyMS;
-                        let roundTripLatencyMS = value.roundTripLatencyMS;
-                        const timeToReachServer = new Date(Date.now() + roundTripLatencyMS - networkLatencyMS);
-                        const timeToReachServerFormatted = `${timeToReachServer.getHours().toString().padStart(2, '0')}:${timeToReachServer.getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
-
-
-                        const events = [{status: 'Sent', date: currentTime}, {
-                            status: 'Processing',
-                            date: timeToReachServerFormatted
-                        }, {
-                            status: 'Received',
-                            date: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`
-                        },];
-                        setPingEvents({
-                            networkLatencyMS: networkLatencyMS, roundTripLatencyMS: roundTripLatencyMS, events: events
-                        })
-                        pingDialogShown.current = true;
-                        setPingDialogShownState(true)
-                        setTimeout(() => {
-                            if(pingDialogShown.current) return pingShowDialog();
-                        }, 150)
-
-                    }).catch(error => {
+            <Menubar end={<>
+                <Tag className="mr-2"
+                     icon={serverStatus === WebSocket.OPEN ? "pi pi-check" : serverStatus === WebSocket.CONNECTING ? "pi pi-info-circle" : serverStatus === WebSocket.CLOSING ? "pi pi-exclamation-triangle" : "pi pi-times"}
+                     severity={serverStatus === WebSocket.OPEN ? "success" : serverStatus === WebSocket.CONNECTING ? "info" : serverStatus === WebSocket.CLOSING ? "warning" : "danger"}
+                     value={serverStatus === WebSocket.OPEN ? "Server Connected" : serverStatus === WebSocket.CONNECTING ? "Connecting Server" : serverStatus === WebSocket.CLOSING ? "Server Disconnecting" : "Server Disconnected"}/>
+                <Tag className="mr-2"
+                     icon={XTABLESState && serverStatus === WebSocket.OPEN ? "pi pi-check" : "pi pi-times"}
+                     severity={XTABLESState && serverStatus === WebSocket.OPEN ? "success" : "danger"}
+                     value={XTABLESState && serverStatus === WebSocket.OPEN ? "XTABLES Connected" : "XTABLES Disconnected"}/>
+            </>} start={<img width={35} className="mr-2 rounded-xl" alt="logo" src={"/favicon.ico"}/>} model={[{
+                label: 'Sync', icon: 'pi pi-sync', command: () => {
+                    setLoading(true)
+                    socket.send(JSON.stringify({type: "ALL"}));
+                    sendMessageAndWaitForCondition({type: "ALL"}, (a) => a.type === "ALL").then((a) => {
+                        setLoading(false)
                         Swal.fire({
                             toast: true,
-                            title: 'Failed To Ping!',
-                            text: "The server is offline or unresponsive!",
+                            title: 'Data Synced!',
+                            text: "The data was synced!",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            icon: "success",
+                            timerProgressBar: true,
+                            position: "top",
+                        });
+                    }).catch((e) => {
+                        setLoading(false)
+                        Swal.fire({
+                            toast: true,
+                            title: 'Failed To Sync!',
+                            text: "The data could not be synced!",
                             showConfirmButton: false,
                             timer: 3000,
                             icon: "error",
@@ -431,162 +392,251 @@ export default function Main() {
                         });
                     });
                 }
+            }, {
+                label: 'Ping', icon: 'pi pi-server', command: () => {
+                    const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
+                    pingShowDialog();
 
-            }
-        }, {
-            label: 'Reboot', icon: 'pi pi-refresh', command: () => {
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "This will reboot the XTABLES server!",
-                    confirmButtonText: "Reboot",
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonColor: "#d33",
-                }).then((result) => {
-                    if (result.isConfirmed) {
-
-
-                        sendMessageAndWaitForCondition({type: "REBOOT"}, (response) => response.type === "REBOOT_RESPONSE").then(response => {
-
+                    function pingShowDialog() {
+                        sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
                             let value = JSON.parse(response.value);
-                            if (value == "OK") Swal.fire({
-                                toast: true,
-                                title: 'Reboot Command Sent!',
-                                text: "The server is now rebooting!",
-                                showConfirmButton: false,
-                                timer: 2000,
-                                icon: "success",
-                                timerProgressBar: true,
-                                position: "top",
-                            }); else Swal.fire({
-                                toast: true,
-                                title: 'Failed To Reboot!',
-                                text: "The server responded with: " + value,
-                                showConfirmButton: false,
-                                timer: 3000,
-                                icon: "error",
-                                timerProgressBar: true,
-                                position: "top",
+                            let networkLatencyMS = value.networkLatencyMS;
+                            let roundTripLatencyMS = value.roundTripLatencyMS;
+                            const timeToReachServer = new Date(Date.now() + roundTripLatencyMS - networkLatencyMS);
+                            const timeToReachServerFormatted = `${timeToReachServer.getHours().toString().padStart(2, '0')}:${timeToReachServer.getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
+
+
+                            const events = [{status: 'Sent', date: currentTime}, {
+                                status: 'Processing',
+                                date: timeToReachServerFormatted
+                            }, {
+                                status: 'Received',
+                                date: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`
+                            },];
+                            setPingEvents({
+                                networkLatencyMS: networkLatencyMS,
+                                roundTripLatencyMS: roundTripLatencyMS,
+                                events: events
                             })
+                            pingDialogShown.current = true;
+                            setPingDialogShownState(true)
+                            setTimeout(() => {
+                                if (pingDialogShown.current) return pingShowDialog();
+                            }, 150)
+
                         }).catch(error => {
                             Swal.fire({
                                 toast: true,
-                                title: 'Failed To Reboot!',
-                                text: "The server did not respond in time!",
+                                title: 'Failed To Ping!',
+                                text: "The server is offline or unresponsive!",
                                 showConfirmButton: false,
                                 timer: 3000,
                                 icon: "error",
                                 timerProgressBar: true,
                                 position: "top",
-                            })
+                            });
                         });
                     }
-                });
 
+                }
+            }, {
+                label: 'Reboot', icon: 'pi pi-refresh', command: () => {
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "This will reboot the XTABLES server!",
+                        confirmButtonText: "Reboot",
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonColor: "#d33",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+
+                            sendMessageAndWaitForCondition({type: "REBOOT"}, (response) => response.type === "REBOOT_RESPONSE").then(response => {
+
+                                let value = JSON.parse(response.value);
+                                if (value == "OK") Swal.fire({
+                                    toast: true,
+                                    title: 'Reboot Command Sent!',
+                                    text: "The server is now rebooting!",
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    icon: "success",
+                                    timerProgressBar: true,
+                                    position: "top",
+                                }); else Swal.fire({
+                                    toast: true,
+                                    title: 'Failed To Reboot!',
+                                    text: "The server responded with: " + value,
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    icon: "error",
+                                    timerProgressBar: true,
+                                    position: "top",
+                                })
+                            }).catch(error => {
+                                Swal.fire({
+                                    toast: true,
+                                    title: 'Failed To Reboot!',
+                                    text: "The server did not respond in time!",
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    icon: "error",
+                                    timerProgressBar: true,
+                                    position: "top",
+                                })
+                            });
+                        }
+                    });
+
+                }
+
+
+            }, {
+                label: 'Utilities', icon: 'pi pi-hammer', items: [
+                    {
+                        label: "Export",
+                        icon: "pi pi-file-export",
+                        items: [
+                            {
+                                label: "PDF",
+                                icon: "pi pi-file-pdf",
+                                command: () => {
+                                    import('jspdf').then((jsPDF) => {
+                                        import('jspdf-autotable').then(() => {
+                                            const doc = new jsPDF.default(0, 0);
+
+                                            doc.autoTable([{
+                                                title: "Key",
+                                                dataKey: "key"
+                                            },
+                                                {
+                                                    title: "Value",
+                                                    dataKey: "value"
+                                                },
+                                                {
+                                                    title: "Subtable",
+                                                    dataKey: "data"
+                                                }], products);
+                                            doc.save('XBOARD.pdf');
+                                        });
+                                    });
+                                }
+                            },
+                            {
+                                label: "EXCEL",
+                                icon: "pi pi-file-excel"
+                            },
+                            {
+                                label: "CSV",
+                                icon: "pi pi-file"
+                            },
+                        ]
+                    }
+                ]
             }
+            ]}/>
+            <div className="flex bg-gray-200">
+                <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShownState}
+                        style={{width: '50vw'}}
+                        onHide={() => {
+                            pingDialogShown.current = false;
+                            setPingDialogShownState(false)
+                        }}>
+                    <Timeline value={pingEvents.events} opposite={(item) => item.status}
+                              content={(item) => <small className="text-color-secondary">{item.date}</small>}/>
+                    <hr className="my-6 border-1 border-gray-200"/>
 
-
-        }, {
-            label: 'Full Screen', icon: 'pi pi-window-maximize', command: () => {
-                document.documentElement.requestFullscreen().catch(() => {}) || document.documentElement.webkitRequestFullscreen().catch(() => {}) || document.documentElement.msRequestFullscreen().catch(() => {})
-            }
-        }]}/>
-        <div className="flex bg-gray-200">
-            <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShownState} style={{width: '50vw'}}
-                    onHide={() => {pingDialogShown.current = false; setPingDialogShownState(false)}}>
-                <Timeline value={pingEvents.events} opposite={(item) => item.status}
-                          content={(item) => <small className="text-color-secondary">{item.date}</small>}/>
-                <hr className="my-6 border-1 border-gray-200"/>
-
-                <div className="grid grid-cols-2 justify-center">
-                    <div className="card h-full">
-                        <span className="font-semibold text-lg flex justify-center">Network Latency</span>
-                        <div className="flex justify-center mt-1">
-                            <div>
+                    <div className="grid grid-cols-2 justify-center">
+                        <div className="card h-full">
+                            <span className="font-semibold text-lg flex justify-center">Network Latency</span>
+                            <div className="flex justify-center mt-1">
+                                <div>
                                     <span
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.networkLatencyMS}</span>
-                                <div className="flex justify-center mt-2">
-                                    <Message
-                                        severity={pingEvents.networkLatencyMS < 0.7 ? "success" : pingEvents.networkLatencyMS < 1 ? "warn" : "error"}
-                                        text={pingEvents.networkLatencyMS < 0.7 ? "GOOD" : pingEvents.networkLatencyMS < 1 ? "DELAYED" : "SLOW"}/>
+                                    <div className="flex justify-center mt-2">
+                                        <Message
+                                            severity={pingEvents.networkLatencyMS < 0.7 ? "success" : pingEvents.networkLatencyMS < 1 ? "warn" : "error"}
+                                            text={pingEvents.networkLatencyMS < 0.7 ? "GOOD" : pingEvents.networkLatencyMS < 1 ? "DELAYED" : "SLOW"}/>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="card h-full">
-                        <span className="font-semibold flex justify-center text-lg">Round Trip Latency</span>
-                        <div className="flex justify-center mt-1">
-                            <div>
+                        <div className="card h-full">
+                            <span className="font-semibold flex justify-center text-lg">Round Trip Latency</span>
+                            <div className="flex justify-center mt-1">
+                                <div>
                                     <span
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.roundTripLatencyMS}</span>
-                                <div className="flex justify-center mt-2">
-                                    <Message
-                                        severity={pingEvents.roundTripLatencyMS < 3 ? "success" : pingEvents.roundTripLatencyMS < 8 ? "warn" : "error"}
-                                        text={pingEvents.roundTripLatencyMS < 3 ? "GOOD" : pingEvents.roundTripLatencyMS < 8 ? "DELAYED" : "SLOW"}/>
+                                    <div className="flex justify-center mt-2">
+                                        <Message
+                                            severity={pingEvents.roundTripLatencyMS < 3 ? "success" : pingEvents.roundTripLatencyMS < 8 ? "warn" : "error"}
+                                            text={pingEvents.roundTripLatencyMS < 3 ? "GOOD" : pingEvents.roundTripLatencyMS < 8 ? "DELAYED" : "SLOW"}/>
+                                    </div>
                                 </div>
+
                             </div>
-
                         </div>
-                    </div>
 
 
-                </div>
-            </Dialog>
-            <Splitter step={10} className={"w-screen"}>
-                <SplitterPanel size={60} className="flex align-items-center justify-content-center">
-                    <DataTable
-                        virtualScrollerOptions={{ itemSize: 50}}
-                        value={products}
-                        showGridlines
-                        editMode="cell"
-                        globalFilterFields={['name', 'value']}
-                        filters={filters}
-                        removableSort
-                        filterDisplay="row"
-                        expandedRows={expandedRows}
-                        loading={loading}
-                        onRowToggle={(e) => setExpandedRows(e.data)}
-                        rowExpansionTemplate={rowExpansionTemplate}
-                        className="h-screen w-full"
-                        dataKey="key"
-                        header={header}
-                        scrollable
-                        scrollHeight={"80vh"}
-                        tableStyle={{minWidth: '15rem'}}
-                        emptyMessage="No Data Found"
-                    >
-                        <Column expander={allowExpansion} style={{width: '5rem'}}/>
-                        <Column field="name" header="Name" sortable/>
-                        <Column
-                            field="value"
-                            header="Value"
-                            className="font-bold max-w-1 overflow-hidden whitespace-nowrap"
-                            frozen={true}
-                            editor={textEditor}
-                            onCellEditComplete={onCellEditComplete}
-                            sortable
-                        />
-                    </DataTable>
-                </SplitterPanel>
-                <SplitterPanel size={40} className="flex-1 align-items-center justify-content-center">
-                    <div className="flex-1">
-                        <Terminal
-                            welcomeMessage="Welcome to XBOARD! Type help to begin."
-                            prompt="XTABLES $"
-                            pt={{
-                                root: 'bg-gray-900 text-white border-round h-[50vh]',
-                                prompt: 'text-gray-400 mr-2',
-                                command: 'text-primary-300 max-w-1',
-                                response: 'text-primary-300 max-w-1'
-                            }}
-                        />
-                        <Logs initialOutput={messages}></Logs>
                     </div>
-                </SplitterPanel>
-            </Splitter>
-        </div>
+                </Dialog>
+                <Splitter step={10} className={"w-screen"}>
+                    <SplitterPanel size={60} className="flex align-items-center justify-content-center">
+                        <DataTable
+                            ref={dt}
+                            virtualScrollerOptions={{itemSize: 50}}
+                            value={products}
+                            showGridlines
+                            editMode="cell"
+                            globalFilterFields={['name', 'value']}
+                            filters={filters}
+                            removableSort
+                            filterDisplay="row"
+                            expandedRows={expandedRows}
+                            loading={loading}
+                            onRowToggle={(e) => setExpandedRows(e.data)}
+                            rowExpansionTemplate={rowExpansionTemplate}
+                            className="h-screen w-full"
+                            dataKey="key"
+                            header={header}
+                            scrollable
+                            scrollHeight={"80vh"}
+                            tableStyle={{minWidth: '15rem'}}
+                            emptyMessage="No Data Found"
+                        >
+                            <Column expander={allowExpansion} style={{width: '5rem'}}/>
+                            <Column field="name" header="Name" sortable/>
+                            <Column
+                                field="value"
+                                header="Value"
+                                className="font-bold max-w-1 overflow-hidden whitespace-nowrap"
+                                frozen={true}
+                                editor={textEditor}
+                                onCellEditComplete={onCellEditComplete}
+                                sortable
+                            />
+                        </DataTable>
+                    </SplitterPanel>
+                    <SplitterPanel size={40} className="flex-1 align-items-center justify-content-center">
+                        <div className="flex-1">
+                            <Terminal
+                                welcomeMessage="Welcome to XBOARD! Type help to begin."
+                                prompt="XTABLES $"
+                                pt={{
+                                    root: 'bg-gray-900 text-white border-round h-[50vh]',
+                                    prompt: 'text-gray-400 mr-2',
+                                    command: 'text-primary-300',
+                                    response: 'text-primary-300'
+                                }}
+                            />
+                            <Logs initialOutput={messages}></Logs>
+                        </div>
+                    </SplitterPanel>
+                </Splitter>
+            </div>
         </div>
     </BlockUI>);
 }
