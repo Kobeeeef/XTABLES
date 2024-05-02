@@ -7,7 +7,7 @@ const Logs = ({initialOutput}) => {
 
     useEffect(() => {
         if (initialOutput && Array.isArray(initialOutput)) {
-            setTerminalOutput(initialOutput.join('\n'));
+            if (initialOutput.length > 0) setTerminalOutput(initialOutput.join('\n')); else setTerminalOutput("Waiting for another message...\n")
         }
         if (terminalOutputRef.current) {
             terminalOutputRef.current.scrollTop = terminalOutputRef.current.scrollHeight;

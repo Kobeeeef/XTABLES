@@ -11,9 +11,11 @@ import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
 import Image from 'next/image'
 
+import { Skeleton } from 'primereact/skeleton';
+
 import {Message} from 'primereact/message';
 
-
+import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import {InputText} from "primereact/inputtext";
 import Logs from '../Components/Logs';
@@ -29,7 +31,8 @@ import Swal from 'sweetalert2'
 
 export default function Main() {
     const [pingEvents, setPingEvents] = useState([]);
-    const [pingDialogShown, setPingDialogShown] = useState(false);
+    const pingDialogShown = useRef(false);
+    const [pingDialogShownState, setPingDialogShownState] = useState(pingDialogShown.current);
     const [serverStatus, setServerStatus] = useState(3);
     const [rawJSON, setRawJSON] = useState({});
     const [XTABLESState, setXTABLESState] = useState(false);
@@ -273,7 +276,7 @@ export default function Main() {
 
 
     const textEditor = (options) => {
-        return <InputText type="text" value={options.value} autoFocus={true}
+        return <InputText type="text" value={options.value}
                           onChange={(e) => options.editorCallback(e.target.value)}
                           onKeyDown={(e) => e.stopPropagation()}/>;
     };
@@ -310,7 +313,7 @@ export default function Main() {
                        dataKey="key" removableSort>
                 <Column expander={allowExpansion} style={{width: '5rem'}}/>
                 <Column field="name" header="" sortable/>
-                <Column field="value" header="" frozen={true} className="font-bold" editor={textEditor}
+                <Column field="value" header="" frozen={true} className="font-bold max-w-1 overflow-hidden whitespace-nowrap" editor={textEditor}
                         onCellEditComplete={onCellEditComplete}
                         sortable/>
             </DataTable>
@@ -342,7 +345,7 @@ export default function Main() {
                         placeholder="Name Search"
                         value={globalFilterValue}
                         onChange={onGlobalFilterChange}
-                        className="block w-full py-2.5 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg pl-11 pr-5 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                        className="block w-full py-2.5 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg pl-11 pr-5 rtl:pr-11 rtl:pl-5 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                     />
                 </div>
             </div>
@@ -351,7 +354,7 @@ export default function Main() {
     const header = renderHeader();
 
     return (<BlockUI blocked={loading}>
-
+        <div className={"h-screen"}>
 
         <Menubar end={<>
             <Tag className="mr-2" icon={serverStatus === WebSocket.OPEN ? "pi pi-check" : serverStatus === WebSocket.CONNECTING ? "pi pi-info-circle" : serverStatus === WebSocket.CLOSING ? "pi pi-exclamation-triangle" : "pi pi-times"} severity={serverStatus === WebSocket.OPEN ? "success" : serverStatus === WebSocket.CONNECTING ? "info" : serverStatus === WebSocket.CLOSING ? "warning" : "danger"} value={serverStatus === WebSocket.OPEN ? "Server Connected" : serverStatus === WebSocket.CONNECTING ? "Connecting Server" : serverStatus === WebSocket.CLOSING ? "Server Disconnecting" : "Server Disconnected"}/>
@@ -389,45 +392,45 @@ export default function Main() {
         }, {
             label: 'Ping', icon: 'pi pi-server', command: () => {
                 const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
-                setLoading(true)
-                sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
-                    setLoading(false)
-                    let value = JSON.parse(response.value);
-                    let networkLatencyMS = value.networkLatencyMS;
-                    let roundTripLatencyMS = value.roundTripLatencyMS;
+                pingShowDialog();
+                function pingShowDialog() {
+                    sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
+                        let value = JSON.parse(response.value);
+                        let networkLatencyMS = value.networkLatencyMS;
+                        let roundTripLatencyMS = value.roundTripLatencyMS;
+                        const timeToReachServer = new Date(Date.now() + roundTripLatencyMS - networkLatencyMS);
+                        const timeToReachServerFormatted = `${timeToReachServer.getHours().toString().padStart(2, '0')}:${timeToReachServer.getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
 
-                    // Calculate the time to reach the server
-                    const timeToReachServer = new Date(Date.now() + roundTripLatencyMS - networkLatencyMS);
-                    const timeToReachServerFormatted = `${timeToReachServer.getHours().toString().padStart(2, '0')}:${timeToReachServer.getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
 
-                    // Simulate server processing time (for demonstration)
+                        const events = [{status: 'Sent', date: currentTime}, {
+                            status: 'Processing',
+                            date: timeToReachServerFormatted
+                        }, {
+                            status: 'Received',
+                            date: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`
+                        },];
+                        setPingEvents({
+                            networkLatencyMS: networkLatencyMS, roundTripLatencyMS: roundTripLatencyMS, events: events
+                        })
+                        pingDialogShown.current = true;
+                        setPingDialogShownState(true)
+                        setTimeout(() => {
+                            if(pingDialogShown.current) return pingShowDialog();
+                        }, 150)
 
-                    const events = [{status: 'Sent', date: currentTime}, {
-                        status: 'Processing',
-                        date: timeToReachServerFormatted
-                    }, {
-                        status: 'Received',
-                        date: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`
-                    },];
-                    setPingEvents({
-                        networkLatencyMS: networkLatencyMS, roundTripLatencyMS: roundTripLatencyMS, events: events
-                    })
-                    setPingDialogShown(true)
-
-                }).catch(error => {
-                    Swal.fire({
-                        toast: true,
-                        title: 'Failed To Ping!',
-                        text: "The server is offline or unresponsive!",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        icon: "error",
-                        timerProgressBar: true,
-                        position: "top",
+                    }).catch(error => {
+                        Swal.fire({
+                            toast: true,
+                            title: 'Failed To Ping!',
+                            text: "The server is offline or unresponsive!",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            icon: "error",
+                            timerProgressBar: true,
+                            position: "top",
+                        });
                     });
-                    setLoading(false)
-                });
-
+                }
 
             }
         }, {
@@ -486,8 +489,8 @@ export default function Main() {
 
         }]}/>
         <div className="flex bg-gray-200">
-            <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShown} style={{width: '50vw'}}
-                    onHide={() => setPingDialogShown(false)}>
+            <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShownState} style={{width: '50vw'}}
+                    onHide={() => {pingDialogShown.current = false; setPingDialogShownState(false)}}>
                 <Timeline value={pingEvents.events} opposite={(item) => item.status}
                           content={(item) => <small className="text-color-secondary">{item.date}</small>}/>
                 <hr className="my-6 border-1 border-gray-200"/>
@@ -501,8 +504,8 @@ export default function Main() {
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.networkLatencyMS}</span>
                                 <div className="flex justify-center mt-2">
                                     <Message
-                                        severity={pingEvents.networkLatencyMS < 0.4 ? "success" : pingEvents.networkLatencyMS < 0.6 ? "warn" : "error"}
-                                        text={pingEvents.networkLatencyMS < 0.4 ? "GOOD" : pingEvents.networkLatencyMS < 0.6 ? "DELAYED" : "SLOW"}/>
+                                        severity={pingEvents.networkLatencyMS < 0.7 ? "success" : pingEvents.networkLatencyMS < 1 ? "warn" : "error"}
+                                        text={pingEvents.networkLatencyMS < 0.7 ? "GOOD" : pingEvents.networkLatencyMS < 1 ? "DELAYED" : "SLOW"}/>
                                 </div>
                             </div>
                         </div>
@@ -516,8 +519,8 @@ export default function Main() {
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.roundTripLatencyMS}</span>
                                 <div className="flex justify-center mt-2">
                                     <Message
-                                        severity={pingEvents.roundTripLatencyMS < 0.9 ? "success" : pingEvents.roundTripLatencyMS < 1.5 ? "warn" : "error"}
-                                        text={pingEvents.roundTripLatencyMS < 0.9 ? "GOOD" : pingEvents.roundTripLatencyMS < 1.5 ? "DELAYED" : "SLOW"}/>
+                                        severity={pingEvents.roundTripLatencyMS < 3 ? "success" : pingEvents.roundTripLatencyMS < 8 ? "warn" : "error"}
+                                        text={pingEvents.roundTripLatencyMS < 3 ? "GOOD" : pingEvents.roundTripLatencyMS < 8 ? "DELAYED" : "SLOW"}/>
                                 </div>
                             </div>
 
@@ -530,6 +533,7 @@ export default function Main() {
             <Splitter step={10} className={"w-screen"}>
                 <SplitterPanel size={60} className="flex align-items-center justify-content-center">
                     <DataTable
+                        virtualScrollerOptions={{ itemSize: 50}}
                         value={products}
                         showGridlines
                         editMode="cell"
@@ -554,7 +558,7 @@ export default function Main() {
                         <Column
                             field="value"
                             header="Value"
-                            className="font-bold"
+                            className="font-bold max-w-1 overflow-hidden whitespace-nowrap"
                             frozen={true}
                             editor={textEditor}
                             onCellEditComplete={onCellEditComplete}
@@ -570,14 +574,15 @@ export default function Main() {
                             pt={{
                                 root: 'bg-gray-900 text-white border-round h-[50vh]',
                                 prompt: 'text-gray-400 mr-2',
-                                command: 'text-primary-300',
-                                response: 'text-primary-300'
+                                command: 'text-primary-300 max-w-1',
+                                response: 'text-primary-300 max-w-1'
                             }}
                         />
                         <Logs initialOutput={messages}></Logs>
                     </div>
                 </SplitterPanel>
             </Splitter>
+        </div>
         </div>
     </BlockUI>);
 }
