@@ -10,6 +10,8 @@ import {DataTable} from 'primereact/datatable';
 import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
 
+import {MeterGroup} from 'primereact/metergroup';
+
 import {Message} from 'primereact/message';
 import {Tag} from 'primereact/tag';
 import {InputText} from "primereact/inputtext";
@@ -416,13 +418,14 @@ export default function Main() {
                             setPingEvents({
                                 networkLatencyMS: networkLatencyMS,
                                 roundTripLatencyMS: roundTripLatencyMS,
+                                systemStatistics: value.systemStatistics,
                                 events: events
                             })
                             pingDialogShown.current = true;
                             setPingDialogShownState(true)
                             setTimeout(() => {
                                 if (pingDialogShown.current) return pingShowDialog();
-                            }, 150)
+                            }, 50)
 
                         }).catch(error => {
                             Swal.fire({
@@ -557,8 +560,8 @@ export default function Main() {
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.networkLatencyMS}</span>
                                     <div className="flex justify-center mt-2">
                                         <Message
-                                            severity={pingEvents.networkLatencyMS < 0.7 ? "success" : pingEvents.networkLatencyMS < 1 ? "warn" : "error"}
-                                            text={pingEvents.networkLatencyMS < 0.7 ? "GOOD" : pingEvents.networkLatencyMS < 1 ? "DELAYED" : "SLOW"}/>
+                                            severity={pingEvents.networkLatencyMS < 1 ? "success" : pingEvents.networkLatencyMS < 1.5 ? "warn" : "error"}
+                                            text={pingEvents.networkLatencyMS < 1 ? "GOOD" : pingEvents.networkLatencyMS < 1.5 ? "DELAYED" : "SLOW"}/>
                                     </div>
                                 </div>
                             </div>
@@ -581,6 +584,42 @@ export default function Main() {
                         </div>
 
 
+                    </div>
+                    <hr className="my-6 border-1 border-gray-200"/>
+                    <div className="space-y-5">
+                        <MeterGroup values={[{
+                            label: 'Memory Usage',
+                            icon: "pi pi-history",
+                            color: '#ff0000',
+                            value: pingEvents?.systemStatistics ? (pingEvents.systemStatistics.maxMemoryMB / pingEvents.systemStatistics.freeMemoryMB).toFixed(2) : "UNKNOWN"
+                        }, {
+                            label: 'Memory Free',
+                            color: '#34d399',
+                            icon: "pi pi-history",
+                            value: pingEvents?.systemStatistics ? (100 - pingEvents.systemStatistics.maxMemoryMB / pingEvents.systemStatistics.freeMemoryMB).toFixed(2) : "UNKNOWN"
+                        }]}/>
+                        <MeterGroup values={[{
+                            label: 'CPU Usage',
+                            icon: "pi pi-microchip",
+                            color: '#ff0000',
+                            value: pingEvents?.systemStatistics ?pingEvents.systemStatistics.processCpuLoadPercentage.toFixed(2) : "UNKNOWN"
+                        }, {
+                            label: 'CPU Free',
+                            color: '#34d399',
+                            icon: "pi pi-microchip",
+                            value: pingEvents?.systemStatistics ?(100 - pingEvents.systemStatistics.processCpuLoadPercentage).toFixed(2) : "UNKNOWN"
+                        }]}/>
+                        <MeterGroup values={[{
+                            label: 'Total Clients',
+                            icon: "pi pi-user",
+                            color: '#ff0000',
+                            value: pingEvents?.systemStatistics ?pingEvents.systemStatistics.totalClients : 0
+                        }, {
+                            label: 'Free Clients',
+                            icon: "pi pi-user",
+                            color: '#34d399',
+                            value: pingEvents?.systemStatistics ?100 - pingEvents.systemStatistics.totalClients : 0
+                        }]}/>
                     </div>
                 </Dialog>
                 <Splitter step={10} className={"w-screen"}>

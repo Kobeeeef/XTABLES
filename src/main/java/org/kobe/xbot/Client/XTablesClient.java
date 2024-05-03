@@ -243,11 +243,12 @@ public class XTablesClient {
             public LatencyInfo parseResponse(long startTime, Object result) {
                 RequestInfo info = new RequestInfo(result.toString());
                 if (info.getTokens().length == 2 && info.getTokens()[0].equals("OK")) {
-                    long serverTime = Long.parseLong(info.getTokens()[1]);
+                    SystemStatistics stats = gson.fromJson(info.getTokens()[1], SystemStatistics.class);
+                    long serverTime = stats.getNanoTime();
                     long currentTime = System.nanoTime();
                     long networkLatency = Math.abs(currentTime - serverTime);
                     long roundTripLatency = Math.abs(currentTime - startTime);
-                    return new LatencyInfo(networkLatency / 1e6, roundTripLatency / 1e6);
+                    return new LatencyInfo(networkLatency / 1e6, roundTripLatency / 1e6, stats);
                 } else {
                     return null;
                 }
@@ -258,6 +259,6 @@ public class XTablesClient {
     }
 
 
-    public record LatencyInfo(double networkLatencyMS, double roundTripLatencyMS) {
+    public record LatencyInfo(double networkLatencyMS, double roundTripLatencyMS, SystemStatistics systemStatistics) {
     }
 }

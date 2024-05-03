@@ -19,11 +19,6 @@ public class Main {
         String response = client.getRawJSON().complete();
         System.out.println(response);
 
-        // Get latency from server
-        XTablesClient.LatencyInfo info = client.ping_latency().complete();
-        System.out.println("Network Latency: " + info.networkLatencyMS() + "ms");
-        System.out.println("Round Trip Latency: " + info.roundTripLatencyMS() + "ms");
-
         // -------- PUT VALUES --------
         // "OK" - Value updated
         // "FAIL" - Failed to update
@@ -88,5 +83,11 @@ public class Main {
         // Unsubscribe after a certain condition is met
         status = client.unsubscribeUpdateEvent("key", String.class, updateConsumer).complete();
         System.out.println(status);
+
+        // Get latency from server
+        XTablesClient.LatencyInfo info = client.ping_latency().complete();
+        System.out.println("Network Latency: " + info.networkLatencyMS() + "ms");
+        System.out.println("Round Trip Latency: " + info.roundTripLatencyMS() + "ms");
+        System.out.println("CPU Usage: " + info.systemStatistics().getProcessCpuLoadPercentage());
     }
 }

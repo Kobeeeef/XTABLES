@@ -200,7 +200,8 @@ public class XTables {
                         out.println(responseInfo.parsed());
                         out.flush();
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.PING)) {
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PING, ResponseStatus.OK.name() + " " + System.nanoTime());
+                        SystemStatistics systemStatistics = new SystemStatistics(clients.size());
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PING, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
                         out.println(responseInfo.parsed());
                         out.flush();
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
@@ -228,15 +229,19 @@ public class XTables {
                 out.close();
                 in.close();
                 clientSocket.close();
+                clients.remove(this);
+                this.interrupt();
                 messages_log.cancel(true);
             } catch (IOException e) {
                 String message = e.getMessage();
                 if (message.contains("Connection reset")) {
                     logger.info(String.format("Client disconnected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
                     messages_log.cancel(true);
+                    clients.remove(this);
                 } else {
                     logger.severe("Error occurred: " + e.getMessage());
                     messages_log.cancel(true);
+                    clients.remove(this);
                 }
             }
         }
