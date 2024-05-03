@@ -230,8 +230,8 @@ public class XTables {
                 in.close();
                 clientSocket.close();
                 clients.remove(this);
-                this.interrupt();
                 messages_log.cancel(true);
+                this.interrupt();
             } catch (IOException e) {
                 String message = e.getMessage();
                 if (message.contains("Connection reset")) {
