@@ -32,7 +32,9 @@ public class XTablesClient {
             Thread.currentThread().interrupt();
         }
     }
-
+    public void updateServerAddress(String SERVER_ADDRESS, int SERVER_PORT) {
+        client.setSERVER_ADDRESS(SERVER_ADDRESS).setSERVER_PORT(SERVER_PORT).reconnect();
+    }
     public static final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
 
     public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {

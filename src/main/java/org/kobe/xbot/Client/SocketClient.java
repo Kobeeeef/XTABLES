@@ -24,8 +24,8 @@ public class SocketClient {
     private final Logger logger = Logger.getLogger(SocketClient.class.getName());
     private final ExecutorService executor;
     private ThreadPoolExecutor socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
-    private final String SERVER_ADDRESS;
-    private final int SERVER_PORT;
+    private String SERVER_ADDRESS;
+    private int SERVER_PORT;
     private long RECONNECT_DELAY_MS;
     private boolean CLEAR_UPDATE_MESSAGES = true;
     private static final List<RequestInfo> MESSAGES = new ArrayList<>() {
@@ -46,7 +46,7 @@ public class SocketClient {
         }
     };
 
-    public Boolean isConnected = null;
+    public Boolean isConnected = false;
     private PrintWriter out = null;
     private BufferedReader in = null;
     private Socket socket;
@@ -60,6 +60,16 @@ public class SocketClient {
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
         this.executor = Executors.newFixedThreadPool(MAX_THREADS);
         this.xTablesClient = xTablesClient;
+    }
+
+    public SocketClient setSERVER_ADDRESS(String SERVER_ADDRESS) {
+        this.SERVER_ADDRESS = SERVER_ADDRESS;
+        return this;
+    }
+
+    public SocketClient setSERVER_PORT(int SERVER_PORT) {
+        this.SERVER_PORT = SERVER_PORT;
+        return this;
     }
 
     public long getRECONNECT_DELAY_MS() {
@@ -128,10 +138,9 @@ public class SocketClient {
 
         @Override
         public void run() {
-            isConnected = true;
             try {
                 String message;
-                while ((message = in.readLine()) != null && !socket.isClosed() && socket.isConnected() && socket.isBound()) {
+                while ((message = in.readLine()) != null && !socket.isClosed() && socket.isConnected()) {
                     isConnected = true;
                     RequestInfo requestInfo = new RequestInfo(message);
                     MESSAGES.add(requestInfo);
@@ -184,9 +193,10 @@ public class SocketClient {
         out.flush();
     }
 
-    private void reconnect() {
+    public void reconnect() {
         try {
             socket.close();
+            isConnected = false;
         } catch (Exception ignored) {
         }
         this.connect();

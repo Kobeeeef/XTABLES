@@ -1,8 +1,6 @@
 "use client"
 
-import 'primereact/resources/themes/saga-blue/theme.css'; //theme
-import 'primereact/resources/primereact.min.css'; //core css
-import 'primeicons/primeicons.css';
+
 
 
 import React, {useEffect, useRef, useState} from 'react';
@@ -12,6 +10,8 @@ import {Column} from 'primereact/column';
 
 import {MeterGroup} from 'primereact/metergroup';
 
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
 import {Message} from 'primereact/message';
 import {Tag} from 'primereact/tag';
 import {InputText} from "primereact/inputtext";
@@ -31,6 +31,7 @@ export default function Main() {
     const [pingEvents, setPingEvents] = useState([]);
     const pingDialogShown = useRef(false);
     const [pingDialogShownState, setPingDialogShownState] = useState(pingDialogShown.current);
+    const [settingsDialogShown, setSettingsDialogShown] = useState(false);
     const [serverStatus, setServerStatus] = useState(3);
     const [rawJSON, setRawJSON] = useState({});
     const [XTABLESState, setXTABLESState] = useState(false);
@@ -110,77 +111,85 @@ export default function Main() {
             let argsIndex = text.indexOf(' ');
             let command = argsIndex !== -1 ? text.substring(0, argsIndex) : text;
             let tokens = text.split(" ");
-            switch (command) {
-                case 'help':
-                case 'ls':
-                    TerminalService.emit('response', helpMessage);
-                    break;
-                case 'clear':
-                    TerminalService.emit('clear');
-                    break;
-                case 'put':
-                    if (!(tokens.length >= 3)) {
-                        TerminalService.emit('response', "Invalid command usage!");
-                    } else if (validateKey(tokens[1]) !== null) {
-                        TerminalService.emit('response', validateKey(tokens[1]));
-                    } else {
+            if (XTABLESState && serverStatus) {
+                switch (command) {
+                    case 'help':
+                    case 'ls':
+                        TerminalService.emit('response', helpMessage);
+                        break;
+                    case 'clear':
+                        TerminalService.emit('clear');
+                        break;
+                    case 'put':
+                        if (!(tokens.length >= 3)) {
+                            TerminalService.emit('response', "Invalid command usage!");
+                        } else if (validateKey(tokens[1]) !== null) {
+                            TerminalService.emit('response', validateKey(tokens[1]));
+                        } else {
+                            setLoading(true)
+                            TerminalService.emit('response', "Sending put request...");
+                            sendMessageAndWaitForCondition({
+                                type: "UPDATE", value: tokens.slice(2).join(" "), key: tokens[1]
+                            }, (response) => response.type === "UPDATE_RESPONSE").then(response => {
+                                setLoading(false)
+                                let value = response.value;
+                                TerminalService.emit('response', "Server responded with: " + value);
+                            }).catch(error => {
+                                setLoading(false)
+                                TerminalService.emit('response', "Failed to put data: " + error);
+                            });
+                        }
+                        break;
+                    case 'get':
+                        if (!(tokens.length == 2)) {
+                            TerminalService.emit('response', "Invalid command usage!");
+                        } else if (validateKey(tokens[1]) !== null) {
+                            TerminalService.emit('response', validateKey(tokens[1]));
+                        } else {
+                            TerminalService.emit('response', "Sending get request...");
+                            sendMessageAndWaitForCondition({
+                                type: "GET",
+                                key: tokens[1]
+                            }, (response) => response.type === "GET").then(response => {
+                                let value = response.value;
+                                TerminalService.emit('response', "" + value);
+                            }).catch(error => {
+                                TerminalService.emit('response', "Failed to get data: " + error);
+                            });
+                        }
+                        break;
+                    case 'sync':
                         setLoading(true)
-                        TerminalService.emit('response', "Sending put request...");
-                        sendMessageAndWaitForCondition({
-                            type: "UPDATE", value: tokens.slice(2).join(" "), key: tokens[1]
-                        }, (response) => response.type === "UPDATE_RESPONSE").then(response => {
+                        TerminalService.emit('response', "Syncing data...");
+                        sendMessageAndWaitForCondition({type: "ALL"}, (response) => response.type === "ALL").then(response => {
                             setLoading(false)
-                            let value = response.value;
-                            TerminalService.emit('response', "Server responded with: " + value);
+                            TerminalService.emit('response', "Data synced!");
                         }).catch(error => {
                             setLoading(false)
-                            TerminalService.emit('response', "Failed to put data: " + error);
+                            TerminalService.emit('response', "Failed to sync data: " + error);
                         });
-                    }
-                    break;
-                case 'get':
-                    if (!(tokens.length == 2)) {
-                        TerminalService.emit('response', "Invalid command usage!");
-                    } else if (validateKey(tokens[1]) !== null) {
-                        TerminalService.emit('response', validateKey(tokens[1]));
-                    } else {
-                        TerminalService.emit('response', "Sending get request...");
-                        sendMessageAndWaitForCondition({
-                            type: "GET",
-                            key: tokens[1]
-                        }, (response) => response.type === "GET").then(response => {
-                            let value = response.value;
-                            TerminalService.emit('response', "" + value);
+                        break;
+                    case 'ping':
+                        TerminalService.emit('response', "Pinging server...");
+                        sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
+                            let value = JSON.parse(response.value);
+                            let networkLatencyMS = value.networkLatencyMS;
+                            let roundTripLatencyMS = value.roundTripLatencyMS;
+                            TerminalService.emit('response', `Network Latency = ${networkLatencyMS}ms; Round Trip Latency = ${roundTripLatencyMS}ms`);
                         }).catch(error => {
-                            TerminalService.emit('response', "Failed to get data: " + error);
+                            TerminalService.emit('response', "Failed to ping server: " + error);
                         });
-                    }
-                    break;
-                case 'sync':
-                    setLoading(true)
-                    TerminalService.emit('response', "Syncing data...");
-                    sendMessageAndWaitForCondition({type: "ALL"}, (response) => response.type === "ALL").then(response => {
-                        setLoading(false)
-                        TerminalService.emit('response', "Data synced!");
-                    }).catch(error => {
-                        setLoading(false)
-                        TerminalService.emit('response', "Failed to sync data: " + error);
-                    });
-                    break;
-                case 'ping':
-                    TerminalService.emit('response', "Pinging server...");
-                    sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
-                        let value = JSON.parse(response.value);
-                        let networkLatencyMS = value.networkLatencyMS;
-                        let roundTripLatencyMS = value.roundTripLatencyMS;
-                        TerminalService.emit('response', `Network Latency = ${networkLatencyMS}ms; Round Trip Latency = ${roundTripLatencyMS}ms`);
-                    }).catch(error => {
-                        TerminalService.emit('response', "Failed to ping server: " + error);
-                    });
-                    break;
-                default:
-                    TerminalService.emit('response', 'Unknown command: ' + command);
-                    break;
+                        break;
+                    default:
+                        TerminalService.emit('response', 'Unknown command: ' + command);
+                        break;
+                }
+        } else {
+                if(!XTABLESState) {
+                    TerminalService.emit('response', "Connect to XTABLES server first!");
+                } else {
+                    TerminalService.emit('response', "Connect to backend server first!");
+                }
             }
 
 
@@ -190,7 +199,7 @@ export default function Main() {
         return () => {
             TerminalService.off('command', commandHandler);
         };
-    }, [socket]);
+    }, [socket, serverStatus, XTABLESState]);
 
     function sendMessageAndWaitForCondition(message, conditionFunc, timeout = 1500) {
 
@@ -339,14 +348,11 @@ export default function Main() {
                 <div className="relative flex items-center mt-2">
         <span className="absolute">
         </span>
-                    <input
-                        type="text"
-                        id="global_search"
-                        placeholder="Name Search"
-                        value={globalFilterValue}
-                        onChange={onGlobalFilterChange}
-                        className="block w-full py-2.5 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg pl-11 pr-5 rtl:pr-11 rtl:pl-5 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                    />
+
+                    <IconField className={"block w-full"} iconPosition="left">
+                        <InputIcon className="pi pi-search"> </InputIcon>
+                        <InputText className={"border border-gray-200 block w-full py-2.5 pl-11 pr-5 rtl:pr-11 rtl:pl-5 rounded-lg"} type="text" id="global_search" value={globalFilterValue} placeholder="Name Search" onChange={onGlobalFilterChange} />
+                    </IconField>
                 </div>
             </div>
         </div>);
@@ -354,7 +360,7 @@ export default function Main() {
     const header = renderHeader();
     return (
         <>
-            <Menubar end={<>
+            <Menubar className={"rounded-none"} end={<>
                 <Tag className="mr-2"
                      icon={serverStatus === WebSocket.OPEN ? "pi pi-check" : serverStatus === WebSocket.CONNECTING ? "pi pi-info-circle" : serverStatus === WebSocket.CLOSING ? "pi pi-exclamation-triangle" : "pi pi-times"}
                      severity={serverStatus === WebSocket.OPEN ? "success" : serverStatus === WebSocket.CONNECTING ? "info" : serverStatus === WebSocket.CLOSING ? "warning" : "danger"}
@@ -364,6 +370,10 @@ export default function Main() {
                      severity={XTABLESState && serverStatus === WebSocket.OPEN ? "success" : "danger"}
                      value={XTABLESState && serverStatus === WebSocket.OPEN ? "XTABLES Connected" : "XTABLES Disconnected"}/>
             </>} start={<img width={35} className="mr-2 rounded-xl" alt="logo" src={"/favicon.ico"}/>} model={[{
+                label: 'Settings', icon: 'pi pi-cog', command: () => {
+                    setSettingsDialogShown(true)
+                }},
+                {
                 label: 'Sync', icon: 'pi pi-sync', command: () => {
                     setLoading(true)
                     socket.send(JSON.stringify({type: "ALL"}));
@@ -395,10 +405,10 @@ export default function Main() {
                 }
             }, {
                 label: 'Ping', icon: 'pi pi-server', command: () => {
-                    const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
                     pingShowDialog();
 
                     function pingShowDialog() {
+                        const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
                         sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
                             let value = JSON.parse(response.value);
                             let networkLatencyMS = value.networkLatencyMS;
@@ -539,90 +549,94 @@ export default function Main() {
                 ]
             }
             ]}/>
-        <BlockUI blocked={loading}>
-        <div className={"h-screen"}>
-            <div className="flex bg-gray-200">
-                <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShownState}
-                        style={{width: '50vw'}}
-                        onHide={() => {
-                            pingDialogShown.current = false;
-                            setPingDialogShownState(false)
-                        }}>
-                    <Timeline value={pingEvents.events} opposite={(item) => item.status}
-                              content={(item) => <small className="text-color-secondary">{item.date}</small>}/>
-                    <hr className="my-6 border-1 border-gray-200"/>
+            <Dialog maximizable style={{width: '100vw', height: '100vw'}} header="XBOARD Settings" visible={settingsDialogShown} onHide={() => {
+                setSettingsDialogShown(false)
+            }}>
 
-                    <div className="grid grid-cols-2 justify-center">
-                        <div className="card h-full">
-                            <span className="font-semibold text-lg flex justify-center">Network Latency</span>
-                            <div className="flex justify-center mt-1">
-                                <div>
+            </Dialog>
+            <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShownState}
+                    style={{width: '60vw'}}
+                    onHide={() => {
+                        pingDialogShown.current = false;
+                        setPingDialogShownState(false)
+                    }}>
+                <Timeline value={pingEvents.events} opposite={(item) => item.status}
+                          content={(item) => <small className="text-color-secondary">{item.date}</small>}/>
+                <hr className="my-6 border-1 border-gray-200"/>
+
+                <div className="grid grid-cols-2 justify-center">
+                    <div className="card h-full">
+                        <span className="font-semibold text-lg flex justify-center">Network Latency</span>
+                        <div className="flex justify-center mt-1">
+                            <div>
                                     <span
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.networkLatencyMS}</span>
-                                    <div className="flex justify-center mt-2">
-                                        <Message
-                                            severity={pingEvents.networkLatencyMS < 1 ? "success" : pingEvents.networkLatencyMS < 1.5 ? "warn" : "error"}
-                                            text={pingEvents.networkLatencyMS < 1 ? "GOOD" : pingEvents.networkLatencyMS < 1.5 ? "DELAYED" : "SLOW"}/>
-                                    </div>
+                                <div className="flex justify-center mt-2">
+                                    <Message
+                                        severity={pingEvents.networkLatencyMS < 1 ? "success" : pingEvents.networkLatencyMS < 1.5 ? "warn" : "error"}
+                                        text={pingEvents.networkLatencyMS < 1 ? "GOOD" : pingEvents.networkLatencyMS < 1.5 ? "DELAYED" : "SLOW"}/>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="card h-full">
-                            <span className="font-semibold flex justify-center text-lg">Round Trip Latency</span>
-                            <div className="flex justify-center mt-1">
-                                <div>
+                    <div className="card h-full">
+                        <span className="font-semibold flex justify-center text-lg">Round Trip Latency</span>
+                        <div className="flex justify-center mt-1">
+                            <div>
                                     <span
                                         className="text-4xl font-bold text-900 flex justify-center">{pingEvents.roundTripLatencyMS}</span>
-                                    <div className="flex justify-center mt-2">
-                                        <Message
-                                            severity={pingEvents.roundTripLatencyMS < 3 ? "success" : pingEvents.roundTripLatencyMS < 8 ? "warn" : "error"}
-                                            text={pingEvents.roundTripLatencyMS < 3 ? "GOOD" : pingEvents.roundTripLatencyMS < 8 ? "DELAYED" : "SLOW"}/>
-                                    </div>
+                                <div className="flex justify-center mt-2">
+                                    <Message
+                                        severity={pingEvents.roundTripLatencyMS < 3 ? "success" : pingEvents.roundTripLatencyMS < 8 ? "warn" : "error"}
+                                        text={pingEvents.roundTripLatencyMS < 3 ? "GOOD" : pingEvents.roundTripLatencyMS < 8 ? "DELAYED" : "SLOW"}/>
                                 </div>
-
                             </div>
+
                         </div>
+                    </div>
 
 
-                    </div>
-                    <hr className="my-6 border-1 border-gray-200"/>
-                    <div className="space-y-5">
-                        <MeterGroup values={[{
-                            label: 'Memory Usage',
-                            icon: "pi pi-history",
-                            color: '#ff0000',
-                            value: pingEvents?.systemStatistics ? (pingEvents.systemStatistics.maxMemoryMB / pingEvents.systemStatistics.freeMemoryMB).toFixed(2) : "UNKNOWN"
-                        }, {
-                            label: 'Memory Free',
-                            color: '#34d399',
-                            icon: "pi pi-history",
-                            value: pingEvents?.systemStatistics ? (100 - pingEvents.systemStatistics.maxMemoryMB / pingEvents.systemStatistics.freeMemoryMB).toFixed(2) : "UNKNOWN"
-                        }]}/>
-                        <MeterGroup values={[{
-                            label: 'CPU Usage',
-                            icon: "pi pi-microchip",
-                            color: '#ff0000',
-                            value: pingEvents?.systemStatistics ?pingEvents.systemStatistics.processCpuLoadPercentage.toFixed(2) : "UNKNOWN"
-                        }, {
-                            label: 'CPU Free',
-                            color: '#34d399',
-                            icon: "pi pi-microchip",
-                            value: pingEvents?.systemStatistics ?(100 - pingEvents.systemStatistics.processCpuLoadPercentage).toFixed(2) : "UNKNOWN"
-                        }]}/>
-                        <MeterGroup values={[{
-                            label: 'Total Clients',
-                            icon: "pi pi-user",
-                            color: '#ff0000',
-                            value: pingEvents?.systemStatistics ?pingEvents.systemStatistics.totalClients : 0
-                        }, {
-                            label: 'Free Clients',
-                            icon: "pi pi-user",
-                            color: '#34d399',
-                            value: pingEvents?.systemStatistics ?100 - pingEvents.systemStatistics.totalClients : 0
-                        }]}/>
-                    </div>
-                </Dialog>
+                </div>
+                <hr className="my-6 border-1 border-gray-200"/>
+                <div className="space-y-5">
+                    <MeterGroup values={[{
+                        label: 'Memory Usage',
+                        icon: "pi pi-history",
+                        color: '#ff0000',
+                        value: pingEvents?.systemStatistics ? (pingEvents.systemStatistics.maxMemoryMB / pingEvents.systemStatistics.freeMemoryMB).toFixed(2) : "UNKNOWN"
+                    }, {
+                        label: 'Memory Free',
+                        color: '#34d399',
+                        icon: "pi pi-history",
+                        value: pingEvents?.systemStatistics ? (100 - pingEvents.systemStatistics.maxMemoryMB / pingEvents.systemStatistics.freeMemoryMB).toFixed(2) : "UNKNOWN"
+                    }]}/>
+                    <MeterGroup values={[{
+                        label: 'CPU Usage',
+                        icon: "pi pi-microchip",
+                        color: '#ff0000',
+                        value: pingEvents?.systemStatistics ?pingEvents.systemStatistics.processCpuLoadPercentage.toFixed(2) : "UNKNOWN"
+                    }, {
+                        label: 'CPU Free',
+                        color: '#34d399',
+                        icon: "pi pi-microchip",
+                        value: pingEvents?.systemStatistics ?(100 - pingEvents.systemStatistics.processCpuLoadPercentage).toFixed(2) : "UNKNOWN"
+                    }]}/>
+                    <MeterGroup values={[{
+                        label: 'Total Clients',
+                        icon: "pi pi-user",
+                        color: '#ff0000',
+                        value: pingEvents?.systemStatistics ?pingEvents.systemStatistics.totalClients : 0
+                    }, {
+                        label: 'Free Clients',
+                        icon: "pi pi-user",
+                        color: '#34d399',
+                        value: pingEvents?.systemStatistics ?100 - pingEvents.systemStatistics.totalClients : 0
+                    }]}/>
+                </div>
+            </Dialog>
+        <div className={"h-screen"}>
+            <div className="flex bg-gray-200">
                 <Splitter step={10} className={"w-screen"}>
                     <SplitterPanel size={60} className="flex align-items-center justify-content-center">
                         <DataTable
@@ -645,7 +659,6 @@ export default function Main() {
                             scrollable
                             scrollHeight={"80vh"}
                             tableStyle={{minWidth: '15rem'}}
-                            emptyMessage="No Data Found"
                         >
                             <Column expander={allowExpansion} style={{width: '5rem'}}/>
                             <Column field="name" header="Name" sortable/>
@@ -662,6 +675,7 @@ export default function Main() {
                     </SplitterPanel>
                     <SplitterPanel size={40} className="flex-1 align-items-center justify-content-center">
                         <div className="flex-1">
+
                             <Terminal
                                 welcomeMessage="Welcome to XBOARD! Type help to begin."
                                 prompt="XTABLES $"
@@ -672,11 +686,11 @@ export default function Main() {
                                     response: 'text-primary-300'
                                 }}
                             />
+
                             <Logs initialOutput={messages}></Logs>
                         </div>
                     </SplitterPanel>
                 </Splitter>
             </div>
-        </div>
-    </BlockUI></>);
+        </div></>);
 }

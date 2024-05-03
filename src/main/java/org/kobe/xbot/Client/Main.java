@@ -19,6 +19,9 @@ public class Main {
         String response = client.getRawJSON().complete();
         System.out.println(response);
 
+        // Variable for connection status, updates on every message
+        System.out.println("Connected? " + client.getSocketClient().isConnected);
+
         // -------- PUT VALUES --------
         // "OK" - Value updated
         // "FAIL" - Failed to update
