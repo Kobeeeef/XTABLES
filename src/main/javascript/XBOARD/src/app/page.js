@@ -352,9 +352,8 @@ export default function Main() {
         </div>);
     };
     const header = renderHeader();
-    return (<BlockUI blocked={loading}>
-        <div className={"h-screen"}>
-
+    return (
+        <>
             <Menubar end={<>
                 <Tag className="mr-2"
                      icon={serverStatus === WebSocket.OPEN ? "pi pi-check" : serverStatus === WebSocket.CONNECTING ? "pi pi-info-circle" : serverStatus === WebSocket.CLOSING ? "pi pi-exclamation-triangle" : "pi pi-times"}
@@ -540,6 +539,8 @@ export default function Main() {
                 ]
             }
             ]}/>
+        <BlockUI blocked={loading}>
+        <div className={"h-screen"}>
             <div className="flex bg-gray-200">
                 <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShownState}
                         style={{width: '50vw'}}
@@ -677,5 +678,5 @@ export default function Main() {
                 </Splitter>
             </div>
         </div>
-    </BlockUI>);
+    </BlockUI></>);
 }
