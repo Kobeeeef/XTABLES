@@ -1,17 +1,18 @@
 "use client"
 
 
-
-
 import React, {useEffect, useRef, useState} from 'react';
 import {DataTable} from 'primereact/datatable';
 import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
 
+import {Dropdown} from 'primereact/dropdown';
 import {MeterGroup} from 'primereact/metergroup';
-
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
+import {Button} from 'primereact/button';
+import {InputNumber} from 'primereact/inputnumber';
+import {FloatLabel} from 'primereact/floatlabel';
+import {IconField} from 'primereact/iconfield';
+import {InputIcon} from 'primereact/inputicon';
 import {Message} from 'primereact/message';
 import {Tag} from 'primereact/tag';
 import {InputText} from "primereact/inputtext";
@@ -28,6 +29,10 @@ import Swal from 'sweetalert2'
 
 export default function Main() {
     const dt = useRef(null);
+    const [serverPort, setServerPort] = useState(null);
+    const [serverAddress, setServerAddress] = useState(null);
+    const [reconnectionTimeout, setReconnectionTimeout] = useState(null);
+    const [settingsLoading, setSettingsLoading] = useState(false);
     const [pingEvents, setPingEvents] = useState([]);
     const pingDialogShown = useRef(false);
     const [pingDialogShownState, setPingDialogShownState] = useState(pingDialogShown.current);
@@ -46,6 +51,14 @@ export default function Main() {
         name: {value: null, matchMode: FilterMatchMode.STARTS_WITH},
         key: {value: null, matchMode: FilterMatchMode.STARTS_WITH}
     });
+    const [theme, setTheme] = useState('Dark');
+
+    useEffect(() => {
+        const themeLink = document.getElementById('theme-css');
+        if (themeLink) {
+            if (theme.toLowerCase() === "light") themeLink.href = '/themes/lara-light-indigo/theme.css'; else themeLink.href = '/themes/lara-dark-indigo/theme.css';
+        }
+    }, [theme]);
 
     const helpMessage = `Available Commands: - clear: Clear the terminal screen. - put {key} {value}: Update a specific key value. - get {key}: Retrieve a value from the server. - sync: Syncs all data from server to refresh. - help: Show available commands and their descriptions.
 `;
@@ -184,8 +197,8 @@ export default function Main() {
                         TerminalService.emit('response', 'Unknown command: ' + command);
                         break;
                 }
-        } else {
-                if(!XTABLESState) {
+            } else {
+                if (!XTABLESState) {
                     TerminalService.emit('response', "Connect to XTABLES server first!");
                 } else {
                     TerminalService.emit('response', "Connect to backend server first!");
@@ -351,7 +364,10 @@ export default function Main() {
 
                     <IconField className={"block w-full"} iconPosition="left">
                         <InputIcon className="pi pi-search"> </InputIcon>
-                        <InputText className={"border border-gray-200 block w-full py-2.5 pl-11 pr-5 rtl:pr-11 rtl:pl-5 rounded-lg"} type="text" id="global_search" value={globalFilterValue} placeholder="Name Search" onChange={onGlobalFilterChange} />
+                        <InputText
+                            className={"border border-gray-200 block w-full py-2.5 pl-11 pr-5 rtl:pr-11 rtl:pl-5 rounded-lg"}
+                            type="text" id="global_search" value={globalFilterValue} placeholder="Name Search"
+                            onChange={onGlobalFilterChange}/>
                     </IconField>
                 </div>
             </div>
@@ -371,76 +387,54 @@ export default function Main() {
                      value={XTABLESState && serverStatus === WebSocket.OPEN ? "XTABLES Connected" : "XTABLES Disconnected"}/>
             </>} start={<img width={35} className="mr-2 rounded-xl" alt="logo" src={"/favicon.ico"}/>} model={[{
                 label: 'Settings', icon: 'pi pi-cog', command: () => {
-                    setSettingsDialogShown(true)
-                }},
-                {
-                label: 'Sync', icon: 'pi pi-sync', command: () => {
-                    setLoading(true)
-                    socket.send(JSON.stringify({type: "ALL"}));
-                    sendMessageAndWaitForCondition({type: "ALL"}, (a) => a.type === "ALL").then((a) => {
-                        setLoading(false)
+
+                    sendMessageAndWaitForCondition({type: "GET_SETTINGS"}, (a) => a.type === "GET_SETTINGS_RESPONSE")
+                        .then((a) => {
+                            let value = JSON.parse(a.value);
+                            let SERVER_ADDRESS = value.SERVER_ADDRESS;
+                            let SERVER_PORT = value.SERVER_PORT;
+                            let RECONNECTION_TIMEOUT = value.RECONNECTION_TIMEOUT;
+                            setServerAddress(SERVER_ADDRESS);
+                            setServerPort(SERVER_PORT)
+                            setReconnectionTimeout(RECONNECTION_TIMEOUT);
+                            setSettingsDialogShown(true)
+                        }).catch(() => {
                         Swal.fire({
                             toast: true,
-                            title: 'Data Synced!',
-                            text: "The data was synced!",
-                            showConfirmButton: false,
-                            timer: 3000,
-                            icon: "success",
-                            timerProgressBar: true,
-                            position: "top",
-                        });
-                    }).catch((e) => {
-                        setLoading(false)
-                        Swal.fire({
-                            toast: true,
-                            title: 'Failed To Sync!',
-                            text: "The data could not be synced!",
+                            title: 'Failed To Fetch!',
+                            text: "The backend is offline or unresponsive!",
                             showConfirmButton: false,
                             timer: 3000,
                             icon: "error",
                             timerProgressBar: true,
                             position: "top",
                         });
-                    });
+                    })
+
                 }
-            }, {
-                label: 'Ping', icon: 'pi pi-server', command: () => {
-                    pingShowDialog();
-
-                    function pingShowDialog() {
-                        const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
-                        sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
-                            let value = JSON.parse(response.value);
-                            let networkLatencyMS = value.networkLatencyMS;
-                            let roundTripLatencyMS = value.roundTripLatencyMS;
-                            const timeToReachServer = new Date(Date.now() + roundTripLatencyMS - networkLatencyMS);
-                            const timeToReachServerFormatted = `${timeToReachServer.getHours().toString().padStart(2, '0')}:${timeToReachServer.getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
-
-
-                            const events = [{status: 'Sent', date: currentTime}, {
-                                status: 'Processing',
-                                date: timeToReachServerFormatted
-                            }, {
-                                status: 'Received',
-                                date: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`
-                            },];
-                            setPingEvents({
-                                networkLatencyMS: networkLatencyMS,
-                                roundTripLatencyMS: roundTripLatencyMS,
-                                systemStatistics: value.systemStatistics,
-                                events: events
-                            })
-                            pingDialogShown.current = true;
-                            setPingDialogShownState(true)
-                            setTimeout(() => {
-                                if (pingDialogShown.current) return pingShowDialog();
-                            }, 50)
-
-                        }).catch(error => {
+            },
+                {
+                    label: 'Sync', icon: 'pi pi-sync', command: () => {
+                        setLoading(true)
+                        socket.send(JSON.stringify({type: "ALL"}));
+                        sendMessageAndWaitForCondition({type: "ALL"}, (a) => a.type === "ALL").then((a) => {
+                            setLoading(false)
                             Swal.fire({
                                 toast: true,
-                                title: 'Failed To Ping!',
-                                text: "The server is offline or unresponsive!",
+                                title: 'Data Synced!',
+                                text: "The data was synced!",
+                                showConfirmButton: false,
+                                timer: 3000,
+                                icon: "success",
+                                timerProgressBar: true,
+                                position: "top",
+                            });
+                        }).catch((e) => {
+                            setLoading(false)
+                            Swal.fire({
+                                toast: true,
+                                title: 'Failed To Sync!',
+                                text: "The data could not be synced!",
                                 showConfirmButton: false,
                                 timer: 3000,
                                 icon: "error",
@@ -449,109 +443,219 @@ export default function Main() {
                             });
                         });
                     }
+                }, {
+                    label: 'Ping', icon: 'pi pi-server', command: () => {
+                        pingShowDialog();
 
-                }
-            }, {
-                label: 'Reboot', icon: 'pi pi-refresh', command: () => {
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "This will reboot the XTABLES server!",
-                        confirmButtonText: "Reboot",
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonColor: "#d33",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-
-                            sendMessageAndWaitForCondition({type: "REBOOT"}, (response) => response.type === "REBOOT_RESPONSE").then(response => {
-
+                        function pingShowDialog() {
+                            const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
+                            sendMessageAndWaitForCondition({type: "PING"}, (response) => response.type === "PING_RESPONSE").then(response => {
                                 let value = JSON.parse(response.value);
-                                if (value == "OK") Swal.fire({
-                                    toast: true,
-                                    title: 'Reboot Command Sent!',
-                                    text: "The server is now rebooting!",
-                                    showConfirmButton: false,
-                                    timer: 2000,
-                                    icon: "success",
-                                    timerProgressBar: true,
-                                    position: "top",
-                                }); else Swal.fire({
-                                    toast: true,
-                                    title: 'Failed To Reboot!',
-                                    text: "The server responded with: " + value,
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    icon: "error",
-                                    timerProgressBar: true,
-                                    position: "top",
+                                let networkLatencyMS = value.networkLatencyMS;
+                                let roundTripLatencyMS = value.roundTripLatencyMS;
+                                const timeToReachServer = new Date(Date.now() + roundTripLatencyMS - networkLatencyMS);
+                                const timeToReachServerFormatted = `${timeToReachServer.getHours().toString().padStart(2, '0')}:${timeToReachServer.getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`;
+
+
+                                const events = [{status: 'Sent', date: currentTime}, {
+                                    status: 'Processing',
+                                    date: timeToReachServerFormatted
+                                }, {
+                                    status: 'Received',
+                                    date: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')} ${(performance.now()).toFixed(2)} milliseconds`
+                                },];
+                                setPingEvents({
+                                    networkLatencyMS: networkLatencyMS,
+                                    roundTripLatencyMS: roundTripLatencyMS,
+                                    systemStatistics: value.systemStatistics,
+                                    events: events
                                 })
+                                pingDialogShown.current = true;
+                                setPingDialogShownState(true)
+                                setTimeout(() => {
+                                    if (pingDialogShown.current) return pingShowDialog();
+                                }, 150)
+
                             }).catch(error => {
                                 Swal.fire({
                                     toast: true,
-                                    title: 'Failed To Reboot!',
-                                    text: "The server did not respond in time!",
+                                    title: 'Failed To Ping!',
+                                    text: "The server is offline or unresponsive!",
                                     showConfirmButton: false,
                                     timer: 3000,
                                     icon: "error",
                                     timerProgressBar: true,
                                     position: "top",
-                                })
+                                });
                             });
                         }
-                    });
 
-                }
-
-
-            }, {
-                label: 'Utilities', icon: 'pi pi-hammer', items: [
-                    {
-                        label: "Export",
-                        icon: "pi pi-file-export",
-                        items: [
-                            {
-                                label: "PDF",
-                                icon: "pi pi-file-pdf",
-                                command: () => {
-                                    import('jspdf').then((jsPDF) => {
-                                        import('jspdf-autotable').then(() => {
-                                            const doc = new jsPDF.default(0, 0);
-
-                                            doc.autoTable([{
-                                                title: "Key",
-                                                dataKey: "key"
-                                            },
-                                                {
-                                                    title: "Value",
-                                                    dataKey: "value"
-                                                },
-                                                {
-                                                    title: "Subtable",
-                                                    dataKey: "data"
-                                                }], products);
-                                            doc.save('XBOARD.pdf');
-                                        });
-                                    });
-                                }
-                            },
-                            {
-                                label: "EXCEL",
-                                icon: "pi pi-file-excel"
-                            },
-                            {
-                                label: "CSV",
-                                icon: "pi pi-file"
-                            },
-                        ]
                     }
-                ]
-            }
+                }, {
+                    label: 'Reboot', icon: 'pi pi-refresh', command: () => {
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "This will reboot the XTABLES server!",
+                            confirmButtonText: "Reboot",
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            cancelButtonColor: "#3085d6",
+                            confirmButtonColor: "#d33",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+
+                                sendMessageAndWaitForCondition({type: "REBOOT"}, (response) => response.type === "REBOOT_RESPONSE").then(response => {
+
+                                    let value = JSON.parse(response.value);
+                                    if (value == "OK") Swal.fire({
+                                        toast: true,
+                                        title: 'Reboot Command Sent!',
+                                        text: "The server is now rebooting!",
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                        icon: "success",
+                                        timerProgressBar: true,
+                                        position: "top",
+                                    }); else Swal.fire({
+                                        toast: true,
+                                        title: 'Failed To Reboot!',
+                                        text: "The server responded with: " + value,
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        icon: "error",
+                                        timerProgressBar: true,
+                                        position: "top",
+                                    })
+                                }).catch(error => {
+                                    Swal.fire({
+                                        toast: true,
+                                        title: 'Failed To Reboot!',
+                                        text: "The server did not respond in time!",
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        icon: "error",
+                                        timerProgressBar: true,
+                                        position: "top",
+                                    })
+                                });
+                            }
+                        });
+
+                    }
+
+
+                }, {
+                    label: 'Utilities', icon: 'pi pi-hammer', items: [
+                        {
+                            label: "Export",
+                            icon: "pi pi-file-export",
+                            items: [
+                                {
+                                    label: "PDF",
+                                    icon: "pi pi-file-pdf",
+                                    command: () => {
+                                        import('jspdf').then((jsPDF) => {
+                                            import('jspdf-autotable').then(() => {
+                                                const doc = new jsPDF.default(0, 0);
+
+                                                doc.autoTable([{
+                                                    title: "Key",
+                                                    dataKey: "key"
+                                                },
+                                                    {
+                                                        title: "Value",
+                                                        dataKey: "value"
+                                                    },
+                                                    {
+                                                        title: "Subtable",
+                                                        dataKey: "data"
+                                                    }], products);
+                                                doc.save('XBOARD.pdf');
+                                            });
+                                        });
+                                    }
+                                },
+                                {
+                                    label: "EXCEL",
+                                    icon: "pi pi-file-excel"
+                                },
+                                {
+                                    label: "CSV",
+                                    icon: "pi pi-file"
+                                },
+                            ]
+                        }
+                    ]
+                }
             ]}/>
-            <Dialog maximizable style={{width: '100vw', height: '100vw'}} header="XBOARD Settings" visible={settingsDialogShown} onHide={() => {
+            <Dialog className={"w-[50vw]"} footer={<Button
+                className={"px-6 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80"}
+                label="Save" icon="pi pi-check" loading={settingsLoading}
+                disabled={!serverStatus || !serverAddress || !serverPort || !reconnectionTimeout}
+                onClick={(e) => {
+                    setSettingsLoading(true)
+                    sendMessageAndWaitForCondition({
+                        type: "UPDATE_SETTINGS",
+                        SERVER_ADDRESS: serverAddress,
+                        SERVER_PORT: serverPort,
+                        RECONNECTION_TIMEOUT: reconnectionTimeout
+                    }, (a) => a.type === "UPDATE_SETTINGS_RESPONSE").then(response => {
+                        setSettingsLoading(false)
+                        setSettingsDialogShown(false)
+                    }).catch((ignored) => {
+                        setSettingsLoading(false)
+                    })
+
+                }}/>
+            } maximizable header="XBOARD Settings"
+                    visible={settingsDialogShown} onHide={() => {
                 setSettingsDialogShown(false)
             }}>
+                <div className="card p-fluid border border-gray-600 rounded-2xl shadow-xl p-4">
+                    <h5 className={"mb-2 font-bold"}>SERVER SETTINGS</h5>
+                    <div className={"space-y-2"}>
+                        <div>
+                            <label htmlFor="server_address">Server Address</label>
+                            <InputText value={serverAddress}
+                                       onChange={(e) => setServerAddress( e.target.value)} className={"h-10 pl-2"}
+                                       id="server_address" type="text"/>
+                        </div>
+                        <div>
+                            <label htmlFor="server_port">Server Port</label>
+                            <InputNumber value={serverPort} onValueChange={(e) => setServerPort(e.value)}
+                                         inputClassName={"pl-2"} useGrouping={false} min={0} max={65535}
+                                         className={"h-10"} id="server_port"/>
+                        </div>
+                        <div>
+                            <label htmlFor="reconnection_timeout">Reconnection Timeout</label>
+                            <InputNumber value={reconnectionTimeout}
+                                         onValueChange={(e) => setReconnectionTimeout(e.value)}
+                                         inputClassName={"pl-2"} suffix={" milliseconds"} min={100} max={60000}
+                                         className={"h-10"} id="name1"/>
+                        </div>
+                    </div>
+                </div>
+                <div className="card p-fluid border border-gray-600 rounded-2xl shadow-xl p-4 mt-4">
+                    <h5 className={"mb-2 font-bold"}>XBOARD SETTINGS</h5>
+                    <div className={"space-y-2"}>
+                        <div>
+                            <label htmlFor="name1">Server Address</label>
+                            <InputText className={"h-11 pl-2"} id="name1" type="text"/>
+                        </div>
+                        <div>
+                            <label htmlFor="name1">Server Port</label>
+                            <InputNumber inputClassName={"pl-2"} useGrouping={false} min={0} max={65535}
+                                         className={"h-11"} id="name1"/>
+                        </div>
+                        <div>
+                            <label htmlFor="name1">Theme</label>
+                            <Dropdown value={{name: theme}} onChange={(e) => setTheme(e.value.name)} id="name1"
+                                      options={[{name: "Dark"}, {name: "Light"}]} optionLabel="name"
+                                      placeholder="Select a theme" checkmark={true} highlightOnSelect={false}/>
+                        </div>
+                    </div>
+                </div>
 
             </Dialog>
             <Dialog maximizable header="Ping Latency Statistics" visible={pingDialogShownState}
@@ -615,82 +719,83 @@ export default function Main() {
                         label: 'CPU Usage',
                         icon: "pi pi-microchip",
                         color: '#ff0000',
-                        value: pingEvents?.systemStatistics ?pingEvents.systemStatistics.processCpuLoadPercentage.toFixed(2) : "UNKNOWN"
+                        value: pingEvents?.systemStatistics ? pingEvents.systemStatistics.processCpuLoadPercentage.toFixed(2) : "UNKNOWN"
                     }, {
                         label: 'CPU Free',
                         color: '#34d399',
                         icon: "pi pi-microchip",
-                        value: pingEvents?.systemStatistics ?(100 - pingEvents.systemStatistics.processCpuLoadPercentage).toFixed(2) : "UNKNOWN"
+                        value: pingEvents?.systemStatistics ? (100 - pingEvents.systemStatistics.processCpuLoadPercentage).toFixed(2) : "UNKNOWN"
                     }]}/>
                     <MeterGroup values={[{
                         label: 'Total Clients',
                         icon: "pi pi-user",
                         color: '#ff0000',
-                        value: pingEvents?.systemStatistics ?pingEvents.systemStatistics.totalClients : 0
+                        value: pingEvents?.systemStatistics ? pingEvents.systemStatistics.totalClients : 0
                     }, {
                         label: 'Free Clients',
                         icon: "pi pi-user",
                         color: '#34d399',
-                        value: pingEvents?.systemStatistics ?100 - pingEvents.systemStatistics.totalClients : 0
+                        value: pingEvents?.systemStatistics ? 100 - pingEvents.systemStatistics.totalClients : 0
                     }]}/>
                 </div>
             </Dialog>
-        <div className={"h-screen"}>
-            <div className="flex bg-gray-200">
-                <Splitter step={10} className={"w-screen"}>
-                    <SplitterPanel size={60} className="flex align-items-center justify-content-center">
-                        <DataTable
-                            ref={dt}
-                            virtualScrollerOptions={{itemSize: 50}}
-                            value={products}
-                            showGridlines
-                            editMode="cell"
-                            globalFilterFields={['name', 'value']}
-                            filters={filters}
-                            removableSort
-                            filterDisplay="row"
-                            expandedRows={expandedRows}
-                            loading={loading}
-                            onRowToggle={(e) => setExpandedRows(e.data)}
-                            rowExpansionTemplate={rowExpansionTemplate}
-                            className="h-screen w-full"
-                            dataKey="key"
-                            header={header}
-                            scrollable
-                            scrollHeight={"80vh"}
-                            tableStyle={{minWidth: '15rem'}}
-                        >
-                            <Column expander={allowExpansion} style={{width: '5rem'}}/>
-                            <Column field="name" header="Name" sortable/>
-                            <Column
-                                field="value"
-                                header="Value"
-                                className="font-bold max-w-1 overflow-hidden whitespace-nowrap"
-                                frozen={true}
-                                editor={textEditor}
-                                onCellEditComplete={onCellEditComplete}
-                                sortable
-                            />
-                        </DataTable>
-                    </SplitterPanel>
-                    <SplitterPanel size={40} className="flex-1 align-items-center justify-content-center">
-                        <div className="flex-1">
+            <div className={"h-screen"}>
+                <div className="flex bg-gray-200">
+                    <Splitter step={10} className={"w-screen"}>
+                        <SplitterPanel size={60} className="flex align-items-center justify-content-center">
+                            <DataTable
+                                ref={dt}
+                                virtualScrollerOptions={{itemSize: 50}}
+                                value={products}
+                                showGridlines
+                                editMode="cell"
+                                globalFilterFields={['name', 'value']}
+                                filters={filters}
+                                removableSort
+                                filterDisplay="row"
+                                expandedRows={expandedRows}
+                                loading={loading}
+                                onRowToggle={(e) => setExpandedRows(e.data)}
+                                rowExpansionTemplate={rowExpansionTemplate}
+                                className="h-screen w-full"
+                                dataKey="key"
+                                header={header}
+                                scrollable
+                                scrollHeight={"80vh"}
+                                tableStyle={{minWidth: '15rem'}}
+                            >
+                                <Column expander={allowExpansion} style={{width: '5rem'}}/>
+                                <Column field="name" header="Name" sortable/>
+                                <Column
+                                    field="value"
+                                    header="Value"
+                                    className="font-bold max-w-1 overflow-hidden whitespace-nowrap"
+                                    frozen={true}
+                                    editor={textEditor}
+                                    onCellEditComplete={onCellEditComplete}
+                                    sortable
+                                />
+                            </DataTable>
+                        </SplitterPanel>
+                        <SplitterPanel size={40} className="flex-1 align-items-center justify-content-center">
+                            <div className="flex-1">
 
-                            <Terminal
-                                welcomeMessage="Welcome to XBOARD! Type help to begin."
-                                prompt="XTABLES $"
-                                pt={{
-                                    root: 'bg-gray-900 text-white border-round h-[50vh]',
-                                    prompt: 'text-gray-400 mr-2',
-                                    command: 'text-primary-300',
-                                    response: 'text-primary-300'
-                                }}
-                            />
+                                <Terminal
+                                    welcomeMessage="Welcome to XBOARD! Type help to begin."
+                                    prompt="XTABLES $"
+                                    pt={{
+                                        root: 'bg-gray-900 text-white border-round h-[50vh]',
+                                        prompt: 'text-gray-400 mr-2',
+                                        command: 'text-primary-300',
+                                        response: 'text-primary-300'
+                                    }}
+                                />
 
-                            <Logs initialOutput={messages}></Logs>
-                        </div>
-                    </SplitterPanel>
-                </Splitter>
+                                <Logs initialOutput={messages}></Logs>
+                            </div>
+                        </SplitterPanel>
+                    </Splitter>
+                </div>
             </div>
-        </div></>);
+        </>);
 }

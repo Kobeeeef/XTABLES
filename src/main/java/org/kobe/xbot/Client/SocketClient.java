@@ -62,6 +62,14 @@ public class SocketClient {
         this.xTablesClient = xTablesClient;
     }
 
+    public String getSERVER_ADDRESS() {
+        return SERVER_ADDRESS;
+    }
+
+    public int getSERVER_PORT() {
+        return SERVER_PORT;
+    }
+
     public SocketClient setSERVER_ADDRESS(String SERVER_ADDRESS) {
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         return this;
@@ -155,13 +163,29 @@ public class SocketClient {
                     }
                 }
                 isConnected = false;
-                logger.warning("Disconnected from the server. Reconnecting...");
-                reconnect();
+                if(!socket.isClosed()) {
+                    logger.warning("Disconnected from the server. Reconnecting...");
+                    try {
+                        // Wait before attempting reconnection
+                        TimeUnit.MILLISECONDS.sleep(RECONNECT_DELAY_MS);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    reconnect();
+                }
             } catch (IOException e) {
                 isConnected = false;
-                System.err.println("Error reading message from server: " + e.getMessage());
-                logger.warning("Disconnected from the server. Reconnecting...");
-                reconnect();
+                if(!socket.isClosed()) {
+                    System.err.println("Error reading message from server: " + e.getMessage());
+                    logger.warning("Disconnected from the server. Reconnecting...");
+                    try {
+                        // Wait before attempting reconnection
+                        TimeUnit.MILLISECONDS.sleep(RECONNECT_DELAY_MS);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    reconnect();
+                }
             }
 
         }
