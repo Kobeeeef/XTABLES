@@ -10,7 +10,6 @@ import {Dropdown} from 'primereact/dropdown';
 import {MeterGroup} from 'primereact/metergroup';
 import {Button} from 'primereact/button';
 import {InputNumber} from 'primereact/inputnumber';
-import {FloatLabel} from 'primereact/floatlabel';
 import {IconField} from 'primereact/iconfield';
 import {InputIcon} from 'primereact/inputicon';
 import {Message} from 'primereact/message';
@@ -24,7 +23,6 @@ import {Dialog} from 'primereact/dialog';
 import {Menubar} from 'primereact/menubar';
 import {Splitter, SplitterPanel} from 'primereact/splitter';
 import {Timeline} from 'primereact/timeline';
-import {BlockUI} from 'primereact/blockui';
 import Swal from 'sweetalert2'
 
 export default function Main() {
@@ -119,6 +117,15 @@ export default function Main() {
         connect();
     }, []);
 
+    function isValidJSON(jsonString) {
+        try {
+            JSON.parse(jsonString);
+            return true; // The JSON is valid
+        } catch (e) {
+            return false; // The JSON is not valid
+        }
+    }
+
     useEffect(() => {
         const commandHandler = (text) => {
             let argsIndex = text.indexOf(' ');
@@ -141,16 +148,20 @@ export default function Main() {
                         } else {
                             setLoading(true)
                             TerminalService.emit('response', "Sending put request...");
-                            sendMessageAndWaitForCondition({
-                                type: "UPDATE", value: tokens.slice(2).join(" "), key: tokens[1]
-                            }, (response) => response.type === "UPDATE_RESPONSE").then(response => {
-                                setLoading(false)
-                                let value = response.value;
-                                TerminalService.emit('response', "Server responded with: " + value);
-                            }).catch(error => {
-                                setLoading(false)
-                                TerminalService.emit('response', "Failed to put data: " + error);
-                            });
+                            if (!isValidJSON(tokens.slice(2).join(" "))) {
+                                TerminalService.emit('response', "Invalid data structure!")
+                            } else {
+                                sendMessageAndWaitForCondition({
+                                    type: "UPDATE", value: tokens.slice(2).join(" "), key: tokens[1]
+                                }, (response) => response.type === "UPDATE_RESPONSE").then(response => {
+                                    setLoading(false)
+                                    let value = response.value;
+                                    TerminalService.emit('response', "Server responded with: " + value);
+                                }).catch(error => {
+                                    setLoading(false)
+                                    TerminalService.emit('response', "Failed to put data: " + error);
+                                });
+                            }
                         }
                         break;
                     case 'get':
@@ -278,6 +289,7 @@ export default function Main() {
                 if (typeof value === 'object' && value !== null) {
                     if (value.hasOwnProperty('value')) {
                         transformed.value = value.value;
+                        transformed.type = (typeof JSON.parse(value.value)).toString()
                     }
                     // Recurse if there's nested data
                     if (value.data) {
@@ -285,6 +297,7 @@ export default function Main() {
                     }
                 } else {
                     transformed.value = value;
+                    transformed.type = (typeof JSON.parse(value)).toString()
                 }
 
                 return transformed;
@@ -310,18 +323,31 @@ export default function Main() {
 
         if (field === "value") {
             let key = rowData.key;
+            if (!isValidJSON(newValue)) {
+                event.preventDefault();
+                Swal.fire({
+                    toast: true,
+                    title: 'Invalid Data!',
+                    text: "The data structure is invalid!",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    icon: "error",
+                    timerProgressBar: true,
+                    position: "top",
+                });
+            } else {
             socket.send(JSON.stringify({type: "UPDATE", value: newValue, key: key}));
             Swal.fire({
                 toast: true,
                 title: 'Request Sent!',
                 text: "The request is now queued!",
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 1500,
                 icon: "success",
                 timerProgressBar: true,
                 position: "top",
             });
-
+        }
         }
         return true;
     }
@@ -338,6 +364,11 @@ export default function Main() {
                         className="font-bold max-w-1 overflow-hidden whitespace-nowrap" editor={textEditor}
                         onCellEditComplete={onCellEditComplete}
                         sortable/>
+                <Column
+                    field="type"
+                    className="capitalize max-w-1 overflow-hidden whitespace-nowrap"
+                    sortable
+                />
             </DataTable>
         </div>);
     };
@@ -618,7 +649,7 @@ export default function Main() {
                         <div>
                             <label htmlFor="server_address">Server Address</label>
                             <InputText value={serverAddress}
-                                       onChange={(e) => setServerAddress( e.target.value)} className={"h-10 pl-2"}
+                                       onChange={(e) => setServerAddress(e.target.value)} className={"h-10 pl-2"}
                                        id="server_address" type="text"/>
                         </div>
                         <div>
@@ -639,15 +670,7 @@ export default function Main() {
                 <div className="card p-fluid border border-gray-600 rounded-2xl shadow-xl p-4 mt-4">
                     <h5 className={"mb-2 font-bold"}>XBOARD SETTINGS</h5>
                     <div className={"space-y-2"}>
-                        <div>
-                            <label htmlFor="name1">Server Address</label>
-                            <InputText className={"h-11 pl-2"} id="name1" type="text"/>
-                        </div>
-                        <div>
-                            <label htmlFor="name1">Server Port</label>
-                            <InputNumber inputClassName={"pl-2"} useGrouping={false} min={0} max={65535}
-                                         className={"h-11"} id="name1"/>
-                        </div>
+
                         <div>
                             <label htmlFor="name1">Theme</label>
                             <Dropdown value={{name: theme}} onChange={(e) => setTheme(e.value.name)} id="name1"
@@ -773,6 +796,12 @@ export default function Main() {
                                     frozen={true}
                                     editor={textEditor}
                                     onCellEditComplete={onCellEditComplete}
+                                    sortable
+                                />
+                                <Column
+                                    field="type"
+                                    header="Type"
+                                    className="capitalize max-w-1 overflow-hidden whitespace-nowrap"
                                     sortable
                                 />
                             </DataTable>

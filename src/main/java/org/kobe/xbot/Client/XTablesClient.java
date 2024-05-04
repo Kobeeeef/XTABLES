@@ -74,9 +74,9 @@ public class XTablesClient {
             requestAction.queue();
         }
     }
-    public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
+    public RequestAction<ResponseStatus> subscribeUpdateEvent(Consumer<SocketClient.KeyValuePair<String>> consumer) {
         String key = " ";
-        return subscribeUpdateEventNoCheck(key, type, consumer);
+        return subscribeUpdateEventNoCheck(key, null, consumer);
     }
 
     public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
@@ -137,9 +137,15 @@ public class XTablesClient {
         for (UpdateConsumer<?> updateConsumer : consumers) {
             UpdateConsumer<T> typedUpdateConsumer = (UpdateConsumer<T>) updateConsumer;
             Consumer<? super SocketClient.KeyValuePair<T>> consumer = typedUpdateConsumer.consumer();
-            Class<T> type = typedUpdateConsumer.type();
-            T parsed = new Gson().fromJson(keyValuePair.getValue(), type);
-            consumer.accept(new SocketClient.KeyValuePair<>(keyValuePair.getKey(), parsed));
+           Class<T> type = typedUpdateConsumer.type();
+            if(type != null) {
+                T parsed = new Gson().fromJson(keyValuePair.getValue(), type);
+                consumer.accept(new SocketClient.KeyValuePair<>(keyValuePair.getKey(), parsed));
+            } else {
+                UpdateConsumer<String> typedUpdateConsumer2 = (UpdateConsumer<String>) updateConsumer;
+                Consumer<? super SocketClient.KeyValuePair<String>> consumer2 = typedUpdateConsumer2.consumer();
+                consumer2.accept(keyValuePair);
+            }
         }
     }
 

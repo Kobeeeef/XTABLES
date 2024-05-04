@@ -47,8 +47,11 @@ public class Main {
         status = client.putObject("SmartDashboard", new String("OK")).complete();
         System.out.println(status);
 
-        // Put an integer value on sub table  asynchronously
+        // Put an integer value on sub table asynchronously
         client.putInteger("SmartDashboard.somevalue.awdwadawd", 488).queue();
+
+        // Put an integer array value on sub table asynchronously
+        client.putArray("SmartDashboard.somearray", List.of("Test", "TEAM XBOT")).queue();
 
         // -------- GET VALUES --------
         // value - Value retrieved

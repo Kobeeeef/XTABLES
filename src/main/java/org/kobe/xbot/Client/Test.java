@@ -7,7 +7,12 @@ public class Test {
     public static void main(String[] args) {
         // Initialize a new client with address and port
         XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5);
-        client.getSocketClient().setRECONNECT_DELAY_MS(1500);
-        client.updateServerAddress("localhost", SERVER_PORT);
+
+        client.subscribeUpdateEvent((stringKeyValuePair -> {
+            System.out.println("Key: " + stringKeyValuePair.getKey());
+            System.out.println("Value: " + stringKeyValuePair.getValue());
+
+        })).complete();
+
     }
 }
