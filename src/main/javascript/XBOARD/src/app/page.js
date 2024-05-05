@@ -6,6 +6,7 @@ import {DataTable} from 'primereact/datatable';
 import {FilterMatchMode} from 'primereact/api';
 import {Column} from 'primereact/column';
 
+import {ContextMenu} from 'primereact/contextmenu';
 import {Dropdown} from 'primereact/dropdown';
 import {MeterGroup} from 'primereact/metergroup';
 import {Button} from 'primereact/button';
@@ -26,6 +27,7 @@ import {Timeline} from 'primereact/timeline';
 import Swal from 'sweetalert2'
 
 export default function Main() {
+    const dataTableConextMenu = useRef(null);
     const dt = useRef(null);
     const [serverPort, setServerPort] = useState(null);
     const [serverAddress, setServerAddress] = useState(null);
@@ -39,6 +41,7 @@ export default function Main() {
     const [rawJSON, setRawJSON] = useState({});
     const [XTABLESState, setXTABLESState] = useState(false);
     const [products, setProducts] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [expandedRows, setExpandedRows] = useState(null);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [socket, setSocket] = useState(null);
@@ -336,27 +339,37 @@ export default function Main() {
                     position: "top",
                 });
             } else {
-            socket.send(JSON.stringify({type: "UPDATE", value: newValue, key: key}));
-            Swal.fire({
-                toast: true,
-                title: 'Request Sent!',
-                text: "The request is now queued!",
-                showConfirmButton: false,
-                timer: 1500,
-                icon: "success",
-                timerProgressBar: true,
-                position: "top",
-            });
-        }
+                socket.send(JSON.stringify({type: "UPDATE", value: newValue, key: key}));
+                Swal.fire({
+                    toast: true,
+                    title: 'Request Sent!',
+                    text: "The request is now queued!",
+                    showConfirmButton: false,
+                    timer: 1500,
+                    icon: "success",
+                    timerProgressBar: true,
+                    position: "top",
+                });
+            }
         }
         return true;
     }
 
     const rowExpansionTemplate = (data) => {
         return (<div className="p-3">
+            <ContextMenu onHide={() => setSelectedProduct(null)} ref={dataTableConextMenu} model={[{
+                label: 'Delete', icon: 'pi pi-fw pi-times', command: () => {
+                    deleteKey(selectedProduct.key)
+                }
+            }]}/>
             <DataTable showGridlines value={data.data} editMode={"cell"} expandedRows={expandedRows}
                        onRowToggle={(e) => setExpandedRows(e.data)}
                        rowExpansionTemplate={rowExpansionTemplate}
+                       contextMenuSelection={selectedProduct}
+                       selectionMode="single"
+                       selection={selectedProduct} onSelectionChange={(e) => setSelectedProduct(e.value)}
+                       onContextMenuSelectionChange={(e) => setSelectedProduct(e.value)}
+                       onContextMenu={(e) => dataTableConextMenu.current.show(e.originalEvent)}
                        dataKey="key" removableSort>
                 <Column expander={allowExpansion} style={{width: '5rem'}}/>
                 <Column field="name" header="" sortable/>
@@ -405,6 +418,50 @@ export default function Main() {
         </div>);
     };
     const header = renderHeader();
+
+    function deleteKey(key) {
+        sendMessageAndWaitForCondition({
+            type: "DELETE_KEY",
+            key: key
+        }, (a) => a.type === "DELETE_KEY_RESPONSE").then((r) => {
+            if(r.value === "\"OK\"") {
+                Swal.fire({
+                    toast: true,
+                    title: 'Successfully Deleted!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    icon: "success",
+                    timerProgressBar: true,
+                    position: "top-right",
+                });
+                sendMessageAndWaitForCondition({type: "ALL"}, (a) => a.type === "ALL").catch(() => {});
+            } else {
+                Swal.fire({
+                    toast: true,
+                    title: 'Failed To Delete!',
+                    text: "This key does not exist or failed to be removed.",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    icon: "error",
+                    timerProgressBar: true,
+                    position: "top-right",
+                });
+            }
+        }).catch(() => {
+            Swal.fire({
+                toast: true,
+                title: 'Failed To Delete!',
+                text: "The server took too long to respond!",
+                showConfirmButton: false,
+                timer: 3000,
+                icon: "error",
+                timerProgressBar: true,
+                position: "top-right",
+            });
+        })
+
+    }
+
     return (
         <>
             <Menubar className={"rounded-none"} end={<>
@@ -766,10 +823,20 @@ export default function Main() {
                 <div className="flex bg-gray-200">
                     <Splitter step={10} className={"w-screen"}>
                         <SplitterPanel size={60} className="flex align-items-center justify-content-center">
+                            <ContextMenu onHide={() => setSelectedProduct(null)} ref={dataTableConextMenu} model={[{
+                                label: 'Delete', icon: 'pi pi-fw pi-times', command: () => {
+                                    deleteKey(selectedProduct.key)
+                                }
+                            }]}/>
                             <DataTable
+                                contextMenuSelection={selectedProduct}
+                                onContextMenuSelectionChange={(e) => setSelectedProduct(e.value)}
+                                onContextMenu={(e) => dataTableConextMenu.current.show(e.originalEvent)}
                                 ref={dt}
                                 virtualScrollerOptions={{itemSize: 50}}
                                 value={products}
+                                selectionMode="single"
+                                selection={selectedProduct} onSelectionChange={(e) => setSelectedProduct(e.value)}
                                 showGridlines
                                 editMode="cell"
                                 globalFilterFields={['name', 'value']}
