@@ -1,6 +1,7 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
+import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilites.*;
 
 import java.util.ArrayList;
@@ -8,16 +9,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 
 public class XTablesClient {
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private final SocketClient client;
     private final Gson gson = new Gson();
-
-
+    private XTablesData<String> cache;
+    private boolean isCacheReady = false;
     private final CountDownLatch latch = new CountDownLatch(1);
 
-    public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS) {
+    public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
         this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS, this);
         Thread thread = new Thread(() -> {
             client.connect();
@@ -31,10 +34,39 @@ public class XTablesClient {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        if (useCache) enableCache();
+    }
+
+    private void enableCache() {
+        cache = new XTablesData<>();
+        isCacheReady = false;
+        logger.info("Starting caching all raw data...");
+        getRawJSON().queue(s -> {
+            cache.updateFromRawJSON(s);
+            logger.info("Cache has been updated.");
+            subscribeUpdateEvent((updateEvent) -> cache.put(updateEvent.getKey(), updateEvent.getValue())).queue((responseStatus) -> {
+                if(responseStatus.equals(ResponseStatus.OK)) {
+                    isCacheReady = true;
+                    logger.info("Cache is now setup and ready to use.");
+                } else {
+                    logger.severe("Failed to subscribe to ANY update, NON OK status returned from server.");
+                }
+            }, (throwable) -> {
+                logger.severe("Failed to subscribe to ANY update. Error:\n" + throwable.getMessage());
+            });
+        });
+    }
+
+    public boolean isCacheReady() {
+        return isCacheReady;
+    }
+    public XTablesData<String> getCache() {
+        return cache;
     }
     public void updateServerAddress(String SERVER_ADDRESS, int SERVER_PORT) {
         client.setSERVER_ADDRESS(SERVER_ADDRESS).setSERVER_PORT(SERVER_PORT).reconnect();
     }
+
     public static final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
 
     public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
@@ -56,24 +88,27 @@ public class XTablesClient {
 
     public List<RequestAction<ResponseStatus>> resubscribeToAllUpdateEvents() {
         List<RequestAction<ResponseStatus>> all = new ArrayList<>();
-        for(String key : update_consumers.keySet()) {
+        for (String key : update_consumers.keySet()) {
             all.add(new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class));
         }
         return all;
     }
-    public <T>  List<T> completeAll(List<RequestAction<T>> requestActions) {
+
+    public <T> List<T> completeAll(List<RequestAction<T>> requestActions) {
         List<T> responses = new ArrayList<>();
-        for(RequestAction<T> requestAction : requestActions) {
+        for (RequestAction<T> requestAction : requestActions) {
             T response = requestAction.complete();
             responses.add(response);
         }
         return responses;
     }
+
     public <T> void queueAll(List<RequestAction<T>> requestActions) {
-        for(RequestAction<T> requestAction : requestActions) {
+        for (RequestAction<T> requestAction : requestActions) {
             requestAction.queue();
         }
     }
+
     public RequestAction<ResponseStatus> subscribeUpdateEvent(Consumer<SocketClient.KeyValuePair<String>> consumer) {
         String key = " ";
         return subscribeUpdateEventNoCheck(key, null, consumer);
@@ -87,19 +122,21 @@ public class XTablesClient {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                     consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
-                    if(consumers.isEmpty()) {
+                    if (consumers.isEmpty()) {
                         update_consumers.remove(key);
                     }
                 }
             }
+
             @Override
-            public boolean doNotRun(){
+            public boolean doNotRun() {
                 List<UpdateConsumer<?>> consumers = new ArrayList<>(update_consumers.computeIfAbsent(key, k -> new ArrayList<>()));
                 consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
                 return !consumers.isEmpty();
             }
         };
     }
+
     public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         String key = " ";
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
@@ -108,19 +145,21 @@ public class XTablesClient {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                     consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
-                    if(consumers.isEmpty()) {
+                    if (consumers.isEmpty()) {
                         update_consumers.remove(key);
                     }
                 }
             }
+
             @Override
-            public boolean doNotRun(){
+            public boolean doNotRun() {
                 List<UpdateConsumer<?>> consumers = new ArrayList<>(update_consumers.computeIfAbsent(key, k -> new ArrayList<>()));
                 consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
                 return !consumers.isEmpty();
             }
         };
     }
+
     public record UpdateConsumer<T>(Class<T> type, Consumer<? super SocketClient.KeyValuePair<T>> consumer) {
     }
 
@@ -137,8 +176,8 @@ public class XTablesClient {
         for (UpdateConsumer<?> updateConsumer : consumers) {
             UpdateConsumer<T> typedUpdateConsumer = (UpdateConsumer<T>) updateConsumer;
             Consumer<? super SocketClient.KeyValuePair<T>> consumer = typedUpdateConsumer.consumer();
-           Class<T> type = typedUpdateConsumer.type();
-            if(type != null) {
+            Class<T> type = typedUpdateConsumer.type();
+            if (type != null) {
                 T parsed = new Gson().fromJson(keyValuePair.getValue(), type);
                 consumer.accept(new SocketClient.KeyValuePair<>(keyValuePair.getKey(), parsed));
             } else {
@@ -160,16 +199,19 @@ public class XTablesClient {
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
+
     public RequestAction<ResponseStatus> renameKey(String key, String newName) {
         Utilities.validateKey(key);
         Utilities.validateName(newName, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + newName).parsed(), ResponseStatus.class);
     }
+
     public RequestAction<ResponseStatus> putBoolean(String key, Boolean value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
+
     public <T> RequestAction<ResponseStatus> putArray(String key, List<T> value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
@@ -205,10 +247,12 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
     }
+
     public RequestAction<Boolean> getBoolean(String key) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Boolean.class);
     }
+
     public <T> RequestAction<T> getObject(String key, Class<T> type) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);

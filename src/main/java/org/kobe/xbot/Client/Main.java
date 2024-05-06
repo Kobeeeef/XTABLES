@@ -1,6 +1,7 @@
 package org.kobe.xbot.Client;
 // EXAMPLE SETUP
 
+import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilites.ResponseStatus;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5);
+        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, true);
         // Thread blocks until connection is successful
 
         // Get raw JSON from server
@@ -21,6 +22,12 @@ public class Main {
 
         // Variable for connection status, updates on every message
         System.out.println("Connected? " + client.getSocketClient().isConnected);
+
+        // Get latency from server
+        XTablesClient.LatencyInfo info = client.ping_latency().complete();
+        System.out.println("Network Latency: " + info.networkLatencyMS() + "ms");
+        System.out.println("Round Trip Latency: " + info.roundTripLatencyMS() + "ms");
+        System.out.println("CPU Usage: " + info.systemStatistics().getProcessCpuLoadPercentage());
 
         // -------- PUT VALUES --------
         // "OK" - Value updated
@@ -90,10 +97,20 @@ public class Main {
         status = client.unsubscribeUpdateEvent("key", String.class, updateConsumer).complete();
         System.out.println(status);
 
-        // Get latency from server
-        XTablesClient.LatencyInfo info = client.ping_latency().complete();
-        System.out.println("Network Latency: " + info.networkLatencyMS() + "ms");
-        System.out.println("Round Trip Latency: " + info.roundTripLatencyMS() + "ms");
-        System.out.println("CPU Usage: " + info.systemStatistics().getProcessCpuLoadPercentage());
+        // Check weather or not the cache is set up and ready to be used.
+        // Any updates/retrievals from cache does not make any request to server.
+        // Cache updates on any update server side.
+        System.out.println("Is cache ready? " + client.isCacheReady());
+        if (client.isCacheReady()) {
+            XTablesData<String> cache = client.getCache();
+
+            // Example: Get data from cache
+            String valueFromCache = cache.get("SmartDashboard.sometable");
+
+            System.out.println("Value from cache: " + valueFromCache);
+
+        }
+
+
     }
 }

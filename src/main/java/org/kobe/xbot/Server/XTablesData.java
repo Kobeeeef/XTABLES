@@ -2,6 +2,7 @@ package org.kobe.xbot.Server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,10 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class XTablesData<V> {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson = new GsonBuilder().create();
     private Map<String, XTablesData<V>> data;
     private V value;
-
     public XTablesData() {
         // Initialize the data map lazily
     }
@@ -149,5 +149,17 @@ public class XTablesData<V> {
 
     public String toJSON() {
         return gson.toJson(this.data);
+    }
+
+
+    public void updateFromRawJSON(String json) {
+        // Clear the current data
+        if (this.data != null) {
+            this.data.clear();
+        } else {
+            this.data = new HashMap<>();
+        }
+
+        this.data = gson.fromJson(json, new TypeToken<Map<String, XTablesData<V>>>(){}.getType());
     }
 }

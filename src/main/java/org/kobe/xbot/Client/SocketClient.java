@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class SocketClient {
-    private final Logger logger = Logger.getLogger(SocketClient.class.getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ExecutorService executor;
     private ThreadPoolExecutor socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
     private String SERVER_ADDRESS;
