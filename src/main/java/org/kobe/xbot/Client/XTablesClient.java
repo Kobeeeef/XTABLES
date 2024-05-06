@@ -34,7 +34,9 @@ public class XTablesClient {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        if (useCache) enableCache();
+        if (useCache) {
+            enableCache();
+        }
     }
 
     private void enableCache() {

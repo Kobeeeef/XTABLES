@@ -58,7 +58,7 @@ public class SocketClient {
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         this.SERVER_PORT = SERVER_PORT;
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
-        this.executor = Executors.newFixedThreadPool(MAX_THREADS);
+        this.executor = Executors.newFixedThreadPool(Math.max(MAX_THREADS, 2));
         this.xTablesClient = xTablesClient;
     }
 
@@ -137,6 +137,10 @@ public class SocketClient {
         }
     }
 
+    public ThreadPoolExecutor getSocketExecutor() {
+        return socketExecutor;
+    }
+
     public class ClientMessageListener implements Runnable {
         private final Socket socket;
 
@@ -163,7 +167,7 @@ public class SocketClient {
                     }
                 }
                 isConnected = false;
-                if(!socket.isClosed()) {
+                if (!socket.isClosed()) {
                     logger.warning("Disconnected from the server. Reconnecting...");
                     try {
                         // Wait before attempting reconnection
@@ -175,7 +179,7 @@ public class SocketClient {
                 }
             } catch (IOException e) {
                 isConnected = false;
-                if(!socket.isClosed()) {
+                if (!socket.isClosed()) {
                     System.err.println("Error reading message from server: " + e.getMessage());
                     logger.warning("Disconnected from the server. Reconnecting...");
                     try {
@@ -232,8 +236,6 @@ public class SocketClient {
     public Socket getSocket() {
         return socket;
     }
-
-
 
 
     public CompletableFuture<String> sendAsync(String message) {
