@@ -3,6 +3,7 @@ package org.kobe.xbot.Server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.kobe.xbot.Utilites.Utilities;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class XTablesData<V> {
 
     // Method to put a value into the nested structure
     public boolean put(String key, V value) {
+        Utilities.validateKey(key);
         String[] keys = key.split("\\."); // Split the key by '.'
         XTablesData<V> current = this;
 
@@ -50,6 +52,7 @@ public class XTablesData<V> {
 
     // Method to get a value from the nested structure
     public V get(String key) {
+        Utilities.validateKey(key);
         XTablesData<V> current = getLevelxTablesData(key);
         if (current == null) return null; // Key not found
 
@@ -58,11 +61,13 @@ public class XTablesData<V> {
     }
 
     public V get(String key, V defaultValue) {
+        Utilities.validateKey(key);
         V result = get(key);
         return (result != null) ? result : defaultValue;
     }
 
     private XTablesData<V> getLevelxTablesData(String key) {
+        Utilities.validateKey(key);
         String[] keys = key.split("\\."); // Split the key by '.'
         XTablesData<V> current = this;
 
@@ -77,6 +82,8 @@ public class XTablesData<V> {
     }
 
     public boolean renameKey(String oldKey, String newKeyName) {
+        Utilities.validateKey(oldKey);
+        Utilities.validateName(newKeyName, true);
         if (oldKey == null || newKeyName == null || oldKey.isEmpty() || newKeyName.isEmpty()) {
             return false; // Invalid parameters
         }
@@ -115,6 +122,7 @@ public class XTablesData<V> {
 
     // Method to get all tables at a given level
     public Set<String> getTables(String key) {
+        Utilities.validateKey(key);
         if (key.isEmpty()) {
             return (data != null) ? data.keySet() : null;
         }
@@ -127,6 +135,7 @@ public class XTablesData<V> {
 
     // Method to delete a value at a given level
     public boolean delete(String key) {
+        Utilities.validateKey(key);
         if (key.isEmpty()) {
             this.data = null; // Remove everything if key is empty
             return true;
