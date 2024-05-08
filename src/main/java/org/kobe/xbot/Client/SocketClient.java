@@ -23,12 +23,12 @@ import java.util.logging.Logger;
 public class SocketClient {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ExecutorService executor;
-    private ThreadPoolExecutor socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
+    private ThreadPoolExecutor socketExecutor;
     private String SERVER_ADDRESS;
     private int SERVER_PORT;
     private long RECONNECT_DELAY_MS;
     private boolean CLEAR_UPDATE_MESSAGES = true;
-    private static final List<RequestInfo> MESSAGES = new ArrayList<>() {
+    private final List<RequestInfo> MESSAGES = new ArrayList<>() {
         private final Logger logger = Logger.getLogger(ArrayList.class.getName());
 
         @Override
@@ -57,6 +57,7 @@ public class SocketClient {
         this.socket = null;
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         this.SERVER_PORT = SERVER_PORT;
+        this.socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
         this.executor = Executors.newFixedThreadPool(Math.max(MAX_THREADS, 2));
         this.xTablesClient = xTablesClient;
@@ -73,6 +74,10 @@ public class SocketClient {
     public SocketClient setSERVER_ADDRESS(String SERVER_ADDRESS) {
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         return this;
+    }
+
+    public List<RequestInfo> getMESSAGES() {
+        return MESSAGES;
     }
 
     public SocketClient setSERVER_PORT(int SERVER_PORT) {
@@ -157,6 +162,7 @@ public class SocketClient {
                     RequestInfo requestInfo = new RequestInfo(message);
                     MESSAGES.add(requestInfo);
                     if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
+                        String ID = requestInfo.getID();
                         String key = requestInfo.getTokens()[1];
                         String value = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (updateConsumer != null) {
@@ -220,17 +226,25 @@ public class SocketClient {
         out.println(responseInfo.parsed());
         out.flush();
     }
-
+    public void stopAll() throws IOException {
+        logger.severe("Shutting down all threads and processes.");
+        if (socket != null) {
+            socket.close();
+            out.close();
+            in.close();
+        }
+        socketExecutor.shutdownNow();
+        isConnected = false;
+        logger.severe("SocketClient is now closed.");
+    }
     public void reconnect() {
         try {
-            socket.close();
-            isConnected = false;
-        } catch (Exception ignored) {
+            stopAll();  // Ensure all resources are closed properly before reconnecting
+        } catch (IOException ignored) {
         }
         this.connect();
-
-
     }
+
 
 
     public Socket getSocket() {

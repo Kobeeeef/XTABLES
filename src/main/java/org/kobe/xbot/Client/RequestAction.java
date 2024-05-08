@@ -61,7 +61,7 @@ public class RequestAction<T> {
     }
 
     public T complete() {
-        if (doNotRun()) return null;
+        if (doNotRun()) return returnValueIfNotRan();
         long startTime = System.nanoTime();
         try {
             T result = client.sendComplete(value, type);
@@ -77,6 +77,9 @@ public class RequestAction<T> {
     }
     public boolean doNotRun(){
         return false;
+    }
+    public T returnValueIfNotRan() {
+        return null;
     }
 
     public T parseResponse(long startTime, Object result) {

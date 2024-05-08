@@ -1,9 +1,11 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilites.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +19,10 @@ public class XTablesClient {
     private final SocketClient client;
     private final Gson gson = new Gson();
     private XTablesData<String> cache;
+    private long cacheFetchCooldown = 10000;
     private boolean isCacheReady = false;
     private final CountDownLatch latch = new CountDownLatch(1);
+    private Thread cacheThread;
 
     public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
         this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS, this);
@@ -35,36 +39,81 @@ public class XTablesClient {
             Thread.currentThread().interrupt();
         }
         if (useCache) {
-            enableCache();
+            cacheThread = new Thread(this::enableCache);
+            cacheThread.setDaemon(true);
+            cacheThread.start();
         }
     }
 
-    private void enableCache() {
-        cache = new XTablesData<>();
-        isCacheReady = false;
-        logger.info("Starting caching all raw data...");
-        getRawJSON().queue(s -> {
-            cache.updateFromRawJSON(s);
-            logger.info("Cache has been updated.");
-            subscribeUpdateEvent((updateEvent) -> cache.put(updateEvent.getKey(), updateEvent.getValue())).queue((responseStatus) -> {
-                if(responseStatus.equals(ResponseStatus.OK)) {
-                    isCacheReady = true;
-                    logger.info("Cache is now setup and ready to use.");
-                } else {
-                    logger.severe("Failed to subscribe to ANY update, NON OK status returned from server.");
-                }
-            }, (throwable) -> {
-                logger.severe("Failed to subscribe to ANY update. Error:\n" + throwable.getMessage());
-            });
-        });
+    public void stopAll() throws IOException {
+        client.stopAll();
+        cacheThread.interrupt();
     }
+
+    public long getCacheFetchCooldown() {
+        return cacheFetchCooldown;
+    }
+
+    public XTablesClient setCacheFetchCooldown(long cacheFetchCooldown) {
+        this.cacheFetchCooldown = cacheFetchCooldown;
+        return this;
+    }
+
+    private void enableCache() {
+        try {
+            initializeCache();
+            if (subscribeToCacheUpdates()) {
+                logger.info("Cache is now setup and ready to use.");
+                periodicallyUpdateCache();
+            } else {
+                logger.severe("Failed to subscribe to ANY update, NON OK status returned from server.");
+            }
+        } catch (Exception e) {
+            logger.severe("Failed to initialize cache or subscribe to updates. Error:\n" + e.getMessage());
+        }
+    }
+
+    private void initializeCache() {
+        logger.info("Initializing cache...");
+        String rawJSON = getRawJSON().complete();
+        cache = new XTablesData<>();
+        cache.updateFromRawJSON(rawJSON);
+        logger.info("Cache initialized and populated.");
+    }
+
+    private boolean subscribeToCacheUpdates() {
+        ResponseStatus responseStatus = subscribeUpdateEvent((updateEvent) -> {
+            cache.put(updateEvent.getKey(), updateEvent.getValue());
+        }).complete();
+        if (responseStatus.equals(ResponseStatus.OK)) logger.info("Cache is now subscribed for updates.");
+        isCacheReady = responseStatus.equals(ResponseStatus.OK);
+        return isCacheReady;
+    }
+
+    private void periodicallyUpdateCache() {
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                String newRawJSON = getRawJSON().complete();
+                cache.updateFromRawJSON(newRawJSON);
+                logger.info("Cache has been auto re-populated.");
+                Thread.sleep(cacheFetchCooldown);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.warning("Cache update thread was interrupted.");
+                break;
+            }
+        }
+    }
+
 
     public boolean isCacheReady() {
         return isCacheReady;
     }
+
     public XTablesData<String> getCache() {
         return cache;
     }
+
     public void updateServerAddress(String SERVER_ADDRESS, int SERVER_PORT) {
         client.setSERVER_ADDRESS(SERVER_ADDRESS).setSERVER_PORT(SERVER_PORT).reconnect();
     }
@@ -131,32 +180,40 @@ public class XTablesClient {
             }
 
             @Override
+            public ResponseStatus returnValueIfNotRan() {
+                return ResponseStatus.OK;
+            }
+
+            @Override
             public boolean doNotRun() {
-                List<UpdateConsumer<?>> consumers = new ArrayList<>(update_consumers.computeIfAbsent(key, k -> new ArrayList<>()));
+                List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                 consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
                 return !consumers.isEmpty();
             }
         };
     }
 
-    public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
+    public RequestAction<ResponseStatus> unsubscribeUpdateEvent(Consumer<SocketClient.KeyValuePair<String>> consumer) {
         String key = " ";
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
             @Override
             public void onResponse(ResponseStatus result) {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
-                    consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                    consumers.removeIf(updateConsumer -> updateConsumer.type.equals(String.class) && updateConsumer.consumer.equals(consumer));
                     if (consumers.isEmpty()) {
                         update_consumers.remove(key);
                     }
                 }
             }
-
+            @Override
+            public ResponseStatus returnValueIfNotRan() {
+                return ResponseStatus.OK;
+            }
             @Override
             public boolean doNotRun() {
-                List<UpdateConsumer<?>> consumers = new ArrayList<>(update_consumers.computeIfAbsent(key, k -> new ArrayList<>()));
-                consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
+                consumers.removeIf(updateConsumer -> updateConsumer.type.equals(String.class) && updateConsumer.consumer.equals(consumer));
                 return !consumers.isEmpty();
             }
         };
@@ -180,12 +237,23 @@ public class XTablesClient {
             Consumer<? super SocketClient.KeyValuePair<T>> consumer = typedUpdateConsumer.consumer();
             Class<T> type = typedUpdateConsumer.type();
             if (type != null) {
-                T parsed = new Gson().fromJson(keyValuePair.getValue(), type);
-                consumer.accept(new SocketClient.KeyValuePair<>(keyValuePair.getKey(), parsed));
+                try {
+                    T parsed = gson.fromJson(keyValuePair.getValue(), type);
+                    consumer.accept(new SocketClient.KeyValuePair<>(keyValuePair.getKey(), parsed));
+                } catch (JsonSyntaxException ignored) {
+                } catch (Exception e) {
+                    logger.severe("There was a exception while running subscriber callback: " + e.getMessage());
+
+                }
             } else {
                 UpdateConsumer<String> typedUpdateConsumer2 = (UpdateConsumer<String>) updateConsumer;
                 Consumer<? super SocketClient.KeyValuePair<String>> consumer2 = typedUpdateConsumer2.consumer();
-                consumer2.accept(keyValuePair);
+                try {
+                    consumer2.accept(keyValuePair);
+                } catch (Exception e) {
+                    logger.severe("There was a exception while running subscriber callback: " + e.getMessage());
+
+                }
             }
         }
     }

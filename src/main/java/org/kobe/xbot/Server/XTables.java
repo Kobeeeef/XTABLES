@@ -179,13 +179,13 @@ public class XTables {
                         out.flush();
                     } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
                         String key = requestInfo.getTokens()[1];
-                        boolean success = updateEvents.add(key);
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
+                        updateEvents.add(key);
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, "OK");
                         out.println(responseInfo.parsed());
                         out.flush();
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
-                        boolean success = updateEvents.add("");
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
+                        updateEvents.add("");
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, "OK");
                         out.println(responseInfo.parsed());
                         out.flush();
                     } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_UPDATE)) {

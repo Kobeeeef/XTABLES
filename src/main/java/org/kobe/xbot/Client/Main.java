@@ -81,21 +81,22 @@ public class Main {
         System.out.println(integer);
 
         // Subscribe to an update event on key
-        client.subscribeUpdateEvent("SmartDashboard", Integer.class, new_value ->
+        status = client.subscribeUpdateEvent("SmartDashboard", Integer.class, new_value ->
                         System.out.println("New Value: " + new_value)
                 )
                 .complete();
+        System.out.println("Subscribe status: " + status);
 
         // Define a consumer for update events
         Consumer<SocketClient.KeyValuePair<String>> updateConsumer = update -> {
             System.out.println("Update received: " + update);
         };
         // Subscribe to updates for a specific key
-        status = client.subscribeUpdateEvent("key", String.class, updateConsumer).complete();
-        System.out.println(status);
+        status = client.subscribeUpdateEvent("SmartDashboard", String.class, updateConsumer).complete();
+        System.out.println("Subscribe status: " + status);
         // Unsubscribe after a certain condition is met
-        status = client.unsubscribeUpdateEvent("key", String.class, updateConsumer).complete();
-        System.out.println(status);
+        status = client.unsubscribeUpdateEvent("SmartDashboard", String.class, updateConsumer).complete();
+        System.out.println("Unsubscribe status: " + status);
 
         // Check weather or not the cache is set up and ready to be used.
         // Any updates/retrievals from cache does not make any request to server.
@@ -108,7 +109,6 @@ public class Main {
             String valueFromCache = cache.get("SmartDashboard.sometable");
 
             System.out.println("Value from cache: " + valueFromCache);
-
         }
 
 
