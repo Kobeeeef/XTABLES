@@ -1,124 +1,124 @@
+
 # XTablesClient Documentation
 
-`XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing, retrieving, and managing data updates in various formats. This document details the methods available in the `XTablesClient` class, including their synchronous and asynchronous usage.
+`XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing, retrieving, and managing data updates in various formats. This document details the methods available in the `XTablesClient` class, including their usage and new enhancements related to caching and error handling.
 
 ## Constructor
 
-- **XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS)**
-  - Initializes a connection to the specified server address and port with support for multithreading.
-  - **Parameters**:
-    - `SERVER_ADDRESS`: The IP address or hostname of the server.
-    - `SERVER_PORT`: The port number on which the server is listening.
-    - `MAX_THREADS`: The maximum number of threads to handle concurrent operations.
+- **XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache)**
+  - Initializes the client with server connection and optional caching.
 
-## Methods
+## Connection Management
+
+- **stopAll()**
+  - Stops all client connections and interrupts the cache management thread.
+- **updateServerAddress(String SERVER_ADDRESS, int SERVER_PORT)**
+  - Updates the server address and port for the client connection.
+
+## Cache Management
+
+- **getCacheFetchCooldown()**
+  - Retrieves the cooldown time between cache fetches.
+- **setCacheFetchCooldown(long cacheFetchCooldown)**
+  - Sets the cooldown time between cache fetches. This defines how frequently, in milliseconds, the client automatically fetches updates from the server to ensure the cache remains synchronized. The default value is 10000 milliseconds (10 seconds).
+- **isCacheReady()**
+  - Checks if the cache is ready for use.
+- **getCache()**
+  - Retrieves the current state of the cache.
+
+### How Cache Works
+
+The caching mechanism in `XTablesClient` is designed to minimize network traffic and enhance performance by maintaining a local copy of server data. Upon initialization, the client fetches all current data from the server to populate the local cache. It then subscribes to updates from the server; any subsequent updates on the server side are automatically pushed to the client, ensuring that the local cache is always synchronized with the server.
+
+Additionally, the client automatically fetches updates at intervals defined by the `cacheFetchCooldown` to prevent any discrepancies, especially in scenarios where real-time update notifications might fail or get delayed.
+
+This setup reduces the number of network messages needed, as the client does not have to query the server for each data retrieval and relies on real-time updates for any changes.
+
+**Note:** Any updates to the local cache are local only and do not affect server-side data. This means that changes made directly to the cache will not be reflected on the server unless explicitly sent via an update method (e.g., `putString`, `putInteger`).
+
+## Data Management Methods
 
 ### Put Methods
-Store data on the server under a specified key.
 
 - **putRaw(String key, String value)**
-  - Stores a raw string under the given key.
-  - **Synchronous**: `complete()` returns the operation result.
-  - **Asynchronous**: `queue()` initiates the operation without blocking.
-
+  - Stores a raw string value under a specified key.
 - **putString(String key, String value)**
-  - Stores a string value after converting it to JSON format.
-  - **Synchronous/Asynchronous**: Same as above.
-
-- **putArray(String key, List<T> value)**
-  - Stores an array under the given key, serialized to JSON format.
-  - **Synchronous/Asynchronous**: Same as above.
-
+  - Stores a string value after converting it to JSON.
 - **putInteger(String key, Integer value)**
-  - Stores an integer value under the specified key.
-  - **Synchronous/Asynchronous**: Same as above.
-
+  - Stores an integer value under a specified key.
+- **putBoolean(String key, Boolean value)**
+  - Stores a Boolean value under a specified key.
 - **putObject(String key, Object value)**
-  - Stores any serializable object under the given key by converting it to JSON.
-  - **Synchronous/Asynchronous**: Same as above.
+  - Stores any serializable object under the specified key by converting it to JSON.
+- **putArray(String key, List<T> value)**
+  - Stores a list of objects under a specified key, serialized to JSON format.
+- **renameKey(String key, String newName)**
+  - Renames an existing key to a new name, effectively updating the key while preserving associated data.
 
 ### Get Methods
-Retrieve data from the server using the specified key.
 
 - **getRaw(String key)**
-  - Retrieves a raw string value.
-  - **Synchronous/Asynchronous**: Same as above.
-
+  - Retrieves a raw string value using the specified key.
 - **getString(String key)**
-  - Retrieves a string value.
-  - **Synchronous/Asynchronous**: Same as above.
-
+  - Retrieves a string value from the server after converting from JSON.
 - **getInteger(String key)**
-  - Retrieves an integer value.
-  - **Synchronous/Asynchronous**: Same as above.
-
+  - Retrieves an integer value using the specified key.
+- **getBoolean(String key)**
+  - Retrieves a Boolean value using the specified key.
 - **getObject(String key, Class<T> type)**
-  - Retrieves an object of type T.
-  - **Synchronous/Asynchronous**: Same as above.
-
+  - Retrieves an object of the specified type using the given key.
 - **getArray(String key, Class<T> type)**
-  - Retrieves an array of type T.
-  - **Synchronous/Asynchronous**: Same as above.
+  - Retrieves an array of objects of the specified type using the given key.
+- **getRawJSON()**
+  - Retrieves the raw JSON data from the server.
 
 ### Delete Method
-- **delete(String key)**
-  - Deletes the value associated with the specified key.
-  - **Synchronous/Asynchronous**: Same as above.
 
-### Subscription Methods
-Manage update subscriptions for specific keys.
+- **delete(String key)**
+  - Deletes the specified key and its associated data from the server.
+
+### Update Event Subscription
 
 - **subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer)**
-  - Subscribes to updates for a specific key, invoking the provided consumer when updates are received. Utilizes a hashmap to manage multiple consumers per key.
-  - **Synchronous/Asynchronous**: Same as above.
-
+  - Subscribes to updates for a specific key using a consumer.
+- **subscribeUpdateEvent(Consumer<SocketClient.KeyValuePair<String>> consumer)**
+  - Subscribes to any update event and returns the updates as raw JSON strings.
 - **unsubscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer)**
-  - Unsubscribes from updates for a specific key by removing the consumer from the list.
-  - **Synchronous/Asynchronous**: Same as above.
+  - Unsubscribes from updates for a specific key, removing the consumer.
 
-### Latency Measurement
-- **ping_latency()**
-  - Measures the network and round-trip latency in milliseconds.
-  - **Synchronous**: Returns latency information.
+### Handling Multiple Requests
+
+- **completeAll(List<RequestAction<T>> requestActions)**
+  - Completes all provided asynchronous request actions synchronously, returning a list of results.
+- **queueAll(List<RequestAction<T>> requestActions)**
+  - Queues all provided request actions for asynchronous processing without waiting for results.
 
 ### Miscellaneous
-- **getTables(String key)**
-  - Retrieves a list of table names or similar structures using the specified key.
-  - **Synchronous/Asynchronous**: Same as above.
-
-- **sendCustomMessage(MethodType method, String message, Class<T> type)**
-  - Sends a custom request to the server using the specified method and message, expecting a return type as specified by `Class<T>`.
-  - **Synchronous/Asynchronous**: Same as above.
 
 - **rebootServer()**
-  - Sends a command to reboot the server, effective after 3 seconds of the request.
-  - **Synchronous/Asynchronous**: Same as above.
+  - Sends a command to reboot the server.
+- **sendCustomMessage(MethodType method, String message, Class<T> type)**
+  - Sends a custom message to the server using a specified method and expects a return type as specified.
+- **ping_latency()**
+  - Measures the network and round-trip latency in milliseconds.
 
 ## Usage Examples
 
 ```java
-XTablesClient client = new XTablesClient("localhost", 1735, 10);
-// Synchronous use
+XTablesClient client = new XTablesClient("localhost", 1735, 10, true);
+// Initialize cache and handle updates
+client.subscribeUpdateEvent("session_id", Integer.class, kv -> {
+    System.out.println("Update received for session_id: " + kv.getValue());
+});
+// Synchronous operation to put a new session ID
 client.putInteger("session_id", 1001).complete();
-// Asynchronous use
-client.getInteger("session_id").queue(
-    result -> System.out.println("Session ID: " + result),
-    error -> System.err.println("Error retrieving session ID")
-);
+```
 
-// Subscribe to
+## Advanced Features
 
- updates
-client.subscribeUpdateEvent("key", String.class, kv -> System.out.println("Update received: " + kv.getValue()))
-        .complete();
+- Handling JSON parsing errors and interruptions during update processing.
+- Efficient management of multiple consumers per update key using a hashmap.
 
-// Define a consumer for update events
-Consumer<SocketClient.KeyValuePair<String>> updateConsumer = kv -> {
-    // Handle update
-    System.out.println("Update received: " + kv.getValue());
-};
-
-// Subscribe to updates for a specific key
-RequestAction<ResponseStatus> subscription = client.subscribeUpdateEvent("key", String.class, updateConsumer)
-        .complete();
+```
+This comprehensive guide ensures clarity on all functionalities and methods available in the `XTablesClient` class, facilitating effective server interaction and data management.
 ```
