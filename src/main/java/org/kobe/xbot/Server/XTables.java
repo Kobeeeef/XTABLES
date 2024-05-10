@@ -1,3 +1,12 @@
+/*
+ * XTables class manages a server that allows clients to interact with a key-value data structure.
+ * It provides methods to start the server, handle client connections, and process client requests.
+ * The class also supports server reboot functionality and notification of clients upon data updates.
+ *
+ * Author: Kobe
+ *
+ */
+
 package org.kobe.xbot.Server;
 
 import com.google.gson.Gson;
@@ -107,6 +116,7 @@ public class XTables {
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
+            super.setDaemon(true);
         }
 
         public Set<String> getUpdateEvents() {
