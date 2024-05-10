@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +26,7 @@ public class XTables {
     private final XTablesData<String> table = new XTablesData<>();
     private ServerSocket serverSocket;
     private final int port;
+    private final ExecutorService clientThreadPool;
 
     public static XTables startInstance(int PORT) {
         if (instance == null) {
@@ -35,6 +37,7 @@ public class XTables {
 
     private XTables(int PORT) {
         this.port = PORT;
+        this.clientThreadPool = Executors.newCachedThreadPool();
         startServer();
     }
 
@@ -48,7 +51,7 @@ public class XTables {
                 logger.info(String.format("Client connected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clients.add(clientHandler);
-                clientHandler.start();
+                clientThreadPool.execute(clientHandler);
             }
         } catch (IOException e) {
             logger.severe("Error occurred: " + e.getMessage());

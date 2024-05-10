@@ -23,6 +23,7 @@ public class XTablesClient {
     private boolean isCacheReady = false;
     private final CountDownLatch latch = new CountDownLatch(1);
     private Thread cacheThread;
+    public final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
 
     public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
         this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS, this);
@@ -118,7 +119,7 @@ public class XTablesClient {
         client.setSERVER_ADDRESS(SERVER_ADDRESS).setSERVER_PORT(SERVER_PORT).reconnect();
     }
 
-    public static final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
+
 
     public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         Utilities.validateKey(key);

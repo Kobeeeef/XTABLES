@@ -162,13 +162,16 @@ public class XTablesData<V> {
 
 
     public void updateFromRawJSON(String json) {
-        // Clear the current data
-        if (this.data != null) {
-            this.data.clear();
-        } else {
-            this.data = new HashMap<>();
+        // Replace the current map directly with the parsed data
+        // This avoids unnecessary clearing and re-creating of the map
+        Map<String, XTablesData<V>> newData = gson.fromJson(json, new TypeToken<Map<String, XTablesData<V>>>(){}.getType());
+
+        // Check if the new data is null which might be the case if json is empty or invalid
+        if (newData == null) {
+            newData = new HashMap<>(); // Ensure the data field is never null
         }
 
-        this.data = gson.fromJson(json, new TypeToken<Map<String, XTablesData<V>>>(){}.getType());
+        this.data = newData; // Directly assign the new data
     }
+
 }
