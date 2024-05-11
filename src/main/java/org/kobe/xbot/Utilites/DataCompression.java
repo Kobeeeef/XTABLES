@@ -19,7 +19,7 @@ import java.util.zip.InflaterInputStream;
 
 public class DataCompression {
     private static final Logger logger = Logger.getLogger(DataCompression.class.getName());
-    private static int compressionLevel = Deflater.BEST_SPEED;
+    private static int compressionLevel = Deflater.DEFLATED;
     private static double speedAverageMS = 0.3;
 
     /**
