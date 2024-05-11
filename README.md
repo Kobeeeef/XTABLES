@@ -36,6 +36,17 @@ This setup reduces the number of network messages needed, as the client does not
 
 **Note:** Any updates to the local cache are local only and do not affect server-side data. This means that changes made directly to the cache will not be reflected on the server unless explicitly sent via an update method (e.g., `putString`, `putInteger`).
 
+### Data Compression and Dynamic Compression Level Adjustment
+
+To further optimize network bandwidth usage, `XTablesClient` implements data compression using Gzip, followed by Base64 encoding for network transmission. The compression level is dynamically adjusted based on the time it takes to compress data. This dynamic adjustment helps balance the trade-off between compression efficiency and processing speed, ensuring optimal performance under varying network conditions.
+
+The compression level is adjusted as follows:
+
+- If the compression time is faster than the set average, the compression level is increased to achieve higher compression ratios and reduce network payload size.
+- Conversely, if the compression time is slower than the set average, the compression level is decreased to prioritize faster processing speed and reduce computational overhead.
+
+You can customize the average compression speed threshold by using the `setSpeedAverageMS(double)` method in the `org.kobe.xbot.Utilites.DataCompression` class. This allows you to fine-tune the compression behavior based on your specific network environment and performance requirements.
+
 ## Data Management Methods
 
 ### Put Methods

@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -26,6 +27,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import static org.kobe.xbot.Utilites.DataCompression.compress;
+import static org.kobe.xbot.Utilites.DataCompression.decompress;
 
 public class XTables {
     private static XTables instance = null;
@@ -223,7 +227,7 @@ public class XTables {
                         out.println(responseInfo.parsed());
                         out.flush();
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_RAW_JSON)) {
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_RAW_JSON, table.toJSON());
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_RAW_JSON, DataCompression.compressAndConvertBase64(table.toJSON()));
                         out.println(responseInfo.parsed());
                         out.flush();
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.REBOOT_SERVER)) {

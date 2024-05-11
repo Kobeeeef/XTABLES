@@ -311,7 +311,21 @@ public class XTablesClient {
     }
 
     public RequestAction<String> getRawJSON() {
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_RAW_JSON).parsed(), null);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_RAW_JSON).parsed(), null) {
+            /**
+             * Parses the response received from the server. Meant to be overridden in subclasses to parse the response based on specific needs.
+             *
+             * @param startTime The start time of the request, used for calculating latency.
+             * @param result    The raw result from the server.
+             * @return The parsed response as type T.
+             */
+            @Override
+            public String parseResponse(long startTime, Object result) {
+                if((result instanceof String)) {
+                   return DataCompression.decompressAndConvertBase64((String) result);
+                } else return null;
+            }
+        };
     }
 
     public RequestAction<String> getString(String key) {
