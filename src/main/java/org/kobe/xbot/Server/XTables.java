@@ -19,7 +19,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -27,9 +26,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-
-import static org.kobe.xbot.Utilites.DataCompression.compress;
-import static org.kobe.xbot.Utilites.DataCompression.decompress;
 
 public class XTables {
     private static XTables instance = null;
@@ -253,13 +249,11 @@ public class XTables {
                 String message = e.getMessage();
                 if (message.contains("Connection reset")) {
                     logger.info(String.format("Client disconnected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
-                    messages_log.cancel(true);
-                    clients.remove(this);
                 } else {
                     logger.severe("Error occurred: " + e.getMessage());
-                    messages_log.cancel(true);
-                    clients.remove(this);
                 }
+                messages_log.cancel(true);
+                clients.remove(this);
             }
         }
 

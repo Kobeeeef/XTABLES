@@ -1,3 +1,10 @@
+/*
+ * DataCompression class provides methods for data compression using Gzip and Base64 encoding for network transmission.
+ *
+ * Author: Kobe
+ *
+ */
+
 package org.kobe.xbot.Utilites;
 
 import java.io.ByteArrayInputStream;
@@ -15,11 +22,23 @@ public class DataCompression {
     private static int compressionLevel = Deflater.BEST_SPEED;
     private static double speedAverageMS = 0.3;
 
+    /**
+     * Compresses the raw string data and converts it to Base64 format.
+     *
+     * @param raw The raw string data to be compressed.
+     * @return The compressed data in Base64 format.
+     */
     public static String compressAndConvertBase64(String raw) {
         byte[] compressedData = compress(raw.getBytes());
         return Base64.getEncoder().encodeToString(compressedData);
     }
 
+    /**
+     * Decompresses the Base64-encoded data and converts it back to its original string format.
+     *
+     * @param base64 The Base64-encoded compressed data.
+     * @return The decompressed original string data.
+     */
     public static String decompressAndConvertBase64(String base64) {
         byte[] decompressedDataString = Base64.getDecoder().decode(base64);
         byte[] decompressedData = decompress(decompressedDataString);
@@ -27,15 +46,25 @@ public class DataCompression {
         return new String(decompressedData);
     }
 
+    /**
+     * Gets the average compression speed threshold in milliseconds.
+     *
+     * @return The average compression speed threshold.
+     */
     public static double getSpeedAverageMS() {
         return speedAverageMS;
     }
 
+    /**
+     * Sets the average compression speed threshold in milliseconds.
+     *
+     * @param speedAverageMS The new average compression speed threshold.
+     */
     public static void setSpeedAverageMS(double speedAverageMS) {
         DataCompression.speedAverageMS = speedAverageMS;
     }
 
-    public static byte[] compress(byte[] data) {
+    private static byte[] compress(byte[] data) {
         try {
             long startTime = System.nanoTime();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -51,8 +80,7 @@ public class DataCompression {
         }
     }
 
-
-    public static byte[] decompress(byte[] compressedData) {
+    private static byte[] decompress(byte[] compressedData) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Inflater inflater = new Inflater();
@@ -87,6 +115,4 @@ public class DataCompression {
             }
         }
     }
-
-
 }
