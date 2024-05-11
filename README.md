@@ -45,7 +45,7 @@ The compression level is adjusted as follows:
 - If the compression time is faster than the set average, the compression level is increased to achieve higher compression ratios and reduce network payload size.
 - Conversely, if the compression time is slower than the set average, the compression level is decreased to prioritize faster processing speed and reduce computational overhead.
 
-You can customize the average compression speed threshold by using the `setSpeedAverageMS(double)` method in the `org.kobe.xbot.Utilites.DataCompression` class. This allows you to fine-tune the compression behavior based on your specific network environment and performance requirements.
+You can customize the average compression speed threshold by using the `setSpeedAverageMS(double milliseconds)` method in the `org.kobe.xbot.Utilites.DataCompression` class. This allows you to fine-tune the compression behavior based on your specific network environment and performance requirements.
 
 ## Data Management Methods
 
