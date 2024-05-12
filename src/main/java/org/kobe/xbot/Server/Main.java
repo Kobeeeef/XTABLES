@@ -1,9 +1,11 @@
 package org.kobe.xbot.Server;
 
-import java.util.logging.Logger;
+import org.kobe.xbot.Utilites.XTablesLogger;
+
+import java.util.logging.Level;
 
 public class Main {
-    private static final Logger logger = Logger.getLogger(Main.class.getName());
+    private static final XTablesLogger logger = XTablesLogger.getLogger();
 
     public static void main(String[] args) {
         if (args.length > 0) {

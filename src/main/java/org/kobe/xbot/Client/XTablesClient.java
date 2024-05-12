@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 
 public class XTablesClient {
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private final XTablesLogger logger = XTablesLogger.getLogger();
+
     private final SocketClient client;
     private final Gson gson = new Gson();
     private XTablesData<String> cache;
@@ -48,7 +48,7 @@ public class XTablesClient {
 
     public void stopAll() throws IOException {
         client.stopAll();
-        cacheThread.interrupt();
+        if (cacheThread != null) cacheThread.interrupt();
     }
 
     public long getCacheFetchCooldown() {
@@ -118,7 +118,6 @@ public class XTablesClient {
     public void updateServerAddress(String SERVER_ADDRESS, int SERVER_PORT) {
         client.setSERVER_ADDRESS(SERVER_ADDRESS).setSERVER_PORT(SERVER_PORT).reconnect();
     }
-
 
 
     public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
@@ -207,10 +206,12 @@ public class XTablesClient {
                     }
                 }
             }
+
             @Override
             public ResponseStatus returnValueIfNotRan() {
                 return ResponseStatus.OK;
             }
+
             @Override
             public boolean doNotRun() {
                 List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
@@ -269,16 +270,17 @@ public class XTablesClient {
              */
             @Override
             public void beforeRun() {
-                if(!Utilities.isValidValue(value)) {
+                if (!Utilities.isValidValue(value)) {
                     logger.warning("Invalid JSON value for key '" + key + "': " + value);
                     logger.warning("The key '" + key + "' may be flagged by the server.");
                 }
             }
         };
     }
+
     public RequestAction<ResponseStatus> putRaw(String key, String value) {
         Utilities.validateKey(key);
-        if(!Utilities.isValidValue(value)) throw new JsonSyntaxException("The value is not a valid JSON.");
+        if (!Utilities.isValidValue(value)) throw new JsonSyntaxException("The value is not a valid JSON.");
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class) {
             /**
              * Returns a value when {@code doNotRun} returns true and the action is not performed. Meant to be overridden in subclasses to provide a default value.
@@ -289,6 +291,7 @@ public class XTablesClient {
             public ResponseStatus returnValueIfNotRan() {
                 return ResponseStatus.FAIL;
             }
+
             /**
              * Determines if the request should not run. Meant to be overridden in subclasses to provide specific conditions.
              *
@@ -300,6 +303,7 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<ResponseStatus> putString(String key, String value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
@@ -339,9 +343,11 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.DELETE, key).parsed(), ResponseStatus.class);
     }
+
     public RequestAction<ResponseStatus> deleteAll() {
         return delete("");
     }
+
     public RequestAction<String> getRaw(String key) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
@@ -358,8 +364,8 @@ public class XTablesClient {
              */
             @Override
             public String parseResponse(long startTime, Object result) {
-                if((result instanceof String)) {
-                   return DataCompression.decompressAndConvertBase64((String) result);
+                if ((result instanceof String)) {
+                    return DataCompression.decompressAndConvertBase64((String) result);
                 } else return null;
             }
         };

@@ -1,5 +1,8 @@
 package org.kobe.xbot.Client;
 
+import org.kobe.xbot.Utilites.XTablesLogger;
+
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -11,10 +14,11 @@ import java.util.function.Consumer;
  * This class encapsulates the logic for sending data over a network, handling responses,
  * and managing errors during communication. It supports both queued (asynchronous)
  * and complete (synchronous) operations.
- *
+ * <p>
  * Author: Kobe
  */
 public class RequestAction<T> {
+    private static final XTablesLogger logger = XTablesLogger.getLogger();
     private final SocketClient client;
     private final String value;
     private final Type type;
@@ -23,8 +27,8 @@ public class RequestAction<T> {
      * Constructs a RequestAction with specified type.
      *
      * @param client The client used to send requests.
-     * @param value The data to be sent.
-     * @param type The expected return type of the response.
+     * @param value  The data to be sent.
+     * @param type   The expected return type of the response.
      */
     public RequestAction(SocketClient client, String value, Type type) {
         this.client = client;
@@ -36,7 +40,7 @@ public class RequestAction<T> {
      * Constructs a RequestAction without a specified type.
      *
      * @param client The client used to send requests.
-     * @param value The data to be sent.
+     * @param value  The data to be sent.
      */
     public RequestAction(SocketClient client, String value) {
         this.client = client;
@@ -54,16 +58,20 @@ public class RequestAction<T> {
         if (doNotRun()) return;
         beforeRun();
         long startTime = System.nanoTime();
-        CompletableFuture<T> future = client.sendAsync(value, type);
-        future.thenAccept(t -> {
-                    T parsed = parseResponse(startTime, t);
-                    onResponse(parsed == null ? t : parsed);
-                    onSuccess.accept(parsed == null ? t : parsed);
-                })
-                .exceptionally(ex -> {
-                    onFailure.accept(ex);
-                    return null;
-                });
+        try {
+            CompletableFuture<T> future = client.sendAsync(value, type);
+            future.thenAccept(t -> {
+                        T parsed = parseResponse(startTime, t);
+                        onResponse(parsed == null ? t : parsed);
+                        onSuccess.accept(parsed == null ? t : parsed);
+                    })
+                    .exceptionally(ex -> {
+                        onFailure.accept(ex);
+                        return null;
+                    });
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     /**
@@ -75,12 +83,16 @@ public class RequestAction<T> {
         if (doNotRun()) return;
         beforeRun();
         long startTime = System.nanoTime();
-        CompletableFuture<T> future = client.sendAsync(value, type);
-        future.thenAccept(t -> {
-            T parsed = parseResponse(startTime, t);
-            onResponse(parsed == null ? t : parsed);
-            onSuccess.accept(parsed == null ? t : parsed);
-        });
+        try {
+            CompletableFuture<T> future = client.sendAsync(value, type);
+            future.thenAccept(t -> {
+                T parsed = parseResponse(startTime, t);
+                onResponse(parsed == null ? t : parsed);
+                onSuccess.accept(parsed == null ? t : parsed);
+            });
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     /**
@@ -90,11 +102,15 @@ public class RequestAction<T> {
         if (doNotRun()) return;
         beforeRun();
         long startTime = System.nanoTime();
-        CompletableFuture<T> future = client.sendAsync(value, type);
-        future.thenAccept(t -> {
-            T parsed = parseResponse(startTime, t);
-            onResponse(parsed == null ? t : parsed);
-        });
+        try {
+            CompletableFuture<T> future = client.sendAsync(value, type);
+            future.thenAccept(t -> {
+                T parsed = parseResponse(startTime, t);
+                onResponse(parsed == null ? t : parsed);
+            });
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     /**
@@ -111,7 +127,7 @@ public class RequestAction<T> {
             T parsed = parseResponse(startTime, result);
             onResponse(parsed == null ? result : parsed);
             return parsed == null ? result : parsed;
-        } catch (ExecutionException | TimeoutException | InterruptedException e) {
+        } catch (ExecutionException | TimeoutException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -129,7 +145,7 @@ public class RequestAction<T> {
      *
      * @return true if the request should not be sent, false otherwise.
      */
-    public boolean doNotRun(){
+    public boolean doNotRun() {
         return false;
     }
 
@@ -146,7 +162,7 @@ public class RequestAction<T> {
      * Parses the response received from the server. Meant to be overridden in subclasses to parse the response based on specific needs.
      *
      * @param startTime The start time of the request, used for calculating latency.
-     * @param result The raw result from the server.
+     * @param result    The raw result from the server.
      * @return The parsed response as type T.
      */
     public T parseResponse(long startTime, Object result) {
@@ -156,6 +172,9 @@ public class RequestAction<T> {
     /**
      * Called before sending the request. Meant to be overridden in subclasses to perform any necessary setup or validation before running the request.
      */
-    public void beforeRun() {};
+    public void beforeRun() {
+    }
+
+    ;
 
 }

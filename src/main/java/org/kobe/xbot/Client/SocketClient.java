@@ -2,10 +2,7 @@ package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
 import com.sun.jdi.connect.spi.ClosedConnectionException;
-import org.kobe.xbot.Utilites.MethodType;
-import org.kobe.xbot.Utilites.RequestInfo;
-import org.kobe.xbot.Utilites.ResponseInfo;
-import org.kobe.xbot.Utilites.ResponseStatus;
+import org.kobe.xbot.Utilites.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,12 +14,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class SocketClient {
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
-    private final ExecutorService executor;
+    private final XTablesLogger logger = XTablesLogger.getLogger();
+    private ExecutorService executor;
     private ThreadPoolExecutor socketExecutor;
     private String SERVER_ADDRESS;
     private int SERVER_PORT;
@@ -45,7 +43,7 @@ public class SocketClient {
             return added;
         }
     };
-
+    private int MAX_THREADS = 2;
     public Boolean isConnected = false;
     private PrintWriter out = null;
     private BufferedReader in = null;
@@ -55,11 +53,11 @@ public class SocketClient {
 
     public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS, int MAX_THREADS, XTablesClient xTablesClient) {
         this.socket = null;
+        this.MAX_THREADS = Math.max(MAX_THREADS, 1);
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         this.SERVER_PORT = SERVER_PORT;
-        this.socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
-        this.executor = Executors.newFixedThreadPool(Math.max(MAX_THREADS, 2));
+        this.executor = getWorkerExecutor(MAX_THREADS);
         this.xTablesClient = xTablesClient;
     }
 
@@ -120,8 +118,13 @@ public class SocketClient {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 logger.info(String.format("Connected to server: %1$s:%2$s", SERVER_ADDRESS, SERVER_PORT));
-                socketExecutor.shutdownNow();
-                socketExecutor = new ThreadPoolExecutor(0, 3, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
+                if (executor == null || executor.isShutdown()) {
+                    this.executor = getWorkerExecutor(MAX_THREADS);
+                }
+                if (socketExecutor != null) {
+                    socketExecutor.shutdownNow();
+                }
+                this.socketExecutor = getSocketExecutor();
                 socketExecutor.submit(new ClientMessageListener(socket));
                 List<RequestAction<ResponseStatus>> requestActions = xTablesClient.resubscribeToAllUpdateEvents();
                 if (!requestActions.isEmpty()) {
@@ -142,9 +145,55 @@ public class SocketClient {
         }
     }
 
-    public ThreadPoolExecutor getSocketExecutor() {
-        return socketExecutor;
+    private ThreadPoolExecutor getSocketExecutor() {
+        return new ThreadPoolExecutor(
+                0,
+                3,
+                60L,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10),
+                new ThreadFactory() {
+                    private final AtomicInteger counter = new AtomicInteger(1);
+
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        String messageName = "SocketClient-MessageHandler-" + counter.getAndIncrement();
+                        Thread thread = new Thread(r);
+                        thread.setDaemon(false);
+                        thread.setName(messageName);
+                        logger.info("Starting SocketClient main thread: " + thread.getName());
+                        return thread;
+                    }
+                }
+        );
     }
+
+    private ExecutorService getWorkerExecutor(int initialMaxThreads) {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
+                0,
+                initialMaxThreads,
+                1000L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>()
+        );
+        // Set a custom ThreadFactory to give meaningful names to threads
+        executor.setThreadFactory(new ThreadFactory() {
+            private final AtomicInteger counter = new AtomicInteger(1);
+
+            @Override
+            public Thread newThread(Runnable r) {
+                String workerName = "SocketClient-WorkerThread-" + counter.getAndIncrement();
+                Thread thread = new Thread(r);
+                thread.setDaemon(true);
+                thread.setName(workerName);
+                logger.info("Starting worker thread: " + workerName);
+                return thread;
+            }
+        });
+
+        return executor;
+    }
+
+
 
     public class ClientMessageListener implements Runnable {
         private final Socket socket;
@@ -226,25 +275,67 @@ public class SocketClient {
         out.println(responseInfo.parsed());
         out.flush();
     }
-    public void stopAll() throws IOException {
+
+    public void stopAll() {
+        long startTime = System.nanoTime();
         logger.severe("Shutting down all threads and processes.");
-        if (socket != null) {
-            socket.close();
-            out.close();
-            in.close();
-        }
-        socketExecutor.shutdownNow();
-        isConnected = false;
-        logger.severe("SocketClient is now closed.");
-    }
-    public void reconnect() {
         try {
-            stopAll();  // Ensure all resources are closed properly before reconnecting
-        } catch (IOException ignored) {
+            if (socketExecutor != null) {
+                socketExecutor.shutdownNow();
+            }
+            if (executor != null) {
+                executor.shutdownNow();
+            }
+        } catch (Exception e) {
+            logger.severe("Failed to shutdown main threads: " + e.getMessage());
         }
-        this.connect();
+        isConnected = false;
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+        } catch (IOException e) {
+            logger.severe("Failed to close socket or streams: " + e.getMessage());
+        }
+        double elapsedTimeMS = (System.nanoTime() - startTime) / 1e6;
+        logger.severe("SocketClient is now closed. (" + elapsedTimeMS + "ms)");
     }
 
+
+    public void reconnect() {
+        long startTime = System.nanoTime();
+        logger.severe("Shutting down all worker threads.");
+        try {
+            if (executor != null) {
+                executor.shutdownNow();
+            }
+        } catch (Exception e) {
+            logger.severe("Failed to shutdown worker threads: " + e.getMessage());
+        }
+        isConnected = false;
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+        } catch (IOException e) {
+            logger.severe("Failed to close socket or streams: " + e.getMessage());
+        }
+        double elapsedTimeMS = (System.nanoTime() - startTime) / 1e6;
+        logger.severe("SocketClient is now closed. (" + elapsedTimeMS + "ms)");
+        this.connect();
+    }
 
 
     public Socket getSocket() {
@@ -252,7 +343,9 @@ public class SocketClient {
     }
 
 
-    public CompletableFuture<String> sendAsync(String message) {
+    public CompletableFuture<String> sendAsync(String message) throws IOException {
+        if (executor == null || executor.isShutdown())
+            throw new IOException("The worker thread executor is shutdown and no new requests can be made.");
         CompletableFuture<String> future = new CompletableFuture<>();
         executor.submit(() -> {
             try {
@@ -267,7 +360,9 @@ public class SocketClient {
         return future;
     }
 
-    public <T> CompletableFuture<T> sendAsync(String message, Type type) {
+    public <T> CompletableFuture<T> sendAsync(String message, Type type) throws IOException {
+        if (executor == null || executor.isShutdown())
+            throw new IOException("The worker thread executor is shutdown and no new requests can be made.");
         CompletableFuture<T> future = new CompletableFuture<>();
         executor.execute(() -> {
             try {
@@ -288,7 +383,7 @@ public class SocketClient {
     }
 
 
-    public <T> T sendComplete(String message, Type type) throws ExecutionException, InterruptedException, TimeoutException {
+    public <T> T sendComplete(String message, Type type) throws ExecutionException, InterruptedException, TimeoutException, IOException {
         String response = sendAsync(message).get(3, TimeUnit.SECONDS);
         if (type == null) {
             return (T) response;

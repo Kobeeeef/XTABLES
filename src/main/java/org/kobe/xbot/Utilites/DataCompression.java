@@ -11,7 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
@@ -19,7 +18,7 @@ import java.util.zip.InflaterInputStream;
 
 public class DataCompression {
     private static boolean log = false;
-    private static final Logger logger = Logger.getLogger(DataCompression.class.getName());
+    private static final XTablesLogger logger = XTablesLogger.getLogger();
     private static int compressionLevel = Deflater.DEFLATED;
     private static double speedAverageMS = 1;
 

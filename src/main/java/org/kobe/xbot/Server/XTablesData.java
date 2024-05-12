@@ -4,15 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.kobe.xbot.Utilites.Utilities;
+import org.kobe.xbot.Utilites.XTablesLogger;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public class XTablesData<V> {
-    private static final Logger logger = Logger.getLogger(XTablesData.class.getName());
+    private static final XTablesLogger logger = XTablesLogger.getLogger();
     private static final Gson gson = new GsonBuilder().create();
     private Map<String, XTablesData<V>> data;
     private V value;

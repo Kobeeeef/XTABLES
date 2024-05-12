@@ -25,12 +25,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public class XTables {
     private static XTables instance = null;
     private final Gson gson = new Gson();
-    private final Logger logger = Logger.getLogger(XTables.class.getName());
+    private final XTablesLogger logger = XTablesLogger.getLogger();
     private final Set<ClientHandler> clients = new HashSet<>();
     private final XTablesData<String> table = new XTablesData<>();
     private ServerSocket serverSocket;
@@ -134,7 +133,7 @@ public class XTables {
                     logger.info("Received " + totalMessages + " messages from IP " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " in the last minute.");
                     totalMessages = 0;
                 }
-            }, 0, 60, TimeUnit.SECONDS);
+            }, 5, 60, TimeUnit.SECONDS);
 
             try {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -173,8 +172,8 @@ public class XTables {
                         }
                     } else if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.UPDATE_KEY)) {
                         String key = requestInfo.getTokens()[1];
-                        String value =requestInfo.getTokens()[2];
-                        if (!Utilities.validateName(value,false)) {
+                        String value = requestInfo.getTokens()[2];
+                        if (!Utilities.validateName(value, false)) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UPDATE_KEY, "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
@@ -184,7 +183,7 @@ public class XTables {
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    }else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.DELETE)) {
+                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.DELETE)) {
                         String key = requestInfo.getTokens()[1];
                         boolean response = table.delete(key);
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
@@ -195,7 +194,7 @@ public class XTables {
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
                         out.println(responseInfo.parsed());
                         out.flush();
-                    }else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
+                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
                         String key = requestInfo.getTokens()[1];
                         updateEvents.add(key);
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, "OK");

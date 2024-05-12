@@ -126,6 +126,9 @@ client.subscribeUpdateEvent("session_id", Integer.class, kv -> {
 // Synchronous operation to put a new session ID
 client.putInteger("session_id", 1001).complete();
 ```
+## Logging
+
+The latest version of `XTablesClient` introduces custom logging capabilities, allowing users to configure logging levels for enhanced control over debugging and monitoring. To set the logging level, utilize the `XTablesLogger.setLoggingLevel(Level)` method.
 
 ## Advanced Features
 
