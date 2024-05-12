@@ -109,9 +109,5 @@ public class Main {
 
             System.out.println("Value from cache: " + valueFromCache);
         }
-
-        while (true) {
-            client.getRawJSON().complete();
-        }
     }
 }

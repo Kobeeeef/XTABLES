@@ -260,7 +260,7 @@ public class XTablesClient {
     }
 
 
-    public RequestAction<ResponseStatus> putRaw(String key, String value) {
+    public RequestAction<ResponseStatus> putRawUnsafe(String key, String value) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class) {
             /**
@@ -275,7 +275,30 @@ public class XTablesClient {
             }
         };
     }
-
+    public RequestAction<ResponseStatus> putRaw(String key, String value) {
+        Utilities.validateKey(key);
+        if(!Utilities.isValidValue(value)) throw new JsonSyntaxException("The value is not a valid JSON.");
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class) {
+            /**
+             * Returns a value when {@code doNotRun} returns true and the action is not performed. Meant to be overridden in subclasses to provide a default value.
+             *
+             * @return The default value to return if the request is not run.
+             */
+            @Override
+            public ResponseStatus returnValueIfNotRan() {
+                return ResponseStatus.FAIL;
+            }
+            /**
+             * Determines if the request should not run. Meant to be overridden in subclasses to provide specific conditions.
+             *
+             * @return true if the request should not be sent, false otherwise.
+             */
+            @Override
+            public boolean doNotRun() {
+                return Utilities.isValidValue(value);
+            }
+        };
+    }
     public RequestAction<ResponseStatus> putString(String key, String value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
