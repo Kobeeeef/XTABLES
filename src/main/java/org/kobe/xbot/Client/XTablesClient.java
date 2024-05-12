@@ -261,6 +261,7 @@ public class XTablesClient {
 
 
     public RequestAction<ResponseStatus> putRawUnsafe(String key, String value) {
+        logger.warning("This method is not recommend to be used. Please use XTablesClient#putRaw instead for a more safe put.");
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class) {
             /**

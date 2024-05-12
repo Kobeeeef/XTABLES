@@ -87,6 +87,8 @@ You can customize the average compression speed threshold by using the `setSpeed
 
 - **delete(String key)**
   - Deletes the specified key and its associated data from the server.
+- **deleteAll()**
+  - Deletes the entire dataset and its associated data from the server.
 
 ### Update Event Subscription
 
