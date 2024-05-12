@@ -190,7 +190,12 @@ public class XTables {
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.DELETE)) {
+                        boolean response = table.delete("");
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    }else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
                         String key = requestInfo.getTokens()[1];
                         updateEvents.add(key);
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, "OK");
