@@ -22,7 +22,6 @@ public class Main {
 
         // Variable for connection status, updates on every message
         System.out.println("Connected? " + client.getSocketClient().isConnected);
-
         // Get latency from server
         XTablesClient.LatencyInfo info = client.ping_latency().complete();
         System.out.println("Network Latency: " + info.networkLatencyMS() + "ms");
@@ -111,6 +110,8 @@ public class Main {
             System.out.println("Value from cache: " + valueFromCache);
         }
 
-
+        while (true) {
+            client.getRawJSON().complete();
+        }
     }
 }

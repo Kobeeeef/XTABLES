@@ -52,6 +52,7 @@ public class RequestAction<T> {
      */
     public void queue(Consumer<T> onSuccess, Consumer<Throwable> onFailure) {
         if (doNotRun()) return;
+        beforeRun();
         long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(t -> {
@@ -72,6 +73,7 @@ public class RequestAction<T> {
      */
     public void queue(Consumer<T> onSuccess) {
         if (doNotRun()) return;
+        beforeRun();
         long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(t -> {
@@ -86,6 +88,7 @@ public class RequestAction<T> {
      */
     public void queue() {
         if (doNotRun()) return;
+        beforeRun();
         long startTime = System.nanoTime();
         CompletableFuture<T> future = client.sendAsync(value, type);
         future.thenAccept(t -> {
@@ -101,6 +104,7 @@ public class RequestAction<T> {
      */
     public T complete() {
         if (doNotRun()) return returnValueIfNotRan();
+        beforeRun();
         long startTime = System.nanoTime();
         try {
             T result = client.sendComplete(value, type);
@@ -148,4 +152,10 @@ public class RequestAction<T> {
     public T parseResponse(long startTime, Object result) {
         return null;
     }
+
+    /**
+     * Called before sending the request. Meant to be overridden in subclasses to perform any necessary setup or validation before running the request.
+     */
+    public void beforeRun() {};
+
 }

@@ -18,9 +18,10 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 public class DataCompression {
+    private static boolean log = false;
     private static final Logger logger = Logger.getLogger(DataCompression.class.getName());
     private static int compressionLevel = Deflater.DEFLATED;
-    private static double speedAverageMS = 0.3;
+    private static double speedAverageMS = 1;
 
     /**
      * Compresses the raw string data and converts it to Base64 format.
@@ -64,6 +65,14 @@ public class DataCompression {
         DataCompression.speedAverageMS = speedAverageMS;
     }
 
+    public static void disableLog() {
+        DataCompression.log = false;
+    }
+
+    public static void enableLog() {
+        DataCompression.log = true;
+    }
+
     private static byte[] compress(byte[] data) {
         try {
             long startTime = System.nanoTime();
@@ -75,7 +84,7 @@ public class DataCompression {
             adjustCompressionLevel(System.nanoTime() - startTime);
             return outputStream.toByteArray();
         } catch (IOException e) {
-            logger.severe(e.getMessage());
+            if (log) logger.severe(e.getMessage());
             return null;
         }
     }
@@ -93,7 +102,7 @@ public class DataCompression {
             inflaterInputStream.close();
             return outputStream.toByteArray();
         } catch (IOException e) {
-            logger.severe(e.getMessage());
+            if (log) logger.severe(e.getMessage());
             return null;
         }
     }
@@ -105,13 +114,15 @@ public class DataCompression {
             // If compression takes less time than the average, increase compression level
             if (DataCompression.compressionLevel < Deflater.BEST_COMPRESSION) {
                 DataCompression.compressionLevel++;
-                logger.info("Compression time (" + ms + " ms) is faster than average. Increasing compression level to: " + DataCompression.compressionLevel);
+                if (log)
+                    logger.info("Compression time (" + ms + " ms) is faster than average. Increasing compression level to: " + DataCompression.compressionLevel);
             }
         } else {
             // If compression takes more time than the average, decrease compression level
             if (DataCompression.compressionLevel > Deflater.NO_COMPRESSION) {
                 DataCompression.compressionLevel--;
-                logger.info("Compression time (" + ms + " ms) is slower than average. Reducing compression level to: " + DataCompression.compressionLevel);
+                if (log)
+                    logger.info("Compression time (" + ms + " ms) is slower than average. Reducing compression level to: " + DataCompression.compressionLevel);
             }
         }
     }

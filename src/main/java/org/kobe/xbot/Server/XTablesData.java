@@ -9,8 +9,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class XTablesData<V> {
+    private static final Logger logger = Logger.getLogger(XTablesData.class.getName());
     private static final Gson gson = new GsonBuilder().create();
     private Map<String, XTablesData<V>> data;
     private V value;
@@ -21,6 +23,10 @@ public class XTablesData<V> {
     // Method to put a value into the nested structure
     public boolean put(String key, V value) {
         Utilities.validateKey(key);
+        if(!Utilities.isValidValue((String) value)) {
+            logger.warning("Invalid JSON value for key '" + key + "': " + value);
+            logger.warning("The key '" + key + "' is now a flagged value.");
+        }
         String[] keys = key.split("\\."); // Split the key by '.'
         XTablesData<V> current = this;
 

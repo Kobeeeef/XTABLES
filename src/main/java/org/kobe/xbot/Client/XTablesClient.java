@@ -262,7 +262,18 @@ public class XTablesClient {
 
     public RequestAction<ResponseStatus> putRaw(String key, String value) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class) {
+            /**
+             * Called before sending the request. Meant to be overridden in subclasses to perform any necessary setup or validation before running the request.
+             */
+            @Override
+            public void beforeRun() {
+                if(!Utilities.isValidValue(value)) {
+                    logger.warning("Invalid JSON value for key '" + key + "': " + value);
+                    logger.warning("The key '" + key + "' may be flagged by the server.");
+                }
+            }
+        };
     }
 
     public RequestAction<ResponseStatus> putString(String key, String value) {

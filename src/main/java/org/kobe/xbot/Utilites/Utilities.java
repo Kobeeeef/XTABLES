@@ -1,6 +1,21 @@
 package org.kobe.xbot.Utilites;
 
+
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 public class Utilities {
+    private static final JSONParser parser = new JSONParser();
+
+    public static boolean isValidValue(String jsonString) {
+        try {
+            // Attempt to parse the JSON string
+            parser.parse(jsonString);
+            return true; // If parsing succeeds, JSON is valid
+        } catch (ParseException e) {
+            return false; // If parsing fails, JSON is invalid
+        }
+    }
     public static boolean validateKey(String key) {
         // Check if key is null or empty
         if (key == null) {
