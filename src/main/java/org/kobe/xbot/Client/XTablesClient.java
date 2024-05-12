@@ -338,7 +338,9 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.DELETE, key).parsed(), ResponseStatus.class);
     }
-
+    public RequestAction<ResponseStatus> deleteAll() {
+        return delete("");
+    }
     public RequestAction<String> getRaw(String key) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
