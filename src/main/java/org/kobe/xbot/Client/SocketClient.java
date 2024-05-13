@@ -43,7 +43,7 @@ public class SocketClient {
             return added;
         }
     };
-    private int MAX_THREADS = 2;
+    private final int MAX_THREADS;
     public Boolean isConnected = false;
     private PrintWriter out = null;
     private BufferedReader in = null;

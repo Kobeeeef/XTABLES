@@ -5,7 +5,6 @@ import com.google.gson.JsonSyntaxException;
 import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilites.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,7 @@ public class XTablesClient {
         }
     }
 
-    public void stopAll() throws IOException {
+    public void stopAll() {
         client.stopAll();
         if (cacheThread != null) cacheThread.interrupt();
     }
