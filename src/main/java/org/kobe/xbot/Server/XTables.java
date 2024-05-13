@@ -25,9 +25,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class XTables {
-    private static XTables instance = null;
+    private static AtomicReference<XTables> instance = new AtomicReference<>();
     private final Gson gson = new Gson();
     private final XTablesLogger logger = XTablesLogger.getLogger();
     private final Set<ClientHandler> clients = new HashSet<>();
@@ -37,10 +38,16 @@ public class XTables {
     private final ExecutorService clientThreadPool;
 
     public static XTables startInstance(int PORT) {
-        if (instance == null) {
-            instance = new XTables(PORT);
+        if (instance.get() == null) {
+           Thread main = new Thread(() -> {
+              XTables xTables = new XTables(PORT);
+               instance.set(xTables);
+            });
+           main.setName("XTABLES-MAIN-SERVER");
+           main.setDaemon(false);
+           main.start();
         }
-        return instance;
+        return instance.get();
     }
 
     private XTables(int PORT) {
