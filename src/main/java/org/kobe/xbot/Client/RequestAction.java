@@ -1,9 +1,13 @@
 package org.kobe.xbot.Client;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import org.kobe.xbot.Utilites.Utilities;
 import org.kobe.xbot.Utilites.XTablesLogger;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -55,15 +59,22 @@ public class RequestAction<T> {
      * @param onFailure Consumer to handle failures during the request execution.
      */
     public void queue(Consumer<T> onSuccess, Consumer<Throwable> onFailure) {
+        long startTime = System.nanoTime();
         if (doNotRun()) return;
         beforeRun();
-        long startTime = System.nanoTime();
         try {
-            CompletableFuture<T> future = client.sendAsync(value, type);
-            future.thenAccept(t -> {
-                        T parsed = parseResponse(startTime, t);
-                        onResponse(parsed == null ? t : parsed);
-                        onSuccess.accept(parsed == null ? t : parsed);
+            CompletableFuture<String> future = client.sendAsync(value);
+            future.thenAccept(result -> {
+                        T parsed = parseResponse(startTime, result);
+                        result = formatResult(result);
+                        T res = null;
+                        if (parsed == null) {
+                            if (type == null) {
+                                res = (T) result;
+                            } else res = new Gson().fromJson(result, type);
+                        }
+                        boolean response = onResponse(parsed == null ? res : parsed);
+                        if (response) onSuccess.accept(parsed == null ? res : parsed);
                     })
                     .exceptionally(ex -> {
                         onFailure.accept(ex);
@@ -80,15 +91,22 @@ public class RequestAction<T> {
      * @param onSuccess Consumer to handle the successful response.
      */
     public void queue(Consumer<T> onSuccess) {
+        long startTime = System.nanoTime();
         if (doNotRun()) return;
         beforeRun();
-        long startTime = System.nanoTime();
         try {
-            CompletableFuture<T> future = client.sendAsync(value, type);
-            future.thenAccept(t -> {
-                T parsed = parseResponse(startTime, t);
-                onResponse(parsed == null ? t : parsed);
-                onSuccess.accept(parsed == null ? t : parsed);
+            CompletableFuture<String> future = client.sendAsync(value);
+            future.thenAccept(result -> {
+                T parsed = parseResponse(startTime, result);
+                result = formatResult(result);
+                T res = null;
+                if (parsed == null) {
+                    if (type == null) {
+                        res = (T) result;
+                    } else res = new Gson().fromJson(result, type);
+                }
+                boolean response = onResponse(parsed == null ? res : parsed);
+                if (response) onSuccess.accept(parsed == null ? res : parsed);
             });
         } catch (IOException e) {
             logger.severe(e.getMessage());
@@ -99,14 +117,21 @@ public class RequestAction<T> {
      * Queues a request to be sent asynchronously without any additional handlers.
      */
     public void queue() {
+        long startTime = System.nanoTime();
         if (doNotRun()) return;
         beforeRun();
-        long startTime = System.nanoTime();
         try {
-            CompletableFuture<T> future = client.sendAsync(value, type);
-            future.thenAccept(t -> {
-                T parsed = parseResponse(startTime, t);
-                onResponse(parsed == null ? t : parsed);
+            CompletableFuture<String> future = client.sendAsync(value);
+            future.thenAccept(result -> {
+                T parsed = parseResponse(startTime, result);
+                result = formatResult(result);
+                T res = null;
+                if (parsed == null) {
+                    if (type == null) {
+                        res = (T) result;
+                    } else res = new Gson().fromJson(result, type);
+                }
+                onResponse(parsed == null ? res : parsed);
             });
         } catch (IOException e) {
             logger.severe(e.getMessage());
@@ -119,14 +144,24 @@ public class RequestAction<T> {
      * @return The response received, parsed by {@code parseResponse}.
      */
     public T complete() {
+        long startTime = System.nanoTime();
         if (doNotRun()) return returnValueIfNotRan();
         beforeRun();
-        long startTime = System.nanoTime();
         try {
-            T result = client.sendComplete(value, type);
+            String result = client.sendComplete(value);
             T parsed = parseResponse(startTime, result);
-            onResponse(parsed == null ? result : parsed);
-            return parsed == null ? result : parsed;
+            result = formatResult(result);
+            T res = null;
+            if (parsed == null) {
+                if (type == null) {
+                    res = (T) result;
+                } else{
+                     res = new Gson().fromJson(result, type);
+                }
+            }
+            boolean response = onResponse(parsed == null ? res : parsed);
+            if (!response) return returnValueIfNotRan();
+            return parsed == null ? res : parsed;
         } catch (ExecutionException | TimeoutException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -137,7 +172,8 @@ public class RequestAction<T> {
      *
      * @param result The result of the response.
      */
-    public void onResponse(T result) {
+    public boolean onResponse(T result) {
+        return true;
     }
 
     /**
@@ -165,7 +201,7 @@ public class RequestAction<T> {
      * @param result    The raw result from the server.
      * @return The parsed response as type T.
      */
-    public T parseResponse(long startTime, Object result) {
+    public T parseResponse(long startTime, String result) {
         return null;
     }
 
@@ -175,6 +211,8 @@ public class RequestAction<T> {
     public void beforeRun() {
     }
 
-    ;
+    public String formatResult(String result) {
+        return result;
+    }
 
 }

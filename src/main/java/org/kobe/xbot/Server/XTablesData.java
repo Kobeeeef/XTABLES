@@ -6,14 +6,12 @@ import com.google.gson.reflect.TypeToken;
 import org.kobe.xbot.Utilites.Utilities;
 import org.kobe.xbot.Utilites.XTablesLogger;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class XTablesData<V> {
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private static final Gson gson = new GsonBuilder().create();
+    private static final Set<String> flaggedKeys = new HashSet<>();
     private Map<String, XTablesData<V>> data;
     private V value;
     public XTablesData() {
@@ -23,9 +21,13 @@ public class XTablesData<V> {
     // Method to put a value into the nested structure
     public boolean put(String key, V value) {
         Utilities.validateKey(key);
-        if(!Utilities.isValidValue((String) value)) {
+        if(!Utilities.isValidValue((String) value) && !flaggedKeys.contains(key)) {
+            flaggedKeys.add(key);
             logger.warning("Invalid JSON value for key '" + key + "': " + value);
             logger.warning("The key '" + key + "' is now a flagged value.");
+        } else if (Utilities.isValidValue((String) value) && flaggedKeys.contains(key)) {
+            flaggedKeys.remove(key);
+            logger.warning("The key '" + key + "' is no longer a flagged value.");
         }
         String[] keys = key.split("\\."); // Split the key by '.'
         XTablesData<V> current = this;
@@ -54,6 +56,11 @@ public class XTablesData<V> {
             }
         }
         return count;
+    }
+
+    public boolean isFlaggedKey(String key) {
+        Utilities.validateKey(key);
+        return flaggedKeys.contains(key);
     }
 
     // Method to get a value from the nested structure
@@ -123,6 +130,12 @@ public class XTablesData<V> {
         parentNode.data.put(newKeyName, oldNode);
         parentNode.data.remove(oldKeys[oldKeys.length - 1]);
 
+        // Update flagged keys
+        if (flaggedKeys.contains(oldKey)) {
+            flaggedKeys.remove(oldKey);
+            flaggedKeys.add(newKey);
+        }
+
         return true; // Successfully renamed
     }
 
@@ -144,6 +157,7 @@ public class XTablesData<V> {
         Utilities.validateKey(key);
         if (key.isEmpty()) {
             this.data = null; // Remove everything if key is empty
+            flaggedKeys.clear(); // Clear flagged keys if everything is removed
             return true;
         }
         String[] keys = key.split("\\."); // Split the key by '.'
@@ -158,8 +172,13 @@ public class XTablesData<V> {
             current = current.data.get(k);
         }
 
-        // Remove the entry at the final level
-        return current.data != null && current.data.remove(keys[keys.length - 1]) != null;
+        boolean result = current.data != null && current.data.remove(keys[keys.length - 1]) != null;
+
+        if (result) {
+            flaggedKeys.remove(key);
+        }
+
+        return result;
     }
 
     public String toJSON() {

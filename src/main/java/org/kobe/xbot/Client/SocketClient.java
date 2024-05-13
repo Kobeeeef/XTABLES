@@ -172,7 +172,7 @@ public class SocketClient {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 0,
                 initialMaxThreads,
-                1000L, TimeUnit.MILLISECONDS,
+                1, TimeUnit.MINUTES,
                 new LinkedBlockingQueue<>()
         );
         // Set a custom ThreadFactory to give meaningful names to threads
@@ -360,36 +360,10 @@ public class SocketClient {
         return future;
     }
 
-    public <T> CompletableFuture<T> sendAsync(String message, Type type) throws IOException {
-        if (executor == null || executor.isShutdown())
-            throw new IOException("The worker thread executor is shutdown and no new requests can be made.");
-        CompletableFuture<T> future = new CompletableFuture<>();
-        executor.execute(() -> {
-            try {
-                RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
-                if (requestInfo == null) throw new ClosedConnectionException();
-                String[] tokens = requestInfo.getTokens();
-                if (type == null) {
-                    future.complete((T) String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)));
-                } else {
-                    T parsed = new Gson().fromJson(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)), type);
-                    future.complete(parsed);
-                }
-            } catch (InterruptedException | ClosedConnectionException e) {
-                future.completeExceptionally(e);
-            }
-        });
-        return future;
-    }
 
 
-    public <T> T sendComplete(String message, Type type) throws ExecutionException, InterruptedException, TimeoutException, IOException {
-        String response = sendAsync(message).get(3, TimeUnit.SECONDS);
-        if (type == null) {
-            return (T) response;
-        } else {
-            return new Gson().fromJson(response, type);
-        }
+    public String sendComplete(String message) throws ExecutionException, InterruptedException, TimeoutException, IOException {
+        return sendAsync(message).get(3, TimeUnit.SECONDS);
     }
 
     public static class KeyValuePair<T> {

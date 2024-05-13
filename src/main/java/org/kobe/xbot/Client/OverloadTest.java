@@ -13,6 +13,5 @@ public class OverloadTest {
         // Initialize a new client with address and port
         XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 2, false);
 
-
     }
 }

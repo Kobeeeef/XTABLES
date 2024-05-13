@@ -145,7 +145,7 @@ public class XTables {
                     if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
                         String key = requestInfo.getTokens()[1];
                         String result = gson.toJson(table.get(key));
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET, result);
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET, String.format("%1$s " + result, table.isFlaggedKey(key) ? "FLAGGED" : "GOOD"));
                         out.println(responseInfo.parsed());
                         out.flush();
                     } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {

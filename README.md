@@ -130,6 +130,10 @@ client.putInteger("session_id", 1001).complete();
 
 The latest version of `XTablesClient` introduces custom logging capabilities, allowing users to configure logging levels for enhanced control over debugging and monitoring. To set the logging level, utilize the `XTablesLogger.setLoggingLevel(Level)` method.
 
+## Value Flagging
+
+`XTablesClient` flags keys with invalid JSON values when using the `XTablesClient#putRawUnsafe` method. If a key's value is not valid JSON, it will be flagged by the server and will not be parsed. In such cases, you must use `XTablesClient#getRaw(String key)` to retrieve the raw string value and parse it back yourself.
+
 ## Advanced Features
 
 - Handling JSON parsing errors and interruptions during update processing.

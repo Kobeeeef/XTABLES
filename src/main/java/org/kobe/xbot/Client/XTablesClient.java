@@ -6,6 +6,7 @@ import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilites.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -127,11 +128,12 @@ public class XTablesClient {
     private <T> RequestAction<ResponseStatus> subscribeUpdateEventNoCheck(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
             @Override
-            public void onResponse(ResponseStatus result) {
+            public boolean onResponse(ResponseStatus result) {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                     consumers.add(new UpdateConsumer<>(type, consumer));
                 }
+                return true;
             }
         };
     }
@@ -168,7 +170,7 @@ public class XTablesClient {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
             @Override
-            public void onResponse(ResponseStatus result) {
+            public boolean onResponse(ResponseStatus result) {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                     consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
@@ -176,6 +178,7 @@ public class XTablesClient {
                         update_consumers.remove(key);
                     }
                 }
+                return true;
             }
 
             @Override
@@ -196,7 +199,7 @@ public class XTablesClient {
         String key = " ";
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
             @Override
-            public void onResponse(ResponseStatus result) {
+            public boolean onResponse(ResponseStatus result) {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
                     consumers.removeIf(updateConsumer -> updateConsumer.type.equals(String.class) && updateConsumer.consumer.equals(consumer));
@@ -204,6 +207,7 @@ public class XTablesClient {
                         update_consumers.remove(key);
                     }
                 }
+                return true;
             }
 
             @Override
@@ -348,8 +352,7 @@ public class XTablesClient {
     }
 
     public RequestAction<String> getRaw(String key) {
-        Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
+        return getString(key);
     }
 
     public RequestAction<String> getRawJSON() {
@@ -362,37 +365,103 @@ public class XTablesClient {
              * @return The parsed response as type T.
              */
             @Override
-            public String parseResponse(long startTime, Object result) {
-                if ((result instanceof String)) {
-                    return DataCompression.decompressAndConvertBase64((String) result);
-                } else return null;
+            public String parseResponse(long startTime, String result) {
+                return DataCompression.decompressAndConvertBase64(result);
             }
         };
     }
 
     public RequestAction<String> getString(String key) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class) {
+            @Override
+            public String formatResult(String result) {
+                String[] parts = result.split(" ");
+                return String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            }
+        };
     }
 
     public RequestAction<Boolean> getBoolean(String key) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Boolean.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Boolean.class) {
+            /**
+             * Parses the response received from the server. Meant to be overridden in subclasses to parse the response based on specific needs.
+             *
+             * @param startTime The start time of the request, used for calculating latency.
+             * @param result    The raw result from the server.
+             * @return The parsed response as type T.
+             */
+            @Override
+            public Boolean parseResponse(long startTime, String result) {
+                checkFlaggedValue(result);
+                return null;
+            }
+
+            @Override
+            public String formatResult(String result) {
+                String[] parts = result.split(" ");
+                return String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            }
+        };
     }
 
     public <T> RequestAction<T> getObject(String key, Class<T> type) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type) {
+            @Override
+            public String formatResult(String result) {
+                String[] parts = result.split(" ");
+                return String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            }
+
+            @Override
+            public T parseResponse(long startTime, String result) {
+                checkFlaggedValue(result);
+                return null;
+            }
+        };
     }
 
     public RequestAction<Integer> getInteger(String key) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Integer.class);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Integer.class) {
+            @Override
+            public String formatResult(String result) {
+                String[] parts = result.split(" ");
+                return String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            }
+
+            @Override
+            public Integer parseResponse(long startTime, String result) {
+
+                checkFlaggedValue(result);
+                return null;
+            }
+        };
     }
 
     public <T> RequestAction<ArrayList<T>> getArray(String key, Class<T> type) {
         Utilities.validateKey(key);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type) {
+            @Override
+            public String formatResult(String result) {
+                String[] parts = result.split(" ");
+                return String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            }
+
+            @Override
+            public ArrayList<T> parseResponse(long startTime, String result) {
+                checkFlaggedValue(result);
+                return null;
+            }
+        };
+    }
+
+    private static void checkFlaggedValue(String result) {
+        if (result.split(" ")[0].equals("FLAGGED")) {
+            throw new JsonSyntaxException("This key is flagged as invalid JSON therefore cannot be parsed. Use XTablesClient#getRaw instead.");
+        }
     }
 
     public RequestAction<ArrayList<String>> getTables(String key) {
@@ -419,8 +488,8 @@ public class XTablesClient {
     public RequestAction<LatencyInfo> ping_latency() {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PING).parsed()) {
             @Override
-            public LatencyInfo parseResponse(long startTime, Object result) {
-                RequestInfo info = new RequestInfo(result.toString());
+            public LatencyInfo parseResponse(long startTime, String result) {
+                RequestInfo info = new RequestInfo(result);
                 if (info.getTokens().length == 2 && info.getTokens()[0].equals("OK")) {
                     SystemStatistics stats = gson.fromJson(info.getTokens()[1], SystemStatistics.class);
                     long serverTime = stats.getNanoTime();
