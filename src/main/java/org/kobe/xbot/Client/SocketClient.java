@@ -347,7 +347,7 @@ public class SocketClient {
         if (executor == null || executor.isShutdown())
             throw new IOException("The worker thread executor is shutdown and no new requests can be made.");
         CompletableFuture<String> future = new CompletableFuture<>();
-        executor.submit(() -> {
+        executor.execute(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
                 if (requestInfo == null) throw new ClosedConnectionException();

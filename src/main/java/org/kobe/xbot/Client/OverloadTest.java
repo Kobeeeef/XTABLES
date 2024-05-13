@@ -12,6 +12,15 @@ public class OverloadTest {
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
         XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 2, false);
+        int i = 0;
+        while (true) {
+            i++;
+            System.out.println(i);
+            XTablesClient.LatencyInfo info = client.ping_latency().complete();
+            System.out.println("Network Latency: " + info.networkLatencyMS() + "ms");
+            System.out.println("Round Trip Latency: " + info.roundTripLatencyMS() + "ms");
+            System.out.println("CPU Usage: " + info.systemStatistics().getProcessCpuLoadPercentage());
+        }
 
     }
 }

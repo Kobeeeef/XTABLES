@@ -211,6 +211,12 @@ public class RequestAction<T> {
     public void beforeRun() {
     }
 
+    /**
+     * Formats the raw result string before parsing it. Meant to be overridden in subclasses to provide specific formatting logic.
+     *
+     * @param result The raw result string from the server.
+     * @return The formatted result string.
+     */
     public String formatResult(String result) {
         return result;
     }
