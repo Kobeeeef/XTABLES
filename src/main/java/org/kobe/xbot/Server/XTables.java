@@ -12,6 +12,7 @@ package org.kobe.xbot.Server;
 import com.google.gson.Gson;
 import org.kobe.xbot.Utilites.*;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,6 +20,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -26,9 +28,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class XTables {
-    private static AtomicReference<XTables> instance = new AtomicReference<>();
+    private static final AtomicReference<XTables> instance = new AtomicReference<>();
     private final Gson gson = new Gson();
     private final XTablesLogger logger = XTablesLogger.getLogger();
     private final Set<ClientHandler> clients = new HashSet<>();
@@ -36,18 +39,33 @@ public class XTables {
     private ServerSocket serverSocket;
     private final int port;
     private final ExecutorService clientThreadPool;
+    private final HashMap<String, Function<ScriptParameters, String>> scripts = new HashMap<>();
 
     public static XTables startInstance(int PORT) {
         if (instance.get() == null) {
-           Thread main = new Thread(() -> {
-              XTables xTables = new XTables(PORT);
-               instance.set(xTables);
+            Thread main = new Thread(() -> {
+                XTables xTables = new XTables(PORT);
+                instance.set(xTables);
             });
-           main.setName("XTABLES-MAIN-SERVER");
-           main.setDaemon(false);
-           main.start();
+            main.setName("XTABLES-MAIN-SERVER");
+            main.setDaemon(false);
+            main.start();
         }
         return instance.get();
+    }
+
+    public static XTables getInstance() {
+        return instance.get();
+    }
+
+    public void addScript(String name, Function<ScriptParameters, String> script) {
+        if (scripts.containsKey(name))
+            throw new KeyAlreadyExistsException("There is already a script with the name: '" + name + "'");
+        scripts.put(name, script);
+    }
+
+    public void removeScript(String name) {
+        scripts.remove(name);
     }
 
     private XTables(int PORT) {
@@ -177,6 +195,40 @@ public class XTables {
                                 notifyClients(key, value);
                             }
                         }
+                    } else if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.RUN_SCRIPT)) {
+                        String name = requestInfo.getTokens()[1];
+                        String customData = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
+                        if (scripts.containsKey(name)) {
+                            clientThreadPool.execute(() -> {
+                                long startTime = System.nanoTime();
+                                String returnValue;
+                                try {
+                                    returnValue = scripts.get(name).apply(new ScriptParameters(table, customData));
+                                    long endTime = System.nanoTime();
+                                    double durationMillis = (endTime - startTime) / 1e6;
+                                    logger.info("The script '" + name + "' ran successfully.");
+                                    logger.info("Start time: " + startTime + " ns");
+                                    logger.info("End time: " + endTime + " ns");
+                                    logger.info("Duration: " + durationMillis + " ms");
+                                } catch (Exception e) {
+                                    long endTime = System.nanoTime();
+                                    double durationMillis = (endTime - startTime) / 1e6;
+                                    returnValue = e.getMessage();
+                                    logger.severe("The script '" + name + "' encountered an error.");
+                                    logger.severe("Error message: " + e.getMessage());
+                                    logger.severe("Start time: " + startTime + " ns");
+                                    logger.severe("End time: " + endTime + " ns");
+                                    logger.severe("Duration: " + durationMillis + " ms");
+                                }
+                                ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.RUN_SCRIPT, "OK " + returnValue.trim());
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            });
+                        } else {
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, "FAIL SCRIPT_NOT_FOUND");
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                        }
                     } else if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.UPDATE_KEY)) {
                         String key = requestInfo.getTokens()[1];
                         String value = requestInfo.getTokens()[2];
@@ -273,4 +325,9 @@ public class XTables {
             out.flush();
         }
     }
+
+    public record ScriptParameters(XTablesData<String> data, String customData) {
+    }
+
+    ;
 }

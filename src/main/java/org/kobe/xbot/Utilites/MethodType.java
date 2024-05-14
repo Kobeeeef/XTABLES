@@ -12,5 +12,6 @@ public enum MethodType {
     UNSUBSCRIBE_UPDATE,
     REBOOT_SERVER,
     PING,
+    RUN_SCRIPT,
     UNKNOWN
 }
