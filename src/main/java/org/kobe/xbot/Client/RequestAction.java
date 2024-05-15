@@ -1,7 +1,7 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
-import org.kobe.xbot.Utilites.XTablesLogger;
+import org.kobe.xbot.Utilities.XTablesLogger;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -70,7 +70,7 @@ public class RequestAction<T> {
         if (doNotRun()) return;
         beforeRun();
         try {
-            CompletableFuture<String> future = client.sendAsync(value);
+            CompletableFuture<String> future = client.sendAsync(value, defaultCompleteTimeout);
             future.thenAccept(result -> {
                         T parsed = parseResponse(startTime, result);
                         result = formatResult(result);
@@ -102,7 +102,7 @@ public class RequestAction<T> {
         if (doNotRun()) return;
         beforeRun();
         try {
-            CompletableFuture<String> future = client.sendAsync(value);
+            CompletableFuture<String> future = client.sendAsync(value, defaultCompleteTimeout);
             future.thenAccept(result -> {
                 T parsed = parseResponse(startTime, result);
                 result = formatResult(result);
@@ -128,7 +128,7 @@ public class RequestAction<T> {
         if (doNotRun()) return;
         beforeRun();
         try {
-            CompletableFuture<String> future = client.sendAsync(value);
+            CompletableFuture<String> future = client.sendAsync(value, defaultCompleteTimeout);
             future.thenAccept(result -> {
                 T parsed = parseResponse(startTime, result);
                 result = formatResult(result);
@@ -171,6 +171,18 @@ public class RequestAction<T> {
             if (!response) return returnValueIfNotRan();
             return parsed == null ? res : parsed;
         } catch (ExecutionException | TimeoutException | IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Sends a request to the server and does not wait for a response.
+     * Instructs the server to perform the action without responding.
+     */
+    public void execute() {
+        try {
+            client.sendExecute(value);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

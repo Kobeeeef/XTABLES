@@ -1,10 +1,10 @@
-package org.kobe.xbot.Utilites;
+package org.kobe.xbot.Utilities;
 
 import java.util.Arrays;
 import java.util.UUID;
 
 public class ResponseInfo {
-    private final String ID;
+    private String ID;
     private final MethodType method;
     private final String response;
 
@@ -18,6 +18,11 @@ public class ResponseInfo {
         this.response = "";
         this.ID = ID == null ? UUID.randomUUID().toString() : ID;
         this.method = method;
+    }
+
+    public ResponseInfo setID(String ID) {
+        this.ID = ID;
+        return this;
     }
 
     public String getID() {

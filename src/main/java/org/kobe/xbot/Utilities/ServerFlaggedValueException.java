@@ -1,19 +1,19 @@
-package org.kobe.xbot.Utilites;
+package org.kobe.xbot.Utilities;
 
 /**
- * Exception thrown when a script already exists in the system.
- * This exception is used to indicate that an attempt to create or register a script
- * has failed because a script with the same identifier or name already exists.
+ * Exception thrown when a value is flagged by the network tables server.
+ * This exception is used to indicate that an operation has failed because the value
+ * in question has been flagged by the server, possibly for violating some rules or constraints.
  * <p>
  * Author: Kobe
  */
-public class ScriptAlreadyExistsException extends RuntimeException {
+public class ServerFlaggedValueException extends RuntimeException {
 
     /**
      * Constructs a new exception with {@code null} as its detail message.
      * The cause is not initialized and may be subsequently initialized by a call to {@link #initCause}.
      */
-    public ScriptAlreadyExistsException() {
+    public ServerFlaggedValueException() {
         super();
     }
 
@@ -23,7 +23,7 @@ public class ScriptAlreadyExistsException extends RuntimeException {
      *
      * @param message The detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
      */
-    public ScriptAlreadyExistsException(String message) {
+    public ServerFlaggedValueException(String message) {
         super(message);
     }
 
@@ -33,7 +33,7 @@ public class ScriptAlreadyExistsException extends RuntimeException {
      * @param message The detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
      * @param cause The cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is permitted, and indicates that the cause is nonexistent or unknown.
      */
-    public ScriptAlreadyExistsException(String message, Throwable cause) {
+    public ServerFlaggedValueException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -42,7 +42,7 @@ public class ScriptAlreadyExistsException extends RuntimeException {
      *
      * @param cause The cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is permitted, and indicates that the cause is nonexistent or unknown.
      */
-    public ScriptAlreadyExistsException(Throwable cause) {
+    public ServerFlaggedValueException(Throwable cause) {
         super(cause);
     }
 }

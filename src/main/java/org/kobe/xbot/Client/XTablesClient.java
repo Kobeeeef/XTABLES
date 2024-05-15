@@ -3,7 +3,7 @@ package org.kobe.xbot.Client;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.kobe.xbot.Server.XTablesData;
-import org.kobe.xbot.Utilites.*;
+import org.kobe.xbot.Utilities.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

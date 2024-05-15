@@ -5,7 +5,7 @@
  *
  */
 
-package org.kobe.xbot.Utilites;
+package org.kobe.xbot.Utilities;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

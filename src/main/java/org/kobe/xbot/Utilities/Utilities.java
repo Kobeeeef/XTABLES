@@ -1,4 +1,4 @@
-package org.kobe.xbot.Utilites;
+package org.kobe.xbot.Utilities;
 
 
 import org.json.simple.parser.JSONParser;

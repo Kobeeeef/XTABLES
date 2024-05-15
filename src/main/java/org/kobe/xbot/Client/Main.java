@@ -2,8 +2,8 @@ package org.kobe.xbot.Client;
 // EXAMPLE SETUP
 
 import org.kobe.xbot.Server.XTablesData;
-import org.kobe.xbot.Utilites.ResponseStatus;
-import org.kobe.xbot.Utilites.ScriptResponse;
+import org.kobe.xbot.Utilities.ResponseStatus;
+import org.kobe.xbot.Utilities.ScriptResponse;
 
 import java.util.List;
 import java.util.function.Consumer;

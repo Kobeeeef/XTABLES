@@ -1,8 +1,7 @@
-package org.kobe.xbot.Utilites;
+package org.kobe.xbot.Utilities;
 
 import com.sun.management.OperatingSystemMXBean;
 
-import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.ThreadMXBean;

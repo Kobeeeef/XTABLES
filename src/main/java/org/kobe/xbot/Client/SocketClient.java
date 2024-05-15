@@ -1,7 +1,7 @@
 package org.kobe.xbot.Client;
 
 import com.sun.jdi.connect.spi.ClosedConnectionException;
-import org.kobe.xbot.Utilites.*;
+import org.kobe.xbot.Utilities.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -171,9 +171,8 @@ public class SocketClient {
                 0,
                 initialMaxThreads,
                 1, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>()
+                new ArrayBlockingQueue<>(1000)
         );
-        // Set a custom ThreadFactory to give meaningful names to threads
         executor.setThreadFactory(new ThreadFactory() {
             private final AtomicInteger counter = new AtomicInteger(1);
 
@@ -185,6 +184,13 @@ public class SocketClient {
                 thread.setName(workerName);
                 logger.info("Starting worker thread: " + workerName);
                 return thread;
+            }
+        });
+        executor.setRejectedExecutionHandler((r, executor1) -> {
+            logger.warning(String.format("Too many tasks in thread queue (%1$s). Clearing queue now...", executor1.getQueue().size()));
+            executor1.getQueue().clear();
+            if (!executor1.isShutdown()) {
+                executor1.execute(r);
             }
         });
 
@@ -207,6 +213,7 @@ public class SocketClient {
                 while ((message = in.readLine()) != null && !socket.isClosed() && socket.isConnected()) {
                     isConnected = true;
                     RequestInfo requestInfo = new RequestInfo(message);
+                    System.out.println(message);
                     MESSAGES.add(requestInfo);
                     if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
                         String ID = requestInfo.getID();
@@ -341,13 +348,13 @@ public class SocketClient {
     }
 
 
-    public CompletableFuture<String> sendAsync(String message) throws IOException {
+    public CompletableFuture<String> sendAsync(String message, long timeoutMS) throws IOException {
         if (executor == null || executor.isShutdown())
             throw new IOException("The worker thread executor is shutdown and no new requests can be made.");
         CompletableFuture<String> future = new CompletableFuture<>();
         executor.execute(() -> {
             try {
-                RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), 3, TimeUnit.SECONDS);
+                RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), timeoutMS, TimeUnit.MILLISECONDS);
                 if (requestInfo == null) throw new ClosedConnectionException();
                 String[] tokens = requestInfo.getTokens();
                 future.complete(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)));
@@ -358,10 +365,18 @@ public class SocketClient {
         return future;
     }
 
+    public void sendExecute(String message) throws IOException {
+        if (executor == null || executor.isShutdown())
+            throw new IOException("The worker thread executor is shutdown and no new requests can be made.");
 
+        executor.execute(() -> {
+                sendMessage(ResponseInfo.from(message).setID("IGNORED"));
+        });
+
+    }
 
     public String sendComplete(String message, long msTimeout) throws ExecutionException, InterruptedException, TimeoutException, IOException {
-        return sendAsync(message).get(msTimeout, TimeUnit.MILLISECONDS);
+        return sendAsync(message, msTimeout).get(msTimeout, TimeUnit.MILLISECONDS);
     }
 
     public static class KeyValuePair<T> {

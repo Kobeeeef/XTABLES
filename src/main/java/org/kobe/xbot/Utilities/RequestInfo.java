@@ -1,17 +1,12 @@
-package org.kobe.xbot.Utilites;
+package org.kobe.xbot.Utilities;
 
-import org.kobe.xbot.Utilites.MethodType;
 
-public class RequestInfo {
-    private final String raw;
-
-    public String getRaw() {
-        return raw;
-    }
+public record RequestInfo(String raw) {
 
     public RequestInfo(String raw) {
         this.raw = raw.replaceAll("\n", "");
     }
+
     public String getID() {
         String[] requestTokens = getTokens()[0].split(":");
         return requestTokens[0];
