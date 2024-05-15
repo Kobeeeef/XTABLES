@@ -160,6 +160,8 @@ client.subscribeUpdateEvent("session_id", Integer.class, kv -> {
 client.putInteger("session_id", 1001).complete();
 ```
 
+For more detailed examples, you can go to the [main file of the client with many examples](https://github.com/Kobeeeef/XBOT_TESTING/blob/XTABLES/src/main/java/org/kobe/xbot/Client/Main.java).
+
 ## Advanced Features
 
 - Handling JSON parsing errors and interruptions during update processing.
