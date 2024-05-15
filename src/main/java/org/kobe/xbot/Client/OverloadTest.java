@@ -12,7 +12,8 @@ public class OverloadTest {
         XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, false);
 
         while (true) {
-            client.getTables().execute();
+            client.getRawJSON().execute();
+
         }
 
 

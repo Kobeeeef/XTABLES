@@ -198,7 +198,6 @@ public class SocketClient {
     }
 
 
-
     public class ClientMessageListener implements Runnable {
         private final Socket socket;
 
@@ -213,7 +212,6 @@ public class SocketClient {
                 while ((message = in.readLine()) != null && !socket.isClosed() && socket.isConnected()) {
                     isConnected = true;
                     RequestInfo requestInfo = new RequestInfo(message);
-                    System.out.println(message);
                     MESSAGES.add(requestInfo);
                     if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
                         String ID = requestInfo.getID();
@@ -365,14 +363,16 @@ public class SocketClient {
         return future;
     }
 
-    public void sendExecute(String message) throws IOException {
+    public void sendExecute(String message, boolean useThreading) throws IOException {
         if (executor == null || executor.isShutdown())
             throw new IOException("The worker thread executor is shutdown and no new requests can be made.");
-
-        executor.execute(() -> {
+        if (useThreading) {
+            executor.execute(() -> {
                 sendMessage(ResponseInfo.from(message).setID("IGNORED"));
-        });
-
+            });
+        } else {
+            sendMessage(ResponseInfo.from(message).setID("IGNORED"));
+        }
     }
 
     public String sendComplete(String message, long msTimeout) throws ExecutionException, InterruptedException, TimeoutException, IOException {

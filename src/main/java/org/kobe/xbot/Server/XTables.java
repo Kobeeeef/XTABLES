@@ -173,7 +173,7 @@ public class XTables {
                 return thread;
             }).scheduleAtFixedRate(() -> {
                 if (totalMessages != 0) {
-                    logger.info("Received " + totalMessages + " messages from IP " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " in the last minute.");
+                    logger.info("Received " + String.format("%,d", totalMessages) + " messages from IP " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " in the last minute.");
                     totalMessages = 0;
                 }
             }, 5, 60, TimeUnit.SECONDS);
