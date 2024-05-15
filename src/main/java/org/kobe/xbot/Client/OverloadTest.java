@@ -1,9 +1,7 @@
 package org.kobe.xbot.Client;
 
-import org.kobe.xbot.Utilites.XTablesLogger;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 public class OverloadTest {
     private static final String SERVER_ADDRESS = "localhost"; // Server address

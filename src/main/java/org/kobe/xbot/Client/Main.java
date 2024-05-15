@@ -3,6 +3,7 @@ package org.kobe.xbot.Client;
 
 import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilites.ResponseStatus;
+import org.kobe.xbot.Utilites.ScriptResponse;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -109,5 +110,10 @@ public class Main {
 
             System.out.println("Value from cache: " + valueFromCache);
         }
+
+
+        ScriptResponse scriptResponse = client.runScript("test", null).complete();
+        System.out.println("Status: " + scriptResponse.status());
+        System.out.println("Script Response: " + scriptResponse.response());
     }
 }

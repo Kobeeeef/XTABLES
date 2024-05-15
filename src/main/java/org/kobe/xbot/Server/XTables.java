@@ -12,7 +12,6 @@ package org.kobe.xbot.Server;
 import com.google.gson.Gson;
 import org.kobe.xbot.Utilites.*;
 
-import javax.management.openmbean.KeyAlreadyExistsException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,35 +22,46 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class XTables {
     private static final AtomicReference<XTables> instance = new AtomicReference<>();
-    private final Gson gson = new Gson();
-    private final XTablesLogger logger = XTablesLogger.getLogger();
+    private static final Gson gson = new Gson();
+    private static final XTablesLogger logger = XTablesLogger.getLogger();
     private final Set<ClientHandler> clients = new HashSet<>();
     private final XTablesData<String> table = new XTablesData<>();
     private ServerSocket serverSocket;
     private final int port;
     private final ExecutorService clientThreadPool;
     private final HashMap<String, Function<ScriptParameters, String>> scripts = new HashMap<>();
+    private static Thread mainThread;
+    private static final CountDownLatch latch = new CountDownLatch(1);
 
     public static XTables startInstance(int PORT) {
         if (instance.get() == null) {
             Thread main = new Thread(() -> {
-                XTables xTables = new XTables(PORT);
-                instance.set(xTables);
+                new XTables(PORT);
             });
             main.setName("XTABLES-MAIN-SERVER");
             main.setDaemon(false);
             main.start();
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            mainThread = main;
         }
         return instance.get();
+    }
+
+    public static void stopInstance() {
+        XTables xTables = instance.get();
+        xTables.stopServer();
+        mainThread.interrupt();
+        instance.set(null);
     }
 
     public static XTables getInstance() {
@@ -60,8 +70,9 @@ public class XTables {
 
     public void addScript(String name, Function<ScriptParameters, String> script) {
         if (scripts.containsKey(name))
-            throw new KeyAlreadyExistsException("There is already a script with the name: '" + name + "'");
+            throw new ScriptAlreadyExistsException("There is already a script with the name: '" + name + "'");
         scripts.put(name, script);
+        logger.info("Added script '" + name + "'");
     }
 
     public void removeScript(String name) {
@@ -71,6 +82,7 @@ public class XTables {
     private XTables(int PORT) {
         this.port = PORT;
         this.clientThreadPool = Executors.newCachedThreadPool();
+        instance.set(this);
         startServer();
     }
 
@@ -78,8 +90,8 @@ public class XTables {
         try {
             serverSocket = new ServerSocket(port);
             logger.info("Server started. Listening on " + serverSocket.getLocalSocketAddress() + "...");
-
-            while (!serverSocket.isClosed()) {
+            latch.countDown();
+            while (!serverSocket.isClosed() && !Thread.currentThread().isInterrupted()) {
                 Socket clientSocket = serverSocket.accept();
                 logger.info(String.format("Client connected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
@@ -98,7 +110,7 @@ public class XTables {
         }
     }
 
-    public void rebootServer() {
+    public void stopServer() {
         try {
             logger.info("Closing connections to all clients...");
             for (ClientHandler client : clients) {
@@ -110,14 +122,20 @@ public class XTables {
                 serverSocket.close();
             }
             table.delete("");
+        } catch (IOException e) {
+            logger.severe("Error occurred during server stop: " + e.getMessage());
+        }
+    }
+
+    public void rebootServer() {
+        try {
+            stopServer();
             logger.info("Starting socket server in 1 second...");
             TimeUnit.SECONDS.sleep(1);
             logger.info("Starting server...");
             startServer();
-
-        } catch (IOException | InterruptedException e) {
-            System.err.println(e);
-            logger.severe("Error occurred during server reboot: " + e.getMessage());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -195,15 +213,16 @@ public class XTables {
                                 notifyClients(key, value);
                             }
                         }
-                    } else if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.RUN_SCRIPT)) {
+                    } else if (requestInfo.getTokens().length >= 2 && requestInfo.getMethod().equals(MethodType.RUN_SCRIPT)) {
                         String name = requestInfo.getTokens()[1];
                         String customData = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (scripts.containsKey(name)) {
                             clientThreadPool.execute(() -> {
                                 long startTime = System.nanoTime();
                                 String returnValue;
+                                ResponseStatus status = ResponseStatus.OK;
                                 try {
-                                    returnValue = scripts.get(name).apply(new ScriptParameters(table, customData));
+                                    returnValue = scripts.get(name).apply(new ScriptParameters(table, customData == null || customData.trim().isEmpty() ? null : customData.trim()));
                                     long endTime = System.nanoTime();
                                     double durationMillis = (endTime - startTime) / 1e6;
                                     logger.info("The script '" + name + "' ran successfully.");
@@ -214,13 +233,15 @@ public class XTables {
                                     long endTime = System.nanoTime();
                                     double durationMillis = (endTime - startTime) / 1e6;
                                     returnValue = e.getMessage();
+                                    status = ResponseStatus.FAIL;
                                     logger.severe("The script '" + name + "' encountered an error.");
                                     logger.severe("Error message: " + e.getMessage());
                                     logger.severe("Start time: " + startTime + " ns");
                                     logger.severe("End time: " + endTime + " ns");
                                     logger.severe("Duration: " + durationMillis + " ms");
                                 }
-                                ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.RUN_SCRIPT, "OK " + returnValue.trim());
+                                String response = returnValue == null || returnValue.trim().isEmpty() ? status.name() : status.name() + " " + returnValue.trim();
+                                ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.RUN_SCRIPT, response);
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             });
@@ -329,5 +350,5 @@ public class XTables {
     public record ScriptParameters(XTablesData<String> data, String customData) {
     }
 
-    ;
+
 }

@@ -114,8 +114,41 @@ You can customize the average compression speed threshold by using the `setSpeed
   - Sends a custom message to the server using a specified method and expects a return type as specified.
 - **ping_latency()**
   - Measures the network and round-trip latency in milliseconds.
+  - 
+## Running Server-Side Scripts
 
-## Usage Examples
+The `XTablesClient` allows you to run server-side scripts with custom data using the `runScript` method.
+
+### Script System
+
+The script system in `XTablesClient` enables executing server-side scripts with custom data inputs. This can be particularly useful for tasks that require server-side processing or automation based on dynamic data provided by the client.
+
+#### Method
+
+- **runScript(String name, String customData)**
+  - Executes a server-side script identified by the `name` parameter, with `customData` passed as input.
+  - Returns a `ScriptResponse` object which provides response status and the return data from the script.
+
+It is recommended to use the `queue` method instead of `complete` because server-side scripts can take time to complete, and `queue` allows for non-blocking execution.
+
+### Usage Example
+
+```java
+// Run a server-side script named "processData" with custom data
+client.runScript("processData", "{\"key\":\"value\"}").queue((scriptResponse) -> {
+    System.out.println("Script Status: " + scriptResponse.status());
+    System.out.println("Script Response: " + scriptResponse.response());
+});
+```
+## Logging
+
+The latest version of `XTablesClient` introduces custom logging capabilities, allowing users to configure logging levels for enhanced control over debugging and monitoring. To set the logging level, utilize the `XTablesLogger.setLoggingLevel(Level)` method.
+
+## Value Flagging
+
+`XTablesClient` flags keys with invalid JSON values when using the `XTablesClient#putRawUnsafe` method. If a key's value is not valid JSON, it will be flagged by the server and will not be parsed. In such cases, you must use `XTablesClient#getRaw(String key)` to retrieve the raw string value and parse it back yourself.
+
+# Full Usage Examples
 
 ```java
 XTablesClient client = new XTablesClient("localhost", 1735, 10, true);
@@ -126,13 +159,6 @@ client.subscribeUpdateEvent("session_id", Integer.class, kv -> {
 // Synchronous operation to put a new session ID
 client.putInteger("session_id", 1001).complete();
 ```
-## Logging
-
-The latest version of `XTablesClient` introduces custom logging capabilities, allowing users to configure logging levels for enhanced control over debugging and monitoring. To set the logging level, utilize the `XTablesLogger.setLoggingLevel(Level)` method.
-
-## Value Flagging
-
-`XTablesClient` flags keys with invalid JSON values when using the `XTablesClient#putRawUnsafe` method. If a key's value is not valid JSON, it will be flagged by the server and will not be parsed. In such cases, you must use `XTablesClient#getRaw(String key)` to retrieve the raw string value and parse it back yourself.
 
 ## Advanced Features
 

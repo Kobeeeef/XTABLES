@@ -406,6 +406,37 @@ public class XTablesClient {
         };
     }
 
+    public RequestAction<ScriptResponse> runScript(String name, String customData) {
+        Utilities.validateName(name, true);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.RUN_SCRIPT, customData == null || customData.trim().isEmpty() ? name : name + " " + customData).parsed(), ScriptResponse.class) {
+            /**
+             * Parses the response received from the server. Meant to be overridden in subclasses to parse the response based on specific needs.
+             *
+             * @param startTime The start time of the request, used for calculating latency.
+             * @param result    The raw result from the server.
+             * @return The parsed response as type T.
+             */
+            @Override
+            public ScriptResponse parseResponse(long startTime, String result) {
+                String[] parts = result.split(" ");
+                ResponseStatus status = ResponseStatus.valueOf(parts[0]);
+                String response = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+                if(response == null || response.trim().isEmpty()) response = null;
+                if (status.equals(ResponseStatus.OK)) {
+                    return new ScriptResponse(response, status);
+                } else {
+                    return new ScriptResponse(response, ResponseStatus.FAIL);
+                }
+            }
+
+            @Override
+            public String formatResult(String result) {
+                String[] parts = result.split(" ");
+                return String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            }
+        };
+    }
+
     public <T> RequestAction<T> getObject(String key, Class<T> type) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type) {
@@ -460,7 +491,7 @@ public class XTablesClient {
 
     private static void checkFlaggedValue(String result) {
         if (result.split(" ")[0].equals("FLAGGED")) {
-            throw new JsonSyntaxException("This key is flagged as invalid JSON therefore cannot be parsed. Use XTablesClient#getRaw instead.");
+            throw new ServerFlaggedValueException("This key is flagged as invalid JSON therefore cannot be parsed. Use XTablesClient#getRaw instead.");
         }
     }
 

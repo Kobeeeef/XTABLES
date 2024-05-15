@@ -1,6 +1,5 @@
 package org.kobe.xbot.Client;
 
-import com.google.gson.Gson;
 import com.sun.jdi.connect.spi.ClosedConnectionException;
 import org.kobe.xbot.Utilites.*;
 
@@ -8,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.lang.reflect.Type;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -362,8 +360,8 @@ public class SocketClient {
 
 
 
-    public String sendComplete(String message) throws ExecutionException, InterruptedException, TimeoutException, IOException {
-        return sendAsync(message).get(3, TimeUnit.SECONDS);
+    public String sendComplete(String message, long msTimeout) throws ExecutionException, InterruptedException, TimeoutException, IOException {
+        return sendAsync(message).get(msTimeout, TimeUnit.MILLISECONDS);
     }
 
     public static class KeyValuePair<T> {

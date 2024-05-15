@@ -1,13 +1,10 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import org.kobe.xbot.Utilites.Utilities;
 import org.kobe.xbot.Utilites.XTablesLogger;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -22,13 +19,23 @@ import java.util.function.Consumer;
  * Author: Kobe
  */
 public class RequestAction<T> {
+    private static long defaultCompleteTimeout = 5000;
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private final SocketClient client;
     private final String value;
     private final Type type;
 
     /**
-     * Constructs a RequestAction with specified type.
+     * Sets the default timeout for synchronous complete operations.
+     *
+     * @param defaultCompleteTimeout The timeout value in milliseconds.
+     */
+    public static void setDefaultCompleteTimeout(long defaultCompleteTimeout) {
+        RequestAction.defaultCompleteTimeout = defaultCompleteTimeout;
+    }
+
+    /**
+     * Constructs a RequestAction with a specified type.
      *
      * @param client The client used to send requests.
      * @param value  The data to be sent.
@@ -141,22 +148,23 @@ public class RequestAction<T> {
     /**
      * Sends a request and waits for the completion synchronously.
      *
+     * @param timeoutMS The timeout value in milliseconds for the synchronous operation.
      * @return The response received, parsed by {@code parseResponse}.
      */
-    public T complete() {
+    public T complete(long timeoutMS) {
         long startTime = System.nanoTime();
         if (doNotRun()) return returnValueIfNotRan();
         beforeRun();
         try {
-            String result = client.sendComplete(value);
+            String result = client.sendComplete(value, timeoutMS);
             T parsed = parseResponse(startTime, result);
             result = formatResult(result);
             T res = null;
             if (parsed == null) {
                 if (type == null) {
                     res = (T) result;
-                } else{
-                     res = new Gson().fromJson(result, type);
+                } else {
+                    res = new Gson().fromJson(result, type);
                 }
             }
             boolean response = onResponse(parsed == null ? res : parsed);
@@ -168,16 +176,21 @@ public class RequestAction<T> {
     }
 
     /**
-     * Called when a response is received. Meant to be overridden in subclasses to handle specific actions on response.
+     * Sends a request and waits for the completion synchronously using the default timeout.
      *
-     * @param result The result of the response.
+     * @return The response received, parsed by {@code parseResponse}.
      */
-    public boolean onResponse(T result) {
-        return true;
+    public T complete() {
+        return complete(defaultCompleteTimeout);
     }
 
+    // ----------------------------- OVERRIDE METHODS -----------------------------
+
     /**
-     * Determines if the request should not run. Meant to be overridden in subclasses to provide specific conditions.
+     * Called to determine if the request should not be run.
+     * Meant to be overridden in subclasses to provide specific conditions.
+     * <p>
+     * Order of execution: 1 (First method called in the sequence)
      *
      * @return true if the request should not be sent, false otherwise.
      */
@@ -186,16 +199,19 @@ public class RequestAction<T> {
     }
 
     /**
-     * Returns a value when {@code doNotRun} returns true and the action is not performed. Meant to be overridden in subclasses to provide a default value.
-     *
-     * @return The default value to return if the request is not run.
+     * Called before sending the request.
+     * Meant to be overridden in subclasses to perform any necessary setup or validation before running the request.
+     * <p>
+     * Order of execution: 2 (Called before the request is sent)
      */
-    public T returnValueIfNotRan() {
-        return null;
+    public void beforeRun() {
     }
 
     /**
-     * Parses the response received from the server. Meant to be overridden in subclasses to parse the response based on specific needs.
+     * Parses the response received from the server.
+     * Meant to be overridden in subclasses to parse the response based on specific needs.
+     * <p>
+     * Order of execution: 3 (Called when a response is received)
      *
      * @param startTime The start time of the request, used for calculating latency.
      * @param result    The raw result from the server.
@@ -206,13 +222,10 @@ public class RequestAction<T> {
     }
 
     /**
-     * Called before sending the request. Meant to be overridden in subclasses to perform any necessary setup or validation before running the request.
-     */
-    public void beforeRun() {
-    }
-
-    /**
-     * Formats the raw result string before parsing it. Meant to be overridden in subclasses to provide specific formatting logic.
+     * Formats the raw result string before parsing it.
+     * Meant to be overridden in subclasses to provide specific formatting logic.
+     * <p>
+     * Order of execution: 4 (Called after receiving the raw response and before parsing)
      *
      * @param result The raw result string from the server.
      * @return The formatted result string.
@@ -221,4 +234,28 @@ public class RequestAction<T> {
         return result;
     }
 
+    /**
+     * Called when a response is received.
+     * Meant to be overridden in subclasses to handle specific actions on response.
+     * <p>
+     * Order of execution: 5 (Called after parsing and formatting the response)
+     *
+     * @param result The result of the response.
+     * @return true if the response was handled successfully, false otherwise.
+     */
+    public boolean onResponse(T result) {
+        return true;
+    }
+
+    /**
+     * Returns a value when {@code doNotRun} returns true and the action is not performed.
+     * Meant to be overridden in subclasses to provide a default value.
+     * <p>
+     * Order of execution: 6 (Called if `doNotRun` returns true)
+     *
+     * @return The default value to return if the request is not run.
+     */
+    public T returnValueIfNotRan() {
+        return null;
+    }
 }
