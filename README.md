@@ -131,6 +131,48 @@ The script system in `XTablesClient` enables executing server-side scripts with 
 
 It is recommended to use the `queue` method instead of `complete` because server-side scripts can take time to complete, and `queue` allows for non-blocking execution.
 
+
+---
+
+## RequestAction Class Overview
+
+The `RequestAction` class, part of the `org.kobe.xbot.Client` package, manages the asynchronous and synchronous sending of requests to a SocketClient. It provides comprehensive functionality for sending data over the network, handling responses, and managing communication errors. This class supports operations that are either queued (asynchronous) or complete (synchronous), accommodating diverse interaction needs with the server.
+
+### Key Features:
+
+- **Asynchronous and Synchronous Operations:** Facilitates both non-blocking (asynchronous) and blocking (synchronous) ways to send requests, making it versatile for various operational contexts.
+- **Error Handling:** Integrates robust error management during the request execution, allowing developers to handle exceptions gracefully.
+- **Timeout Settings:** Offers the ability to set default timeout values for synchronous operations, ensuring flexibility in operation timing.
+- **Response Parsing:** Includes mechanisms to parse and format server responses, enabling custom handling of data returned from the server.
+
+### Constructor Details:
+
+- **RequestAction(SocketClient client, String value, Type type):** Initializes a new request with a specified return type.
+- **RequestAction(SocketClient client, String value):** Constructs a request without specifying a return type, useful for simple send-and-forget operations.
+
+### Methods:
+
+- **queue(Consumer<T> onSuccess, Consumer<Throwable> onFailure):** Sends a request asynchronously, providing handlers for both success and failure scenarios.
+- **complete(long timeoutMS):** Sends a request and waits for the response synchronously, with a specified timeout.
+- **execute(boolean asynchronous):** Facilitates executing a request either asynchronously or synchronously based on the parameter.
+
+### Usage Examples:
+
+```java
+// Queue a request asynchronously with handlers for success and failure
+requestAction.queue(response -> System.out.println("Received: " + response),
+                    error -> System.out.println("Error: " + error.getMessage()));
+
+// Perform a synchronous operation with a custom timeout
+String response = requestAction.complete(3000).toString();
+System.out.println("Synchronous response: " + response);
+
+// Execute a request in the current thread
+requestAction.execute(false);
+```
+
+The `RequestAction` class is a pivotal component in handling network communication efficiently, supporting a wide range of operations from simple data sends to complex handling of asynchronous processes.
+
 ### Usage Example
 
 ```java
