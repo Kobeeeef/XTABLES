@@ -44,16 +44,17 @@ public class XTablesLogger extends Logger {
             String formattedDateTime = dateTime.format(formatter);
 
             // Get class and method names
-            String className = record.getSourceClassName();
+            String classPath = record.getSourceClassName();
             String methodName = record.getSourceMethodName();
+            String className = classPath.split("\\.")[classPath.split("\\.").length - 1];
 
-
-            builder.append(getColorFromLevel(record.getLevel())).append("[")
+            builder.append(getColorFromLevel(record.getLevel()))
+                    .append("[")
                     .append(record.getLevel().getName())
                     .append("] ")
                     .append(formattedDateTime)
                     .append(" ")
-                    .append(className)
+                    .append(classPath)
                     .append(" ")
                     .append(RESET)
                     .append(methodName)
@@ -61,6 +62,9 @@ public class XTablesLogger extends Logger {
                     .append(getColorFromLevel(record.getLevel()))
                     .append("[")
                     .append(record.getLevel().getName())
+                    .append("] ")
+                    .append("[")
+                    .append(className)
                     .append("] ")
                     .append(RESET)
                     .append(record.getMessage())
