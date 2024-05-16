@@ -131,7 +131,15 @@ The script system in `XTablesClient` enables executing server-side scripts with 
 
 It is recommended to use the `queue` method instead of `complete` because server-side scripts can take time to complete, and `queue` allows for non-blocking execution.
 
+### Usage Example
 
+```java
+// Run a server-side script named "processData" with custom data
+client.runScript("processData", "{\"key\":\"value\"}").queue((scriptResponse) -> {
+    System.out.println("Script Status: " + scriptResponse.status());
+    System.out.println("Script Response: " + scriptResponse.response());
+});
+```
 ---
 
 ## RequestAction Class Overview
@@ -173,15 +181,6 @@ requestAction.execute(false);
 
 The `RequestAction` class is a pivotal component in handling network communication efficiently, supporting a wide range of operations from simple data sends to complex handling of asynchronous processes.
 
-### Usage Example
-
-```java
-// Run a server-side script named "processData" with custom data
-client.runScript("processData", "{\"key\":\"value\"}").queue((scriptResponse) -> {
-    System.out.println("Script Status: " + scriptResponse.status());
-    System.out.println("Script Response: " + scriptResponse.response());
-});
-```
 ## Logging
 
 The latest version of `XTablesClient` introduces custom logging capabilities, allowing users to configure logging levels for enhanced control over debugging and monitoring. To set the logging level, utilize the `XTablesLogger.setLoggingLevel(Level)` method.
