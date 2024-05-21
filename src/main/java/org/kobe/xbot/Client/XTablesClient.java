@@ -346,14 +346,14 @@ public class XTablesClient {
              */
             @Override
             public boolean onResponse(VideoStreamResponse result) {
-                if(result.getStatus().equals(ResponseStatus.OK)) {
+                if(result.getStatus().equals(ImageStreamStatus.OKAY)) {
                     VideoStreamServer streamServer = new VideoStreamServer(name);
                     try {
                         streamServer.start();
                         result.setStreamServer(streamServer);
                     } catch (IOException e) {
                         logger.severe("There was an exception while starting video stream: " + e.getMessage());
-                        result.setStatus(ResponseStatus.FAIL);
+                        result.setStatus(ImageStreamStatus.FAIL_START_SERVER);
                     }
                 }
                 return true;
@@ -371,7 +371,7 @@ public class XTablesClient {
              */
             @Override
             public VideoStreamResponse parseResponse(long startTime, String result) {
-                return new VideoStreamResponse(ResponseStatus.valueOf(result));
+                return new VideoStreamResponse(ImageStreamStatus.valueOf(result));
             }
         };
     }
@@ -389,7 +389,7 @@ public class XTablesClient {
              */
             @Override
             public boolean onResponse(VideoStreamResponse result) {
-                if(result.getStatus().equals(ResponseStatus.OK)) {
+                if(result.getStatus().equals(ImageStreamStatus.OKAY)) {
                     VideoStreamClient streamClient = new VideoStreamClient(result.getAddress(), consumer);
                     streamClient.start(client.getExecutor());
                     result.setStreamClient(streamClient);
@@ -409,8 +409,8 @@ public class XTablesClient {
              */
             @Override
             public VideoStreamResponse parseResponse(long startTime, String result) {
-                if(result.equals(ResponseStatus.FAIL.name())) return new VideoStreamResponse(ResponseStatus.FAIL);
-                return new VideoStreamResponse(ResponseStatus.OK).setAddress(gson.fromJson(result, String.class));
+                if(Utilities.contains(ImageStreamStatus.class, result)) return new VideoStreamResponse(ImageStreamStatus.valueOf(result));
+                return new VideoStreamResponse(ImageStreamStatus.OKAY).setAddress(gson.fromJson(result, String.class));
             }
         };
     }

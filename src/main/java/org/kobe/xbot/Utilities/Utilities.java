@@ -4,11 +4,44 @@ package org.kobe.xbot.Utilities;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Utilities {
     private static final JSONParser parser = new JSONParser();
+    public static String getLocalIpAddress() throws SocketException {
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = interfaces.nextElement();
 
+            // Skip loopback and down interfaces
+            if (networkInterface.isLoopback() || !networkInterface.isUp()) {
+                continue;
+            }
+
+            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                InetAddress inetAddress = addresses.nextElement();
+
+                // Return the first non-loopback IPv4 address
+                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof InetAddress && inetAddress.getHostAddress().contains(".")) {
+                    return inetAddress.getHostAddress();
+                }
+            }
+        }
+        throw new SocketException("No non-loopback IPv4 address found");
+    }
+    public static <E extends Enum<E>> boolean contains(Class<E> enumClass, String constant) {
+        for (E e : enumClass.getEnumConstants()) {
+            if (e.name().equals(constant)) {
+                return true;
+            }
+        }
+        return false;
+    }
     public static boolean isValidValue(String jsonString) {
         try {
             // Attempt to parse the JSON string

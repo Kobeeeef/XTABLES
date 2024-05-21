@@ -36,7 +36,7 @@ public class VideoStreamClient {
                     try (InputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
                         byte[] byteArray = inputStream.readAllBytes();
                         if (byteArray.length == 0) {
-                            logger.severe("Received empty byte array.");
+                            logger.warning("Received empty byte array.");
                             continue;
                         }
 

@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -207,7 +208,7 @@ public class XTables {
                         if (Utilities.validateName(name, false)) {
                             if (clients.stream().anyMatch(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name))) {
                                 if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.FAIL.name());
+                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.FAIL_NAME_ALREADY_EXISTS.name());
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
@@ -217,13 +218,13 @@ public class XTables {
                                 }
                                 streams.add(name);
                                 if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.OK.name());
+                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.OKAY.name());
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
                             }
                         } else if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.FAIL.name());
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name());
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
@@ -232,12 +233,19 @@ public class XTables {
                         if (Utilities.validateName(name, false)) {
                             Optional<ClientHandler> optional = clients.stream().filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name)).findFirst();
                             ResponseInfo responseInfo;
-                            responseInfo = optional.map(clientHandler -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientHandler.clientSocket.getInetAddress().getHostAddress().replaceFirst("/", ""), name))))
-                                    .orElseGet(() -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ResponseStatus.FAIL.name()));
+                            responseInfo = optional.map(clientHandler -> {
+                                String clientAddress = clientHandler.clientSocket.getLocalAddress().getHostAddress();
+                                        try {
+                                            return new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIpAddress() : clientAddress.replaceFirst("/", ""), name)));
+                                        } catch (SocketException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    })
+                                    .orElseGet(() -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_PARSE.name()));
                             out.println(responseInfo.parsed());
                             out.flush();
                         } else {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.FAIL.name());
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name());
                             out.println(responseInfo.parsed());
                             out.flush();
                         }

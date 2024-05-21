@@ -6,19 +6,19 @@ import org.kobe.xbot.Client.VideoStreamServer;
 public class VideoStreamResponse {
     private VideoStreamServer streamServer;
     private VideoStreamClient streamClient;
-    private ResponseStatus status;
+    private ImageStreamStatus status;
     private String address;
 
-    public VideoStreamResponse(VideoStreamServer streamServer, ResponseStatus status) {
+    public VideoStreamResponse(VideoStreamServer streamServer, ImageStreamStatus status) {
         this.streamServer = streamServer;
         this.status = status;
     }
 
-    public VideoStreamResponse(VideoStreamClient streamClient, ResponseStatus status) {
+    public VideoStreamResponse(VideoStreamClient streamClient, ImageStreamStatus status) {
         this.streamClient = streamClient;
         this.status = status;
     }
-    public VideoStreamResponse(ResponseStatus status) {
+    public VideoStreamResponse(ImageStreamStatus status) {
         this.status = status;
     }
 
@@ -48,11 +48,11 @@ public class VideoStreamResponse {
         this.streamServer = streamServer;
     }
 
-    public ResponseStatus getStatus() {
+    public ImageStreamStatus getStatus() {
         return status;
     }
 
-    public VideoStreamResponse setStatus(ResponseStatus status) {
+    public VideoStreamResponse setStatus(ImageStreamStatus status) {
         this.status = status;
         return this;
     }
