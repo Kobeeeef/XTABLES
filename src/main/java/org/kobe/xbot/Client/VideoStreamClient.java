@@ -1,7 +1,6 @@
 package org.kobe.xbot.Client;
 
 import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.opencv.global.opencv_highgui;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.kobe.xbot.Utilities.XTablesLogger;
@@ -11,63 +10,61 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 public class VideoStreamClient {
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private final String serverUrl;
+    private final Consumer<Mat> consumer;
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public VideoStreamClient(String serverUrl) {
+    public VideoStreamClient(String serverUrl, Consumer<Mat> onFrame) {
         this.serverUrl = serverUrl;
+        this.consumer = onFrame;
     }
 
-    public void start() {
-        try {
-            while (true) {
-                HttpURLConnection connection = (HttpURLConnection) new URL(serverUrl).openConnection();
-                connection.setRequestMethod("GET");
+    public void start(ExecutorService service) {
+        running.set(true);
+        service.execute(() -> {
+            try {
+                while (running.get() && !Thread.currentThread().isInterrupted()) {
+                    HttpURLConnection connection = (HttpURLConnection) new URL(serverUrl).openConnection();
+                    connection.setRequestMethod("GET");
 
-                try (InputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
-                    byte[] byteArray = inputStream.readAllBytes();
-                    if (byteArray.length == 0) {
-                        logger.severe("Received empty byte array.");
-                        continue;
+                    try (InputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
+                        byte[] byteArray = inputStream.readAllBytes();
+                        if (byteArray.length == 0) {
+                            logger.severe("Received empty byte array.");
+                            continue;
+                        }
+
+                        Mat frame = byteArrayToMat(byteArray);
+                        if (frame.empty()) {
+                            logger.severe("Failed to decode frame.");
+                            continue;
+                        }
+                        consumer.accept(frame);
+                    } catch (IOException e) {
+                        logger.severe("Error reading stream: " + e.getMessage());
+                        Thread.sleep(1000);
+                    } finally {
+                        connection.disconnect();
                     }
-
-                    Mat frame = byteArrayToMat(byteArray);
-                    if (frame.empty()) {
-                        logger.severe("Failed to decode frame.");
-                        continue;
-                    }
-
-                    processFrame(frame); // Process the frame (e.g., display or save)
-                } catch (IOException e) {
-                    logger.severe("Error reading stream: " + e.getMessage());
-                } finally {
-                    connection.disconnect();
                 }
+            } catch (IOException | InterruptedException e) {
+                logger.severe("Error connecting to server: " + e.getMessage());
             }
-        } catch (IOException e) {
-            logger.severe("Error connecting to server: " + e.getMessage());
-        }
+        });
+    }
+
+    public void stop() {
+        running.set(false);
     }
 
     private Mat byteArrayToMat(byte[] byteArray) {
         Mat mat = new Mat(new BytePointer(byteArray));
         return opencv_imgcodecs.imdecode(mat, opencv_imgcodecs.IMREAD_COLOR);
-    }
-
-    private void processFrame(Mat frame) {
-        // Process the frame (e.g., display or save)
-        // This is a placeholder method. Implement as needed.
-        opencv_highgui.imshow("Camera Stream", frame);
-        opencv_highgui.waitKey(1);
-
-    }
-
-    public static void main(String[] args) {
-        // Example usage
-        String serverUrl = "http://localhost:4888/poopi";
-        VideoStreamClient client = new VideoStreamClient(serverUrl);
-        client.start();
     }
 }

@@ -25,7 +25,7 @@ public class VideoStreamServer {
         this.endpoint = "/" + name;
     }
 
-    public void start() throws IOException {
+    public VideoStreamServer start() throws IOException {
         if (server == null) {
             server = HttpServer.create(new InetSocketAddress(4888), 0);
             server.setExecutor(Executors.newCachedThreadPool());
@@ -39,6 +39,7 @@ public class VideoStreamServer {
         } else {
             logger.info(("Server added endpoint: http://localhost:" + server.getAddress().getPort()) + endpoint);
         }
+        return this;
     }
 
     public void stop() {

@@ -63,6 +63,10 @@ public class SocketClient {
         return SERVER_ADDRESS;
     }
 
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
     public int getSERVER_PORT() {
         return SERVER_PORT;
     }

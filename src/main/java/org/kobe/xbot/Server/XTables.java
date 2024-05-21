@@ -165,7 +165,7 @@ public class XTables {
         private final Set<String> updateEvents = new HashSet<>();
         private final AtomicBoolean deleteEvent = new AtomicBoolean(false);
         private int totalMessages = 0;
-        private ConcurrentHashMap<String, String> streams;
+        private List<String> streams;
 
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
@@ -202,11 +202,10 @@ public class XTables {
                     RequestInfo requestInfo = new RequestInfo(inputLine);
                     boolean shouldReply = !requestInfo.getID().equals("IGNORED");
                     totalMessages++;
-                    if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.REGISTER_VIDEO_STREAM)) {
+                    if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.REGISTER_VIDEO_STREAM)) {
                         String name = requestInfo.getTokens()[1].trim();
-                        String ip = requestInfo.getTokens()[2].trim();
                         if (Utilities.validateName(name, false)) {
-                            if (clients.stream().anyMatch(clientHandler -> clientHandler.streams != null && clientHandler.streams.containsKey(name))) {
+                            if (clients.stream().anyMatch(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name))) {
                                 if (shouldReply) {
                                     ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.FAIL.name());
                                     out.println(responseInfo.parsed());
@@ -214,9 +213,9 @@ public class XTables {
                                 }
                             } else {
                                 if (streams == null) {
-                                    streams = new ConcurrentHashMap<>();
+                                    streams = Collections.synchronizedList(new ArrayList<>());
                                 }
-                                streams.put(name, ip);
+                                streams.add(name);
                                 if (shouldReply) {
                                     ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.OK.name());
                                     out.println(responseInfo.parsed());
@@ -231,9 +230,9 @@ public class XTables {
                     } else if (shouldReply && requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET_VIDEO_STREAM)) {
                         String name = requestInfo.getTokens()[1];
                         if (Utilities.validateName(name, false)) {
-                            Optional<ClientHandler> optional = clients.stream().filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.containsKey(name)).findFirst();
+                            Optional<ClientHandler> optional = clients.stream().filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name)).findFirst();
                             ResponseInfo responseInfo;
-                            responseInfo = optional.map(clientHandler -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, clientHandler.streams.get(name).trim()))
+                            responseInfo = optional.map(clientHandler -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientHandler.clientSocket.getInetAddress().getHostAddress().replaceFirst("/", ""), name))))
                                     .orElseGet(() -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ResponseStatus.FAIL.name()));
                             out.println(responseInfo.parsed());
                             out.flush();
@@ -412,7 +411,7 @@ public class XTables {
                     } else {
                         // Invalid command
                         if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN);
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN, ResponseStatus.FAIL.name());
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
