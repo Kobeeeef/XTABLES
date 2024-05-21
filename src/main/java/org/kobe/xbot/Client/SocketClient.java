@@ -212,7 +212,6 @@ public class SocketClient {
                 while ((message = in.readLine()) != null && !socket.isClosed() && socket.isConnected()) {
                     isConnected = true;
                     RequestInfo requestInfo = new RequestInfo(message);
-                    MESSAGES.add(requestInfo);
                     if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
                         String ID = requestInfo.getID();
                         String key = requestInfo.getTokens()[1];
@@ -222,6 +221,8 @@ public class SocketClient {
                             updateConsumer.accept(keyValuePair);
                             if (CLEAR_UPDATE_MESSAGES) MESSAGES.remove(requestInfo);
                         }
+                    } else {
+                        MESSAGES.add(requestInfo);
                     }
                 }
                 isConnected = false;

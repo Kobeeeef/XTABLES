@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -50,6 +51,7 @@ public class XTables {
             try {
                 latch.await();
             } catch (InterruptedException e) {
+                logger.severe("Main thread interrupted: " + e.getMessage());
                 Thread.currentThread().interrupt();
             }
             mainThread = main;
@@ -139,20 +141,32 @@ public class XTables {
         }
     }
 
-    private void notifyClients(String key, String value) {
-        for (ClientHandler client : clients) {
-            if (client.getUpdateEvents().contains("") || client.getUpdateEvents().contains(key)) {
-                client.sendUpdate(key, value);
+    private void notifyUpdateChangeClients(String key, String value) {
+        synchronized (clients) {
+            for (ClientHandler client : clients) {
+                if (client.getUpdateEvents().contains("") || client.getUpdateEvents().contains(key)) {
+                    client.sendUpdate(key, value);
+                }
             }
         }
     }
 
+    private void notifyDeleteChangeClients(String key) {
+        synchronized (clients) {
+            for (ClientHandler client : clients) {
+                if (client.getDeleteEvent()) {
+                    client.sendDelete(key);
+                }
+            }
+        }
+    }
 
     // Thread to handle each client connection
     private class ClientHandler extends Thread {
         private final Socket clientSocket;
         private final PrintWriter out;
         private final Set<String> updateEvents = new HashSet<>();
+        private final AtomicBoolean deleteEvent = new AtomicBoolean(false);
         private int totalMessages = 0;
 
         public ClientHandler(Socket socket) throws IOException {
@@ -163,6 +177,10 @@ public class XTables {
 
         public Set<String> getUpdateEvents() {
             return updateEvents;
+        }
+
+        public Boolean getDeleteEvent() {
+            return deleteEvent.get();
         }
 
         @Override
@@ -202,20 +220,20 @@ public class XTables {
                         String key = requestInfo.getTokens()[1];
                         String value = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (value.equals(table.get(key))) {
-                            if(shouldReply) {
+                            if (shouldReply) {
                                 ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, "OK");
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }
                         } else {
                             boolean response = table.put(key, value);
-                            if(shouldReply) {
+                            if (shouldReply) {
                                 ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, response ? "OK" : "FAIL");
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }
                             if (response) {
-                                notifyClients(key, value);
+                                notifyUpdateChangeClients(key, value);
                             }
                         }
                     } else if (requestInfo.getTokens().length >= 2 && requestInfo.getMethod().equals(MethodType.RUN_SCRIPT)) {
@@ -246,13 +264,13 @@ public class XTables {
                                     logger.severe("Duration: " + durationMillis + " ms");
                                 }
                                 String response = returnValue == null || returnValue.trim().isEmpty() ? status.name() : status.name() + " " + returnValue.trim();
-                                if(shouldReply) {
+                                if (shouldReply) {
                                     ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.RUN_SCRIPT, response);
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
                             });
-                        } else if(shouldReply) {
+                        } else if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, "FAIL SCRIPT_NOT_FOUND");
                             out.println(responseInfo.parsed());
                             out.flush();
@@ -261,14 +279,14 @@ public class XTables {
                         String key = requestInfo.getTokens()[1];
                         String value = requestInfo.getTokens()[2];
                         if (!Utilities.validateName(value, false)) {
-                            if(shouldReply) {
+                            if (shouldReply) {
                                 ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UPDATE_KEY, "FAIL");
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }
                         } else {
                             boolean response = table.renameKey(key, value);
-                            if(shouldReply) {
+                            if (shouldReply) {
                                 ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UPDATE_KEY, response ? "OK" : "FAIL");
                                 out.println(responseInfo.parsed());
                                 out.flush();
@@ -277,29 +295,42 @@ public class XTables {
                     } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.DELETE)) {
                         String key = requestInfo.getTokens()[1];
                         boolean response = table.delete(key);
-                        if(shouldReply) {
+                        if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
+                        }
+                        if (response) {
+                            notifyDeleteChangeClients(key);
                         }
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.DELETE)) {
                         boolean response = table.delete("");
-                        if(shouldReply) {
+                        if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_DELETE)) {
+                        deleteEvent.set(true);
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_DELETE, "OK");
+                        out.println(responseInfo.parsed());
+                        out.flush();
+                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_DELETE)) {
+                        deleteEvent.set(false);
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNSUBSCRIBE_DELETE, "OK");
+                        out.println(responseInfo.parsed());
+                        out.flush();
                     } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
                         String key = requestInfo.getTokens()[1];
                         updateEvents.add(key);
-                        if(shouldReply) {
+                        if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, "OK");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
                         updateEvents.add("");
-                        if(shouldReply) {
+                        if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, "OK");
                             out.println(responseInfo.parsed());
                             out.flush();
@@ -307,14 +338,14 @@ public class XTables {
                     } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_UPDATE)) {
                         String key = requestInfo.getTokens()[1];
                         boolean success = updateEvents.remove(key);
-                        if(shouldReply) {
+                        if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_UPDATE)) {
                         boolean success = updateEvents.remove("");
-                        if(shouldReply) {
+                        if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
@@ -334,7 +365,7 @@ public class XTables {
                         out.println(responseInfo.parsed());
                         out.flush();
                     } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.REBOOT_SERVER)) {
-                        if(shouldReply) {
+                        if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REBOOT_SERVER, ResponseStatus.OK.name());
                             out.println(responseInfo.parsed());
                             out.flush();
@@ -342,7 +373,7 @@ public class XTables {
                         rebootServer();
                     } else {
                         // Invalid command
-                        if(shouldReply) {
+                        if (shouldReply) {
                             ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN);
                             out.println(responseInfo.parsed());
                             out.flush();
@@ -370,6 +401,11 @@ public class XTables {
 
         public void sendUpdate(String key, String value) {
             out.println(new ResponseInfo(null, MethodType.UPDATE, key + " " + value).parsed());
+            out.flush();
+        }
+
+        public void sendDelete(String key) {
+            out.println(new ResponseInfo(null, MethodType.DELETE, key).parsed());
             out.flush();
         }
     }

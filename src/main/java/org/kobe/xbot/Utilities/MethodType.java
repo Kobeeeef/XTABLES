@@ -13,5 +13,7 @@ public enum MethodType {
     REBOOT_SERVER,
     PING,
     RUN_SCRIPT,
+    SUBSCRIBE_DELETE,
+    UNSUBSCRIBE_DELETE,
     UNKNOWN
 }

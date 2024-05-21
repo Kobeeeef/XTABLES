@@ -306,7 +306,22 @@ public class XTablesClient {
             }
         };
     }
+    public RequestAction<ByteFrame> getByteFrame(String key) {
+        Utilities.validateKey(key);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), ByteFrame.class) {
+            @Override
+            public String formatResult(String result) {
+                String[] parts = result.split(" ");
+                return String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            }
 
+            @Override
+            public ByteFrame parseResponse(long startTime, String result) {
+                checkFlaggedValue(result);
+                return null;
+            }
+        };
+    }
     public RequestAction<ResponseStatus> putString(String key, String value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
@@ -330,7 +345,11 @@ public class XTablesClient {
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
-
+    public RequestAction<ResponseStatus> putByteFrame(String key, byte[] value) {
+        Utilities.validateKey(key);
+        String parsedValue = gson.toJson(new ByteFrame(value));
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
+    }
     public RequestAction<ResponseStatus> putInteger(String key, Integer value) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class);
