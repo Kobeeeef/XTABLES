@@ -162,7 +162,7 @@ The `RequestAction` class, part of the `org.kobe.xbot.Client` package, manages t
 
 - **queue(Consumer<T> onSuccess, Consumer<Throwable> onFailure):** Sends a request asynchronously, providing handlers for both success and failure scenarios.
 - **complete(long timeoutMS):** Sends a request and waits for the response synchronously, with a specified timeout.
-- **execute(boolean asynchronous):** Facilitates executing a request either asynchronously or synchronously based on the parameter.
+- **execute():** Sends a request and instructs the server to not respond back, helpful when using update methods.
 
 ### Usage Examples:
 
