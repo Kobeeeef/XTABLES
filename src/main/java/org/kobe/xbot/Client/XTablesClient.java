@@ -306,6 +306,7 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<ByteFrame> getByteFrame(String key) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), ByteFrame.class) {
@@ -322,10 +323,16 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<ResponseStatus> putString(String key, String value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
+    }
+
+    public RequestAction<ResponseStatus> registerCameraStream(String name, String ip) {
+        Utilities.validateName(name, true);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.REGISTER_VIDEO_STREAM, name + " " + ip).parsed(), ResponseStatus.class);
     }
 
     public RequestAction<ResponseStatus> renameKey(String key, String newName) {
@@ -345,11 +352,13 @@ public class XTablesClient {
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
+
     public RequestAction<ResponseStatus> putByteFrame(String key, byte[] value) {
         Utilities.validateKey(key);
         String parsedValue = gson.toJson(new ByteFrame(value));
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
+
     public RequestAction<ResponseStatus> putInteger(String key, Integer value) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class);
@@ -400,7 +409,10 @@ public class XTablesClient {
             }
         };
     }
-
+    public RequestAction<String> getVideoStreamIP(String name) {
+        Utilities.validateName(name, true);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_VIDEO_STREAM, name).parsed(), String.class);
+    }
     public RequestAction<Boolean> getBoolean(String key) {
         Utilities.validateKey(key);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Boolean.class) {
@@ -440,7 +452,7 @@ public class XTablesClient {
                 String[] parts = result.split(" ");
                 ResponseStatus status = ResponseStatus.valueOf(parts[0]);
                 String response = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
-                if(response == null || response.trim().isEmpty()) response = null;
+                if (response == null || response.trim().isEmpty()) response = null;
                 if (status.equals(ResponseStatus.OK)) {
                     return new ScriptResponse(response, status);
                 } else {

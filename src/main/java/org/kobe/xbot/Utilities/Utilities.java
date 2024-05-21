@@ -4,6 +4,8 @@ package org.kobe.xbot.Utilities;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Utilities {
     private static final JSONParser parser = new JSONParser();
 
@@ -15,6 +17,14 @@ public class Utilities {
         } catch (ParseException e) {
             return false; // If parsing fails, JSON is invalid
         }
+    }
+    @SafeVarargs
+    public static <K, V> ConcurrentHashMap<K, V> combineConcurrentHashMaps(ConcurrentHashMap<K, V>... maps) {
+        ConcurrentHashMap<K, V> combinedMap = new ConcurrentHashMap<>();
+        for (ConcurrentHashMap<K, V> map : maps) {
+            combinedMap.putAll(map);
+        }
+        return combinedMap;
     }
     public static boolean validateKey(String key) {
         // Check if key is null or empty

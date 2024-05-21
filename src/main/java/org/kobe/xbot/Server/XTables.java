@@ -18,10 +18,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -168,6 +165,7 @@ public class XTables {
         private final Set<String> updateEvents = new HashSet<>();
         private final AtomicBoolean deleteEvent = new AtomicBoolean(false);
         private int totalMessages = 0;
+        private ConcurrentHashMap<String, String> streams;
 
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
@@ -204,7 +202,47 @@ public class XTables {
                     RequestInfo requestInfo = new RequestInfo(inputLine);
                     boolean shouldReply = !requestInfo.getID().equals("IGNORED");
                     totalMessages++;
-                    if (shouldReply && requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
+                    if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.REGISTER_VIDEO_STREAM)) {
+                        String name = requestInfo.getTokens()[1].trim();
+                        String ip = requestInfo.getTokens()[2].trim();
+                        if (Utilities.validateName(name, false)) {
+                            if (clients.stream().anyMatch(clientHandler -> clientHandler.streams != null && clientHandler.streams.containsKey(name))) {
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.FAIL.name());
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                            } else {
+                                if (streams == null) {
+                                    streams = new ConcurrentHashMap<>();
+                                }
+                                streams.put(name, ip);
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.OK.name());
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                            }
+                        } else if (shouldReply) {
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.FAIL.name());
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                        }
+                    } else if (shouldReply && requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET_VIDEO_STREAM)) {
+                        String name = requestInfo.getTokens()[1];
+                        if (Utilities.validateName(name, false)) {
+                            Optional<ClientHandler> optional = clients.stream().filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.containsKey(name)).findFirst();
+                            ResponseInfo responseInfo;
+                            responseInfo = optional.map(clientHandler -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, clientHandler.streams.get(name).trim()))
+                                    .orElseGet(() -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ResponseStatus.FAIL.name()));
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                        } else {
+                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ResponseStatus.FAIL.name());
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                        }
+                    } else if (shouldReply && requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
                         String key = requestInfo.getTokens()[1];
                         String result = gson.toJson(table.get(key));
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET, String.format("%1$s " + result, table.isFlaggedKey(key) ? "FLAGGED" : "GOOD"));
