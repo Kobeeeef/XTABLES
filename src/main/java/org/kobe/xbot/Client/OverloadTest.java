@@ -9,6 +9,8 @@ import org.kobe.xbot.Utilities.VideoStreamResponse;
 
 import java.io.IOException;
 
+import static org.kobe.xbot.Utilities.Utilities.matToByteArray;
+
 public class OverloadTest {
     private static final String SERVER_ADDRESS = "localhost"; // Server address
     private static final int SERVER_PORT = 1735; // Server port
@@ -29,11 +31,5 @@ public class OverloadTest {
         }
     }
 
-    private static byte[] matToByteArray(Mat mat) {
-        BytePointer bytePointer = new BytePointer();
-        opencv_imgcodecs.imencode(".jpg", mat, bytePointer); // Encode the image
-        byte[] byteArray = new byte[(int) bytePointer.limit()];
-        bytePointer.get(byteArray);
-        return byteArray;
-    }
+
 }

@@ -106,6 +106,31 @@ You can customize the average compression speed threshold by using the `setSpeed
 - **queueAll(List<RequestAction<T>> requestActions)**
   - Queues all provided request actions for asynchronous processing without waiting for results.
 
+### Video Stream Methods
+
+- **registerImageStreamServer(String name)**
+  - Registers a video stream with the server using the given name. Starts a local server to serve the video stream.
+  - **Parameters**:
+    - `name`: The unique name chosen by the client for the video stream.
+  - **Returns**: A `VideoStreamResponse` indicating the success or failure of the registration.
+
+- **registerImageStreamClient(String name, Consumer<Mat> consumer)**
+  - Queries the server for the given stream name and connects to the provided IP and endpoint to receive the video stream.
+  - **Parameters**:
+    - `name`: The name of the video stream to query.
+    - `consumer`: A consumer function that processes each received frame.
+  - **Returns**: A `VideoStreamResponse` indicating the success or failure of the connection.
+
+### VideoStreamResponse Class
+
+- **Description**: Represents the response from the server for video stream-related operations.
+- **Fields**:
+  - `VideoStreamServer streamServer`: The video stream server instance for Client A.
+  - `VideoStreamClient streamClient`: The video stream client instance for Client B.
+  - `ImageStreamStatus status`: The status of the video stream operation.
+  - `String address`: The address of the video stream.
+
+
 ### Miscellaneous
 
 - **rebootServer()**
