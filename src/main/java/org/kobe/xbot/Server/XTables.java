@@ -241,7 +241,7 @@ public class XTables {
                                             throw new RuntimeException(e);
                                         }
                                     })
-                                    .orElseGet(() -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_PARSE.name()));
+                                    .orElseGet(() -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name()));
                             out.println(responseInfo.parsed());
                             out.flush();
                         } else {

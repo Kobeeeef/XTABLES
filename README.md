@@ -181,6 +181,72 @@ requestAction.execute(false);
 
 The `RequestAction` class is a pivotal component in handling network communication efficiently, supporting a wide range of operations from simple data sends to complex handling of asynchronous processes.
 
+
+## Hybrid P2P Video Stream System
+
+This section describes the implementation and usage of a hybrid peer-to-peer (P2P) video streaming system using the `XTablesClient`. The system allows Client A to register a video stream with the server and serve it, while Client B can query the server for available streams and connect directly to Client A to receive the video stream.
+
+### Overview
+
+- **Client A**: Registers a unique stream name with the server and starts a local server to stream video captured using OpenCV.
+- **Server**: Stores the stream names registered by clients and ensures no duplicate names. Provides the IP and endpoint of the stream to Client B upon request.
+- **Client B**: Queries the server for the stream name and connects directly to Client A to receive the video stream.
+
+### Client A
+
+Client A captures video using OpenCV and streams it to a local server. It registers the stream with the central server, providing a unique name chosen by the client.
+
+```java
+XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, false);
+VideoStreamResponse response = client.registerImageStreamServer("camera1").complete();
+if (response.getStatus().equals(ImageStreamStatus.OKAY)) {
+    VideoCapture camera = new VideoCapture(0);
+    Mat frame = new Mat();
+    while (camera.read(frame)) {
+        response.getStreamServer().updateFrame(matToByteArray(frame));
+    }
+}
+```
+
+### Client B
+
+Client B queries the server for the stream name and connects directly to Client A to receive and display the video stream. The consumer is called for each received frame.
+
+```java
+XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, false);
+client.registerImageStreamClient("camera1", (Mat frame) -> {
+    opencv_highgui.imshow("Received Stream", frame);
+    opencv_highgui.waitKey(1);
+}).complete();
+```
+
+### Method Details
+
+#### Client A: `registerImageStreamServer(String name)`
+
+- **Description**: Registers a video stream with the server using the given name. Starts a local server to serve the video stream.
+- **Parameters**:
+  - `name`: The unique name chosen by the client for the video stream.
+- **Returns**: A `VideoStreamResponse` indicating the success or failure of the registration.
+
+#### Client B: `registerImageStreamClient(String name, Consumer<Mat> consumer)`
+
+- **Description**: Queries the server for the given stream name and connects to the provided IP and endpoint to receive the video stream.
+- **Parameters**:
+  - `name`: The name of the video stream to query.
+  - `consumer`: A consumer function that processes each received frame.
+- **Returns**: A `VideoStreamResponse` indicating the success or failure of the connection.
+
+### Summary
+
+This implementation provides a hybrid P2P video streaming system where:
+
+- **Client A** registers a unique stream name with the central server and streams video to a local endpoint.
+- **Client B** queries the central server for the stream name and connects directly to Client A to receive the video stream.
+
+This setup ensures efficient video streaming with reduced latency and minimal server load by leveraging direct client-to-client connections for video data transfer.
+
+
 ## Logging
 
 The latest version of `XTablesClient` introduces custom logging capabilities, allowing users to configure logging levels for enhanced control over debugging and monitoring. To set the logging level, utilize the `XTablesLogger.setLoggingLevel(Level)` method.
