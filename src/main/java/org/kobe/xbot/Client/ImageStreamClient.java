@@ -14,13 +14,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-public class VideoStreamClient {
+public class ImageStreamClient {
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private final String serverUrl;
     private final Consumer<Mat> consumer;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public VideoStreamClient(String serverUrl, Consumer<Mat> onFrame) {
+    public ImageStreamClient(String serverUrl, Consumer<Mat> onFrame) {
         this.serverUrl = serverUrl;
         this.consumer = onFrame;
     }

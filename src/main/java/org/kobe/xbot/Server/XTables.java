@@ -234,7 +234,7 @@ public class XTables {
                             Optional<ClientHandler> optional = clients.stream().filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name)).findFirst();
                             ResponseInfo responseInfo;
                             responseInfo = optional.map(clientHandler -> {
-                                String clientAddress = clientHandler.clientSocket.getLocalAddress().getHostAddress();
+                                        String clientAddress = clientHandler.clientSocket.getLocalAddress().getHostAddress();
                                         try {
                                             return new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIpAddress() : clientAddress.replaceFirst("/", ""), name)));
                                         } catch (SocketException e) {
@@ -445,12 +445,12 @@ public class XTables {
         }
 
         public void sendUpdate(String key, String value) {
-            out.println(new ResponseInfo(null, MethodType.UPDATE, key + " " + value).parsed());
+            out.println(new ResponseInfo(null, MethodType.UPDATE_EVENT, key + " " + value).parsed());
             out.flush();
         }
 
         public void sendDelete(String key) {
-            out.println(new ResponseInfo(null, MethodType.DELETE, key).parsed());
+            out.println(new ResponseInfo(null, MethodType.DELETE_EVENT, key).parsed());
             out.flush();
         }
     }

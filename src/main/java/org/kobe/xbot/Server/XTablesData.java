@@ -20,7 +20,7 @@ public class XTablesData<V> {
 
     // Method to put a value into the nested structure
     public boolean put(String key, V value) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         if(!Utilities.isValidValue((String) value) && !flaggedKeys.contains(key)) {
             flaggedKeys.add(key);
             logger.warning("Invalid JSON value for key '" + key + "': " + value);
@@ -59,13 +59,13 @@ public class XTablesData<V> {
     }
 
     public boolean isFlaggedKey(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return flaggedKeys.contains(key);
     }
 
     // Method to get a value from the nested structure
     public V get(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         XTablesData<V> current = getLevelxTablesData(key);
         if (current == null) return null; // Key not found
 
@@ -74,13 +74,13 @@ public class XTablesData<V> {
     }
 
     public V get(String key, V defaultValue) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         V result = get(key);
         return (result != null) ? result : defaultValue;
     }
 
     private XTablesData<V> getLevelxTablesData(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         String[] keys = key.split("\\."); // Split the key by '.'
         XTablesData<V> current = this;
 
@@ -95,7 +95,7 @@ public class XTablesData<V> {
     }
 
     public boolean renameKey(String oldKey, String newKeyName) {
-        Utilities.validateKey(oldKey);
+        Utilities.validateKey(oldKey, true);
         Utilities.validateName(newKeyName, true);
         if (oldKey == null || newKeyName == null || oldKey.isEmpty() || newKeyName.isEmpty()) {
             return false; // Invalid parameters
@@ -141,7 +141,7 @@ public class XTablesData<V> {
 
     // Method to get all tables at a given level
     public Set<String> getTables(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         if (key.isEmpty()) {
             return (data != null) ? data.keySet() : null;
         }
@@ -154,7 +154,7 @@ public class XTablesData<V> {
 
     // Method to delete a value at a given level
     public boolean delete(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         if (key.isEmpty()) {
             this.data = null; // Remove everything if key is empty
             flaggedKeys.clear(); // Clear flagged keys if everything is removed

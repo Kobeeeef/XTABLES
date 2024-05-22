@@ -3,10 +3,6 @@ package org.kobe.xbot.Client;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.opencv.global.opencv_imgcodecs;
-import org.bytedeco.opencv.opencv_core.Mat;
-import org.bytedeco.opencv.opencv_videoio.VideoCapture;
 import org.kobe.xbot.Utilities.XTablesLogger;
 
 import java.io.IOException;
@@ -14,18 +10,18 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-public class VideoStreamServer {
+public class ImageStreamServer {
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private static HttpServer server;
     private static boolean isServerRunning = false;
     private byte[] currentFrame;
     private final String endpoint;
 
-    public VideoStreamServer(String name) {
+    public ImageStreamServer(String name) {
         this.endpoint = "/" + name;
     }
 
-    public VideoStreamServer start() throws IOException {
+    public ImageStreamServer start() throws IOException {
         if (server == null) {
             server = HttpServer.create(new InetSocketAddress(4888), 0);
             server.setExecutor(Executors.newCachedThreadPool());
@@ -67,28 +63,5 @@ public class VideoStreamServer {
                 exchange.sendResponseHeaders(503, -1); // Service unavailable if no frame available
             }
         }
-    }
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        // Example usage
-        VideoStreamServer server = new VideoStreamServer("poopi");
-        server.start();
-
-        VideoCapture camera = new VideoCapture(0);
-        Mat frame = new Mat();
-        while (true) {
-            if (camera.read(frame)) {
-                byte[] byteArray = matToByteArray(frame);
-                server.updateFrame(byteArray);
-            }
-        }
-    }
-
-    private static byte[] matToByteArray(Mat mat) {
-        BytePointer bytePointer = new BytePointer();
-        opencv_imgcodecs.imencode(".jpg", mat, bytePointer); // Encode the image
-        byte[] byteArray = new byte[(int) bytePointer.limit()];
-        bytePointer.get(byteArray);
-        return byteArray;
     }
 }

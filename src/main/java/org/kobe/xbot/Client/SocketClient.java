@@ -47,6 +47,7 @@ public class SocketClient {
     private BufferedReader in = null;
     private Socket socket;
     private Consumer<KeyValuePair<String>> updateConsumer;
+    private Consumer<String> deleteConsumer;
     private final XTablesClient xTablesClient;
 
     public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS, int MAX_THREADS, XTablesClient xTablesClient) {
@@ -102,6 +103,11 @@ public class SocketClient {
         this.updateConsumer = updateConsumer;
     }
 
+    public SocketClient setDeleteConsumer(Consumer<String> deleteConsumer) {
+        this.deleteConsumer = deleteConsumer;
+        return this;
+    }
+
     public boolean isCLEAR_UPDATE_MESSAGES() {
         return CLEAR_UPDATE_MESSAGES;
     }
@@ -133,6 +139,11 @@ public class SocketClient {
                     logger.info("Resubscribing to all previously submitted update events.");
                     xTablesClient.queueAll(requestActions);
                     logger.info("Queued " + requestActions.size() + " subscriptions successfully!");
+                }
+                if(xTablesClient.resubscribeToDeleteEvents()) {
+                    logger.info("Subscribing to previously submitted delete event.");
+                    new RequestAction<>(this, new ResponseInfo(null, MethodType.SUBSCRIBE_DELETE).parsed(), ResponseStatus.class).queue();
+                    logger.info("Queued delete event subscription successfully!");
                 }
                 break;
             } catch (IOException e) {
@@ -216,14 +227,20 @@ public class SocketClient {
                 while ((message = in.readLine()) != null && !socket.isClosed() && socket.isConnected()) {
                     isConnected = true;
                     RequestInfo requestInfo = new RequestInfo(message);
-                    if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE)) {
-                        String ID = requestInfo.getID();
+                    if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.UPDATE_EVENT)) {
                         String key = requestInfo.getTokens()[1];
                         String value = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (updateConsumer != null) {
                             KeyValuePair<String> keyValuePair = new KeyValuePair<>(key, value);
-                            updateConsumer.accept(keyValuePair);
+                            executor.execute(() -> updateConsumer.accept(keyValuePair)); // maybe implement a cachedThread instead of using the same executor as socket client
                             if (CLEAR_UPDATE_MESSAGES) MESSAGES.remove(requestInfo);
+                        }
+                    } else if (requestInfo.getTokens().length >= 2 && requestInfo.getMethod().equals(MethodType.DELETE_EVENT)) {
+                        String key = requestInfo.getTokens()[1];
+                        if (Utilities.validateKey(key, true)) {
+                            if (deleteConsumer != null) {
+                                executor.execute(() -> deleteConsumer.accept(key));
+                            }
                         }
                     } else {
                         MESSAGES.add(requestInfo);

@@ -26,12 +26,14 @@ public class XTablesClient {
     private final CountDownLatch latch = new CountDownLatch(1);
     private Thread cacheThread;
     public final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
+    public final List<Consumer<String>> delete_consumers = new ArrayList<>();
 
     public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
         this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS, this);
         Thread thread = new Thread(() -> {
             client.connect();
             client.setUpdateConsumer(this::on_update);
+            client.setDeleteConsumer(this::on_delete);
             latch.countDown();
         });
         thread.setDaemon(true);
@@ -123,7 +125,7 @@ public class XTablesClient {
 
 
     public <T> RequestAction<ResponseStatus> subscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return subscribeUpdateEventNoCheck(key, type, consumer);
     }
 
@@ -147,6 +149,9 @@ public class XTablesClient {
         }
         return all;
     }
+    public boolean resubscribeToDeleteEvents() {
+        return !delete_consumers.isEmpty();
+    }
 
     public <T> List<T> completeAll(List<RequestAction<T>> requestActions) {
         List<T> responses = new ArrayList<>();
@@ -169,7 +174,7 @@ public class XTablesClient {
     }
 
     public <T> RequestAction<ResponseStatus> unsubscribeUpdateEvent(String key, Class<T> type, Consumer<SocketClient.KeyValuePair<T>> consumer) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_UPDATE, key).parsed(), ResponseStatus.class) {
             @Override
             public boolean onResponse(ResponseStatus result) {
@@ -225,7 +230,40 @@ public class XTablesClient {
             }
         };
     }
+    public RequestAction<ResponseStatus> subscribeDeleteEvent(Consumer<String> consumer) {
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_DELETE).parsed(), ResponseStatus.class) {
+            @Override
+            public boolean onResponse(ResponseStatus result) {
+                if (result.equals(ResponseStatus.OK)) {
+                    delete_consumers.add(consumer);
+                }
+                return true;
+            }
 
+        };
+    }
+    public RequestAction<ResponseStatus> unsubscribeDeleteEvent(Consumer<String> consumer) {
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_DELETE).parsed(), ResponseStatus.class) {
+            @Override
+            public boolean onResponse(ResponseStatus result) {
+                if (result.equals(ResponseStatus.OK)) {
+                    delete_consumers.remove(consumer);
+                }
+                return true;
+            }
+
+            @Override
+            public ResponseStatus returnValueIfNotRan() {
+                return ResponseStatus.OK;
+            }
+
+            @Override
+            public boolean doNotRun() {
+                delete_consumers.remove(consumer);
+                return !delete_consumers.isEmpty();
+            }
+        };
+    }
     public record UpdateConsumer<T>(Class<T> type, Consumer<? super SocketClient.KeyValuePair<T>> consumer) {
     }
 
@@ -234,6 +272,18 @@ public class XTablesClient {
         processUpdate(keyValuePair, keyValuePair.getKey());
         if (update_consumers.containsKey(" ")) {
             processUpdate(keyValuePair, " ");
+        }
+    }
+
+    private void on_delete(String key) {
+        synchronized (delete_consumers) {
+            for (Consumer<String> consumer : delete_consumers) {
+                try {
+                    consumer.accept(key);
+                } catch (Exception e) {
+                    logger.severe("There was a exception while running delete subscriber callback: " + e.getMessage());
+                }
+            }
         }
     }
 
@@ -249,7 +299,7 @@ public class XTablesClient {
                     consumer.accept(new SocketClient.KeyValuePair<>(keyValuePair.getKey(), parsed));
                 } catch (JsonSyntaxException ignored) {
                 } catch (Exception e) {
-                    logger.severe("There was a exception while running subscriber callback: " + e.getMessage());
+                    logger.severe("There was a exception while running update subscriber callback: " + e.getMessage());
 
                 }
             } else {
@@ -268,7 +318,7 @@ public class XTablesClient {
 
     public RequestAction<ResponseStatus> putRawUnsafe(String key, String value) {
         logger.warning("This method is not recommend to be used. Please use XTablesClient#putRaw instead for a more safe put.");
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class) {
             /**
              * Called before sending the request. Meant to be overridden in subclasses to perform any necessary setup or validation before running the request.
@@ -284,7 +334,7 @@ public class XTablesClient {
     }
 
     public RequestAction<ResponseStatus> putRaw(String key, String value) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         if (!Utilities.isValidValue(value)) throw new JsonSyntaxException("The value is not a valid JSON.");
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class) {
             /**
@@ -310,7 +360,7 @@ public class XTablesClient {
     }
 
     public RequestAction<ByteFrame> getByteFrame(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), ByteFrame.class) {
             @Override
             public String formatResult(String result) {
@@ -327,14 +377,14 @@ public class XTablesClient {
     }
 
     public RequestAction<ResponseStatus> putString(String key, String value) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
 
     public RequestAction<VideoStreamResponse> registerImageStreamServer(String name) {
         Utilities.validateName(name, true);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.REGISTER_VIDEO_STREAM, name).parsed(), VideoStreamResponse.class){
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.REGISTER_VIDEO_STREAM, name).parsed(), VideoStreamResponse.class) {
             /**
              * Called when a response is received.
              * Meant to be overridden in subclasses to handle specific actions on response.
@@ -346,8 +396,8 @@ public class XTablesClient {
              */
             @Override
             public boolean onResponse(VideoStreamResponse result) {
-                if(result.getStatus().equals(ImageStreamStatus.OKAY)) {
-                    VideoStreamServer streamServer = new VideoStreamServer(name);
+                if (result.getStatus().equals(ImageStreamStatus.OKAY)) {
+                    ImageStreamServer streamServer = new ImageStreamServer(name);
                     try {
                         streamServer.start();
                         result.setStreamServer(streamServer);
@@ -375,9 +425,10 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<VideoStreamResponse> registerImageStreamClient(String name, Consumer<Mat> consumer) {
         Utilities.validateName(name, true);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_VIDEO_STREAM, name).parsed(), VideoStreamResponse.class){
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_VIDEO_STREAM, name).parsed(), VideoStreamResponse.class) {
             /**
              * Called when a response is received.
              * Meant to be overridden in subclasses to handle specific actions on response.
@@ -389,8 +440,8 @@ public class XTablesClient {
              */
             @Override
             public boolean onResponse(VideoStreamResponse result) {
-                if(result.getStatus().equals(ImageStreamStatus.OKAY)) {
-                    VideoStreamClient streamClient = new VideoStreamClient(result.getAddress(), consumer);
+                if (result.getStatus().equals(ImageStreamStatus.OKAY)) {
+                    ImageStreamClient streamClient = new ImageStreamClient(result.getAddress(), consumer);
                     streamClient.start(client.getExecutor());
                     result.setStreamClient(streamClient);
                 }
@@ -409,48 +460,50 @@ public class XTablesClient {
              */
             @Override
             public VideoStreamResponse parseResponse(long startTime, String result) {
-                if(Utilities.contains(ImageStreamStatus.class, result)) return new VideoStreamResponse(ImageStreamStatus.valueOf(result));
+                if (Utilities.contains(ImageStreamStatus.class, result))
+                    return new VideoStreamResponse(ImageStreamStatus.valueOf(result));
                 return new VideoStreamResponse(ImageStreamStatus.OKAY).setAddress(gson.fromJson(result, String.class));
             }
         };
     }
+
     public RequestAction<ResponseStatus> renameKey(String key, String newName) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         Utilities.validateName(newName, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + newName).parsed(), ResponseStatus.class);
     }
 
     public RequestAction<ResponseStatus> putBoolean(String key, Boolean value) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
 
     public <T> RequestAction<ResponseStatus> putArray(String key, List<T> value) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
 
     public RequestAction<ResponseStatus> putByteFrame(String key, byte[] value) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         String parsedValue = gson.toJson(new ByteFrame(value));
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
 
     public RequestAction<ResponseStatus> putInteger(String key, Integer value) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + value).parsed(), ResponseStatus.class);
     }
 
     public RequestAction<ResponseStatus> putObject(String key, Object value) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         String parsedValue = gson.toJson(value);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
 
     public RequestAction<ResponseStatus> delete(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.DELETE, key).parsed(), ResponseStatus.class);
     }
 
@@ -479,7 +532,7 @@ public class XTablesClient {
     }
 
     public RequestAction<String> getString(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class) {
             @Override
             public String formatResult(String result) {
@@ -488,13 +541,14 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<String> getImageStreamAddress(String name) {
         Utilities.validateName(name, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_VIDEO_STREAM, name).parsed(), String.class);
     }
-    
+
     public RequestAction<Boolean> getBoolean(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Boolean.class) {
             /**
              * Parses the response received from the server. Meant to be overridden in subclasses to parse the response based on specific needs.
@@ -549,7 +603,7 @@ public class XTablesClient {
     }
 
     public <T> RequestAction<T> getObject(String key, Class<T> type) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type) {
             @Override
             public String formatResult(String result) {
@@ -566,7 +620,7 @@ public class XTablesClient {
     }
 
     public RequestAction<Integer> getInteger(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Integer.class) {
             @Override
             public String formatResult(String result) {
@@ -584,7 +638,7 @@ public class XTablesClient {
     }
 
     public <T> RequestAction<ArrayList<T>> getArray(String key, Class<T> type) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type) {
             @Override
             public String formatResult(String result) {
@@ -607,7 +661,7 @@ public class XTablesClient {
     }
 
     public RequestAction<ArrayList<String>> getTables(String key) {
-        Utilities.validateKey(key);
+        Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_TABLES, key).parsed(), ArrayList.class);
     }
 

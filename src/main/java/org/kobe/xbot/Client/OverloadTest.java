@@ -18,17 +18,8 @@ public class OverloadTest {
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
         XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, false);
-        VideoStreamResponse response = client.registerImageStreamServer("oki2").complete();
-        if(response.getStatus().equals(ImageStreamStatus.OKAY)) {
-            VideoCapture camera = new VideoCapture(0);
-            Mat frame = new Mat();
-            while (true) {
-                if (camera.read(frame)) {
-                    byte[] byteArray = matToByteArray(frame);
-                    response.getStreamServer().updateFrame(byteArray);
-                }
-            }
-        }
+
+
     }
 
 

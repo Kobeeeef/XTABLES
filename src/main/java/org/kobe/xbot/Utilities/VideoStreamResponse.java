@@ -1,20 +1,20 @@
 package org.kobe.xbot.Utilities;
 
-import org.kobe.xbot.Client.VideoStreamClient;
-import org.kobe.xbot.Client.VideoStreamServer;
+import org.kobe.xbot.Client.ImageStreamClient;
+import org.kobe.xbot.Client.ImageStreamServer;
 
 public class VideoStreamResponse {
-    private VideoStreamServer streamServer;
-    private VideoStreamClient streamClient;
+    private ImageStreamServer streamServer;
+    private ImageStreamClient streamClient;
     private ImageStreamStatus status;
     private String address;
 
-    public VideoStreamResponse(VideoStreamServer streamServer, ImageStreamStatus status) {
+    public VideoStreamResponse(ImageStreamServer streamServer, ImageStreamStatus status) {
         this.streamServer = streamServer;
         this.status = status;
     }
 
-    public VideoStreamResponse(VideoStreamClient streamClient, ImageStreamStatus status) {
+    public VideoStreamResponse(ImageStreamClient streamClient, ImageStreamStatus status) {
         this.streamClient = streamClient;
         this.status = status;
     }
@@ -31,20 +31,20 @@ public class VideoStreamResponse {
         return this;
     }
 
-    public VideoStreamServer getStreamServer() {
+    public ImageStreamServer getStreamServer() {
         return streamServer;
     }
 
-    public VideoStreamClient getStreamClient() {
+    public ImageStreamClient getStreamClient() {
         return streamClient;
     }
 
-    public VideoStreamResponse setStreamClient(VideoStreamClient streamClient) {
+    public VideoStreamResponse setStreamClient(ImageStreamClient streamClient) {
         this.streamClient = streamClient;
         return this;
     }
 
-    public void setStreamServer(VideoStreamServer streamServer) {
+    public void setStreamServer(ImageStreamServer streamServer) {
         this.streamServer = streamServer;
     }
 
