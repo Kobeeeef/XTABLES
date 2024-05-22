@@ -245,23 +245,6 @@ client.registerImageStreamClient("camera1", (Mat frame) -> {
 }).complete();
 ```
 
-### Method Details
-
-#### Client A: `registerImageStreamServer(String name)`
-
-- **Description**: Registers a video stream with the server using the given name. Starts a local server to serve the video stream.
-- **Parameters**:
-  - `name`: The unique name chosen by the client for the video stream.
-- **Returns**: A `VideoStreamResponse` indicating the success or failure of the registration.
-
-#### Client B: `registerImageStreamClient(String name, Consumer<Mat> consumer)`
-
-- **Description**: Queries the server for the given stream name and connects to the provided IP and endpoint to receive the video stream.
-- **Parameters**:
-  - `name`: The name of the video stream to query.
-  - `consumer`: A consumer function that processes each received frame.
-- **Returns**: A `VideoStreamResponse` indicating the success or failure of the connection.
-
 ### Summary
 
 This implementation provides a hybrid P2P video streaming system where:
