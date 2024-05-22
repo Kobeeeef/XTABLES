@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -234,7 +235,8 @@ public class XTables {
                             Optional<ClientHandler> optional = clients.stream().filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name)).findFirst();
                             ResponseInfo responseInfo;
                             responseInfo = optional.map(clientHandler -> {
-                                        String clientAddress = clientHandler.clientSocket.getLocalAddress().getHostAddress();
+                                        String clientAddress = clientHandler.clientSocket.getInetAddress().getHostAddress();
+                                        System.out.println(clientAddress);
                                         try {
                                             return new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIpAddress() : clientAddress.replaceFirst("/", ""), name)));
                                         } catch (SocketException e) {
