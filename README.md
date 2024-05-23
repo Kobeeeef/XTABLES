@@ -288,7 +288,7 @@ This setup ensures efficient video streaming with reduced latency and minimal se
 
 #### Simple Demo
 <video width="620" height="280">
-  <source src="https://github.com/Kobeeeef/XBOT_TESTING/blob/XTABLES/HybridP2PDemo.mp4" type="video/mp4">
+  <source src="https://github.com/Kobeeeef/XBOT_TESTING/raw/XTABLES/HybridP2PDemo.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
