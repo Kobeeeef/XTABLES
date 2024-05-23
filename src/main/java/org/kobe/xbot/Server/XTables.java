@@ -47,7 +47,8 @@ public class XTables {
         if (instance.get() == null) {
             if (PORT == 5353)
                 throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
-
+            if (SERVICE_NAME.equalsIgnoreCase("localhost"))
+                throw new IllegalArgumentException("The mDNS service name cannot be localhost!");
             Thread main = new Thread(() -> {
                 new XTables(SERVICE_NAME, PORT);
             });

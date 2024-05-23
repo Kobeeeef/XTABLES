@@ -58,6 +58,7 @@ public class XTablesClient {
                 @Override
                 public void serviceAdded(ServiceEvent event) {
                     logger.info("Service found: " + event.getName());
+                    jmdns.requestServiceInfo(event.getType(), event.getName());
                 }
 
                 @Override
