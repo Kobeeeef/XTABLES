@@ -2,6 +2,7 @@
 
 `XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing, retrieving, and managing data updates in various formats. This document details the methods available in the `XTablesClient` class, including their usage and new enhancements related to caching and error handling.
 
+
 ## mDNS Integration
 
 ### Overview
@@ -15,6 +16,17 @@ The latest version of `XTablesClient` introduces support for mDNS (Multicast DNS
 
 This approach is particularly useful in dynamic or large-scale network environments where hardcoding server addresses is impractical.
 
+### Important Note on IPv6 Compatibility
+
+Some operating systems prefer IPv6, which might not be fully supported by the mDNS implementation used in `XTablesClient`. If you encounter issues related to `java.net.SocketException: Invalid argument: no further information`, it is likely due to the system preferring IPv6.
+
+To resolve this issue, you must set the JVM option to prefer the IPv4 stack. Add the following option when starting your Java application:
+
+```sh
+-Djava.net.preferIPv4Stack=true
+```
+
+This setting forces the JVM to use the IPv4 stack, which should resolve the socket exception issue. Make sure to include this option in your command line or IDE configuration when running the application.
 ## Constructor
 
 - **XTablesClient(String name, int MAX_THREADS, boolean useCache)**
