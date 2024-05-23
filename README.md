@@ -264,7 +264,7 @@ Client A captures video using OpenCV and streams it to a local server. It regist
 **Note:** The server is started on port `4888` locally.
 
 ```java
-XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, false);
+XTablesClient client = new XTablesClient("XTablesService", 5, false);
 VideoStreamResponse response = client.registerImageStreamServer("camera1").complete();
 if(response.getStatus().equals(ImageStreamStatus.OKAY)){
     VideoCapture camera = new VideoCapture(0);
@@ -282,7 +282,7 @@ Client B queries the server for the stream name and connects directly to Client 
 **Note:** Each stream client uses a worker thread so you must increase `MAX_THREADS` argument to accommodate for this.
 
 ```java
-XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, false);
+XTablesClient client = new XTablesClient("XTablesService", 5, false);
 client.registerImageStreamClient("camera1", (Mat frame) -> {
     opencv_highgui.imshow("Received Stream", frame);
     opencv_highgui.waitKey(1);
@@ -313,7 +313,7 @@ The latest version of `XTablesClient` introduces custom logging capabilities, al
 # Full Usage Examples
 
 ```java
-XTablesClient client = new XTablesClient("localhost", 1735, 10, true);
+XTablesClient client = new XTablesClient("XTablesService", 10, true);
 // Initialize cache and handle updates
 client.subscribeUpdateEvent("session_id", Integer.class, kv -> {
     System.out.println("Update received for session_id: " + kv.getValue());

@@ -98,7 +98,7 @@ public class XTables {
     private void startServer() {
         try {
             try {
-                InetAddress addr = InetAddress.getLocalHost();
+                InetAddress addr = Inet4Address.getLocalHost();
                 logger.info("Initializing mDNS with address: " + addr.getHostAddress());
                 // Create JmDNS instance and bind it to the specific network interface
                 jmdns = JmDNS.create(addr);

@@ -12,7 +12,9 @@ import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,6 +42,10 @@ public class XTablesClient {
         initializeClient(SERVER_ADDRESS, SERVER_PORT, MAX_THREADS, useCache);
     }
 
+    public XTablesClient(int MAX_THREADS, boolean useCache) {
+        this("XTablesService", MAX_THREADS, useCache);
+    }
+
     public XTablesClient(String name, int MAX_THREADS, boolean useCache) {
         try {
             InetAddress addr = InetAddress.getLocalHost();
@@ -51,7 +57,7 @@ public class XTablesClient {
             jmdns.addServiceListener("_xtables._tcp.local.", new ServiceListener() {
                 @Override
                 public void serviceAdded(ServiceEvent event) {
-                    logger.info("Service added: " + event.getName());
+                    logger.info("Service found: " + event.getName());
                 }
 
                 @Override
@@ -62,8 +68,19 @@ public class XTablesClient {
                 @Override
                 public void serviceResolved(ServiceEvent event) {
                     ServiceInfo serviceInfo = event.getInfo();
-                    if (!serviceFound[0] && serviceInfo.getPort() == 5353 && serviceInfo.getName().equals(name)) {
-                        String serviceAddress = serviceInfo.getInetAddresses()[0].getHostAddress();
+                    String serviceAddress = serviceInfo.getInetAddresses()[0].getHostAddress();
+                    String localAddress = null;
+                    try {
+                        if (name.equalsIgnoreCase("localhost")) {
+                            localAddress = Inet4Address.getLocalHost().getHostAddress();
+                            serviceAddress = localAddress;
+                        }
+                    } catch (UnknownHostException e) {
+                        logger.severe("Could not find localhost address: " + e.getMessage());
+                    }
+
+                    if (!serviceFound[0] && serviceInfo.getPort() == 5353 && (localAddress != null || serviceInfo.getName().equals(name) || serviceAddress.equals(name))) {
+
                         String description = serviceInfo.getNiceTextString();
                         int socketServerPort = -1;
                         try {
