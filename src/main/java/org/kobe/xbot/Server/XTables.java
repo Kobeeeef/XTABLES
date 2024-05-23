@@ -19,10 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -103,6 +100,7 @@ public class XTables {
             try {
                 InetAddress addr = InetAddress.getLocalHost();
                 logger.info("Initializing mDNS with address: " + addr.getHostAddress());
+                // Create JmDNS instance and bind it to the specific network interface
                 jmdns = JmDNS.create(addr);
 
                 // Register the service
@@ -110,6 +108,7 @@ public class XTables {
                 jmdns.registerService(serviceInfo);
                 logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
             } catch (IOException e) {
+                e.printStackTrace();
                 logger.severe("Error initializing mDNS: " + e.getMessage());
             }
 
@@ -150,8 +149,8 @@ public class XTables {
             table.delete("");
 
             if (jmdns != null) {
-                logger.info("Unregistering mDNS service: " + serviceInfo.getQualifiedName());
-                jmdns.unregisterService(serviceInfo);
+                logger.info("Unregistering all mDNS services: " + serviceInfo.getQualifiedName());
+                jmdns.unregisterAllServices();
                 jmdns.close();
                 logger.info("mDNS service unregistered and mDNS closed");
             }
