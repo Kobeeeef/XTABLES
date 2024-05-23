@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.kobe.xbot.Utilities.Utilities;
-import org.kobe.xbot.Utilities.XTablesLogger;
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import java.util.*;
 

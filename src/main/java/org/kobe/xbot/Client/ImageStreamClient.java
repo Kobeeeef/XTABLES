@@ -3,7 +3,7 @@ package org.kobe.xbot.Client;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
-import org.kobe.xbot.Utilities.XTablesLogger;
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

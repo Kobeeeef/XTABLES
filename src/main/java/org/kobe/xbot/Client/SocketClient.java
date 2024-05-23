@@ -2,6 +2,7 @@ package org.kobe.xbot.Client;
 
 import com.sun.jdi.connect.spi.ClosedConnectionException;
 import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import java.io.BufferedReader;
 import java.io.IOException;

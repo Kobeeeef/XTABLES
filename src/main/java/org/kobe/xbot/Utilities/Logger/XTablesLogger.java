@@ -1,4 +1,4 @@
-package org.kobe.xbot.Utilities;
+package org.kobe.xbot.Utilities.Logger;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

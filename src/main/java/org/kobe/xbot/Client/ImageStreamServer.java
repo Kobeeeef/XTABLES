@@ -3,7 +3,7 @@ package org.kobe.xbot.Client;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import org.kobe.xbot.Utilities.XTablesLogger;
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import java.io.IOException;
 import java.io.OutputStream;

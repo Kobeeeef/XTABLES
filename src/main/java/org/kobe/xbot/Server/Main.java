@@ -1,6 +1,6 @@
 package org.kobe.xbot.Server;
 
-import org.kobe.xbot.Utilities.XTablesLogger;
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 public class Main {
     private static final XTablesLogger logger = XTablesLogger.getLogger();

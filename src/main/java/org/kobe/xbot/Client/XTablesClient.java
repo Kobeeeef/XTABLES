@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -46,7 +47,7 @@ public class XTablesClient {
             CountDownLatch serviceLatch = new CountDownLatch(1);
             final boolean[] serviceFound = {false};
             final String[] serviceAddressIP = new String[1];
-            final int[] socketServiceServerPort = new int[1];
+            final Integer[] socketServiceServerPort = new Integer[1];
             jmdns.addServiceListener("_xtables._tcp.local.", new ServiceListener() {
                 @Override
                 public void serviceAdded(ServiceEvent event) {
@@ -88,9 +89,14 @@ public class XTablesClient {
             logger.info("Service latch released, proceeding to close mDNS services...");
             jmdns.close();
             logger.info("mDNS service successfully closed. Service discovery resolver shut down.");
-            initializeClient(serviceAddressIP[0], socketServiceServerPort[0], MAX_THREADS, useCache);
+            if (serviceAddressIP[0] == null || socketServiceServerPort[0] == null) {
+                throw new RuntimeException("The service address could not be found.");
+            } else {
+                initializeClient(serviceAddressIP[0], socketServiceServerPort[0], MAX_THREADS, useCache);
+            }
         } catch (IOException | InterruptedException e) {
             logger.severe("Service discovery error: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

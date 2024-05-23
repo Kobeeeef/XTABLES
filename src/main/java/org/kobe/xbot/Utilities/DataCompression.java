@@ -7,6 +7,8 @@
 
 package org.kobe.xbot.Utilities;
 
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
-import org.kobe.xbot.Utilities.XTablesLogger;
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import java.io.IOException;
 import java.lang.reflect.Type;

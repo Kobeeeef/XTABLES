@@ -11,6 +11,7 @@ package org.kobe.xbot.Server;
 
 import com.google.gson.Gson;
 import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
