@@ -6,7 +6,12 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilities.*;
 
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceInfo;
+import javax.jmdns.ServiceListener;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +23,7 @@ import java.util.function.Consumer;
 public class XTablesClient {
     private final XTablesLogger logger = XTablesLogger.getLogger();
 
-    private final SocketClient client;
+    private SocketClient client;
     private final Gson gson = new Gson();
     private XTablesData<String> cache;
     private long cacheFetchCooldown = 10000;
@@ -29,6 +34,62 @@ public class XTablesClient {
     public final List<Consumer<String>> delete_consumers = new ArrayList<>();
 
     public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
+        if (SERVER_PORT == 5353)
+            throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
+        initializeClient(SERVER_ADDRESS, SERVER_PORT, MAX_THREADS, useCache);
+    }
+
+    public XTablesClient(String name, int MAX_THREADS, boolean useCache) {
+        try {
+            InetAddress addr = InetAddress.getLocalHost();
+            JmDNS jmdns = JmDNS.create(addr);
+            CountDownLatch serviceLatch = new CountDownLatch(1);
+            final boolean[] serviceFound = {false};
+            jmdns.addServiceListener("_xtables._tcp.local.", new ServiceListener() {
+                @Override
+                public void serviceAdded(ServiceEvent event) {
+                    logger.info("Service added: " + event.getName());
+                }
+
+                @Override
+                public void serviceRemoved(ServiceEvent event) {
+                    logger.info("Service removed: " + event.getName());
+                }
+
+                @Override
+                public void serviceResolved(ServiceEvent event) {
+                    ServiceInfo serviceInfo = event.getInfo();
+                    if (!serviceFound[0] && serviceInfo.getPort() == 5353 && serviceInfo.getName().equals(name)) {
+                        String serviceAddress = serviceInfo.getInetAddresses()[0].getHostAddress();
+                        String description = serviceInfo.getNiceTextString();
+                        int socketServerPort = -1;
+                        try {
+                            socketServerPort = Utilities.extractPortFromDescription(description);
+                        } catch (IllegalArgumentException e) {
+                            logger.warning("No port found from mDNS description. Waiting for next resolve...");
+                        }
+                        if (socketServerPort != -1 && serviceAddress != null && !serviceAddress.trim().isEmpty()) {
+                            serviceFound[0] = true;
+
+                            logger.info("Service resolved: " + serviceInfo.getQualifiedName());
+                            logger.info("Address: " + serviceAddress + " Port: " + socketServerPort + " Description: " + description);
+                            serviceLatch.countDown();
+                            initializeClient(serviceAddress, socketServerPort, MAX_THREADS, useCache);
+                        }
+                    }
+                }
+            });
+
+            logger.info("Listening for services on port 5353...");
+            serviceLatch.await();
+            jmdns.close();
+            logger.info("Closed mDNS service discovery resolver.");
+        } catch (IOException | InterruptedException e) {
+            logger.severe("Service discovery error: " + e.getMessage());
+        }
+    }
+
+    private void initializeClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
         this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS, this);
         Thread thread = new Thread(() -> {
             client.connect();
@@ -149,6 +210,7 @@ public class XTablesClient {
         }
         return all;
     }
+
     public boolean resubscribeToDeleteEvents() {
         return !delete_consumers.isEmpty();
     }
@@ -230,6 +292,7 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<ResponseStatus> subscribeDeleteEvent(Consumer<String> consumer) {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.SUBSCRIBE_DELETE).parsed(), ResponseStatus.class) {
             @Override
@@ -242,6 +305,7 @@ public class XTablesClient {
 
         };
     }
+
     public RequestAction<ResponseStatus> unsubscribeDeleteEvent(Consumer<String> consumer) {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.UNSUBSCRIBE_DELETE).parsed(), ResponseStatus.class) {
             @Override
@@ -264,6 +328,7 @@ public class XTablesClient {
             }
         };
     }
+
     public record UpdateConsumer<T>(Class<T> type, Consumer<? super SocketClient.KeyValuePair<T>> consumer) {
     }
 

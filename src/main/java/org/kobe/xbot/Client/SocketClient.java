@@ -50,9 +50,9 @@ public class SocketClient {
     private Consumer<String> deleteConsumer;
     private final XTablesClient xTablesClient;
 
-    public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS, int MAX_THREADS, XTablesClient xTablesClient) {
+    public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS, int MAX_THREADS_ARG, XTablesClient xTablesClient) {
         this.socket = null;
-        this.MAX_THREADS = Math.max(MAX_THREADS, 1);
+        this.MAX_THREADS = Math.max(MAX_THREADS_ARG, 1);
         this.SERVER_ADDRESS = SERVER_ADDRESS;
         this.SERVER_PORT = SERVER_PORT;
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;

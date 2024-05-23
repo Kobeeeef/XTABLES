@@ -12,6 +12,8 @@ package org.kobe.xbot.Server;
 import com.google.gson.Gson;
 import org.kobe.xbot.Utilities.*;
 
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceInfo;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,9 +29,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class XTables {
+    private final String SERVICE_NAME;
+    private static final int SERVICE_PORT = 5353;
     private static final AtomicReference<XTables> instance = new AtomicReference<>();
     private static final Gson gson = new Gson();
     private static final XTablesLogger logger = XTablesLogger.getLogger();
+    private JmDNS jmdns;
+    private ServiceInfo serviceInfo;
     private final Set<ClientHandler> clients = new HashSet<>();
     private final XTablesData<String> table = new XTablesData<>();
     private ServerSocket serverSocket;
@@ -39,10 +45,13 @@ public class XTables {
     private static Thread mainThread;
     private static final CountDownLatch latch = new CountDownLatch(1);
 
-    public static XTables startInstance(int PORT) {
+    public static XTables startInstance(String SERVICE_NAME, int PORT) {
         if (instance.get() == null) {
+            if (PORT == 5353)
+                throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
+
             Thread main = new Thread(() -> {
-                new XTables(PORT);
+                new XTables(SERVICE_NAME, PORT);
             });
             main.setName("XTABLES-MAIN-SERVER");
             main.setDaemon(false);
@@ -80,8 +89,9 @@ public class XTables {
         scripts.remove(name);
     }
 
-    private XTables(int PORT) {
+    private XTables(String SERVICE_NAME, int PORT) {
         this.port = PORT;
+        this.SERVICE_NAME = SERVICE_NAME;
         this.clientThreadPool = Executors.newCachedThreadPool();
         instance.set(this);
         startServer();
@@ -89,6 +99,20 @@ public class XTables {
 
     private void startServer() {
         try {
+            try {
+                InetAddress addr = InetAddress.getLocalHost();
+                logger.info("Initializing mDNS with address: " + addr.getHostAddress());
+                jmdns = JmDNS.create(addr);
+
+                // Register the service
+                serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, "XTables Server; Port=" + port);
+                jmdns.registerService(serviceInfo);
+                logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
+            } catch (IOException e) {
+                logger.severe("Error initializing mDNS: " + e.getMessage());
+            }
+
+
             serverSocket = new ServerSocket(port);
             logger.info("Server started. Listening on " + serverSocket.getLocalSocketAddress() + "...");
             latch.countDown();
@@ -123,6 +147,13 @@ public class XTables {
                 serverSocket.close();
             }
             table.delete("");
+
+            if (jmdns != null) {
+                logger.info("Unregistering mDNS service: " + serviceInfo.getQualifiedName());
+                jmdns.unregisterService(serviceInfo);
+                jmdns.close();
+                logger.info("mDNS service unregistered and mDNS closed");
+            }
         } catch (IOException e) {
             logger.severe("Error occurred during server stop: " + e.getMessage());
         }
@@ -236,7 +267,6 @@ public class XTables {
                             ResponseInfo responseInfo;
                             responseInfo = optional.map(clientHandler -> {
                                         String clientAddress = clientHandler.clientSocket.getInetAddress().getHostAddress();
-                                        System.out.println(clientAddress);
                                         try {
                                             return new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIpAddress() : clientAddress.replaceFirst("/", ""), name)));
                                         } catch (SocketException e) {
