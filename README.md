@@ -287,8 +287,8 @@ This implementation provides a hybrid P2P video streaming system where:
 This setup ensures efficient video streaming with reduced latency and minimal server load by leveraging direct client-to-client connections for video data transfer.
 
 #### Simple Demo
-<video width="620" height="280">
-  <source src="https://github.com/Kobeeeef/XBOT_TESTING/raw/XTABLES/HybridP2PDemo.mp4" type="video/mp4">
+<video width="620" height="280" controls>
+  <source src="https://drive.google.com/uc?export=download&id=1RYW3cDBy0JnrXNKGSnyU1OnVkRvv2VyA" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
