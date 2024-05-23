@@ -3,10 +3,38 @@
 
 `XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing, retrieving, and managing data updates in various formats. This document details the methods available in the `XTablesClient` class, including their usage and new enhancements related to caching and error handling.
 
+## mDNS Integration
+
+### Overview
+
+The latest version of `XTablesClient` introduces support for mDNS (Multicast DNS) to facilitate automatic service discovery. This allows the client to locate and connect to the server using a service name, simplifying network configuration and connection management.
+
+### How It Works
+
+- **Server Side**: The server registers its service with mDNS, broadcasting its presence on the network with a specified name and port.
+- **Client Side**: The client uses mDNS to discover the server by its service name, extracting the necessary connection details (such as IP address and port) to establish a connection.
+
+This approach is particularly useful in dynamic or large-scale network environments where hardcoding server addresses is impractical.
+
 ## Constructor
+- **XTablesClient(String name, int MAX_THREADS, boolean useCache)**
+  - Initializes the client using mDNS service discovery to find the server by name and connect to it.
+  - `name`: The service name to look for during mDNS discovery.
+  - `MAX_THREADS`: Maximum number of threads for the worker client.
+  - `useCache`: Whether to enable caching.
 
 - **XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache)**
   - Initializes the client with server connection and optional caching.
+
+### Example Usage
+
+```java
+// Initialize the client with direct server address
+XTablesClient client1 = new XTablesClient("127.0.0.1", 1735, 10, true);
+
+// Initialize the client using mDNS service discovery
+XTablesClient client2 = new XTablesClient("XTablesService", 10, true);
+```
 
 ## Connection Management
 
