@@ -101,17 +101,20 @@ public class XTables {
             try {
                 InetAddress addr = InetAddress.getLocalHost();
                 logger.info("Initializing mDNS with address: " + addr.getHostAddress());
-                // Create JmDNS instance and bind it to the specific network interface
                 jmdns = JmDNS.create(addr);
 
-                // Register the service
-                serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, "XTables Server; Port=" + port);
+                // Create the service with additional attributes
+                Map<String, String> props = new HashMap<>();
+                props.put("port", String.valueOf(port));
+                ServiceInfo serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
                 jmdns.registerService(serviceInfo);
+
                 logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
             } catch (IOException e) {
-                e.printStackTrace();
                 logger.severe("Error initializing mDNS: " + e.getMessage());
+                e.printStackTrace();
             }
+
 
 
             serverSocket = new ServerSocket(port);

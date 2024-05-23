@@ -12,9 +12,7 @@ import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,68 +47,61 @@ public class XTablesClient {
     public XTablesClient(String name, int MAX_THREADS, boolean useCache) {
         try {
             InetAddress addr = InetAddress.getLocalHost();
-            JmDNS jmdns = JmDNS.create(addr);
-            CountDownLatch serviceLatch = new CountDownLatch(1);
-            final boolean[] serviceFound = {false};
-            final String[] serviceAddressIP = new String[1];
-            final Integer[] socketServiceServerPort = new Integer[1];
-            jmdns.addServiceListener("_xtables._tcp.local.", new ServiceListener() {
-                @Override
-                public void serviceAdded(ServiceEvent event) {
-                    logger.info("Service found: " + event.getName());
-                    jmdns.requestServiceInfo(event.getType(), event.getName());
-                }
+            try (JmDNS jmdns = JmDNS.create(addr)) {
+                CountDownLatch serviceLatch = new CountDownLatch(1);
+                final boolean[] serviceFound = {false};
+                final String[] serviceAddressIP = new String[1];
+                final Integer[] socketServiceServerPort = new Integer[1];
 
-                @Override
-                public void serviceRemoved(ServiceEvent event) {
-                    logger.info("Service removed: " + event.getName());
-                }
-
-                @Override
-                public void serviceResolved(ServiceEvent event) {
-                    ServiceInfo serviceInfo = event.getInfo();
-                    String serviceAddress = serviceInfo.getInetAddresses()[0].getHostAddress();
-                    String localAddress = null;
-                    try {
-                        if (name.equalsIgnoreCase("localhost")) {
-                            localAddress = Inet4Address.getLocalHost().getHostAddress();
-                            serviceAddress = localAddress;
-                        }
-                    } catch (UnknownHostException e) {
-                        logger.severe("Could not find localhost address: " + e.getMessage());
+                jmdns.addServiceListener("_xtables._tcp.local.", new ServiceListener() {
+                    @Override
+                    public void serviceAdded(ServiceEvent event) {
+                        logger.info("Service found: " + event.getName());
+                        jmdns.requestServiceInfo(event.getType(), event.getName());
                     }
 
-                    if (!serviceFound[0] && serviceInfo.getPort() == 5353 && (localAddress != null || serviceInfo.getName().equals(name) || serviceAddress.equals(name))) {
+                    @Override
+                    public void serviceRemoved(ServiceEvent event) {
+                        logger.info("Service removed: " + event.getName());
+                    }
 
-                        String description = serviceInfo.getNiceTextString();
-                        int socketServerPort = -1;
-                        try {
-                            socketServerPort = Utilities.extractPortFromDescription(description);
-                        } catch (IllegalArgumentException e) {
-                            logger.warning("No port found from mDNS description. Waiting for next resolve...");
-                        }
-                        if (socketServerPort != -1 && serviceAddress != null && !serviceAddress.trim().isEmpty()) {
-                            serviceFound[0] = true;
-
-                            logger.info("Service resolved: " + serviceInfo.getQualifiedName());
-                            logger.info("Address: " + serviceAddress + " Port: " + socketServerPort);
-                            serviceAddressIP[0] = serviceAddress;
-                            socketServiceServerPort[0] = socketServerPort;
-                            serviceLatch.countDown();
+                    @Override
+                    public void serviceResolved(ServiceEvent event) {
+                        synchronized (serviceFound) {
+                            if (!serviceFound[0]) {
+                                ServiceInfo serviceInfo = event.getInfo();
+                                String serviceAddress = serviceInfo.getInetAddresses()[0].getHostAddress();
+                                int socketServerPort = -1;
+                                String portStr = serviceInfo.getPropertyString("port");
+                                try {
+                                    socketServerPort = Integer.parseInt(portStr);
+                                } catch (NumberFormatException e) {
+                                    logger.warning("Invalid port format from mDNS description. Waiting for next resolve...");
+                                }
+                                if (socketServerPort != -1 && serviceAddress != null && !serviceAddress.trim().isEmpty()) {
+                                    serviceFound[0] = true;
+                                    logger.info("Service resolved: " + serviceInfo.getQualifiedName());
+                                    logger.info("Address: " + serviceAddress + " Port: " + socketServerPort);
+                                    serviceAddressIP[0] = serviceAddress;
+                                    socketServiceServerPort[0] = socketServerPort;
+                                    serviceLatch.countDown();
+                                }
+                            }
                         }
                     }
-                }
-            });
+                });
 
-            logger.info("Listening for services on port 5353...");
-            serviceLatch.await();
-            logger.info("Service latch released, proceeding to close mDNS services...");
-            jmdns.close();
-            logger.info("mDNS service successfully closed. Service discovery resolver shut down.");
-            if (serviceAddressIP[0] == null || socketServiceServerPort[0] == null) {
-                throw new RuntimeException("The service address could not be found.");
-            } else {
-                initializeClient(serviceAddressIP[0], socketServiceServerPort[0], MAX_THREADS, useCache);
+                logger.info("Listening for services on port 5353...");
+                serviceLatch.await();
+                logger.info("Service latch released, proceeding to close mDNS services...");
+                jmdns.close();
+                logger.info("mDNS service successfully closed. Service discovery resolver shut down.");
+
+                if (serviceAddressIP[0] == null || socketServiceServerPort[0] == null) {
+                    throw new RuntimeException("The service address or port could not be found.");
+                } else {
+                    initializeClient(serviceAddressIP[0], socketServiceServerPort[0], MAX_THREADS, useCache);
+                }
             }
         } catch (IOException | InterruptedException e) {
             logger.severe("Service discovery error: " + e.getMessage());
