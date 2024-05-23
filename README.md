@@ -249,6 +249,8 @@ This section describes the implementation and usage of a hybrid peer-to-peer (P2
 
 Client A captures video using OpenCV and streams it to a local server. It registers the stream with the central server, providing a unique name chosen by the client.
 
+**Note:** The server is started on port `4888` locally.
+
 ```java
 XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, false);
 VideoStreamResponse response = client.registerImageStreamServer("camera1").complete();
@@ -264,6 +266,8 @@ if (response.getStatus().equals(ImageStreamStatus.OKAY)) {
 ### Client B
 
 Client B queries the server for the stream name and connects directly to Client A to receive and display the video stream. The consumer is called for each received frame.
+
+**Note:** Each stream client uses a worker thread so you must increase `MAX_THREADS` argument to accommodate for this.
 
 ```java
 XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 5, false);
