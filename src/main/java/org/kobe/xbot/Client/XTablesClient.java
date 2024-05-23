@@ -45,6 +45,8 @@ public class XTablesClient {
             JmDNS jmdns = JmDNS.create(addr);
             CountDownLatch serviceLatch = new CountDownLatch(1);
             final boolean[] serviceFound = {false};
+            final String[] serviceAddressIP = new String[1];
+            final int[] socketServiceServerPort = new int[1];
             jmdns.addServiceListener("_xtables._tcp.local.", new ServiceListener() {
                 @Override
                 public void serviceAdded(ServiceEvent event) {
@@ -72,9 +74,10 @@ public class XTablesClient {
                             serviceFound[0] = true;
 
                             logger.info("Service resolved: " + serviceInfo.getQualifiedName());
-                            logger.info("Address: " + serviceAddress + " Port: " + socketServerPort + " Description: " + description);
+                            logger.info("Address: " + serviceAddress + " Port: " + socketServerPort);
+                            serviceAddressIP[0] = serviceAddress;
+                            socketServiceServerPort[0] = socketServerPort;
                             serviceLatch.countDown();
-                            initializeClient(serviceAddress, socketServerPort, MAX_THREADS, useCache);
                         }
                     }
                 }
@@ -82,8 +85,10 @@ public class XTablesClient {
 
             logger.info("Listening for services on port 5353...");
             serviceLatch.await();
+            logger.info("Service latch released, proceeding to close mDNS services...");
             jmdns.close();
-            logger.info("Closed mDNS service discovery resolver.");
+            logger.info("mDNS service successfully closed. Service discovery resolver shut down.");
+            initializeClient(serviceAddressIP[0], socketServiceServerPort[0], MAX_THREADS, useCache);
         } catch (IOException | InterruptedException e) {
             logger.severe("Service discovery error: " + e.getMessage());
         }
