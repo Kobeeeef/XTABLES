@@ -11,8 +11,13 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -76,7 +81,7 @@ public class XTablesClient {
                                 try {
                                     socketServerPort = Integer.parseInt(portStr);
                                 } catch (NumberFormatException e) {
-                                    logger.warning("Invalid port format from mDNS description. Waiting for next resolve...");
+                                    logger.warning("Invalid port format from mDNS attribute. Waiting for next resolve...");
                                 }
                                 if (socketServerPort != -1 && serviceAddress != null && !serviceAddress.trim().isEmpty()) {
                                     serviceFound[0] = true;
@@ -460,7 +465,49 @@ public class XTablesClient {
             }
         };
     }
+    public RequestAction<File> saveBackup(String directory, String inputFilename) {
+        Utilities.validateName(inputFilename, true);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_RAW_JSON).parsed(), null) {
 
+            /**
+             * Parses the response received from the server.
+             * Meant to be overridden in subclasses to parse the response based on specific needs.
+             * <p>
+             * Order of execution: 3 (Called when a response is received)
+             *
+             * @param startTime The start time of the request, used for calculating latency.
+             * @param result    The raw result from the server.
+             * @return The parsed response as type T.
+             */
+            @Override
+            public File parseResponse(long startTime, String result) {
+                String response = DataCompression.decompressAndConvertBase64(result);
+                Path path = Paths.get(directory);
+                if (!Files.exists(path)) {
+                    try {
+                        Files.createDirectories(path);
+                    } catch (IOException e) {
+                        logger.severe("There was a exception while creating the directory: " + e.getMessage());
+                    }
+                }
+                String filename = inputFilename.contains(".")
+                        ? inputFilename.substring(0, inputFilename.lastIndexOf('.')) + ".json"
+                        : inputFilename + ".json";
+                String filePath = directory + "/" + filename;
+
+                try (FileWriter file = new FileWriter(filePath)) {
+                    file.write(response);
+                    logger.info("Successfully saved JSON content to " + filePath);
+                    return new File(filePath);
+                } catch (IOException e) {
+                    throw new BackupException(e);
+                }
+
+            }
+
+
+        };
+    }
     public RequestAction<ResponseStatus> putString(String key, String value) {
         Utilities.validateKey(key, true);
         String parsedValue = gson.toJson(value);
