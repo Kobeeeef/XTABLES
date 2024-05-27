@@ -62,6 +62,12 @@ public class XTables {
                 Thread.currentThread().interrupt();
             }
             mainThread = main;
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                logger.info("Shutdown hook triggered. Stopping server...");
+                instance.get().stopServer();
+                logger.info("Server stopped gracefully.");
+            }));
+
         }
         return instance.get();
     }
@@ -106,7 +112,7 @@ public class XTables {
                 // Create the service with additional attributes
                 Map<String, String> props = new HashMap<>();
                 props.put("port", String.valueOf(port));
-                ServiceInfo serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
+                serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
                 jmdns.registerService(serviceInfo);
 
                 logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
@@ -128,7 +134,7 @@ public class XTables {
                 clientThreadPool.execute(clientHandler);
             }
         } catch (IOException e) {
-            logger.severe("Error occurred: " + e.getMessage());
+            logger.severe("Socket error occurred: " + e.getMessage());
             if (!serverSocket.isClosed()) {
                 try {
                     serverSocket.close();
@@ -152,9 +158,9 @@ public class XTables {
             }
             table.delete("");
 
-            if (jmdns != null) {
-                logger.info("Unregistering all mDNS services: " + serviceInfo.getQualifiedName());
-                jmdns.unregisterAllServices();
+            if (jmdns != null && serviceInfo != null) {
+                logger.info("Unregistering mDNS service: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT + "...");
+                jmdns.unregisterService(serviceInfo);
                 jmdns.close();
                 logger.info("mDNS service unregistered and mDNS closed");
             }

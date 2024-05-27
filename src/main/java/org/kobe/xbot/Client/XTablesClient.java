@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,30 +26,60 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
+/**
+ * Handles client-side interactions with the XTables server.
+ * This class provides various constructors to connect to the XTables server using different configurations:
+ * direct connection with specified address and port, or service discovery via mDNS with optional settings.
+ * <p>
+ * The XTablesClient class supports operations like caching, subscribing to updates and delete events,
+ * running scripts, managing key-value pairs, and handling video streams.
+ * It utilizes Gson for JSON parsing and integrates with a custom SocketClient for network communication.
+ * <p>
+ * Author: Kobe
+ */
+
 
 public class XTablesClient {
-    private final XTablesLogger logger = XTablesLogger.getLogger();
 
-    private SocketClient client;
-    private final Gson gson = new Gson();
-    private XTablesData<String> cache;
-    private long cacheFetchCooldown = 10000;
-    private boolean isCacheReady = false;
-    private final CountDownLatch latch = new CountDownLatch(1);
-    private Thread cacheThread;
-    public final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
-    public final List<Consumer<String>> delete_consumers = new ArrayList<>();
-
+    /**
+     * Connects to the XTables instance using the specified server address and port with direct connection settings.
+     *
+     * @param SERVER_ADDRESS the address of the server to connect to.
+     * @param SERVER_PORT    the port of the server to connect to.
+     * @param MAX_THREADS    the maximum number of threads to use for client operations.
+     * @param useCache       flag indicating whether to use caching.
+     * @throws IllegalArgumentException if the server port is 5353, which is reserved for mDNS services.
+     */
     public XTablesClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
         if (SERVER_PORT == 5353)
             throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
         initializeClient(SERVER_ADDRESS, SERVER_PORT, MAX_THREADS, useCache);
     }
 
-    public XTablesClient(int MAX_THREADS, boolean useCache) {
-        this("XTablesService", MAX_THREADS, useCache);
+    /**
+     * Connects to the first instance of XTables found with default settings (mDNS).
+     */
+    public XTablesClient() {
+        this(null, 5, false);
     }
 
+    /**
+     * Connects to the first instance of XTables found with the specified settings (mDNS).
+     *
+     * @param MAX_THREADS the maximum number of threads to use for client operations.
+     * @param useCache    flag indicating whether to use caching.
+     */
+    public XTablesClient(int MAX_THREADS, boolean useCache) {
+        this(null, MAX_THREADS, useCache);
+    }
+
+    /**
+     * Connects to the XTables instance with the specified mDNS service name and settings.
+     *
+     * @param name        the mDNS service name of the XTables instance to connect to.
+     * @param MAX_THREADS the maximum number of threads to use for client operations.
+     * @param useCache    flag indicating whether to use caching.
+     */
     public XTablesClient(String name, int MAX_THREADS, boolean useCache) {
         try {
             InetAddress addr = InetAddress.getLocalHost();
@@ -83,7 +114,17 @@ public class XTablesClient {
                                 } catch (NumberFormatException e) {
                                     logger.warning("Invalid port format from mDNS attribute. Waiting for next resolve...");
                                 }
-                                if (socketServerPort != -1 && serviceAddress != null && !serviceAddress.trim().isEmpty()) {
+
+                                String localAddress = null;
+                                if (name != null && name.equalsIgnoreCase("localhost")) {
+                                    try {
+                                        localAddress = InetAddress.getLocalHost().getHostAddress();
+                                        serviceAddress = localAddress;
+                                    } catch (UnknownHostException e) {
+                                        logger.severe("Could not find localhost address: " + e.getMessage());
+                                    }
+                                }
+                                if (socketServerPort != -1 && serviceAddress != null && !serviceAddress.trim().isEmpty() && (localAddress != null || serviceInfo.getName().equals(name) || serviceAddress.equals(name) || name == null)) {
                                     serviceFound[0] = true;
                                     logger.info("Service resolved: " + serviceInfo.getQualifiedName());
                                     logger.info("Address: " + serviceAddress + " Port: " + socketServerPort);
@@ -113,6 +154,22 @@ public class XTablesClient {
             throw new RuntimeException(e);
         }
     }
+
+
+    // ---------------------------------------------------------------
+    // ---------------- Methods and Fields ---------------------------
+    // ---------------------------------------------------------------
+
+    private final XTablesLogger logger = XTablesLogger.getLogger();
+    private SocketClient client;
+    private final Gson gson = new Gson();
+    private XTablesData<String> cache;
+    private long cacheFetchCooldown = 10000;
+    private boolean isCacheReady = false;
+    private final CountDownLatch latch = new CountDownLatch(1);
+    private Thread cacheThread;
+    public final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
+    public final List<Consumer<String>> delete_consumers = new ArrayList<>();
 
     private void initializeClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
         this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 1000, MAX_THREADS, this);
@@ -465,6 +522,7 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<File> saveBackup(String directory, String inputFilename) {
         Utilities.validateName(inputFilename, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET_RAW_JSON).parsed(), null) {
@@ -508,6 +566,7 @@ public class XTablesClient {
 
         };
     }
+
     public RequestAction<ResponseStatus> putString(String key, String value) {
         Utilities.validateKey(key, true);
         String parsedValue = gson.toJson(value);

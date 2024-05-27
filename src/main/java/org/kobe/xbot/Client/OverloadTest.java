@@ -9,7 +9,8 @@ public class OverloadTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient("XTablesService", 5, false);
+        XTablesClient client = new XTablesClient();
+
 
 
 
