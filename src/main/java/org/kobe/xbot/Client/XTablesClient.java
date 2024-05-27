@@ -58,27 +58,39 @@ public class XTablesClient {
 
     /**
      * Connects to the first instance of XTables found with default settings (mDNS).
+     * This constructor utilizes mDNS (Multicast DNS) to discover the first available XTables instance on the network.
+     * The default settings include using a maximum of 5 threads for client operations and disabling caching.
+     * It is designed for quick and simple client initialization without needing to specify server details manually.
      */
     public XTablesClient() {
         this(null, 5, false);
     }
 
+
     /**
      * Connects to the first instance of XTables found with the specified settings (mDNS).
+     * This constructor utilizes mDNS (Multicast DNS) to discover the first available XTables instance on the network.
+     * It allows for customized client configuration by specifying the maximum number of threads for client operations
+     * and whether to enable caching. This is useful for scenarios where you want to use custom settings but do not
+     * want to manually specify the server details.
      *
-     * @param MAX_THREADS the maximum number of threads to use for client operations.
-     * @param useCache    flag indicating whether to use caching.
+     * @param MAX_THREADS the maximum number of threads to use for client operations, ensuring efficient handling of multiple requests.
+     * @param useCache    flag indicating whether to use client-side caching for faster data retrieval and reduced server load.
      */
     public XTablesClient(int MAX_THREADS, boolean useCache) {
         this(null, MAX_THREADS, useCache);
     }
 
+
     /**
      * Connects to the XTables instance with the specified mDNS service name and settings.
+     * This constructor uses mDNS (Multicast DNS) to discover the XTables instance on the network
+     * that matches the provided service name. It allows for customized client configuration
+     * by specifying the maximum number of threads for client operations and whether to enable caching.
      *
-     * @param name        the mDNS service name of the XTables instance to connect to.
-     * @param MAX_THREADS the maximum number of threads to use for client operations.
-     * @param useCache    flag indicating whether to use caching.
+     * @param name        the mDNS service name of the XTables instance to connect to. If null, connects to the first found instance.
+     * @param MAX_THREADS the maximum number of threads to use for client operations, ensuring efficient handling of multiple requests.
+     * @param useCache    flag indicating whether to use client-side caching for faster data retrieval and reduced server load.
      */
     public XTablesClient(String name, int MAX_THREADS, boolean useCache) {
         try {
