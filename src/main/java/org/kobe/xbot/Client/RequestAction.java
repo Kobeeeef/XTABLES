@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * and managing errors during communication. It supports both queued (asynchronous)
  * and complete (synchronous) operations.
  * <p>
- * Author: Kobe
+ * @author Kobe
  */
 public class RequestAction<T> {
     private static long defaultCompleteTimeout = 5000;

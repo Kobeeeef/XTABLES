@@ -1,9 +1,11 @@
-/*
+/**
+ *
  * XTables class manages a server that allows clients to interact with a key-value data structure.
  * It provides methods to start the server, handle client connections, and process client requests.
  * The class also supports server reboot functionality and notification of clients upon data updates.
  *
- * Author: Kobe
+ * <p>
+ * @author Kobe
  *
  */
 

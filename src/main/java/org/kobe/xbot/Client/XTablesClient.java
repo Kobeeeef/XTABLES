@@ -35,7 +35,7 @@ import java.util.function.Consumer;
  * running scripts, managing key-value pairs, and handling video streams.
  * It utilizes Gson for JSON parsing and integrates with a custom SocketClient for network communication.
  * <p>
- * Author: Kobe
+ * @author Kobe
  */
 
 
