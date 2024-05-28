@@ -148,8 +148,8 @@ public class XTablesClient {
                         }
                     }
                 });
-
-                logger.info("Listening for services on port 5353...");
+                if (name == null) logger.info("Listening for first instance of XTABLES service on port 5353...");
+                else logger.info("Listening for '" + name + "' XTABLES services on port 5353...");
                 serviceLatch.await();
                 logger.info("Service latch released, proceeding to close mDNS services...");
                 jmdns.close();

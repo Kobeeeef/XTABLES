@@ -19,7 +19,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,6 +45,8 @@ public class XTables {
     private final HashMap<String, Function<ScriptParameters, String>> scripts = new HashMap<>();
     private static Thread mainThread;
     private static final CountDownLatch latch = new CountDownLatch(1);
+    private ExecutorService mdnsExecutorService;
+
 
     public static XTables startInstance(String SERVICE_NAME, int PORT) {
         if (instance.get() == null) {
@@ -97,30 +102,18 @@ public class XTables {
     private XTables(String SERVICE_NAME, int PORT) {
         this.port = PORT;
         this.SERVICE_NAME = SERVICE_NAME;
-        this.clientThreadPool = Executors.newCachedThreadPool();
         instance.set(this);
+        this.clientThreadPool = Executors.newCachedThreadPool();
         startServer();
     }
 
     private void startServer() {
         try {
-            try {
-                InetAddress addr = InetAddress.getLocalHost();
-                logger.info("Initializing mDNS with address: " + addr.getHostAddress());
-                jmdns = JmDNS.create(addr);
-
-                // Create the service with additional attributes
-                Map<String, String> props = new HashMap<>();
-                props.put("port", String.valueOf(port));
-                serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
-                jmdns.registerService(serviceInfo);
-
-                logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
-            } catch (IOException e) {
-                logger.severe("Error initializing mDNS: " + e.getMessage());
-                e.printStackTrace();
+            if(mdnsExecutorService != null) {
+                mdnsExecutorService.shutdownNow();
             }
-
+            this.mdnsExecutorService = Executors.newCachedThreadPool();
+            mdnsExecutorService.execute(() -> initializeMDNSWithRetries(15));
 
 
             serverSocket = new ServerSocket(port);
@@ -157,7 +150,7 @@ public class XTables {
                 serverSocket.close();
             }
             table.delete("");
-
+            mdnsExecutorService.shutdownNow();
             if (jmdns != null && serviceInfo != null) {
                 logger.info("Unregistering mDNS service: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT + "...");
                 jmdns.unregisterService(serviceInfo);
@@ -166,6 +159,43 @@ public class XTables {
             }
         } catch (IOException e) {
             logger.severe("Error occurred during server stop: " + e.getMessage());
+        }
+    }
+
+    private void initializeMDNSWithRetries(int maxRetries) {
+        int attempt = 0;
+        long delay = 1000; // 1 second mDNS setup retry
+
+        while (attempt < maxRetries && !Thread.currentThread().isInterrupted()) {
+            try {
+                attempt++;
+                InetAddress addr = InetAddress.getLocalHost();
+                logger.info("Initializing mDNS with address: " + addr.getHostAddress());
+                jmdns = JmDNS.create(addr);
+                // Create the service with additional attributes
+                Map<String, String> props = new HashMap<>();
+                props.put("port", String.valueOf(port));
+                serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
+                jmdns.registerService(serviceInfo);
+
+                logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
+                return;
+            } catch (IOException e) {
+                logger.severe("Error initializing mDNS (attempt " + attempt + "): " + e.getMessage());
+                if (attempt >= maxRetries) {
+                    logger.severe("Max retries reached. Giving up on mDNS initialization.");
+                    return;
+                }
+
+                try {
+                    logger.info("Retying mDNS initialization in " + delay + " ms.");
+                    TimeUnit.MILLISECONDS.sleep(delay);
+                    delay *= 1.5;
+                } catch (InterruptedException ie) {
+                    logger.severe("Retry sleep interrupted: " + ie.getMessage());
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
     }
 
