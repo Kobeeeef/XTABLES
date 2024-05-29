@@ -7,15 +7,10 @@
     <artifactId>xtables</artifactId>
     <version>4.0.0</version>
     <distributionManagement>
-        <snapshotRepository>
-            <id>github</id>
-            <name>GitHub Packages Snapshots</name>
-            <url>https://maven.pkg.github.com/Kobeeeef/XBOT_TESTING</url>
-        </snapshotRepository>
         <repository>
             <id>github</id>
             <name>GitHub Packages Releases</name>
-            <url>https://maven.pkg.github.com/Kobeeeef/XBOT_TESTING</url>
+            <url>https://maven.pkg.github.com/Kobeeeef/XTABLES</url>
         </repository>
     </distributionManagement>
     <properties>
