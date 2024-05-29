@@ -143,8 +143,10 @@ public class XTables {
     public void stopServer() {
         try {
             logger.info("Closing connections to all clients...");
-            for (ClientHandler client : clients) {
-                client.clientSocket.close();
+            synchronized (clients) {
+                for (ClientHandler client : clients) {
+                    client.clientSocket.close();
+                }
             }
             clients.clear();
             logger.info("Closing socket server...");
