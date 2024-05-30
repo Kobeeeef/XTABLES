@@ -60,6 +60,8 @@ public class XTables {
     private static final CountDownLatch latch = new CountDownLatch(1);
     private ExecutorService mdnsExecutorService;
     private Server userInterfaceServer;
+    private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
+
 
     public static XTables startInstance(String SERVICE_NAME, int PORT) {
         if (instance.get() == null) {
@@ -67,6 +69,7 @@ public class XTables {
                 throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
             if (SERVICE_NAME.equalsIgnoreCase("localhost"))
                 throw new IllegalArgumentException("The mDNS service name cannot be localhost!");
+            status.set(XTableStatus.STARTING);
             Thread main = new Thread(() -> new XTables(SERVICE_NAME, PORT));
             main.setName("XTABLES-SERVER");
             main.setDaemon(false);
@@ -120,6 +123,7 @@ public class XTables {
 
     private void startServer() {
         try {
+            status.set(XTableStatus.STARTING);
             if (mdnsExecutorService != null) {
                 mdnsExecutorService.shutdownNow();
             }
@@ -129,6 +133,7 @@ public class XTables {
 
             serverSocket = new ServerSocket(port);
             logger.info("Server started. Listening on " + serverSocket.getLocalSocketAddress() + "...");
+            status.set(XTableStatus.ONLINE);
             if (userInterfaceServer == null || !userInterfaceServer.isRunning()) {
                 try {
                     userInterfaceServer = new Server(4880);
@@ -153,7 +158,7 @@ public class XTables {
                             resp.setContentType("application/json");
                             resp.setCharacterEncoding("UTF-8");
                             SystemStatistics systemStatistics = new SystemStatistics(clients.size());
-                            systemStatistics.setOnline(!serverSocket.isClosed());
+                            systemStatistics.setStatus(XTables.getStatus());
                             synchronized (clients) {
                                 systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.totalMessages, m.identifier)).toList());
                                 int i = 0;
@@ -170,9 +175,14 @@ public class XTables {
                         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
                             resp.setContentType("application/json");
                             resp.setCharacterEncoding("UTF-8");
-                            rebootServer();
+                            boolean response = rebootServer();
+                            if(response) {
                             resp.setStatus(HttpServletResponse.SC_OK);
                             resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been rebooted!\"}");
+                        }else {
+                                resp.setStatus(HttpServletResponse.SC_CONFLICT);
+                                resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Server cannot reboot while: " + getStatus() + "\"}");
+                            }
                         }
                     }), "/api/reboot");
                     servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
@@ -239,9 +249,11 @@ public class XTables {
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clients.add(clientHandler);
                 clientThreadPool.execute(clientHandler);
+                status.set(XTableStatus.ONLINE);
             }
         } catch (IOException e) {
             logger.severe("Socket error occurred: " + e.getMessage());
+            status.set(XTableStatus.OFFLINE);
             if (!serverSocket.isClosed()) {
                 try {
                     serverSocket.close();
@@ -257,6 +269,7 @@ public class XTables {
     public void stopServer(boolean fullShutdown) {
         try {
             logger.info("Closing connections to all clients...");
+            status.set(XTableStatus.OFFLINE);
             synchronized (clients) {
                 for (ClientHandler client : clients) {
                     client.clientSocket.close();
@@ -324,10 +337,20 @@ public class XTables {
         }
     }
 
-    public void rebootServer() {
+    public static XTableStatus getStatus() {
+        return status.get();
+    }
+
+    public boolean rebootServer() {
+        if (!getStatus().equals(XTableStatus.ONLINE)) {
+            logger.warning("Cannot reboot server when status is: " + getStatus());
+            return false;
+        }
         try {
+            status.set(XTableStatus.OFFLINE);
             stopServer(false);
             logger.info("Starting socket server in 1 second...");
+            status.set(XTableStatus.STARTING);
             TimeUnit.SECONDS.sleep(1);
             logger.info("Starting server...");
 
@@ -335,7 +358,7 @@ public class XTables {
             Thread thread = new Thread(this::startServer);
             thread.setDaemon(false);
             thread.start();
-
+            return true;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

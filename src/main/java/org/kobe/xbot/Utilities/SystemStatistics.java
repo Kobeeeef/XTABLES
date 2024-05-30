@@ -18,7 +18,7 @@ public class SystemStatistics {
     private final long totalThreads;
     private final long nanoTime;
     private final int totalClients;
-    private boolean online;
+    private XTableStatus status;
     private int totalMessages;
     private String ip;
     private List<ClientData> clientDataList;
@@ -52,12 +52,12 @@ public class SystemStatistics {
         return this;
     }
 
-    public boolean isOnline() {
-        return online;
+    public XTableStatus getStatus() {
+        return status;
     }
 
-    public SystemStatistics setOnline(boolean online) {
-        this.online = online;
+    public SystemStatistics setStatus(XTableStatus status) {
+        this.status = status;
         return this;
     }
 
