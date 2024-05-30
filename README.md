@@ -313,8 +313,7 @@ The XTables local status page is hosted on port 4880. It provides real-time info
 - **Server Control**: Includes a button to reboot the server.
 - **Client Control**: Includes buttons to disconnect individual clients.
 
-![image](https://github.com/Kobeeeef/XTABLES/assets/83244503/987e14b3-1bfd-4bd0-a042-5636fc0ad54c)
-
+![image](https://github.com/Kobeeeef/XTABLES/assets/83244503/2876500a-be71-45ae-a0f4-ef6dffde017e)
 
 To access the status page, open your web browser and navigate to `http://localhost:4880`.
 
