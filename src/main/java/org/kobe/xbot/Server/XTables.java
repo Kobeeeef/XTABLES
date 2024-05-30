@@ -1,12 +1,11 @@
 /**
- *
  * XTables class manages a server that allows clients to interact with a key-value data structure.
  * It provides methods to start the server, handle client connections, and process client requests.
  * The class also supports server reboot functionality and notification of clients upon data updates.
  *
  * <p>
- * @author Kobe
  *
+ * @author Kobe
  */
 
 package org.kobe.xbot.Server;
@@ -60,7 +59,7 @@ public class XTables {
     private static Thread mainThread;
     private static final CountDownLatch latch = new CountDownLatch(1);
     private ExecutorService mdnsExecutorService;
-
+    private Server userInterfaceServer;
 
     public static XTables startInstance(String SERVICE_NAME, int PORT) {
         if (instance.get() == null) {
@@ -83,7 +82,7 @@ public class XTables {
             mainThread = main;
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("Shutdown hook triggered. Stopping server...");
-                instance.get().stopServer();
+                instance.get().stopServer(true);
                 logger.info("Server stopped gracefully.");
             }));
 
@@ -93,7 +92,7 @@ public class XTables {
 
     public static void stopInstance() {
         XTables xTables = instance.get();
-        xTables.stopServer();
+        xTables.stopServer(false);
         mainThread.interrupt();
         instance.set(null);
     }
@@ -123,7 +122,7 @@ public class XTables {
 
     private void startServer() {
         try {
-            if(mdnsExecutorService != null) {
+            if (mdnsExecutorService != null) {
                 mdnsExecutorService.shutdownNow();
             }
             this.mdnsExecutorService = Executors.newCachedThreadPool();
@@ -132,58 +131,109 @@ public class XTables {
 
             serverSocket = new ServerSocket(port);
             logger.info("Server started. Listening on " + serverSocket.getLocalSocketAddress() + "...");
-            try {
-                Server server = new Server(4880);
-                // Static resource handler
-                ResourceHandler resourceHandler = new ResourceHandler();
-                resourceHandler.setDirectoriesListed(true);
-                URL resourceURL = XTables.class.getResource("/static");
-                assert resourceURL != null;
-                String resourceBase = resourceURL.toExternalForm();
-                resourceHandler.setResourceBase(resourceBase);
+            if (userInterfaceServer == null || !userInterfaceServer.isRunning()) {
+                try {
+                    userInterfaceServer = new Server(4880);
+                    // Static resource handler
+                    ResourceHandler resourceHandler = new ResourceHandler();
+                    resourceHandler.setDirectoriesListed(true);
+                    URL resourceURL = XTables.class.getResource("/static");
+                    assert resourceURL != null;
+                    String resourceBase = resourceURL.toExternalForm();
+                    resourceHandler.setResourceBase(resourceBase);
 
-                ContextHandler staticContext = new ContextHandler("/");
-                staticContext.setHandler(resourceHandler);
+                    ContextHandler staticContext = new ContextHandler("/");
+                    staticContext.setHandler(resourceHandler);
 
-                // Simple GET request handler
-                ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-                servletContextHandler.setContextPath("/");
+                    ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                    servletContextHandler.setContextPath("/");
 
-                // Add a servlet to handle GET requests
-                servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
-                    @Override
-                    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-                        resp.setContentType("application/json");
-                        resp.setCharacterEncoding("UTF-8");
-                        SystemStatistics systemStatistics = new SystemStatistics(clients.size());
-                        systemStatistics.setOnline(!serverSocket.isClosed());
-                        synchronized (clients) {
-                            systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.totalMessages)).toList());
-                            int i = 0;
-                            for (ClientHandler clientHandler : clients) {
-                                i += clientHandler.totalMessages;
+                    // Add a servlet to handle GET requests
+                    servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+                        @Override
+                        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                            resp.setContentType("application/json");
+                            resp.setCharacterEncoding("UTF-8");
+                            SystemStatistics systemStatistics = new SystemStatistics(clients.size());
+                            systemStatistics.setOnline(!serverSocket.isClosed());
+                            synchronized (clients) {
+                                systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.totalMessages, m.identifier)).toList());
+                                int i = 0;
+                                for (ClientHandler clientHandler : clients) {
+                                    i += clientHandler.totalMessages;
+                                }
+                                systemStatistics.setTotalMessages(i);
                             }
-                            systemStatistics.setTotalMessages(i);
+                            resp.getWriter().println(gson.toJson(systemStatistics));
                         }
-                        resp.getWriter().println(gson.toJson(systemStatistics));
-                    }
-                }), "/api/get");
-                FilterHolder cors = servletContextHandler.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
-                cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
-                cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
-                cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,HEAD");
-                cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
+                    }), "/api/get");
+                    servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+                        @Override
+                        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                            resp.setContentType("application/json");
+                            resp.setCharacterEncoding("UTF-8");
+                            rebootServer();
+                            resp.setStatus(HttpServletResponse.SC_OK);
+                            resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been rebooted!\"}");
+                        }
+                    }), "/api/reboot");
+                    servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+                        @Override
+                        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                            String uuidParam = req.getParameter("uuid");
 
-                // Combine the handlers
-                HandlerList handlers = new HandlerList();
-                handlers.addHandler(staticContext);
-                handlers.addHandler(servletContextHandler);
+                            resp.setContentType("application/json");
+                            resp.setCharacterEncoding("UTF-8");
+                            if (uuidParam == null || uuidParam.isEmpty()) {
+                                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"No UUID found in parameter!\"}");
+                                return;
+                            }
+                            UUID uuid = null;
 
-                server.setHandler(handlers);
-                server.start();
-                logger.info("The local XTABLES user interface started at port 4880!");
-            } catch (Exception e) {
-                logger.warning("The local XTABLES user interface failed to start!");
+                            try {
+                                uuid = UUID.fromString(uuidParam);
+                            } catch (IllegalArgumentException e) {
+                                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Invalid UUID format!\"}");
+                                return;
+                            }
+
+                            synchronized (clients) {
+                                UUID finalUuid = uuid;
+                                Optional<ClientHandler> clientHandler = clients.stream().filter(f -> f.identifier.equals(finalUuid.toString())).findFirst();
+                                if (clientHandler.isPresent()) {
+                                    clientHandler.get().disconnect();
+                                    resp.setStatus(HttpServletResponse.SC_OK);
+                                    resp.getWriter().println("{ \"status\": \"success\", \"message\": \"The client has been disconnected!\"}");
+                                } else {
+                                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
+                                }
+                            }
+
+
+                        }
+                    }), "/api/disconnect");
+
+                    FilterHolder cors = servletContextHandler.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+                    cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
+                    cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
+                    cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,HEAD");
+                    cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
+
+                    // Combine the handlers
+                    HandlerList handlers = new HandlerList();
+                    handlers.addHandler(staticContext);
+                    handlers.addHandler(servletContextHandler);
+
+                    userInterfaceServer.setHandler(handlers);
+                    userInterfaceServer.start();
+
+                    logger.info("The local XTABLES user interface started at port 4880!");
+                } catch (Exception e) {
+                    logger.warning("The local XTABLES user interface failed to start!");
+                }
             }
             latch.countDown();
             while (!serverSocket.isClosed() && !Thread.currentThread().isInterrupted()) {
@@ -207,7 +257,7 @@ public class XTables {
         }
     }
 
-    public void stopServer() {
+    public void stopServer(boolean fullShutdown) {
         try {
             logger.info("Closing connections to all clients...");
             synchronized (clients) {
@@ -228,8 +278,15 @@ public class XTables {
                 jmdns.close();
                 logger.info("mDNS service unregistered and mDNS closed");
             }
+            if (fullShutdown) {
+                mainThread.interrupt();
+                if (userInterfaceServer != null) userInterfaceServer.stop();
+                clientThreadPool.shutdownNow();
+            }
         } catch (IOException e) {
             logger.severe("Error occurred during server stop: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -272,11 +329,16 @@ public class XTables {
 
     public void rebootServer() {
         try {
-            stopServer();
+            stopServer(false);
             logger.info("Starting socket server in 1 second...");
             TimeUnit.SECONDS.sleep(1);
             logger.info("Starting server...");
-            startServer();
+
+
+            Thread thread = new Thread(this::startServer);
+            thread.setDaemon(false);
+            thread.start();
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -309,10 +371,12 @@ public class XTables {
         private final Set<String> updateEvents = new HashSet<>();
         private final AtomicBoolean deleteEvent = new AtomicBoolean(false);
         private int totalMessages = 0;
+        private final String identifier;
         private List<String> streams;
 
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
+            this.identifier = UUID.randomUUID().toString();
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
             super.setDaemon(true);
         }
@@ -569,6 +633,7 @@ public class XTables {
                     }
                 }
                 // Close the streams and socket when done
+                System.out.println("ADUAUDHAHWDIAWHDIUA");
                 out.close();
                 in.close();
                 clientSocket.close();
@@ -585,6 +650,10 @@ public class XTables {
                 messages_log.cancel(true);
                 clients.remove(this);
             }
+        }
+
+        public void disconnect() throws IOException {
+            this.clientSocket.close();
         }
 
         public void sendUpdate(String key, String value) {
