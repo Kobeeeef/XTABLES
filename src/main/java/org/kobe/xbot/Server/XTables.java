@@ -68,7 +68,7 @@ public class XTables {
             if (SERVICE_NAME.equalsIgnoreCase("localhost"))
                 throw new IllegalArgumentException("The mDNS service name cannot be localhost!");
             Thread main = new Thread(() -> new XTables(SERVICE_NAME, PORT));
-            main.setName("XTABLES-MAIN-SERVER");
+            main.setName("XTABLES-SERVER");
             main.setDaemon(false);
             main.start();
             try {
