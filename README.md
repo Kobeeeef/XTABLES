@@ -302,6 +302,23 @@ This setup ensures efficient video streaming with reduced latency and minimal se
 
 https://github.com/Kobeeeef/XBOT_TESTING/assets/83244503/707172c6-ae2e-4623-99d7-579ff19734f2
 
+# XTables Local Status Page
+
+The XTables local status page is hosted on port 4880. It provides real-time information about the server status and connected clients. 
+
+## Features
+
+- **Server Status**: Displays the current status of the XTables server and the total number of requests received in the last minute.
+- **Client Management**: Lists all connected clients with their IP addresses and the number of requests each client has made.
+- **Server Control**: Includes a button to reboot the server.
+- **Client Control**: Includes buttons to disconnect individual clients.
+
+![image](https://github.com/Kobeeeef/XTABLES/assets/83244503/987e14b3-1bfd-4bd0-a042-5636fc0ad54c)
+
+
+To access the status page, open your web browser and navigate to `http://localhost:4880`.
+
+
 ## Logging
 
 The latest version of `XTablesClient` introduces custom logging capabilities, allowing users to configure logging levels for enhanced control over debugging and monitoring. To set the logging level, utilize the `XTablesLogger.setLoggingLevel(Level)` method.
