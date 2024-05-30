@@ -12,8 +12,22 @@
 package org.kobe.xbot.Server;
 
 import com.google.gson.Gson;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -21,10 +35,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,6 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class XTables {
+    private static final Logger log = LoggerFactory.getLogger(XTables.class);
     private final String SERVICE_NAME;
     private static final int SERVICE_PORT = 5353;
     private static final AtomicReference<XTables> instance = new AtomicReference<>();
@@ -120,6 +132,59 @@ public class XTables {
 
             serverSocket = new ServerSocket(port);
             logger.info("Server started. Listening on " + serverSocket.getLocalSocketAddress() + "...");
+            try {
+                Server server = new Server(4880);
+                // Static resource handler
+                ResourceHandler resourceHandler = new ResourceHandler();
+                resourceHandler.setDirectoriesListed(true);
+                URL resourceURL = XTables.class.getResource("/static");
+                assert resourceURL != null;
+                String resourceBase = resourceURL.toExternalForm();
+                resourceHandler.setResourceBase(resourceBase);
+
+                ContextHandler staticContext = new ContextHandler("/");
+                staticContext.setHandler(resourceHandler);
+
+                // Simple GET request handler
+                ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                servletContextHandler.setContextPath("/");
+
+                // Add a servlet to handle GET requests
+                servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+                    @Override
+                    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                        resp.setContentType("application/json");
+                        resp.setCharacterEncoding("UTF-8");
+                        SystemStatistics systemStatistics = new SystemStatistics(clients.size());
+                        systemStatistics.setOnline(!serverSocket.isClosed());
+                        synchronized (clients) {
+                            systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.totalMessages)).toList());
+                            int i = 0;
+                            for (ClientHandler clientHandler : clients) {
+                                i += clientHandler.totalMessages;
+                            }
+                            systemStatistics.setTotalMessages(i);
+                        }
+                        resp.getWriter().println(gson.toJson(systemStatistics));
+                    }
+                }), "/api/get");
+                FilterHolder cors = servletContextHandler.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+                cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
+                cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
+                cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,HEAD");
+                cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
+
+                // Combine the handlers
+                HandlerList handlers = new HandlerList();
+                handlers.addHandler(staticContext);
+                handlers.addHandler(servletContextHandler);
+
+                server.setHandler(handlers);
+                server.start();
+                logger.info("The local XTABLES user interface started at port 4880!");
+            } catch (Exception e) {
+                logger.warning("The local XTABLES user interface failed to start!");
+            }
             latch.countDown();
             while (!serverSocket.isClosed() && !Thread.currentThread().isInterrupted()) {
                 Socket clientSocket = serverSocket.accept();
@@ -137,6 +202,8 @@ public class XTables {
                     logger.severe("Error closing server socket: " + ex.getMessage());
                 }
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
