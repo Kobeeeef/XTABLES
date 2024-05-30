@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="XTABLES_CLIENT:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/XTABLES_CLIENT_jar</output-path>
-    <root id="archive" name="XTABLES.jar">
-      <element id="module-output" name="XTABLES" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar" path-in-jar="/" />
-    </root>
-  </artifact>
-</component>
