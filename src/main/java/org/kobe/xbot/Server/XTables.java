@@ -397,7 +397,7 @@ public class XTables {
                     logger.info("Received " + String.format("%,d", totalMessages) + " messages from IP " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " in the last minute.");
                     totalMessages = 0;
                 }
-            }, 5, 60, TimeUnit.SECONDS);
+            }, 60, 60, TimeUnit.SECONDS);
 
             try {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);

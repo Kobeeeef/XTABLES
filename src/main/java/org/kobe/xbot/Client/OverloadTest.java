@@ -11,7 +11,9 @@ public class OverloadTest {
         // Initialize a new client with address and port
         XTablesClient client = new XTablesClient();
 
-
+        while(true) {
+            client.putString("yep", "" + Math.random()).execute();
+        }
 
 
     }
