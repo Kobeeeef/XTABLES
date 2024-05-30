@@ -237,7 +237,7 @@ public class XTables {
                     userInterfaceServer.setHandler(handlers);
                     userInterfaceServer.start();
 
-                    logger.info("The local XTABLES user interface started at port 4880!");
+                    logger.info("The local XTABLES user interface started at port http://localhost:4880!");
                 } catch (Exception e) {
                     logger.warning("The local XTABLES user interface failed to start!");
                 }
