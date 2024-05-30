@@ -318,6 +318,13 @@ The XTables local status page is hosted on port 4880. It provides real-time info
 
 To access the status page, open your web browser and navigate to `http://localhost:4880`.
 
+## Service Hosting Information
+
+- **mDNS Server**: Hosted on port `5353`.
+- **Default XTables Server**: Hosted on port `1735`.
+- **Video Streams**: Each video stream is hosted on port `4888`.
+- **Status Page**: The status page is hosted on port `4880`. It provides real-time information about the server status and connected clients.
+
 
 ## Logging
 
