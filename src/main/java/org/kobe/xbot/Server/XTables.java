@@ -133,7 +133,6 @@ public class XTables {
 
             serverSocket = new ServerSocket(port);
             logger.info("Server started. Listening on " + serverSocket.getLocalSocketAddress() + "...");
-            status.set(XTableStatus.ONLINE);
             if (userInterfaceServer == null || !userInterfaceServer.isRunning()) {
                 try {
                     userInterfaceServer = new Server(4880);
@@ -243,6 +242,7 @@ public class XTables {
                 }
             }
             latch.countDown();
+            status.set(XTableStatus.ONLINE);
             while (!serverSocket.isClosed() && !Thread.currentThread().isInterrupted()) {
                 Socket clientSocket = serverSocket.accept();
                 logger.info(String.format("Client connected: %1$s:%2$s", clientSocket.getInetAddress(), clientSocket.getPort()));
@@ -347,14 +347,13 @@ public class XTables {
             return false;
         }
         try {
-            status.set(XTableStatus.OFFLINE);
+            status.set(XTableStatus.REBOOTING);
             stopServer(false);
             logger.info("Starting socket server in 1 second...");
             status.set(XTableStatus.STARTING);
             TimeUnit.SECONDS.sleep(1);
             logger.info("Starting server...");
-
-
+            status.set(XTableStatus.STARTING);
             Thread thread = new Thread(this::startServer);
             thread.setDaemon(false);
             thread.start();
