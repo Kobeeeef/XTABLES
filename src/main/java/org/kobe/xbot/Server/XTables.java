@@ -67,9 +67,7 @@ public class XTables {
                 throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
             if (SERVICE_NAME.equalsIgnoreCase("localhost"))
                 throw new IllegalArgumentException("The mDNS service name cannot be localhost!");
-            Thread main = new Thread(() -> {
-                new XTables(SERVICE_NAME, PORT);
-            });
+            Thread main = new Thread(() -> new XTables(SERVICE_NAME, PORT));
             main.setName("XTABLES-MAIN-SERVER");
             main.setDaemon(false);
             main.start();
@@ -189,7 +187,7 @@ public class XTables {
                                 resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"No UUID found in parameter!\"}");
                                 return;
                             }
-                            UUID uuid = null;
+                            UUID uuid;
 
                             try {
                                 uuid = UUID.fromString(uuidParam);
@@ -200,8 +198,7 @@ public class XTables {
                             }
 
                             synchronized (clients) {
-                                UUID finalUuid = uuid;
-                                Optional<ClientHandler> clientHandler = clients.stream().filter(f -> f.identifier.equals(finalUuid.toString())).findFirst();
+                                Optional<ClientHandler> clientHandler = clients.stream().filter(f -> f.identifier.equals(uuid.toString())).findFirst();
                                 if (clientHandler.isPresent()) {
                                     clientHandler.get().disconnect();
                                     resp.setStatus(HttpServletResponse.SC_OK);
@@ -318,7 +315,7 @@ public class XTables {
                 try {
                     logger.info("Retying mDNS initialization in " + delay + " ms.");
                     TimeUnit.MILLISECONDS.sleep(delay);
-                    delay *= 1.5;
+                    delay *= 2;
                 } catch (InterruptedException ie) {
                     logger.severe("Retry sleep interrupted: " + ie.getMessage());
                     Thread.currentThread().interrupt();
