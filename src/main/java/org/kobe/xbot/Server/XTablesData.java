@@ -22,7 +22,6 @@ public class XTablesData<V> {
     // Method to put a value into the nested structure
     public boolean put(String key, V value) {
         Utilities.validateKey(key, true);
-        // Causes too much delay and doesn't allow multi threading - find a fix for this
 //        if(!Utilities.isValidValue((String) value) && !flaggedKeys.contains(key)) {
 //            flaggedKeys.add(key);
 //            logger.warning("Invalid JSON value for key '" + key + "': " + value);

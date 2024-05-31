@@ -365,10 +365,8 @@ public class XTables {
 
     private void notifyUpdateChangeClients(String key, String value) {
         synchronized (clients) {
-            for (ClientHandler client : clients) {
-                if (client.getUpdateEvents().contains("") || client.getUpdateEvents().contains(key)) {
+            for (ClientHandler client : clients.stream().filter(a -> a.getUpdateEvents().contains("") || a.getUpdateEvents().contains(key)).toList()) {
                     client.sendUpdate(key, value);
-                }
             }
         }
     }
