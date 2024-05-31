@@ -652,7 +652,6 @@ public class XTables {
                     }
                 }
                 // Close the streams and socket when done
-                System.out.println("ADUAUDHAHWDIAWHDIUA");
                 out.close();
                 in.close();
                 clientSocket.close();
@@ -672,7 +671,9 @@ public class XTables {
         }
 
         public void disconnect() throws IOException {
-            this.clientSocket.close();
+            clientSocket.close();
+            clients.remove(this);
+            this.interrupt();
         }
 
         public void sendUpdate(String key, String value) {

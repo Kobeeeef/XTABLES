@@ -3,8 +3,8 @@ package org.kobe.xbot.Server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import org.kobe.xbot.Utilities.Utilities;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.Utilities;
 
 import java.util.*;
 
@@ -14,6 +14,7 @@ public class XTablesData<V> {
     private static final Set<String> flaggedKeys = new HashSet<>();
     private Map<String, XTablesData<V>> data;
     private V value;
+
     public XTablesData() {
         // Initialize the data map lazily
     }
@@ -21,14 +22,15 @@ public class XTablesData<V> {
     // Method to put a value into the nested structure
     public boolean put(String key, V value) {
         Utilities.validateKey(key, true);
-        if(!Utilities.isValidValue((String) value) && !flaggedKeys.contains(key)) {
-            flaggedKeys.add(key);
-            logger.warning("Invalid JSON value for key '" + key + "': " + value);
-            logger.warning("The key '" + key + "' is now a flagged value.");
-        } else if (Utilities.isValidValue((String) value) && flaggedKeys.contains(key)) {
-            flaggedKeys.remove(key);
-            logger.warning("The key '" + key + "' is no longer a flagged value.");
-        }
+        // Causes too much delay and doesn't allow multi threading - find a fix for this
+//        if(!Utilities.isValidValue((String) value) && !flaggedKeys.contains(key)) {
+//            flaggedKeys.add(key);
+//            logger.warning("Invalid JSON value for key '" + key + "': " + value);
+//            logger.warning("The key '" + key + "' is now a flagged value.");
+//        } else if (Utilities.isValidValue((String) value) && flaggedKeys.contains(key)) {
+//            flaggedKeys.remove(key);
+//            logger.warning("The key '" + key + "' is no longer a flagged value.");
+//        }
         String[] keys = key.split("\\."); // Split the key by '.'
         XTablesData<V> current = this;
 
@@ -189,7 +191,8 @@ public class XTablesData<V> {
     public void updateFromRawJSON(String json) {
         // Replace the current map directly with the parsed data
         // This avoids unnecessary clearing and re-creating of the map
-        Map<String, XTablesData<V>> newData = gson.fromJson(json, new TypeToken<Map<String, XTablesData<V>>>(){}.getType());
+        Map<String, XTablesData<V>> newData = gson.fromJson(json, new TypeToken<Map<String, XTablesData<V>>>() {
+        }.getType());
 
         // Check if the new data is null which might be the case if json is empty or invalid
         if (newData == null) {

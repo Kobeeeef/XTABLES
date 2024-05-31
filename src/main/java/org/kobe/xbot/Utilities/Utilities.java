@@ -4,8 +4,6 @@ package org.kobe.xbot.Utilities;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -14,7 +12,6 @@ import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Utilities {
-    private static final JSONParser parser = new JSONParser();
 
     public static byte[] matToByteArray(Mat mat) {
         BytePointer bytePointer = new BytePointer();
@@ -59,9 +56,9 @@ public class Utilities {
     public static boolean isValidValue(String jsonString) {
         try {
             // Attempt to parse the JSON string
-            parser.parse(jsonString);
+
             return true; // If parsing succeeds, JSON is valid
-        } catch (ParseException e) {
+        } catch ( Error | Exception e) {
             return false; // If parsing fails, JSON is invalid
         }
     }
