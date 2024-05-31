@@ -14,7 +14,7 @@ public class Main {
 
     public static void main(String[] args) {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 1, true);
+        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 3, true);
         // Thread blocks until connection is successful
 
         // Get raw JSON from server
