@@ -324,7 +324,7 @@ To access the status page, open your web browser and navigate to `http://localho
 - **mDNS Server**: Hosted on port `5353`.
 - **Default XTables Server**: Hosted on port `1735`.
 - **Video Streams**: Each video stream is hosted on port `4888` (Client side).
-- **Status Page**: The status page is hosted on port `4880`. It provides real-time information about the server status and connected clients.
+- **Status Page**: The status page is hosted on port `4880`.
 
 
 ## Logging
