@@ -315,7 +315,7 @@ The XTables local status page is hosted on port 4880. It provides real-time info
 
 ![image](https://github.com/Kobeeeef/XTABLES/assets/83244503/2876500a-be71-45ae-a0f4-ef6dffde017e)
 
-https://github.com/Kobeeeef/XTABLES/assets/83244503/b900764f-4ca2-4fda-8fb3-94b25bd2a8fc
+https://github.com/Kobeeeef/XTABLES/assets/83244503/6a72c4f6-e875-4296-9e93-18b2d5d328e4
 
 To access the status page, open your web browser and navigate to `http://localhost:4880`.
 
