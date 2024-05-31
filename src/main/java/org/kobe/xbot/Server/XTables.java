@@ -40,6 +40,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class XTables {
     private static final Logger log = LoggerFactory.getLogger(XTables.class);
@@ -159,10 +160,10 @@ public class XTables {
                             SystemStatistics systemStatistics = new SystemStatistics(clients.size());
                             systemStatistics.setStatus(XTables.getStatus());
                             synchronized (clients) {
-                                systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.totalMessages, m.identifier)).toList());
+                                systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.totalMessages, m.identifier)).collect(Collectors.toList()));
                                 int i = 0;
-                                for (ClientHandler clientHandler : clients) {
-                                    i += clientHandler.totalMessages;
+                                for (ClientHandler client : clients) {
+                                    i += client.totalMessages;
                                 }
                                 systemStatistics.setTotalMessages(i);
                             }
@@ -175,10 +176,10 @@ public class XTables {
                             resp.setContentType("application/json");
                             resp.setCharacterEncoding("UTF-8");
                             boolean response = rebootServer();
-                            if(response) {
-                            resp.setStatus(HttpServletResponse.SC_OK);
-                            resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been rebooted!\"}");
-                        }else {
+                            if (response) {
+                                resp.setStatus(HttpServletResponse.SC_OK);
+                                resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been rebooted!\"}");
+                            } else {
                                 resp.setStatus(HttpServletResponse.SC_CONFLICT);
                                 resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Server cannot reboot while: " + getStatus() + "\"}");
                             }
@@ -235,7 +236,6 @@ public class XTables {
 
                     userInterfaceServer.setHandler(handlers);
                     userInterfaceServer.start();
-
                     logger.info("The local XTABLES user interface started at port http://localhost:4880!");
                 } catch (Exception e) {
                     logger.warning("The local XTABLES user interface failed to start!");
@@ -270,11 +270,10 @@ public class XTables {
         try {
             logger.info("Closing connections to all clients...");
             status.set(XTableStatus.OFFLINE);
-            synchronized (clients) {
-                for (ClientHandler client : clients) {
-                    client.clientSocket.close();
-                }
+            for (ClientHandler client : new ArrayList<>(clients)) {
+                if (client != null) client.clientSocket.close();
             }
+
             clients.clear();
             logger.info("Closing socket server...");
             if (serverSocket != null && !serverSocket.isClosed()) {
@@ -315,7 +314,6 @@ public class XTables {
                 props.put("port", String.valueOf(port));
                 serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
                 jmdns.registerService(serviceInfo);
-
                 logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
                 return;
             } catch (IOException e) {
@@ -364,10 +362,17 @@ public class XTables {
     }
 
     private void notifyUpdateChangeClients(String key, String value) {
-        synchronized (clients) {
-            for (ClientHandler client : clients.stream().filter(a -> a.getUpdateEvents().contains("") || a.getUpdateEvents().contains(key)).toList()) {
-                    client.sendUpdate(key, value);
+        try {
+            for (ClientHandler client : new ArrayList<>(clients)) {
+                try {
+                    if (client.getUpdateEvents().contains("") || client.getUpdateEvents().contains(key))
+                        client.sendUpdate(key, value);
+                } catch (Exception | Error e) {
+                    logger.warning("Failed to push updates to client: " + e.getMessage());
+                }
             }
+        } catch (Exception | Error e) {
+            logger.warning("Failed to push updates to all clients: " + e.getMessage());
         }
     }
 
