@@ -14,8 +14,9 @@ public class OverloadTest {
         XTablesClient client = new XTablesClient();
 
         while (true) {
-           ResponseStatus status = client.putString("yep", "" + Math.random()).complete();
-           System.out.println(status);
+            try {
+                client.putString("yep", "" + Math.random()).execute();
+            } catch (Exception ignored) {}
         }
 
 
