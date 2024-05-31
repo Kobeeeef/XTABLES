@@ -424,9 +424,11 @@ public class XTables {
                 }
             }, 60, 60, TimeUnit.SECONDS);
 
-            try {
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            // try with resources for no memory leak
+
+            try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+
                 String inputLine;
                 while ((inputLine = in.readLine()) != null && !this.isInterrupted()) {
                     RequestInfo requestInfo = new RequestInfo(inputLine);
