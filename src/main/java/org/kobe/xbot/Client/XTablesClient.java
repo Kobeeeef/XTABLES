@@ -599,6 +599,16 @@ public class XTablesClient {
         Utilities.validateKey(key, true);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
+    public <T> void executePutArray(String key, List<T> value) {
+        Utilities.validateKey(key, true);
+        String parsedValue = gson.toJson(value);
+        client.sendMessageRaw("IGNORED:PUT " + key + " " + parsedValue);
+    }
+    public void executePutObject(String key, Object value) {
+        Utilities.validateKey(key, true);
+        String parsedValue = gson.toJson(value);
+        client.sendMessageRaw("IGNORED:PUT " + key + " " + parsedValue);
+    }
     public RequestAction<VideoStreamResponse> registerImageStreamServer(String name) {
         Utilities.validateName(name, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.REGISTER_VIDEO_STREAM, name).parsed(), VideoStreamResponse.class) {
