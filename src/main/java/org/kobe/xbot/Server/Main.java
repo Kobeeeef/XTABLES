@@ -19,7 +19,7 @@ public class Main {
             }
         } else {
             logger.info("No port number provided. Default port 1735 is being used.");
-           XTables xTables = XTables.startInstance("XTablesService", 1735);
+            XTables xTables = XTables.startInstance("XTablesService", 1735);
         }
     }
 }

@@ -1,9 +1,6 @@
 package org.kobe.xbot.Client;
 
 
-import org.kobe.xbot.Utilities.ResponseInfo;
-import org.kobe.xbot.Utilities.ResponseStatus;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,17 +15,18 @@ public class OverloadTest {
         int i = 0;
         long time = System.nanoTime();
         List<Double> times = new ArrayList<>();
-        while (i<1000000) {
+        while (i < 1000000) {
             i++;
             try {
                 long start = System.nanoTime();
                 client.executePutInteger("ok", 1);
                 times.add((System.nanoTime() - start) / 1e6);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
-        System.out.println("Average Time (1M Updates): " + times.stream().mapToDouble(Double::doubleValue )
+        System.out.println("Average Time (1M Updates): " + times.stream().mapToDouble(Double::doubleValue)
                 .average().orElse(Double.NaN) + " ms");
-        System.out.println("Total Time (1M Updates): " + (System.nanoTime() - time)/1e6 + " ms");
+        System.out.println("Total Time (1M Updates): " + (System.nanoTime() - time) / 1e6 + " ms");
 
 
     }

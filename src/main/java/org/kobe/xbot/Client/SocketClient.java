@@ -1,8 +1,8 @@
 package org.kobe.xbot.Client;
 
 import com.sun.jdi.connect.spi.ClosedConnectionException;
-import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -141,7 +141,7 @@ public class SocketClient {
                     xTablesClient.queueAll(requestActions);
                     logger.info("Queued " + requestActions.size() + " subscriptions successfully!");
                 }
-                if(xTablesClient.resubscribeToDeleteEvents()) {
+                if (xTablesClient.resubscribeToDeleteEvents()) {
                     logger.info("Subscribing to previously submitted delete event.");
                     new RequestAction<>(this, new ResponseInfo(null, MethodType.SUBSCRIBE_DELETE).parsed(), ResponseStatus.class).queue();
                     logger.info("Queued delete event subscription successfully!");
@@ -301,10 +301,12 @@ public class SocketClient {
         out.println(responseInfo.parsed());
         out.flush();
     }
+
     public void sendMessageRaw(String raw) {
         out.println(raw);
         out.flush();
     }
+
     public void stopAll() {
         long startTime = System.nanoTime();
         logger.severe("Shutting down all threads and processes.");

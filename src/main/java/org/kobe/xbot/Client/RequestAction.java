@@ -16,6 +16,7 @@ import java.util.function.Consumer;
  * and managing errors during communication. It supports both queued (asynchronous)
  * and complete (synchronous) operations.
  * <p>
+ *
  * @author Kobe
  */
 public class RequestAction<T> {
@@ -178,9 +179,10 @@ public class RequestAction<T> {
 
     /**
      * Sends a request to the server to execute an action.
+     *
      * @param asynchronous If true, the request is executed in a separate thread; otherwise, it is executed in the current thread.
-     * In asynchronous mode, the method uses the thread pool to handle the request, allowing the current thread to continue without waiting.
-     * In synchronous mode, the method waits for the request to send before proceeding.
+     *                     In asynchronous mode, the method uses the thread pool to handle the request, allowing the current thread to continue without waiting.
+     *                     In synchronous mode, the method waits for the request to send before proceeding.
      */
     public void execute(boolean asynchronous) {
         try {
@@ -198,7 +200,6 @@ public class RequestAction<T> {
     public void execute() {
         execute(false);
     }
-
 
 
     /**
