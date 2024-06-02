@@ -595,6 +595,14 @@ public class XTablesClient {
         Utilities.validateKey(key, true);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
+    public void executePutDouble(String key, double value) {
+        Utilities.validateKey(key, true);
+        client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
+    }
+    public void executePutLong(String key, long value) {
+        Utilities.validateKey(key, true);
+        client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
+    }
     public void executePutBoolean(String key, boolean value) {
         Utilities.validateKey(key, true);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);

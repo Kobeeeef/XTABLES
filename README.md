@@ -179,6 +179,20 @@ You can customize the average compression speed threshold by using the `setSpeed
 - **ping_latency()**
   - Measures the network and round-trip latency in milliseconds.
 
+## High-Efficiency Methods
+
+To ensure absolute maximum efficiency and speed, the following methods should be used as they incur no processing:
+
+- **executePutString(String key, String value)**: Stores a string value with no additional processing.
+- **executePutInteger(String key, int value)**: Stores an integer value with no additional processing.
+- **executePutBoolean(String key, boolean value)**: Stores a boolean value with no additional processing.
+- **executePutDouble(String key, double value)**: Stores a double value with no additional processing.
+- **executePutLong(String key, long value)**: Stores a long value with no additional processing.
+- **executePutArray(String key, List<T> value)**: Stores an array with minimal processing, converting it to JSON.
+- **executePutObject(String key, Object value)**: Stores an object with minimal processing, converting it to JSON.
+
+These methods directly send raw messages to the server, bypassing additional processing steps to achieve optimal performance.
+
 ## Running Server-Side Scripts
 
 The `XTablesClient` allows you to run server-side scripts with custom data using the `runScript` method.
