@@ -1,6 +1,7 @@
 package org.kobe.xbot.Client;
 
 
+import org.kobe.xbot.Utilities.ResponseInfo;
 import org.kobe.xbot.Utilities.ResponseStatus;
 
 import java.io.IOException;
@@ -14,10 +15,12 @@ public class OverloadTest {
         XTablesClient client = new XTablesClient();
 
         while (true) {
+
             try {
-                client.putString("yep", "" + Math.random()).execute();
+                client.executePutInteger("ok", 1);
             } catch (Exception ignored) {}
         }
+
 
 
     }

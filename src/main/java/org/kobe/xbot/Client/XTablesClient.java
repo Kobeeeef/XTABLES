@@ -33,8 +33,9 @@ import java.util.function.Consumer;
  * <p>
  * The XTablesClient class supports operations like caching, subscribing to updates and delete events,
  * running scripts, managing key-value pairs, and handling video streams.
- * It utilizes Gson for JSON parsing and integrates with a custom SocketClient for network communication.
+ * It uses Gson for JSON parsing and integrates with a custom SocketClient for network communication.
  * <p>
+ *
  * @author Kobe
  */
 
@@ -58,8 +59,8 @@ public class XTablesClient {
 
     /**
      * Connects to the first instance of XTables found with default settings (mDNS).
-     * This constructor utilizes mDNS (Multicast DNS) to discover the first available XTables instance on the network.
-     * The default settings include using a maximum of 5 threads for client operations and disabling caching.
+     * This constructor uses mDNS (Multicast DNS) to discover the first available XTables instance on the network.
+     * The default settings include using a maximum of five threads for client operations and disabling caching.
      * It is designed for quick and simple client initialization without needing to specify server details manually.
      */
     public XTablesClient() {
@@ -69,7 +70,7 @@ public class XTablesClient {
 
     /**
      * Connects to the first instance of XTables found with the specified settings (mDNS).
-     * This constructor utilizes mDNS (Multicast DNS) to discover the first available XTables instance on the network.
+     * This constructor uses mDNS (Multicast DNS) to discover the first available XTables instance on the network.
      * It allows for customized client configuration by specifying the maximum number of threads for client operations
      * and whether to enable caching. This is useful for scenarios where you want to use custom settings but do not
      * want to manually specify the server details.
@@ -88,7 +89,7 @@ public class XTablesClient {
      * that matches the provided service name. It allows for customized client configuration
      * by specifying the maximum number of threads for client operations and whether to enable caching.
      *
-     * @param name        the mDNS service name of the XTables instance to connect to. If null, connects to the first found instance.
+     * @param name        the mDNS service name of the XTables instance to connect to. If null, connect to the first found instance.
      * @param MAX_THREADS the maximum number of threads to use for client operations, ensuring efficient handling of multiple requests.
      * @param useCache    flag indicating whether to use client-side caching for faster data retrieval and reduced server load.
      */
@@ -585,6 +586,19 @@ public class XTablesClient {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PUT, key + " " + parsedValue).parsed(), ResponseStatus.class);
     }
 
+    public void executePutString(String key, String value) {
+        Utilities.validateKey(key, true);
+        client.sendMessageRaw("IGNORED:PUT " + key + " \"" + value + "\"");
+    }
+
+    public void executePutInteger(String key, int value) {
+        Utilities.validateKey(key, true);
+        client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
+    }
+    public void executePutBoolean(String key, boolean value) {
+        Utilities.validateKey(key, true);
+        client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
+    }
     public RequestAction<VideoStreamResponse> registerImageStreamServer(String name) {
         Utilities.validateName(name, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.REGISTER_VIDEO_STREAM, name).parsed(), VideoStreamResponse.class) {

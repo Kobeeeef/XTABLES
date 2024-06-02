@@ -63,6 +63,13 @@ public class XTables {
     private Server userInterfaceServer;
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
 
+    private XTables(String SERVICE_NAME, int PORT) {
+        this.port = PORT;
+        this.SERVICE_NAME = SERVICE_NAME;
+        instance.set(this);
+        this.clientThreadPool = Executors.newCachedThreadPool();
+        startServer();
+    }
 
     public static XTables startInstance(String SERVICE_NAME, int PORT) {
         if (instance.get() == null) {
@@ -103,6 +110,10 @@ public class XTables {
         return instance.get();
     }
 
+    public static XTableStatus getStatus() {
+        return status.get();
+    }
+
     public void addScript(String name, Function<ScriptParameters, String> script) {
         if (scripts.containsKey(name))
             throw new ScriptAlreadyExistsException("There is already a script with the name: '" + name + "'");
@@ -112,14 +123,6 @@ public class XTables {
 
     public void removeScript(String name) {
         scripts.remove(name);
-    }
-
-    private XTables(String SERVICE_NAME, int PORT) {
-        this.port = PORT;
-        this.SERVICE_NAME = SERVICE_NAME;
-        instance.set(this);
-        this.clientThreadPool = Executors.newCachedThreadPool();
-        startServer();
     }
 
     private void startServer() {
@@ -335,10 +338,6 @@ public class XTables {
         }
     }
 
-    public static XTableStatus getStatus() {
-        return status.get();
-    }
-
     public boolean rebootServer() {
         if (!getStatus().equals(XTableStatus.ONLINE)) {
             logger.warning("Cannot reboot server when status is: " + getStatus());
@@ -431,9 +430,9 @@ public class XTables {
 
                 String inputLine;
                 while ((inputLine = in.readLine()) != null && !this.isInterrupted()) {
+                    totalMessages++;
                     RequestInfo requestInfo = new RequestInfo(inputLine);
                     boolean shouldReply = !requestInfo.getID().equals("IGNORED");
-                    totalMessages++;
                     if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.REGISTER_VIDEO_STREAM)) {
                         String name = requestInfo.getTokens()[1].trim();
                         if (Utilities.validateName(name, false)) {
@@ -656,13 +655,6 @@ public class XTables {
                         }
                     }
                 }
-                // Close the streams and socket when done
-                out.close();
-                in.close();
-                clientSocket.close();
-                clients.remove(this);
-                messages_log.cancel(true);
-                this.interrupt();
             } catch (IOException e) {
                 String message = e.getMessage();
                 if (message.contains("Connection reset")) {
@@ -672,6 +664,15 @@ public class XTables {
                 }
                 messages_log.cancel(true);
                 clients.remove(this);
+            } finally {
+                try {
+                    clientSocket.close();
+                } catch (IOException e) {
+                    logger.severe("Error closing client socket: " + e.getMessage());
+                }
+                clients.remove(this);
+                messages_log.cancel(true);
+                this.interrupt();
             }
         }
 

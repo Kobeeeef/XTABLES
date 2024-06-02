@@ -301,7 +301,10 @@ public class SocketClient {
         out.println(responseInfo.parsed());
         out.flush();
     }
-
+    public void sendMessageRaw(String raw) {
+        out.println(raw);
+        out.flush();
+    }
     public void stopAll() {
         long startTime = System.nanoTime();
         logger.severe("Shutting down all threads and processes.");
