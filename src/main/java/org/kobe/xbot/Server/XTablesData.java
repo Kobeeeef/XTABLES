@@ -8,19 +8,19 @@ import org.kobe.xbot.Utilities.Utilities;
 
 import java.util.*;
 
-public class XTablesData<V> {
+public class XTablesData {
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private static final Gson gson = new GsonBuilder().create();
-    private static final Set<String> flaggedKeys = new HashSet<>();
-    private Map<String, XTablesData<V>> data;
-    private V value;
+    private static final Set<String> flaggedKeys = Collections.synchronizedSet(new HashSet<>());
+    private Map<String, XTablesData> data;
+    private String value;
 
     public XTablesData() {
         // Initialize the data map lazily
     }
 
     // Method to put a value into the nested structure
-    public boolean put(String key, V value) {
+    public boolean put(String key, String value) {
         Utilities.validateKey(key, true);
 //        if(!Utilities.isValidValue((String) value) && !flaggedKeys.contains(key)) {
 //            flaggedKeys.add(key);
@@ -31,16 +31,14 @@ public class XTablesData<V> {
 //            logger.warning("The key '" + key + "' is no longer a flagged value.");
 //        }
         String[] keys = key.split("\\."); // Split the key by '.'
-        XTablesData<V> current = this;
+        XTablesData current = this;
 
         // Traverse through the nested structure until reaching the final level
         for (String k : keys) {
             if (current.data == null) {
                 current.data = new HashMap<>();
             }
-            if (!current.data.containsKey(k)) {
-                current.data.put(k, new XTablesData<>());
-            }
+            current.data.putIfAbsent(k, new XTablesData());
             current = current.data.get(k);
         }
 
@@ -52,7 +50,7 @@ public class XTablesData<V> {
     public int size() {
         int count = (value != null) ? 1 : 0;
         if (data != null) {
-            for (XTablesData<V> child : data.values()) {
+            for (XTablesData child : data.values()) {
                 count += child.size();
             }
         }
@@ -65,25 +63,22 @@ public class XTablesData<V> {
     }
 
     // Method to get a value from the nested structure
-    public V get(String key) {
+    public String get(String key) {
         Utilities.validateKey(key, true);
-        XTablesData<V> current = getLevelxTablesData(key);
-        if (current == null) return null; // Key not found
-
-        // Return the value found at the final level
-        return current.value;
+        XTablesData current = getLevelxTablesData(key);
+        return (current != null) ? current.value : null;
     }
 
-    public V get(String key, V defaultValue) {
+    public String get(String key, String defaultValue) {
         Utilities.validateKey(key, true);
-        V result = get(key);
+        String result = get(key);
         return (result != null) ? result : defaultValue;
     }
 
-    private XTablesData<V> getLevelxTablesData(String key) {
+    private XTablesData getLevelxTablesData(String key) {
         Utilities.validateKey(key, true);
         String[] keys = key.split("\\."); // Split the key by '.'
-        XTablesData<V> current = this;
+        XTablesData current = this;
 
         // Traverse through the nested structure
         for (String k : keys) {
@@ -111,13 +106,13 @@ public class XTablesData<V> {
         String parentKey = String.join(".", Arrays.copyOf(oldKeys, oldKeys.length - 1));
         String newKey = parentKey.isEmpty() ? newKeyName : parentKey + "." + newKeyName;
 
-        XTablesData<V> parentNode = getLevelxTablesData(parentKey);
+        XTablesData parentNode = getLevelxTablesData(parentKey);
         if (parentNode == null || !parentNode.data.containsKey(oldKeys[oldKeys.length - 1])) {
             return false; // Old key does not exist
         }
 
         // Get the old node
-        XTablesData<V> oldNode = parentNode.data.get(oldKeys[oldKeys.length - 1]);
+        XTablesData oldNode = parentNode.data.get(oldKeys[oldKeys.length - 1]);
         if (oldNode == null) {
             return false;
         }
@@ -132,10 +127,10 @@ public class XTablesData<V> {
         parentNode.data.remove(oldKeys[oldKeys.length - 1]);
 
         // Update flagged keys
-        if (flaggedKeys.contains(oldKey)) {
-            flaggedKeys.remove(oldKey);
-            flaggedKeys.add(newKey);
-        }
+//        if (flaggedKeys.contains(oldKey)) {
+//            flaggedKeys.remove(oldKey);
+//            flaggedKeys.add(newKey);
+//        }
 
         return true; // Successfully renamed
     }
@@ -146,23 +141,20 @@ public class XTablesData<V> {
         if (key.isEmpty()) {
             return (data != null) ? data.keySet() : null;
         }
-        XTablesData<V> current = getLevelxTablesData(key);
-        if (current == null || current.data == null) return null;
-
-        // Return the keys at this level
-        return current.data.keySet();
+        XTablesData current = getLevelxTablesData(key);
+        return (current != null && current.data != null) ? current.data.keySet() : null;
     }
 
     // Method to delete a value at a given level
     public boolean delete(String key) {
         Utilities.validateKey(key, true);
         if (key.isEmpty()) {
-            this.data = null; // Remove everything if key is empty
-            flaggedKeys.clear(); // Clear flagged keys if everything is removed
+            this.data = null; // Remove everything if the key is empty
+//            flaggedKeys.clear(); // Clear flagged keys if everything is removed
             return true;
         }
         String[] keys = key.split("\\."); // Split the key by '.'
-        XTablesData<V> current = this;
+        XTablesData current = this;
 
         // Traverse through the nested structure until reaching the level to delete
         for (int i = 0; i < keys.length - 1; i++) {
@@ -175,9 +167,9 @@ public class XTablesData<V> {
 
         boolean result = current.data != null && current.data.remove(keys[keys.length - 1]) != null;
 
-        if (result) {
-            flaggedKeys.remove(key);
-        }
+//        if (result) {
+//            flaggedKeys.remove(key);
+//        }
 
         return result;
     }
@@ -186,19 +178,17 @@ public class XTablesData<V> {
         return gson.toJson(this.data);
     }
 
-
     public void updateFromRawJSON(String json) {
         // Replace the current map directly with the parsed data
         // This avoids unnecessary clearing and re-creating of the map
-        Map<String, XTablesData<V>> newData = gson.fromJson(json, new TypeToken<Map<String, XTablesData<V>>>() {
+        Map<String, XTablesData> newData = gson.fromJson(json, new TypeToken<Map<String, XTablesData>>() {
         }.getType());
 
-        // Check if the new data is null which might be the case if json is empty or invalid
+        // Check if the new data is null, which might be the case if json is empty or invalid
         if (newData == null) {
             newData = new HashMap<>(); // Ensure the data field is never null
         }
 
         this.data = newData; // Directly assign the new data
     }
-
 }

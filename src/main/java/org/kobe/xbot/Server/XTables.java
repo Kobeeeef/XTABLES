@@ -52,7 +52,7 @@ public class XTables {
     private JmDNS jmdns;
     private ServiceInfo serviceInfo;
     private final Set<ClientHandler> clients = new HashSet<>();
-    private final XTablesData<String> table = new XTablesData<>();
+    private final XTablesData table = new XTablesData();
     private ServerSocket serverSocket;
     private final int port;
     private final ExecutorService clientThreadPool;
@@ -692,7 +692,7 @@ public class XTables {
         }
     }
 
-    public record ScriptParameters(XTablesData<String> data, String customData) {
+    public record ScriptParameters(XTablesData data, String customData) {
     }
 
 

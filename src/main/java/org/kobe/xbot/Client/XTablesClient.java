@@ -175,7 +175,7 @@ public class XTablesClient {
     private final XTablesLogger logger = XTablesLogger.getLogger();
     private SocketClient client;
     private final Gson gson = new Gson();
-    private XTablesData<String> cache;
+    private XTablesData cache;
     private long cacheFetchCooldown = 10000;
     private boolean isCacheReady = false;
     private final CountDownLatch latch = new CountDownLatch(1);
@@ -236,7 +236,7 @@ public class XTablesClient {
     private void initializeCache() {
         logger.info("Initializing cache...");
         String rawJSON = getRawJSON().complete();
-        cache = new XTablesData<>();
+        cache = new XTablesData();
         cache.updateFromRawJSON(rawJSON);
         logger.info("Cache initialized and populated.");
     }
@@ -270,7 +270,7 @@ public class XTablesClient {
         return isCacheReady;
     }
 
-    public XTablesData<String> getCache() {
+    public XTablesData getCache() {
         return cache;
     }
 

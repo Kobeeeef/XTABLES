@@ -103,7 +103,7 @@ public class Main {
         // Cache updates on any update server side.
         System.out.println("Is cache ready? " + client.isCacheReady());
         if (client.isCacheReady()) {
-            XTablesData<String> cache = client.getCache();
+            XTablesData cache = client.getCache();
 
             // Example: Get data from cache
             String valueFromCache = cache.get("SmartDashboard.sometable");
