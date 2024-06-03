@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -131,9 +130,9 @@ public class XTablesClient {
                                 String localAddress = null;
                                 if (name != null && name.equalsIgnoreCase("localhost")) {
                                     try {
-                                        localAddress = InetAddress.getLocalHost().getHostAddress();
+                                        localAddress = Utilities.getLocalIPAddress();
                                         serviceAddress = localAddress;
-                                    } catch (UnknownHostException e) {
+                                    } catch (Exception e) {
                                         logger.severe("Could not find localhost address: " + e.getMessage());
                                     }
                                 }
