@@ -5,10 +5,7 @@ import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +22,7 @@ public class Utilities {
 
     public static String getLocalIPAddress() {
         try {
-            InetAddress localHost = InetAddress.getLocalHost();
+            InetAddress localHost = Inet4Address.getLocalHost();
             if (localHost.isLoopbackAddress()) {
                 return findNonLoopbackAddress().getHostAddress();
             }
@@ -35,9 +32,10 @@ public class Utilities {
         }
         return null;
     }
+
     public static InetAddress getLocalInetAddress() {
         try {
-            InetAddress localHost = InetAddress.getLocalHost();
+            InetAddress localHost = Inet4Address.getLocalHost();
             if (localHost.isLoopbackAddress()) {
                 return findNonLoopbackAddress();
             }
@@ -47,6 +45,7 @@ public class Utilities {
         }
         return null;
     }
+
     private static InetAddress findNonLoopbackAddress() throws SocketException {
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         while (networkInterfaces.hasMoreElements()) {

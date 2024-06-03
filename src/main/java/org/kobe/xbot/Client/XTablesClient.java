@@ -118,7 +118,7 @@ public class XTablesClient {
                         synchronized (serviceFound) {
                             if (!serviceFound[0]) {
                                 ServiceInfo serviceInfo = event.getInfo();
-                                String serviceAddress = serviceInfo.getInetAddresses()[0].getHostAddress();
+                                String serviceAddress = serviceInfo.getInet4Addresses()[0].getHostAddress();
                                 int socketServerPort = -1;
                                 String portStr = serviceInfo.getPropertyString("port");
                                 try {
