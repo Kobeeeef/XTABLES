@@ -6,7 +6,7 @@
 
 You can access the Javadocs for XTABLES at the following link:
 
-[XTABLES Javadocs](https://kobeeeef.github.io/XTABLES/)
+[XTABLES Javadocs](https://kobeeeef.github.io/XTABLES/org/kobe/xbot/Client/XTablesClient.html)
 
 ## Comparison with FRC Network Tables
 
