@@ -5,8 +5,6 @@ import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.ThreadMXBean;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.util.List;
 
 public class SystemStatistics {
@@ -25,6 +23,7 @@ public class SystemStatistics {
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     private static final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+
     public SystemStatistics(int totalClients) {
         this.nanoTime = System.nanoTime();
         this.totalClients = totalClients;
@@ -33,10 +32,8 @@ public class SystemStatistics {
         this.processCpuLoadPercentage = osMXBean.getCpuLoad() * 100;
         this.availableProcessors = osMXBean.getAvailableProcessors();
         this.totalThreads = threadMXBean.getThreadCount();
-        try {
-            this.ip = Inet4Address.getLocalHost().getHostAddress();
-        } catch (UnknownHostException ignored) {
-        }
+        this.ip = Utilities.getLocalIPAddress();
+
     }
 
     public String getIp() {
@@ -99,7 +96,6 @@ public class SystemStatistics {
     public long getTotalThreads() {
         return totalThreads;
     }
-
 
 
 }

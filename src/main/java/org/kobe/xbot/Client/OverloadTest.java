@@ -14,14 +14,10 @@ public class OverloadTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient("10.0.0.52", 1735, 5, false);
+        XTablesClient client = new XTablesClient();
 
-        org.bytedeco.opencv.opencv_videoio.VideoCapture capture = new VideoCapture(0);
-        org.bytedeco.opencv.opencv_core.Mat frame = new Mat();
-        while(capture.read(frame)) {
-            client.putByteFrame("camera", Utilities.matToByteArray(frame)).execute();
-            opencv_highgui.imshow("ok", frame);
-            opencv_highgui.waitKey(1);
+        while(true) {
+          client.executePutString("http://" + SERVER_ADDRESS + ":" + SERVER_PORT, "Hello World");
         }
 
     }
