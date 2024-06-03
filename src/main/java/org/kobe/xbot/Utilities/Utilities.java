@@ -8,6 +8,7 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,23 +22,48 @@ public class Utilities {
         return byteArray;
     }
 
-    public static String getLocalIpAddress() throws SocketException {
-        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = interfaces.nextElement();
+
+    public static String getLocalIPAddress() {
+        try {
+            InetAddress localHost = InetAddress.getLocalHost();
+            if (localHost.isLoopbackAddress()) {
+                return findNonLoopbackAddress().getHostAddress();
+            }
+            return localHost.getHostAddress();
+        } catch (UnknownHostException | SocketException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static InetAddress getLocalInetAddress() {
+        try {
+            InetAddress localHost = InetAddress.getLocalHost();
+            if (localHost.isLoopbackAddress()) {
+                return findNonLoopbackAddress();
+            }
+            return localHost;
+        } catch (UnknownHostException | SocketException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private static InetAddress findNonLoopbackAddress() throws SocketException {
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = networkInterfaces.nextElement();
 
             // Skip loopback and down interfaces
             if (networkInterface.isLoopback() || !networkInterface.isUp()) {
                 continue;
             }
 
-            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                InetAddress inetAddress = addresses.nextElement();
+            Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+            while (inetAddresses.hasMoreElements()) {
+                InetAddress inetAddress = inetAddresses.nextElement();
 
                 // Return the first non-loopback IPv4 address
-                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof InetAddress && inetAddress.getHostAddress().contains(".")) {
-                    return inetAddress.getHostAddress();
+                if (!inetAddress.isLoopbackAddress() && inetAddress.isSiteLocalAddress() && inetAddress.getHostAddress().contains(".")) {
+                    return inetAddress;
                 }
             }
         }
@@ -58,7 +84,7 @@ public class Utilities {
             // Attempt to parse the JSON string
             Json.read(jsonString);
             return true; // If parsing succeeds, JSON is valid
-        } catch ( Error | Exception e) {
+        } catch (Error | Exception e) {
             return false; // If parsing fails, JSON is invalid
         }
     }
@@ -71,6 +97,7 @@ public class Utilities {
         }
         return combinedMap;
     }
+
     public static int extractPortFromDescription(String description) {
         for (String part : description.split(";")) {
             part = part.trim();
@@ -80,8 +107,9 @@ public class Utilities {
         }
         throw new IllegalArgumentException("Port not found in service description");
     }
+
     public static boolean validateKey(String key, boolean throwError) {
-        // Check if key is null or empty
+        // Check if the key is null or empty
         if (key == null) {
             if (throwError) throw new IllegalArgumentException("Key cannot be null.");
             else return false;
@@ -119,19 +147,19 @@ public class Utilities {
     }
 
     public static boolean validateName(String name, boolean throwError) {
-        // Check if name is null or empty
+        // Check if the name is null or empty
         if (name == null) {
             if (throwError) throw new IllegalArgumentException("Name cannot be null.");
             else return false;
         }
 
-        // Check if name contains spaces
+        // Check if the name contains spaces
         if (name.contains(" ")) {
             if (throwError) throw new IllegalArgumentException("Name cannot contain spaces.");
             else return false;
         }
 
-        // Check if name contains '.'
+        // Check if the name contains '.'
         if (name.contains(".")) {
             if (throwError) throw new IllegalArgumentException("Name cannot contain '.'");
             else return false;

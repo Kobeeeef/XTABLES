@@ -309,7 +309,10 @@ public class XTables {
         while (attempt < maxRetries && !Thread.currentThread().isInterrupted()) {
             try {
                 attempt++;
-                InetAddress addr = InetAddress.getLocalHost();
+                InetAddress addr = Utilities.getLocalInetAddress();
+                if(addr == null) {
+                    throw new RuntimeException("No local IP address found!");
+                }
                 logger.info("Initializing mDNS with address: " + addr.getHostAddress());
                 jmdns = JmDNS.create(addr);
                 // Create the service with additional attributes
@@ -465,11 +468,7 @@ public class XTables {
                             ResponseInfo responseInfo;
                             responseInfo = optional.map(clientHandler -> {
                                         String clientAddress = clientHandler.clientSocket.getInetAddress().getHostAddress();
-                                        try {
-                                            return new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIpAddress() : clientAddress.replaceFirst("/", ""), name)));
-                                        } catch (SocketException e) {
-                                            throw new RuntimeException(e);
-                                        }
+                                        return new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIPAddress() : clientAddress.replaceFirst("/", ""), name)));
                                     })
                                     .orElseGet(() -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name()));
                             out.println(responseInfo.parsed());

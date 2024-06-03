@@ -7,8 +7,6 @@ import org.bytedeco.opencv.opencv_videoio.VideoCapture;
 import org.kobe.xbot.Utilities.Utilities;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class OverloadTest {
     private static final String SERVER_ADDRESS = "localhost"; // Server address

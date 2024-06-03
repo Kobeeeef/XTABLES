@@ -95,7 +95,7 @@ public class XTablesClient {
      */
     public XTablesClient(String name, int MAX_THREADS, boolean useCache) {
         try {
-            InetAddress addr = InetAddress.getLocalHost();
+            InetAddress addr = Utilities.getLocalInetAddress();
             try (JmDNS jmdns = JmDNS.create(addr)) {
                 CountDownLatch serviceLatch = new CountDownLatch(1);
                 final boolean[] serviceFound = {false};
