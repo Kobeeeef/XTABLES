@@ -2,6 +2,12 @@
 
 `XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing, retrieving, and managing data updates in various formats. This document details the methods available in the `XTablesClient` class, including their usage and new enhancements related to caching and error handling.
 
+## Javadocs
+
+You can access the Javadocs for XTABLES at the following link:
+
+[XTABLES Javadocs](https://kobeeeef.github.io/XTABLES/)
+
 ## Comparison with FRC Network Tables
 
 `XTablesClient` boasts superior performance and efficiency compared to traditional FRC Network Tables. Here are some key statistics highlighting the differences:
