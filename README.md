@@ -8,7 +8,7 @@
 
 - **Message Rate**:
   - **FRC Network Tables**: Approximately 10 to 20 thousand messages per second.
-  - **XTablesClient**: Capable of sending around 450,000 updates per second, which translates to 30 million messages per minute with 0% loss.
+  - **XTablesClient**: Capable of sending around ~400,000 updates per second, which translates to 25 million messages per minute with 0% loss.
 
 - **Latency**:
   - **FRC Network Tables**: Typically higher latency due to lower message rates and less optimized data handling.
