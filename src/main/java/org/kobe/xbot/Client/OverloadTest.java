@@ -1,6 +1,11 @@
 package org.kobe.xbot.Client;
 
 
+import org.bytedeco.opencv.global.opencv_highgui;
+import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_videoio.VideoCapture;
+import org.kobe.xbot.Utilities.Utilities;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,23 +16,15 @@ public class OverloadTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient();
-        int i = 0;
-        long time = System.nanoTime();
-        List<Double> times = new ArrayList<>();
-        while (i < 1000000) {
-            i++;
-            try {
-                long start = System.nanoTime();
-                client.executePutInteger("ok", 1);
-                times.add((System.nanoTime() - start) / 1e6);
-            } catch (Exception ignored) {
-            }
-        }
-        System.out.println("Average Time (1M Updates): " + times.stream().mapToDouble(Double::doubleValue)
-                .average().orElse(Double.NaN) + " ms");
-        System.out.println("Total Time (1M Updates): " + (System.nanoTime() - time) / 1e6 + " ms");
+        XTablesClient client = new XTablesClient("10.0.0.52", 1735, 5, false);
 
+        org.bytedeco.opencv.opencv_videoio.VideoCapture capture = new VideoCapture(0);
+        org.bytedeco.opencv.opencv_core.Mat frame = new Mat();
+        while(capture.read(frame)) {
+            client.putByteFrame("camera", Utilities.matToByteArray(frame)).execute();
+            opencv_highgui.imshow("ok", frame);
+            opencv_highgui.waitKey(1);
+        }
 
     }
 

@@ -134,7 +134,7 @@ public class SocketClient {
                     socketExecutor.shutdownNow();
                 }
                 this.socketExecutor = getSocketExecutor();
-                socketExecutor.submit(new ClientMessageListener(socket));
+                socketExecutor.execute(new ClientMessageListener(socket));
                 List<RequestAction<ResponseStatus>> requestActions = xTablesClient.resubscribeToAllUpdateEvents();
                 if (!requestActions.isEmpty()) {
                     logger.info("Resubscribing to all previously submitted update events.");
@@ -391,16 +391,12 @@ public class SocketClient {
         return future;
     }
 
-    public void sendExecute(String message, boolean useThreading) throws IOException {
+    public void sendExecute(String message) throws IOException {
         if (executor == null || executor.isShutdown())
             throw new IOException("The worker thread executor is shutdown and no new requests can be made.");
-        if (useThreading) {
-            executor.execute(() -> {
-                sendMessage(ResponseInfo.from(message).setID("IGNORED"));
-            });
-        } else {
-            sendMessage(ResponseInfo.from(message).setID("IGNORED"));
-        }
+
+        sendMessage(ResponseInfo.from(message).setID("IGNORED"));
+
     }
 
     public String sendComplete(String message, long msTimeout) throws ExecutionException, InterruptedException, TimeoutException, IOException {

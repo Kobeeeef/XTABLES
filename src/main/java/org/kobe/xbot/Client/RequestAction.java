@@ -178,27 +178,16 @@ public class RequestAction<T> {
 
 
     /**
-     * Sends a request to the server to execute an action.
-     *
-     * @param asynchronous If true, the request is executed in a separate thread; otherwise, it is executed in the current thread.
-     *                     In asynchronous mode, the method uses the thread pool to handle the request, allowing the current thread to continue without waiting.
-     *                     In synchronous mode, the method waits for the request to send before proceeding.
-     */
-    public void execute(boolean asynchronous) {
-        try {
-            client.sendExecute(value, asynchronous);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Sends a request to the server and does not wait for a response.
      * Instructs the server to perform the action without responding.
      * This method defaults to sending the request synchronously.
      */
     public void execute() {
-        execute(false);
+        try {
+            client.sendExecute(value);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
