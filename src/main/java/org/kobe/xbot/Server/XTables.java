@@ -30,7 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -398,8 +401,7 @@ public class XTables {
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
             this.identifier = UUID.randomUUID().toString();
-            BufferedOutputStream bos = new BufferedOutputStream(clientSocket.getOutputStream());
-            this.out = new PrintWriter(bos, true);
+            this.out = new PrintWriter(clientSocket.getOutputStream(), true);
             super.setDaemon(true);
         }
 
