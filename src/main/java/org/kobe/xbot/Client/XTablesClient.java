@@ -586,22 +586,27 @@ public class XTablesClient {
     }
 
     public void executePutString(String key, String value) {
+        Utilities.validateKey(key, true);
         client.sendMessageRaw("IGNORED:PUT " + key + " \"" + value + "\"");
     }
 
     public void executePutInteger(String key, int value) {
+        Utilities.validateKey(key, true);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
 
     public void executePutDouble(String key, double value) {
+        Utilities.validateKey(key, true);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
 
     public void executePutLong(String key, long value) {
+        Utilities.validateKey(key, true);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
 
     public void executePutBoolean(String key, boolean value) {
+        Utilities.validateKey(key, true);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
 
