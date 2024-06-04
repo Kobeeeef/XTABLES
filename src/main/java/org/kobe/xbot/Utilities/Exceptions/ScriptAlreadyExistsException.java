@@ -1,4 +1,4 @@
-package org.kobe.xbot.Utilities;
+package org.kobe.xbot.Utilities.Exceptions;
 
 /**
  * Exception thrown when a script already exists in the system.

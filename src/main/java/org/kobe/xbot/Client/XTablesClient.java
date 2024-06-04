@@ -5,6 +5,9 @@ import com.google.gson.JsonSyntaxException;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.kobe.xbot.Server.XTablesData;
 import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.Entities.UpdateConsumer;
+import org.kobe.xbot.Utilities.Exceptions.BackupException;
+import org.kobe.xbot.Utilities.Exceptions.ServerFlaggedValueException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import javax.jmdns.JmDNS;
@@ -336,7 +339,7 @@ public class XTablesClient {
             public boolean onResponse(ResponseStatus result) {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
-                    consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                    consumers.removeIf(updateConsumer -> updateConsumer.getType().equals(type) && updateConsumer.getConsumer().equals(consumer));
                     if (consumers.isEmpty()) {
                         update_consumers.remove(key);
                     }
@@ -352,7 +355,7 @@ public class XTablesClient {
             @Override
             public boolean doNotRun() {
                 List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
-                consumers.removeIf(updateConsumer -> updateConsumer.type.equals(type) && updateConsumer.consumer.equals(consumer));
+                consumers.removeIf(updateConsumer -> updateConsumer.getType().equals(type) && updateConsumer.getConsumer().equals(consumer));
                 return !consumers.isEmpty();
             }
         };
@@ -365,7 +368,7 @@ public class XTablesClient {
             public boolean onResponse(ResponseStatus result) {
                 if (result.equals(ResponseStatus.OK)) {
                     List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
-                    consumers.removeIf(updateConsumer -> updateConsumer.type.equals(String.class) && updateConsumer.consumer.equals(consumer));
+                    consumers.removeIf(updateConsumer -> updateConsumer.getType().equals(String.class) && updateConsumer.getConsumer().equals(consumer));
                     if (consumers.isEmpty()) {
                         update_consumers.remove(key);
                     }
@@ -381,7 +384,7 @@ public class XTablesClient {
             @Override
             public boolean doNotRun() {
                 List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
-                consumers.removeIf(updateConsumer -> updateConsumer.type.equals(String.class) && updateConsumer.consumer.equals(consumer));
+                consumers.removeIf(updateConsumer -> updateConsumer.getType().equals(String.class) && updateConsumer.getConsumer().equals(consumer));
                 return !consumers.isEmpty();
             }
         };
@@ -423,8 +426,7 @@ public class XTablesClient {
         };
     }
 
-    public record UpdateConsumer<T>(Class<T> type, Consumer<? super SocketClient.KeyValuePair<T>> consumer) {
-    }
+
 
 
     private <T> void on_update(SocketClient.KeyValuePair<String> keyValuePair) {
@@ -450,8 +452,8 @@ public class XTablesClient {
         List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
         for (UpdateConsumer<?> updateConsumer : consumers) {
             UpdateConsumer<T> typedUpdateConsumer = (UpdateConsumer<T>) updateConsumer;
-            Consumer<? super SocketClient.KeyValuePair<T>> consumer = typedUpdateConsumer.consumer();
-            Class<T> type = typedUpdateConsumer.type();
+            Consumer<? super SocketClient.KeyValuePair<T>> consumer = typedUpdateConsumer.getConsumer();
+            Class<T> type = typedUpdateConsumer.getType();
             if (type != null) {
                 try {
                     T parsed = gson.fromJson(keyValuePair.getValue(), type);
@@ -463,7 +465,7 @@ public class XTablesClient {
                 }
             } else {
                 UpdateConsumer<String> typedUpdateConsumer2 = (UpdateConsumer<String>) updateConsumer;
-                Consumer<? super SocketClient.KeyValuePair<String>> consumer2 = typedUpdateConsumer2.consumer();
+                Consumer<? super SocketClient.KeyValuePair<String>> consumer2 = typedUpdateConsumer2.getConsumer();
                 try {
                     consumer2.accept(keyValuePair);
                 } catch (Exception e) {
@@ -943,6 +945,40 @@ public class XTablesClient {
     }
 
 
-    public record LatencyInfo(double networkLatencyMS, double roundTripLatencyMS, SystemStatistics systemStatistics) {
+    public static class LatencyInfo {
+        private double networkLatencyMS;
+        private double roundTripLatencyMS;
+        private SystemStatistics systemStatistics;
+
+        public LatencyInfo(double networkLatencyMS, double roundTripLatencyMS, SystemStatistics systemStatistics) {
+            this.networkLatencyMS = networkLatencyMS;
+            this.roundTripLatencyMS = roundTripLatencyMS;
+            this.systemStatistics = systemStatistics;
+        }
+
+        public double getNetworkLatencyMS() {
+            return networkLatencyMS;
+        }
+
+        public void setNetworkLatencyMS(double networkLatencyMS) {
+            this.networkLatencyMS = networkLatencyMS;
+        }
+
+        public double getRoundTripLatencyMS() {
+            return roundTripLatencyMS;
+        }
+
+        public void setRoundTripLatencyMS(double roundTripLatencyMS) {
+            this.roundTripLatencyMS = roundTripLatencyMS;
+        }
+
+        public SystemStatistics getSystemStatistics() {
+            return systemStatistics;
+        }
+
+        public void setSystemStatistics(SystemStatistics systemStatistics) {
+            this.systemStatistics = systemStatistics;
+        }
     }
+
 }

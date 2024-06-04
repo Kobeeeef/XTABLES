@@ -27,9 +27,9 @@ public class SystemStatistics {
     public SystemStatistics(int totalClients) {
         this.nanoTime = System.nanoTime();
         this.totalClients = totalClients;
-        this.maxMemoryMB = osMXBean.getTotalMemorySize() / (1024 * 1024);
-        this.freeMemoryMB = osMXBean.getFreeMemorySize() / (1024 * 1024);
-        this.processCpuLoadPercentage = osMXBean.getCpuLoad() * 100;
+        this.maxMemoryMB = osMXBean.getTotalPhysicalMemorySize() / (1024 * 1024);
+        this.freeMemoryMB = osMXBean.getFreePhysicalMemorySize() / (1024 * 1024);
+        this.processCpuLoadPercentage = osMXBean.getSystemCpuLoad() * 100;
         this.availableProcessors = osMXBean.getAvailableProcessors();
         this.totalThreads = threadMXBean.getThreadCount();
         this.ip = Utilities.getLocalIPAddress();

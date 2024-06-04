@@ -25,9 +25,9 @@ public class Main {
         System.out.println("Connected? " + client.getSocketClient().isConnected);
         // Get latency from server
         XTablesClient.LatencyInfo info = client.ping_latency().complete();
-        System.out.println("Network Latency: " + info.networkLatencyMS() + "ms");
-        System.out.println("Round Trip Latency: " + info.roundTripLatencyMS() + "ms");
-        System.out.println("CPU Usage: " + info.systemStatistics().getProcessCpuLoadPercentage());
+        System.out.println("Network Latency: " + info.getNetworkLatencyMS() + "ms");
+        System.out.println("Round Trip Latency: " + info.getRoundTripLatencyMS() + "ms");
+        System.out.println("CPU Usage: " + info.getSystemStatistics().getProcessCpuLoadPercentage());
 
         // -------- PUT VALUES --------
         // "OK" - Value updated
@@ -80,7 +80,7 @@ public class Main {
         Integer integer = client.getInteger("SmartDashboard.somevalue").complete();
         System.out.println(integer);
 
-        // Subscribe to an update event on key
+        // Subscribe to an update event on a key
         status = client.subscribeUpdateEvent("SmartDashboard", Integer.class, new_value ->
                         System.out.println("New Value: " + new_value)
                 )
@@ -113,7 +113,7 @@ public class Main {
 
 
         ScriptResponse scriptResponse = client.runScript("test", null).complete();
-        System.out.println("Status: " + scriptResponse.status());
-        System.out.println("Script Response: " + scriptResponse.response());
+        System.out.println("Status: " + scriptResponse.getStatus());
+        System.out.println("Script Response: " + scriptResponse.getResponse());
     }
 }

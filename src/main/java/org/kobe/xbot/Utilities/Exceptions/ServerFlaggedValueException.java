@@ -1,4 +1,4 @@
-package org.kobe.xbot.Utilities;
+package org.kobe.xbot.Utilities.Exceptions;
 
 /**
  * Exception thrown when a value is flagged by the network tables server.

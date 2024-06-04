@@ -1,7 +1,8 @@
 package org.kobe.xbot.Utilities;
 
 
-public record RequestInfo(String raw) {
+public class RequestInfo {
+    private final String raw;
 
     public RequestInfo(String raw) {
         this.raw = raw.replaceAll("\n", "");

@@ -24,6 +24,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.Entities.ScriptParameters;
+import org.kobe.xbot.Utilities.Exceptions.ScriptAlreadyExistsException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -692,8 +694,6 @@ public class XTables {
         }
     }
 
-    public record ScriptParameters(XTablesData data, String customData) {
-    }
 
 
 }
