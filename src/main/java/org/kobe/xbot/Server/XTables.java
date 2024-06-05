@@ -36,7 +36,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -136,8 +139,17 @@ public class XTables {
             this.mdnsExecutorService = Executors.newCachedThreadPool();
             mdnsExecutorService.execute(() -> initializeMDNSWithRetries(15));
 
-
-            serverSocket = new ServerSocket(port);
+            try {
+                serverSocket = new ServerSocket(port);
+            } catch (IOException e) {
+                if (e.getMessage().contains("Address already in use")) {
+                    logger.fatal("Port " + port + " is already in use.");
+                    logger.fatal("Exiting server now...");
+                    System.exit(1);
+                } else {
+                    throw e;
+                }
+            }
             logger.info("Server started. Listening on " + serverSocket.getLocalSocketAddress() + "...");
             if (userInterfaceServer == null || !userInterfaceServer.isRunning()) {
                 try {
@@ -259,7 +271,7 @@ public class XTables {
         } catch (IOException e) {
             logger.severe("Socket error occurred: " + e.getMessage());
             status.set(XTableStatus.OFFLINE);
-            if (!serverSocket.isClosed()) {
+            if (serverSocket != null && !serverSocket.isClosed()) {
                 try {
                     serverSocket.close();
                 } catch (IOException ex) {
@@ -312,7 +324,7 @@ public class XTables {
             try {
                 attempt++;
                 InetAddress addr = Utilities.getLocalInetAddress();
-                if(addr == null) {
+                if (addr == null) {
                     throw new RuntimeException("No local IP address found!");
                 }
                 logger.info("Initializing mDNS with address: " + addr.getHostAddress());
@@ -647,13 +659,14 @@ public class XTables {
                             out.flush();
                         }
                         rebootServer();
-                    } else {
+                    } else if (shouldReply) {
                         // Invalid command
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN, ResponseStatus.FAIL.name());
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
+                        logger.warning("Unknown command received from " + clientSocket.getInetAddress().getHostAddress() + ": " + inputLine);
+
+                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN, ResponseStatus.FAIL.name());
+                        out.println(responseInfo.parsed());
+                        out.flush();
+
                     }
                 }
             } catch (IOException e) {
@@ -693,7 +706,6 @@ public class XTables {
             out.flush();
         }
     }
-
 
 
 }

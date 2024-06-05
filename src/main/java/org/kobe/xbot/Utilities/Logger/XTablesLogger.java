@@ -1,5 +1,7 @@
 package org.kobe.xbot.Utilities.Logger;
 
+import org.slf4j.LoggerFactory;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.ConsoleHandler;
@@ -8,12 +10,17 @@ import java.util.logging.Logger;
 
 public class XTablesLogger extends Logger {
     private static final String loggerName = "XTablesLogger";
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(XTablesLogger.class);
     private static Level defaultLevel = Level.ALL;
     private static XTablesLogger instance = null;
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";
     private static final String YELLOW = "\u001B[33m";
     private static final String BLUE = "\u001B[34m";
+    private static final String PURPLE = "\u001B[35m"; // For fatal level
+
+    // Define a custom FATAL logging level
+    public static final Level FATAL = new Level("FATAL", Level.SEVERE.intValue() + 1) {};
 
     protected XTablesLogger(String name, String resourceBundleName) {
         super(name, resourceBundleName);
@@ -29,6 +36,11 @@ public class XTablesLogger extends Logger {
             instance = logger;
             return logger;
         } else return instance;
+    }
+
+    // Method to log fatal messages
+    public void fatal(String msg) {
+        log(FATAL, msg);
     }
 
     // Custom formatter for XTablesLogger
@@ -74,7 +86,9 @@ public class XTablesLogger extends Logger {
     }
 
     private static String getColorFromLevel(Level level) {
-        if (level == Level.SEVERE) {
+        if (level == FATAL) {
+            return PURPLE;
+        } else if (level == Level.SEVERE) {
             return RED;
         } else if (level == Level.WARNING) {
             return YELLOW;
