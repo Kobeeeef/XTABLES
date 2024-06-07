@@ -1,24 +1,27 @@
 import socket
 import logging
+import time
+
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import threading
-import time
+
+import Utilities
 
 
 class XTablesClient:
     def __init__(self, name=None):
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.setblocking(True)
+        self.out = None
         self.name = name
         self.server_ip = None
         self.server_port = None
+        self.client_socket = None
         self.service_found = threading.Event()
-
         self.logger = logging.getLogger(__name__)
         self.zeroconf = Zeroconf()
         self.listener = XTablesServiceListener(self)
+        self.reconnect_delay_ms = 3000
         self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
-
+        self.clientMessageListener = None
         self.discover_service()
 
     def discover_service(self):
@@ -27,10 +30,10 @@ class XTablesClient:
         else:
             self.logger.info(f"Listening for '{self.name}' XTABLES services on port 5353...")
 
-        self.service_found.wait()  # Wait for service to be discovered
-        self.logger.info("Service latch released, proceeding to close mDNS services...")
+        self.service_found.wait()
+        self.logger.info("Service found, proceeding to close mDNS services...")
         self.zeroconf.close()
-        self.logger.info("mDNS service successfully closed. Service discovery resolver shut down.")
+        self.logger.info("mDNS service closed.")
 
         if self.server_ip is None or self.server_port is None:
             raise RuntimeError("The service address or port could not be found.")
@@ -40,20 +43,41 @@ class XTablesClient:
     def initialize_client(self, server_ip, server_port):
         self.logger.info(f"Initializing client with server {server_ip}:{server_port}")
         try:
+            self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client_socket.connect((server_ip, server_port))
             self.logger.info(f"Connected to server {server_ip}:{server_port}")
+            self.out = self.client_socket.makefile('w')
+            if self.clientMessageListener is None:
+                ClientMessageListener(self).start()
         except socket.error as e:
             self.logger.error(f"Connection error: {e}")
+            self.close()
+            time.sleep(self.reconnect_delay_ms/1000)
+            self.initialize_client(server_ip, server_port)
 
     def send_data(self, data):
         try:
             if self.client_socket:
-                self.client_socket.sendall((data + "\n").encode('utf-8'))
-                self.client_socket.recv()
+                self.out.write(data + "\n")
         except socket.error as e:
             self.logger.error(f"Send data error: {e}")
             self.close()
             self.initialize_client(self.server_ip, self.server_port)
+
+    def executePutString(self, key, value):
+        if isinstance(value, str) and isinstance(key, str):
+            Utilities.validate_key(key, True)
+            self.send_data(f"IGNORED:PUT {key} \"{value}\"")
+
+    def executePutInteger(self, key, value):
+        if isinstance(value, int) and isinstance(key, str):
+            Utilities.validate_key(key, True)
+            self.send_data(f"IGNORED:PUT {key} {value}")
+
+    def executePutBoolean(self, key, value):
+        if isinstance(value, bool) and isinstance(key, str):
+            Utilities.validate_key(key, True)
+            self.send_data(f"IGNORED:PUT {key} {value}")
 
     def close(self):
         try:
@@ -103,16 +127,36 @@ class XTablesServiceListener(ServiceListener):
             self.client.service_found.set()
 
 
+class ClientMessageListener(threading.Thread):
+    def __init__(self, client: XTablesClient):
+        super().__init__()
+        self.client = client
+        self.client_socket = client.client_socket
+        self.is_connected = False
+        self.messages = []
+        self.ip = client.server_ip
+        self.port = client.server_port
+        self.in_ = self.client_socket.makefile('r')
+        self.logger = logging.getLogger(__name__)
+
+    def run(self):
+        while True:
+            try:
+                message = self.in_.readline().strip()
+                if message:
+                    self.is_connected = True
+                    self.messages.append(message)
+                    print(self.messages)
+                elif not self.is_connected:
+                    print("Recieved a empty message, attempting reconnection...")
+                    self.client.initialize_client(self.ip, self.port)
+                    self.is_connected = True
+            except Exception as e:
+                self.logger.error(e)
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     client = XTablesClient(name="localhost")
-    try:
-        while True:
-            client.send_data("IGNORED:GET a")
-
-    except KeyboardInterrupt:
-        client.close()
-        print("Client closed.")
-    except Exception as e:
-        logging.error(f"Unexpected error: {e}")
-        client.close()
+    while True:
+        client.executePutString("ok", "okie")

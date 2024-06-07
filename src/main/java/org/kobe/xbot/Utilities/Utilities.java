@@ -97,16 +97,6 @@ public class Utilities {
         return combinedMap;
     }
 
-    public static int extractPortFromDescription(String description) {
-        for (String part : description.split(";")) {
-            part = part.trim();
-            if (part.startsWith("Port=")) {
-                return Integer.parseInt(part.substring(5));
-            }
-        }
-        throw new IllegalArgumentException("Port not found in service description");
-    }
-
     public static boolean validateKey(String key, boolean throwError) {
         // Check if the key is null or empty
         if (key == null) {
