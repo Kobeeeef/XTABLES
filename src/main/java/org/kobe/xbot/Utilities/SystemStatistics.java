@@ -16,7 +16,7 @@ public class SystemStatistics {
     private final long totalThreads;
     private final long nanoTime;
     private final int totalClients;
-    private XTableStatus status;
+    private String status;
     private int totalMessages;
     private String ip;
     private List<ClientData> clientDataList;
@@ -49,12 +49,12 @@ public class SystemStatistics {
         return this;
     }
 
-    public XTableStatus getStatus() {
-        return status;
+    public XTablesStatus getStatus() {
+        return XTablesStatus.valueOf(status);
     }
 
-    public SystemStatistics setStatus(XTableStatus status) {
-        this.status = status;
+    public SystemStatistics setStatus(XTablesStatus status) {
+        this.status = status.toString();
         return this;
     }
 
