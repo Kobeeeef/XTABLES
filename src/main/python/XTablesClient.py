@@ -1,10 +1,8 @@
 import socket
 import logging
 import time
-
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import threading
-
 import Utilities
 
 
@@ -47,21 +45,23 @@ class XTablesClient:
             self.client_socket.connect((server_ip, server_port))
             self.logger.info(f"Connected to server {server_ip}:{server_port}")
             self.out = self.client_socket.makefile('w')
-            if self.clientMessageListener is None:
-                ClientMessageListener(self).start()
+            if not self.clientMessageListener:
+                self.clientMessageListener = ClientMessageListener(self)
+                self.clientMessageListener.start()
         except socket.error as e:
             self.logger.error(f"Connection error: {e}")
-            self.close()
-            time.sleep(self.reconnect_delay_ms/1000)
+            self.close_socket()
+            time.sleep(self.reconnect_delay_ms / 1000)
             self.initialize_client(server_ip, server_port)
 
     def send_data(self, data):
         try:
             if self.client_socket:
                 self.out.write(data + "\n")
+                self.out.flush()
         except socket.error as e:
             self.logger.error(f"Send data error: {e}")
-            self.close()
+            self.close_socket()
             self.initialize_client(self.server_ip, self.server_port)
 
     def executePutString(self, key, value):
@@ -79,12 +79,15 @@ class XTablesClient:
             Utilities.validate_key(key, True)
             self.send_data(f"IGNORED:PUT {key} {value}")
 
-    def close(self):
-        try:
-            self.client_socket.close()
-            self.logger.info("Socket closed.")
-        except socket.error as e:
-            self.logger.error(f"Close socket error: {e}")
+    def close_socket(self):
+        if self.client_socket:
+            try:
+                self.client_socket.close()
+                self.logger.info("Socket closed.")
+            except socket.error as e:
+                self.logger.error(f"Close socket error: {e}")
+            finally:
+                self.client_socket = None
 
 
 class XTablesServiceListener(ServiceListener):
@@ -133,7 +136,6 @@ class ClientMessageListener(threading.Thread):
         self.client = client
         self.client_socket = client.client_socket
         self.is_connected = False
-        self.messages = []
         self.ip = client.server_ip
         self.port = client.server_port
         self.in_ = self.client_socket.makefile('r')
@@ -145,18 +147,20 @@ class ClientMessageListener(threading.Thread):
                 message = self.in_.readline().strip()
                 if message:
                     self.is_connected = True
-                    self.messages.append(message)
-                    print(self.messages)
-                elif not self.is_connected:
-                    print("Recieved a empty message, attempting reconnection...")
+                else:
+                    print(self.is_connected)
+                    self.logger.warning("Received an empty message, attempting reconnection...")
+                    self.client.close_socket()
                     self.client.initialize_client(self.ip, self.port)
-                    self.is_connected = True
             except Exception as e:
-                self.logger.error(e)
+                self.logger.error(f"Error in message listener: {e}")
+                self.client.close_socket()
+                self.client.initialize_client(self.ip, self.port)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    client = XTablesClient(name="localhost")
+    client = XTablesClient()
     while True:
         client.executePutString("ok", "okie")
+        time.sleep(1)  # To prevent overwhelming the server

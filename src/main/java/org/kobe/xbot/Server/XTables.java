@@ -640,6 +640,11 @@ public class XTables {
                         }
                     } else if (shouldReply && requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.PING)) {
                         SystemStatistics systemStatistics = new SystemStatistics(clients.size());
+                        int i = 0;
+                        for (ClientHandler client : clients) {
+                            i += client.totalMessages;
+                        }
+                        systemStatistics.setTotalMessages(i);
                         ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PING, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
                         out.println(responseInfo.parsed());
                         out.flush();

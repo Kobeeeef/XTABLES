@@ -515,7 +515,7 @@ public class XTablesClient {
              */
             @Override
             public boolean doNotRun() {
-                return Utilities.isValidValue(value);
+                return !Utilities.isValidValue(value);
             }
         };
     }
