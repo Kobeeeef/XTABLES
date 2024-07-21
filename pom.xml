@@ -52,10 +52,5 @@
             <version>1.7.36</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>opencv-platform</artifactId>
-            <version>${opencv.version}</version>
-        </dependency>
     </dependencies>
 </project>
