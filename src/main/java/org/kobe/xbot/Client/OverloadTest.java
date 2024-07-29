@@ -14,7 +14,7 @@ public class OverloadTest {
         XTablesClient client = new XTablesClient();
 
         while(true) {
-          client.executePutString("a.a.a.a.a.a.a.a", "Hello World" + Math.random());
+          client.executePutDouble("SmartDashboard.test", Math.random());
         }
 
     }

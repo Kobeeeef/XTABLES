@@ -336,17 +336,18 @@ public class XTables {
                 jmdns.registerService(serviceInfo);
                 logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
                 return;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.severe("Error initializing mDNS (attempt " + attempt + "): " + e.getMessage());
                 if (attempt >= maxRetries) {
                     logger.severe("Max retries reached. Giving up on mDNS initialization.");
+                    stopInstance();
+                    System.exit(0);
                     return;
                 }
 
                 try {
                     logger.info("Retying mDNS initialization in " + delay + " ms.");
                     TimeUnit.MILLISECONDS.sleep(delay);
-                    delay *= 2;
                 } catch (InterruptedException ie) {
                     logger.severe("Retry sleep interrupted: " + ie.getMessage());
                     Thread.currentThread().interrupt();
