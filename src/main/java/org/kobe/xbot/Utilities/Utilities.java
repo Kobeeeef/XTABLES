@@ -40,8 +40,7 @@ public class Utilities {
                 return findNonLoopbackAddress();
             }
             return localHost;
-        } catch (UnknownHostException | SocketException e) {
-            e.printStackTrace();
+        } catch (UnknownHostException | SocketException ignored) {
         }
         return null;
     }
