@@ -30,11 +30,29 @@ public class XTablesData {
 //            flaggedKeys.remove(key);
 //            logger.warning("The key '" + key + "' is no longer a flagged value.");
 //        }
-        String[] keys = key.split("\\."); // Split the key by '.'
         XTablesData current = this;
+        int start = 0;
+        int length = key.length();
 
-        // Traverse through the nested structure until reaching the final level
-        for (String k : keys) {
+        for (int i = 0; i < length; i++) {
+            if (key.charAt(i) == '.') {
+                if (i > start) {
+                    String k = key.substring(start, i); // Extract the part of the key
+
+                    if (current.data == null) {
+                        current.data = new HashMap<>();
+                    }
+                    current.data.putIfAbsent(k, new XTablesData());
+                    current = current.data.get(k);
+                }
+                start = i + 1;
+            }
+        }
+
+// Handle the last part of the key
+        if (start < length) {
+            String k = key.substring(start);
+
             if (current.data == null) {
                 current.data = new HashMap<>();
             }
@@ -42,9 +60,9 @@ public class XTablesData {
             current = current.data.get(k);
         }
 
-        // Put the value into the final level
         current.value = value;
         return true; // Operation successful
+
     }
 
     public int size() {
@@ -58,13 +76,13 @@ public class XTablesData {
     }
 
     public boolean isFlaggedKey(String key) {
-        Utilities.validateKey(key, true);
-        return flaggedKeys.contains(key);
+        return false;
+//        Utilities.validateKey(key, true);
+//        return flaggedKeys.contains(key);
     }
 
     // Method to get a value from the nested structure
     public String get(String key) {
-        Utilities.validateKey(key, true);
         XTablesData current = getLevelxTablesData(key);
         return (current != null) ? current.value : null;
     }

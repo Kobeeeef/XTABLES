@@ -379,19 +379,24 @@ public class XTables {
     }
 
     private void notifyUpdateChangeClients(String key, String value) {
-        try {
-            for (ClientHandler client : new ArrayList<>(clients)) {
-                try {
-                    if (client.getUpdateEvents().contains("") || client.getUpdateEvents().contains(key))
-                        client.sendUpdate(key, value);
-                } catch (Exception | Error e) {
-                    logger.warning("Failed to push updates to client: " + e.getMessage());
-                }
+        synchronized (clients) {
+            Iterator<ClientHandler> iterator = clients.iterator();
+            if (iterator.hasNext()) {
+                do {
+                    ClientHandler client = iterator.next();
+                    try {
+                        Set<String> updateEvents = client.getUpdateEvents();
+                        if (updateEvents.contains("") || updateEvents.contains(key)) {
+                            client.sendUpdate(key, value);
+                        }
+                    } catch (Exception | Error e) {
+                        logger.warning("Failed to push updates to client: " + e.getMessage());
+                    }
+                } while (iterator.hasNext());
             }
-        } catch (Exception | Error e) {
-            logger.warning("Failed to push updates to all clients: " + e.getMessage());
         }
     }
+
 
     private void notifyDeleteChangeClients(String key) {
         synchronized (clients) {
@@ -449,14 +454,23 @@ public class XTables {
                 String inputLine;
                 while ((inputLine = in.readLine()) != null && !this.isInterrupted()) {
                     totalMessages++;
-                    RequestInfo requestInfo = new RequestInfo(inputLine);
-                    boolean shouldReply = !requestInfo.getID().equals("IGNORED");
-                    if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.REGISTER_VIDEO_STREAM)) {
-                        String name = requestInfo.getTokens()[1].trim();
+                    String raw = inputLine.replace("\n", "");
+                    String[] tokens = tokenize(raw, ' ');
+                    String[] requestTokens = tokenize(tokens[0], ':');
+                    String id = requestTokens[0];
+                    MethodType methodType;
+                    try {
+                        methodType = MethodType.valueOf(requestTokens[1]);
+                    } catch (Exception e) {
+                        methodType = MethodType.UNKNOWN;
+                    }
+                    boolean shouldReply = !id.equals("IGNORED");
+                    if (tokens.length == 2 && methodType.equals(MethodType.REGISTER_VIDEO_STREAM)) {
+                        String name = tokens[1].trim();
                         if (Utilities.validateName(name, false)) {
                             if (clients.stream().anyMatch(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name))) {
                                 if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.FAIL_NAME_ALREADY_EXISTS.name());
+                                    ResponseInfo responseInfo = new ResponseInfo(id, MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.FAIL_NAME_ALREADY_EXISTS.name());
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
@@ -466,68 +480,60 @@ public class XTables {
                                 }
                                 streams.add(name);
                                 if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.OKAY.name());
+                                    ResponseInfo responseInfo = new ResponseInfo(id, MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.OKAY.name());
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
                             }
                         } else if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name());
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name());
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    } else if (shouldReply && requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET_VIDEO_STREAM)) {
-                        String name = requestInfo.getTokens()[1];
+                    } else if (shouldReply && tokens.length == 2 && methodType.equals(MethodType.GET_VIDEO_STREAM)) {
+                        String name = tokens[1];
                         if (Utilities.validateName(name, false)) {
                             Optional<ClientHandler> optional = clients.stream().filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name)).findFirst();
                             ResponseInfo responseInfo;
                             responseInfo = optional.map(clientHandler -> {
                                         String clientAddress = clientHandler.clientSocket.getInetAddress().getHostAddress();
-                                        return new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIPAddress() : clientAddress.replaceFirst("/", ""), name)));
+                                        return new ResponseInfo(id, MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIPAddress() : clientAddress.replaceFirst("/", ""), name)));
                                     })
-                                    .orElseGet(() -> new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name()));
+                                    .orElseGet(() -> new ResponseInfo(id, MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name()));
                             out.println(responseInfo.parsed());
                             out.flush();
                         } else {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name());
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name());
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    } else if (shouldReply && requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET)) {
-                        String key = requestInfo.getTokens()[1];
+                    } else if (shouldReply && tokens.length == 2 && methodType.equals(MethodType.GET)) {
+                        String key = tokens[1];
                         String result = gson.toJson(table.get(key));
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET, String.format("%1$s " + result, table.isFlaggedKey(key) ? "FLAGGED" : "GOOD"));
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET, String.format("%1$s " + result, table.isFlaggedKey(key) ? "FLAGGED" : "GOOD"));
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (shouldReply && requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
-                        String key = requestInfo.getTokens()[1];
+                    } else if (shouldReply && tokens.length == 2 && methodType.equals(MethodType.GET_TABLES)) {
+                        String key = tokens[1];
                         String result = gson.toJson(table.getTables(key));
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_TABLES, result);
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (requestInfo.getTokens().length >= 3 && requestInfo.getMethod().equals(MethodType.PUT)) {
-                        String key = requestInfo.getTokens()[1];
-                        String value = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
-                        if (value.equals(table.get(key))) {
-                            if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, "OK");
-                                out.println(responseInfo.parsed());
-                                out.flush();
-                            }
-                        } else {
+                    } else if (tokens.length >= 3 && methodType.equals(MethodType.PUT)) {
+                        String key = tokens[1];
+                        String value = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
                             boolean response = table.put(key, value);
                             if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, response ? "OK" : "FAIL");
+                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.PUT, response ? "OK" : "FAIL");
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }
                             if (response) {
                                 notifyUpdateChangeClients(key, value);
                             }
-                        }
-                    } else if (requestInfo.getTokens().length >= 2 && requestInfo.getMethod().equals(MethodType.RUN_SCRIPT)) {
-                        String name = requestInfo.getTokens()[1];
-                        String customData = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
+                    } else if (tokens.length >= 2 && methodType.equals(MethodType.RUN_SCRIPT)) {
+                        String name = tokens[1];
+                        String customData = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
                         if (scripts.containsKey(name)) {
                             clientThreadPool.execute(() -> {
                                 long startTime = System.nanoTime();
@@ -554,113 +560,113 @@ public class XTables {
                                 }
                                 String response = returnValue == null || returnValue.trim().isEmpty() ? status.name() : status.name() + " " + returnValue.trim();
                                 if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.RUN_SCRIPT, response);
+                                    ResponseInfo responseInfo = new ResponseInfo(id, MethodType.RUN_SCRIPT, response);
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
                             });
                         } else if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PUT, "FAIL SCRIPT_NOT_FOUND");
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.PUT, "FAIL SCRIPT_NOT_FOUND");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    } else if (requestInfo.getTokens().length == 3 && requestInfo.getMethod().equals(MethodType.UPDATE_KEY)) {
-                        String key = requestInfo.getTokens()[1];
-                        String value = requestInfo.getTokens()[2];
+                    } else if (tokens.length == 3 && methodType.equals(MethodType.UPDATE_KEY)) {
+                        String key = tokens[1];
+                        String value = tokens[2];
                         if (!Utilities.validateName(value, false)) {
                             if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UPDATE_KEY, "FAIL");
+                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UPDATE_KEY, "FAIL");
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }
                         } else {
                             boolean response = table.renameKey(key, value);
                             if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UPDATE_KEY, response ? "OK" : "FAIL");
+                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UPDATE_KEY, response ? "OK" : "FAIL");
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }
                         }
-                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.DELETE)) {
-                        String key = requestInfo.getTokens()[1];
+                    } else if (tokens.length == 2 && methodType.equals(MethodType.DELETE)) {
+                        String key = tokens[1];
                         boolean response = table.delete(key);
                         if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.DELETE, response ? "OK" : "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
                         if (response) {
                             notifyDeleteChangeClients(key);
                         }
-                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.DELETE)) {
+                    } else if (tokens.length == 1 && methodType.equals(MethodType.DELETE)) {
                         boolean response = table.delete("");
                         if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.DELETE, response ? "OK" : "FAIL");
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.DELETE, response ? "OK" : "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_DELETE)) {
+                    } else if (tokens.length == 1 && methodType.equals(MethodType.SUBSCRIBE_DELETE)) {
                         deleteEvent.set(true);
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_DELETE, "OK");
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.SUBSCRIBE_DELETE, "OK");
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_DELETE)) {
+                    } else if (tokens.length == 1 && methodType.equals(MethodType.UNSUBSCRIBE_DELETE)) {
                         deleteEvent.set(false);
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNSUBSCRIBE_DELETE, "OK");
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UNSUBSCRIBE_DELETE, "OK");
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
-                        String key = requestInfo.getTokens()[1];
+                    } else if (tokens.length == 2 && methodType.equals(MethodType.SUBSCRIBE_UPDATE)) {
+                        String key = tokens[1];
                         updateEvents.add(key);
                         if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, "OK");
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.SUBSCRIBE_UPDATE, "OK");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.SUBSCRIBE_UPDATE)) {
+                    } else if (tokens.length == 1 && methodType.equals(MethodType.SUBSCRIBE_UPDATE)) {
                         updateEvents.add("");
                         if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.SUBSCRIBE_UPDATE, "OK");
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.SUBSCRIBE_UPDATE, "OK");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    } else if (requestInfo.getTokens().length == 2 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_UPDATE)) {
-                        String key = requestInfo.getTokens()[1];
+                    } else if (tokens.length == 2 && methodType.equals(MethodType.UNSUBSCRIBE_UPDATE)) {
+                        String key = tokens[1];
                         boolean success = updateEvents.remove(key);
                         if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.UNSUBSCRIBE_UPDATE)) {
+                    } else if (tokens.length == 1 && methodType.equals(MethodType.UNSUBSCRIBE_UPDATE)) {
                         boolean success = updateEvents.remove("");
                         if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
-                    } else if (shouldReply && requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.PING)) {
+                    } else if (shouldReply && tokens.length == 1 && methodType.equals(MethodType.PING)) {
                         SystemStatistics systemStatistics = new SystemStatistics(clients.size());
                         int i = 0;
                         for (ClientHandler client : clients) {
                             i += client.totalMessages;
                         }
                         systemStatistics.setTotalMessages(i);
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.PING, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.PING, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (shouldReply && requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_TABLES)) {
+                    } else if (shouldReply && tokens.length == 1 && methodType.equals(MethodType.GET_TABLES)) {
                         String result = gson.toJson(table.getTables(""));
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_TABLES, result);
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (shouldReply && requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.GET_RAW_JSON)) {
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.GET_RAW_JSON, DataCompression.compressAndConvertBase64(table.toJSON()));
+                    } else if (shouldReply && tokens.length == 1 && methodType.equals(MethodType.GET_RAW_JSON)) {
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_RAW_JSON, DataCompression.compressAndConvertBase64(table.toJSON()));
                         out.println(responseInfo.parsed());
                         out.flush();
-                    } else if (requestInfo.getTokens().length == 1 && requestInfo.getMethod().equals(MethodType.REBOOT_SERVER)) {
+                    } else if (tokens.length == 1 && methodType.equals(MethodType.REBOOT_SERVER)) {
                         if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.REBOOT_SERVER, ResponseStatus.OK.name());
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.REBOOT_SERVER, ResponseStatus.OK.name());
                             out.println(responseInfo.parsed());
                             out.flush();
                         }
@@ -669,7 +675,7 @@ public class XTables {
                         // Invalid command
                         logger.warning("Unknown command received from " + clientSocket.getInetAddress().getHostAddress() + ": " + inputLine);
 
-                        ResponseInfo responseInfo = new ResponseInfo(requestInfo.getID(), MethodType.UNKNOWN, ResponseStatus.FAIL.name());
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UNKNOWN, ResponseStatus.FAIL.name());
                         out.println(responseInfo.parsed());
                         out.flush();
 
@@ -703,15 +709,41 @@ public class XTables {
         }
 
         public void sendUpdate(String key, String value) {
-            out.println(new ResponseInfo(null, MethodType.UPDATE_EVENT, key + " " + value).parsed());
+            out.println("null:UPDATE_EVENT " + (key + " " + value).replaceAll("\n", ""));
             out.flush();
         }
 
         public void sendDelete(String key) {
-            out.println(new ResponseInfo(null, MethodType.DELETE_EVENT, key).parsed());
+            out.println("null:DELETE_EVENT " + (key).replaceAll("\n", ""));
             out.flush();
         }
     }
 
+    private String[] tokenize(String input, char delimiter) {
+        int count = 1;
+        int length = input.length();
+        for (int i = 0; i < length; i++) {
+            if (input.charAt(i) == delimiter) {
+                count++;
+            }
+        }
 
+        // Allocate array for results
+        String[] result = new String[count];
+        int index = 0;
+        int tokenStart = 0;
+
+        // Second pass: Extract tokens
+        for (int i = 0; i < length; i++) {
+            if (input.charAt(i) == delimiter) {
+                result[index++] = input.substring(tokenStart, i);
+                tokenStart = i + 1;
+            }
+        }
+
+        // Add last token
+        result[index] = input.substring(tokenStart);
+
+        return result;
+    }
 }
