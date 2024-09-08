@@ -454,7 +454,7 @@ public class XTables {
                 String inputLine;
                 while ((inputLine = in.readLine()) != null && !this.isInterrupted()) {
                     totalMessages++;
-                    String raw = inputLine.replace("\n", "");
+                    String raw = inputLine.replace("\n", "").trim();
                     String[] tokens = tokenize(raw, ' ');
                     String[] requestTokens = tokenize(tokens[0], ':');
                     String id = requestTokens[0];
