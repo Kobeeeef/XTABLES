@@ -1,8 +1,8 @@
 import socket
 import logging
+import threading
 import time
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
-import threading
 import Utilities
 
 
@@ -17,14 +17,10 @@ class XTablesClient:
         self.logger = logging.getLogger(__name__)
         self.zeroconf = Zeroconf()
         self.listener = XTablesServiceListener(self)
-        self.reconnect_delay_ms = 3000  # Start with 3 seconds
-        self.max_reconnect_delay_ms = 60000  # Max delay of 60 seconds
-        self.reconnect_attempts = 0  # Track reconnection attempts
-        self.max_reconnect_attempts = 5  # Limit the number of consecutive reconnects
         self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
         self.clientMessageListener = None
         self.shutdown_event = threading.Event()
-        self.lock = threading.Lock()  # To ensure only one thread can connect at a time
+        self.lock = threading.Lock()
         self.discover_service()
 
     def discover_service(self):
@@ -44,30 +40,31 @@ class XTablesClient:
             self.initialize_client(self.server_ip, self.server_port)
 
     def initialize_client(self, server_ip, server_port):
+        # Shut down the existing client if already connected
+        self.close_socket()
+
         with self.lock:  # Ensure no concurrent connections
-            self.reconnect_attempts = 0  # Reset attempts when reconnecting
-            attempt = 0
             while not self.shutdown_event.is_set():
                 try:
-                    self.logger.info(f"Initializing client with server {server_ip}:{server_port}")
+                    self.logger.info(f"Connecting to server {server_ip}:{server_port}")
                     self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    self.client_socket.connect((server_ip, server_port))
+                    self.client_socket.connect((server_ip, 1735))
                     self.logger.info(f"Connected to server {server_ip}:{server_port}")
                     self.out = self.client_socket.makefile('w')
 
-                    # Start the message listener if it's not already running
-                    if not self.clientMessageListener or not self.clientMessageListener.is_alive():
-                        self.clientMessageListener = ClientMessageListener(self)
-                        self.clientMessageListener.start()
-                    break
+                    # Stop the old message listener if it exists
+                    if self.clientMessageListener:
+                        self.logger.info("Stopping previous message listener...")
+                        self.clientMessageListener.stop()
+                        self.clientMessageListener = None  # Set to None to avoid calling join() from the same thread
+
+                    # Start a new message listener
+                    self.clientMessageListener = ClientMessageListener(self)
+                    self.clientMessageListener.start()
+                    break  # Exit the loop after a successful connection
                 except socket.error as e:
-                    self.logger.error(f"Connection error: {e}. Retrying in {self.reconnect_delay_ms / 1000:.1f} seconds.")
-                    attempt += 1
-                    time.sleep(min(self.reconnect_delay_ms * attempt / 1000, self.max_reconnect_delay_ms / 1000))
-                    self.close_socket()
-                    if attempt >= self.max_reconnect_attempts:
-                        self.logger.error("Max reconnection attempts reached, stopping retries.")
-                        break  # Exit the reconnection loop
+                    self.logger.error(f"Connection error: {e}. Retrying immediately.")
+                time.sleep(1)
 
     def send_data(self, data):
         try:
@@ -75,14 +72,7 @@ class XTablesClient:
                 self.out.write(data + "\n")
                 self.out.flush()
         except socket.error as e:
-            self.logger.error(f"Send data error: {e}")
-            self.close_socket()
-            self.reconnect_attempts += 1
-            if self.reconnect_attempts < self.max_reconnect_attempts:
-                time.sleep(self.reconnect_delay_ms / 1000)  # Delay before retrying
-                self.initialize_client(self.server_ip, self.server_port)
-            else:
-                self.logger.error("Max reconnection attempts reached, stopping retries.")
+            pass
 
     def executePutString(self, key, value):
         if isinstance(value, str) and isinstance(key, str):
@@ -97,46 +87,12 @@ class XTablesClient:
     def executePutBoolean(self, key, value):
         if isinstance(value, bool) and isinstance(key, str):
             Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {str(value).lower()}")  # JSON requires 'true'/'false'
+            self.send_data(f"IGNORED:PUT {key} {str(value).lower()}")
 
     def executePutFloat(self, key, value):
         if isinstance(value, float) and isinstance(key, str):
             Utilities.validate_key(key, True)
             self.send_data(f"IGNORED:PUT {key} {value}")
-
-    def executePutDouble(self, key, value):
-        if isinstance(value, float) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {value}")
-
-    def executePutLong(self, key, value):
-        if isinstance(value, int) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {value}")
-
-    def executePutByte(self, key, value):
-        if isinstance(value, bytes) and isinstance(key, str):
-            # Convert bytes to list of integers for JSON
-            byte_list = list(value)
-            Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {byte_list}")
-
-    def executePutList(self, key, value):
-        if isinstance(value, list) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {value}")
-
-    def executePutDict(self, key, value):
-        if isinstance(value, dict) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {value}")
-
-    def executePutTuple(self, key, value):
-        if isinstance(value, tuple) and isinstance(key, str):
-            # Convert tuple to a list for JSON
-            value_as_list = list(value)
-            Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {value_as_list}")
 
     def close_socket(self):
         with self.lock:  # Ensure cleanup is thread-safe
@@ -148,6 +104,12 @@ class XTablesClient:
                     self.logger.error(f"Close socket error: {e}")
                 finally:
                     self.client_socket = None
+
+            # Ensure the listener thread is stopped
+            if self.clientMessageListener:
+                self.logger.info("Stopping message listener...")
+                self.clientMessageListener.stop()
+                self.clientMessageListener = None
 
     def shutdown(self):
         self.shutdown_event.set()
@@ -183,14 +145,15 @@ class XTablesServiceListener(ServiceListener):
                 port = int(port_str.decode('utf-8'))
             except ValueError:
                 self.logger.warning("Invalid port format from mDNS attribute. Waiting for next resolve...")
+
         if self.client.name and self.client.name.lower() == "localhost":
             try:
                 service_address = socket.gethostbyname(socket.gethostname())
             except Exception as e:
                 self.logger.fatal(f"Could not find localhost address: {e}")
+
         if port != -1 and service_address and (self.client.name in [None, "localhost", info.name, service_address]):
-            self.logger.info(f"Service resolved: {info.name}")
-            self.logger.info(f"Address: {service_address}, Port: {port}")
+            self.logger.info(f"Service resolved: {info.name} at {service_address}:{port}")
             self.client.server_ip = service_address
             self.client.server_port = port
             self.client.service_found.set()
@@ -201,9 +164,6 @@ class ClientMessageListener(threading.Thread):
         super().__init__()
         self.client = client
         self.client_socket = client.client_socket
-        self.is_connected = False
-        self.ip = client.server_ip
-        self.port = client.server_port
         self.in_ = self.client_socket.makefile('r')
         self.logger = logging.getLogger(__name__)
         self.stop_event = threading.Event()
@@ -213,27 +173,36 @@ class ClientMessageListener(threading.Thread):
             try:
                 message = self.in_.readline().strip()
                 if message:
-                    self.is_connected = True
+                    # Process the message here (placeholder logic)
+                    self.logger.info(f"Received message: {message}")
                 else:
                     self.logger.warning("Received an empty message, attempting reconnection...")
+                    time.sleep(1)
                     self.stop_event.set()  # Stop the listener thread before reconnecting
-                    self.client.close_socket()
-                    self.client.initialize_client(self.ip, self.port)
             except Exception as e:
                 self.logger.error(f"Error in message listener: {e}")
+            finally:
+                # Ensure client socket is closed, and let main thread handle reconnection
                 self.client.close_socket()
-                self.client.initialize_client(self.ip, self.port)
 
     def stop(self):
         self.stop_event.set()
+        self.logger.info("Message listener stopped.")
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     client = XTablesClient()
-    try:
-        while True:
-            client.executePutBoolean("ok", False)
 
-    except KeyboardInterrupt:
-        client.shutdown()
+    while not client.shutdown_event.is_set():
+        try:
+            client.executePutBoolean("ok", False)
+        except socket.error as e:
+            client.logger.error(f"Send data error: {e}")
+        except Exception:
+            pass
+
+        # Reinitialize the client if it shuts down due to a listener stop
+        if client.client_socket is None:
+            client.logger.info("Reconnecting client...")
+            client.initialize_client(client.server_ip, client.server_port)
