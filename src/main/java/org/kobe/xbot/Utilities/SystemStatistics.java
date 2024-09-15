@@ -52,20 +52,23 @@ public class SystemStatistics {
         this.powerUsageWatts = getEstimatedPowerConsumption();
         this.totalThreads = threadMXBean.getThreadCount();
         this.ip = Utilities.getLocalIPAddress();
-
-        if (usedMemoryMB > maxMemoryMB * 0.8 && processCpuLoadPercentage < 50 && totalThreads < availableProcessors * 20) {
+        if (usedMemoryMB <= maxMemoryMB * 0.5 && processCpuLoadPercentage < 50 && totalThreads <= availableProcessors * 4) {
             this.health = HealthStatus.GOOD.name();
-        } else if (usedMemoryMB > maxMemoryMB * 0.5 && processCpuLoadPercentage < 70 && totalThreads < availableProcessors * 50) {
-            this.health = HealthStatus.OK.name();
-        } else if (usedMemoryMB > maxMemoryMB * 0.2 && processCpuLoadPercentage < 90 && totalThreads < availableProcessors * 70) {
-            this.health = HealthStatus.BAD.name();
-        } else {
+        } else if (usedMemoryMB <= maxMemoryMB * 0.6 && processCpuLoadPercentage < 70 && totalThreads <= availableProcessors * 6) {
+            this.health = HealthStatus.OKAY.name();
+        } else if (usedMemoryMB <= maxMemoryMB * 0.7 && processCpuLoadPercentage < 85 && totalThreads <= availableProcessors * 8) {
+            this.health = HealthStatus.STRESSED.name();
+        } else if (usedMemoryMB <= maxMemoryMB * 0.85 && processCpuLoadPercentage < 95 && totalThreads <= availableProcessors * 10) {
             this.health = HealthStatus.OVERLOAD.name();
+        } else {
+            this.health = HealthStatus.CRITICAL.name();
         }
+
+
     }
 
     public enum HealthStatus {
-        GOOD, OK, BAD, OVERLOAD, CRITICAL, UNKNOWN
+        GOOD, OKAY, STRESSED, OVERLOAD, CRITICAL, UNKNOWN
     }
 
     public String getIp() {

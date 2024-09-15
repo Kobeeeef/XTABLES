@@ -435,11 +435,12 @@ public class XTables {
 
         @Override
         public void run() {
-            ScheduledFuture<?> messages_log = Executors.newSingleThreadScheduledExecutor(r -> {
+            ScheduledExecutorService messages_log_executor = Executors.newSingleThreadScheduledExecutor(r -> {
                 Thread thread = new Thread(r);
                 thread.setDaemon(true);
                 return thread;
-            }).scheduleAtFixedRate(() -> {
+            });
+            messages_log_executor.scheduleAtFixedRate(() -> {
                 if (totalMessages != 0) {
                     logger.info("Received " + String.format("%,d", totalMessages) + " messages from IP " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " in the last minute.");
                     totalMessages = 0;
@@ -522,15 +523,15 @@ public class XTables {
                     } else if (tokens.length >= 3 && methodType.equals(MethodType.PUT)) {
                         String key = tokens[1];
                         String value = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
-                            boolean response = table.put(key, value);
-                            if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.PUT, response ? "OK" : "FAIL");
-                                out.println(responseInfo.parsed());
-                                out.flush();
-                            }
-                            if (response) {
-                                notifyUpdateChangeClients(key, value);
-                            }
+                        boolean response = table.put(key, value);
+                        if (shouldReply) {
+                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.PUT, response ? "OK" : "FAIL");
+                            out.println(responseInfo.parsed());
+                            out.flush();
+                        }
+                        if (response) {
+                            notifyUpdateChangeClients(key, value);
+                        }
                     } else if (tokens.length >= 2 && methodType.equals(MethodType.RUN_SCRIPT)) {
                         String name = tokens[1];
                         String customData = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
@@ -688,17 +689,22 @@ public class XTables {
                 } else {
                     logger.severe("Error occurred: " + e.getMessage());
                 }
-                messages_log.cancel(true);
-                clients.remove(this);
             } finally {
+                logger.info(String.format("Starting cleanup for client: %1$s:%2$s",
+                        clientSocket.getInetAddress(),
+                        clientSocket.getPort()));
                 try {
                     clientSocket.close();
                 } catch (IOException e) {
                     logger.severe("Error closing client socket: " + e.getMessage());
                 }
                 clients.remove(this);
-                messages_log.cancel(true);
+                messages_log_executor.shutdownNow();
+                logger.info(String.format("Finishing cleanup for client: %1$s:%2$s.",
+                        clientSocket.getInetAddress(),
+                        clientSocket.getPort()));
                 this.interrupt();
+
             }
         }
 
