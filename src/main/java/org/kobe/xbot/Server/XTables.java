@@ -544,7 +544,185 @@ public class XTables {
                                 }
                             }
                         }
-                        // Add more cases for other method types like RUN_SCRIPT, DELETE, etc.
+                        case "RUN_SCRIPT" -> {
+                            if (tokens.length >= 2) {
+                                String name = tokens[1];
+                                String customData = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+                                if (scripts.containsKey(name)) {
+                                    clientThreadPool.execute(() -> {
+                                        long startTime = System.nanoTime();
+                                        String returnValue;
+                                        ResponseStatus status = ResponseStatus.OK;
+                                        try {
+                                            returnValue = scripts.get(name).apply(new ScriptParameters(table, customData == null || customData.trim().isEmpty() ? null : customData.trim()));
+                                            long endTime = System.nanoTime();
+                                            double durationMillis = (endTime - startTime) / 1e6;
+                                            logger.info("The script '" + name + "' ran successfully.");
+                                            logger.info("Start time: " + startTime + " ns");
+                                            logger.info("End time: " + endTime + " ns");
+                                            logger.info("Duration: " + durationMillis + " ms");
+                                        } catch (Exception e) {
+                                            long endTime = System.nanoTime();
+                                            double durationMillis = (endTime - startTime) / 1e6;
+                                            returnValue = e.getMessage();
+                                            status = ResponseStatus.FAIL;
+                                            logger.severe("The script '" + name + "' encountered an error.");
+                                            logger.severe("Error message: " + e.getMessage());
+                                            logger.severe("Start time: " + startTime + " ns");
+                                            logger.severe("End time: " + endTime + " ns");
+                                            logger.severe("Duration: " + durationMillis + " ms");
+                                        }
+                                        String response = returnValue == null || returnValue.trim().isEmpty() ? status.name() : status.name() + " " + returnValue.trim();
+                                        if (shouldReply) {
+                                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, response);
+                                            out.println(responseInfo.parsed());
+                                            out.flush();
+                                        }
+                                    });
+                                } else if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, "FAIL SCRIPT_NOT_FOUND");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                            }
+                        }
+                        case "UPDATE_KEY" -> {
+                            if (tokens.length == 3) {
+                                String key = tokens[1];
+                                String value = tokens[2];
+                                if (!Utilities.validateName(value, false)) {
+                                    if (shouldReply) {
+                                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, "FAIL");
+                                        out.println(responseInfo.parsed());
+                                        out.flush();
+                                    }
+                                } else {
+                                    boolean response = table.renameKey(key, value);
+                                    if (shouldReply) {
+                                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
+                                        out.println(responseInfo.parsed());
+                                        out.flush();
+                                    }
+                                }
+                            }
+                        }
+                        case "DELETE" -> {
+                            if (tokens.length == 2) {
+                                String key = tokens[1];
+                                boolean response = table.delete(key);
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                                if (response) {
+                                    notifyDeleteChangeClients(key);
+                                }
+                            } else if (tokens.length == 1) {
+                                boolean response = table.delete("");
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                            }
+                        }
+                        case "SUBSCRIBE_DELETE" -> {
+                            if (tokens.length == 1) {
+                                deleteEvent.set(true);
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            }
+                        }
+                        case "UNSUBSCRIBE_DELETE" -> {
+                            if (tokens.length == 1) {
+                                deleteEvent.set(false);
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            }
+                        }
+                        case "SUBSCRIBE_UPDATE" -> {
+                            if (tokens.length == 2) {
+                                String key = tokens[1];
+                                updateEvents.add(key);
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                            } else if (tokens.length == 1) {
+                                updateEvents.add("");
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                            }
+                        }
+                        case "UNSUBSCRIBE_UPDATE" -> {
+                            if (tokens.length == 2) {
+                                String key = tokens[1];
+                                boolean success = updateEvents.remove(key);
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, success ? "OK" : "FAIL");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                            } else if (tokens.length == 1) {
+                                boolean success = updateEvents.remove("");
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, success ? "OK" : "FAIL");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                            }
+                        }
+                        case "PING" -> {
+                            if (tokens.length == 1 && shouldReply) {
+                                SystemStatistics systemStatistics = new SystemStatistics(clients.size());
+                                int i = 0;
+                                for (ClientHandler client : clients) {
+                                    i += client.totalMessages;
+                                }
+                                systemStatistics.setTotalMessages(i);
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            }
+                        }
+                        case "GET_TABLES" -> {
+                            if (tokens.length == 1 && shouldReply) {
+                                String result = gson.toJson(table.getTables(""));
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, result);
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            } else if (tokens.length == 2 && shouldReply) {
+                                String key = tokens[1];
+                                String result = gson.toJson(table.getTables(key));
+                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            }
+                        }
+                        case "GET_RAW_JSON" -> {
+                            if (tokens.length == 1 && shouldReply) {
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, DataCompression.compressAndConvertBase64(table.toJSON()));
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            }
+                        }
+                        case "REBOOT_SERVER" -> {
+                            if (tokens.length == 1) {
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, ResponseStatus.OK.name());
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                                rebootServer();
+                            }
+                        }
                         default -> {
                             if (shouldReply) {
                                 ResponseInfo responseInfo = new ResponseInfo(id, "UNKNOWN", ResponseStatus.FAIL.name());
@@ -553,6 +731,7 @@ public class XTables {
                             }
                         }
                     }
+
 
                 }
             } catch (IOException e) {

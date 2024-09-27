@@ -19,7 +19,7 @@ public class Main {
 
         // Get raw JSON from server
         String response = client.getRawJSON().complete();
-        System.out.println(response);
+        System.out.println("Raw JSON: " + response);
 
         // Variable for connection status, updates on every message
         System.out.println("Connected? " + client.getSocketClient().isConnected);

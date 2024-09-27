@@ -384,10 +384,10 @@ public class SocketClient {
         executor.execute(() -> {
             try {
                 RequestInfo requestInfo = sendMessageAndWaitForReply(ResponseInfo.from(message), timeoutMS, TimeUnit.MILLISECONDS);
-                if (requestInfo == null) throw new ClosedConnectionException();
+                if (requestInfo == null) throw new RuntimeException("Nothing received back from server when sending: " + message);
                 String[] tokens = requestInfo.getTokens();
                 future.complete(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)));
-            } catch (InterruptedException | ClosedConnectionException e) {
+            } catch (InterruptedException e) {
                 future.completeExceptionally(e);
             }
         });
