@@ -2,6 +2,7 @@ import socket
 import logging
 import threading
 import time
+import uuid
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import Utilities
 
@@ -21,6 +22,9 @@ class XTablesClient:
         self.clientMessageListener = None
         self.shutdown_event = threading.Event()
         self.lock = threading.Lock()
+        self.isConnected = False  # Variable to track connection status
+        self.response_map = {}  # Map to track UUID responses
+        self.response_lock = threading.Lock()  # Lock for thread-safe access to response_map
         self.discover_service()
 
     def discover_service(self):
@@ -40,8 +44,8 @@ class XTablesClient:
             self.initialize_client(self.server_ip, self.server_port)
 
     def initialize_client(self, server_ip, server_port):
-        # Shut down the existing client if already connected
         self.close_socket()
+        self.isConnected = False  # Set to False when starting to reconnect
 
         with self.lock:  # Ensure no concurrent connections
             while not self.shutdown_event.is_set():
@@ -51,48 +55,69 @@ class XTablesClient:
                     self.client_socket.connect((server_ip, 1735))
                     self.logger.info(f"Connected to server {server_ip}:{server_port}")
                     self.out = self.client_socket.makefile('w')
+                    self.isConnected = True  # Set to True when connection is established
 
                     # Stop the old message listener if it exists
                     if self.clientMessageListener:
                         self.logger.info("Stopping previous message listener...")
                         self.clientMessageListener.stop()
-                        self.clientMessageListener = None  # Set to None to avoid calling join() from the same thread
+                        self.clientMessageListener = None
 
                     # Start a new message listener
                     self.clientMessageListener = ClientMessageListener(self)
                     self.clientMessageListener.start()
-                    break  # Exit the loop after a successful connection
+                    break
                 except socket.error as e:
                     self.logger.error(f"Connection error: {e}. Retrying immediately.")
-                time.sleep(1)
+                    time.sleep(1)
 
     def send_data(self, data):
         try:
-            if self.client_socket:
+            if self.client_socket and self.isConnected:
                 self.out.write(data + "\n")
                 self.out.flush()
         except socket.error as e:
-            pass
-
-    def executePutString(self, key, value):
-        if isinstance(value, str) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} \"{value}\"")
-
-    def executePutInteger(self, key, value):
-        if isinstance(value, int) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {value}")
+            self.logger.error(f"Error sending data: {e}")
 
     def executePutBoolean(self, key, value):
         if isinstance(value, bool) and isinstance(key, str):
             Utilities.validate_key(key, True)
             self.send_data(f"IGNORED:PUT {key} {str(value).lower()}")
 
-    def executePutFloat(self, key, value):
-        if isinstance(value, float) and isinstance(key, str):
+    def executePutString(self, key, value):
+        if isinstance(value, str) and isinstance(key, str):
             Utilities.validate_key(key, True)
-            self.send_data(f"IGNORED:PUT {key} {value}")
+            self.send_data(f'IGNORED:PUT {key} "{value}"')
+
+    def getString(self, key, TIMEOUT=3000):
+        if not isinstance(key, str):
+            raise ValueError("Key must be a string.")
+
+        # Generate a unique UUID for the request
+        request_id = str(uuid.uuid4())
+        response_event = threading.Event()
+
+        # Register the request in the response map
+        with self.response_lock:
+            self.response_map[request_id] = {
+                'event': response_event,
+                'value': None
+            }
+
+        # Send the GET request to the server
+        self.send_data(f"{request_id}:GET {key}")
+
+        # Wait for the response with the specified timeout
+        if response_event.wait(TIMEOUT / 1000):  # Convert milliseconds to seconds
+            with self.response_lock:
+                value = self.response_map.pop(request_id)['value']
+            return parse_string(value)
+        else:
+            # Remove the request if it timed out
+            with self.response_lock:
+                self.response_map.pop(request_id, None)
+            self.logger.error(f"Timeout waiting for response for key: {key}")
+            return None
 
     def close_socket(self):
         with self.lock:  # Ensure cleanup is thread-safe
@@ -105,17 +130,22 @@ class XTablesClient:
                 finally:
                     self.client_socket = None
 
-            # Ensure the listener thread is stopped
             if self.clientMessageListener:
                 self.logger.info("Stopping message listener...")
                 self.clientMessageListener.stop()
                 self.clientMessageListener = None
+
+    def handle_reconnect(self):
+        self.logger.info("Attempting to reconnect...")
+        self.isConnected = False
+        self.initialize_client(self.server_ip, self.server_port)
 
     def shutdown(self):
         self.shutdown_event.set()
         if self.clientMessageListener:
             self.clientMessageListener.stop()
         self.close_socket()
+        self.isConnected = False
 
 
 class XTablesServiceListener(ServiceListener):
@@ -128,12 +158,6 @@ class XTablesServiceListener(ServiceListener):
         info = zeroconf.get_service_info(service_type, name)
         if info:
             self.resolve_service(info)
-
-    def remove_service(self, zeroconf, service_type, name):
-        self.logger.info(f"Service removed: {name}")
-
-    def update_service(self, zeroconf, service_type, name):
-        pass
 
     def resolve_service(self, info):
         service_address = socket.inet_ntoa(info.addresses[0])
@@ -173,36 +197,56 @@ class ClientMessageListener(threading.Thread):
             try:
                 message = self.in_.readline().strip()
                 if message:
-                    # Process the message here (placeholder logic)
-                    self.logger.info(f"Received message: {message}")
+
+                    self.process_message(message)
                 else:
                     self.logger.warning("Received an empty message, attempting reconnection...")
-                    time.sleep(1)
-                    self.stop_event.set()  # Stop the listener thread before reconnecting
+                    self.client.isConnected = False
+                    self.stop()
+                    self.client.handle_reconnect()
             except Exception as e:
                 self.logger.error(f"Error in message listener: {e}")
-            finally:
-                # Ensure client socket is closed, and let main thread handle reconnection
-                self.client.close_socket()
+                self.client.isConnected = False
+                self.stop_event.set()
+                self.client.handle_reconnect()
+
+    def process_message(self, message):
+        try:
+            # Split the message by spaces
+            parts = message.split(" ")
+
+            # Extract UUID from the first part by splitting with ':'
+            request_id = parts[0].split(":")[0].strip()
+
+            # Extract the value, which is everything after the first index
+            response_value = " ".join(parts[2:]).strip()
+
+            # Check if the request_id matches any pending requests
+            with self.client.response_lock:
+                if request_id in self.client.response_map:
+                    # Set the extracted value to the response map
+                    self.client.response_map[request_id]['value'] = response_value
+                    self.client.response_map[request_id]['event'].set()
+        except Exception as e:
+            self.logger.error(f"Invalid message format: {message}. Error: {e}")
 
     def stop(self):
         self.stop_event.set()
         self.logger.info("Message listener stopped.")
 
 
+def parse_string(s):
+    # Check if the string starts and ends with \" and remove them
+    if s.startswith('"\\"') and s.endswith('\\""'):
+        s = s[3:-3]
+    elif s.startswith('"') and s.endswith('"'):
+        s = s[1:-1]
+    return s
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     client = XTablesClient()
-
-    while not client.shutdown_event.is_set():
-        try:
-            client.executePutBoolean("ok", False)
-        except socket.error as e:
-            client.logger.error(f"Send data error: {e}")
-        except Exception:
-            pass
-
-        # Reinitialize the client if it shuts down due to a listener stop
-        if client.client_socket is None:
-            client.logger.info("Reconnecting client...")
-            client.initialize_client(client.server_ip, client.server_port)
+    while True:
+        client.getString("SmartDashboard.test")
+        print(len(client.response_map))

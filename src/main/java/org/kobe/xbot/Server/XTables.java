@@ -459,228 +459,101 @@ public class XTables {
                     String[] tokens = tokenize(raw, ' ');
                     String[] requestTokens = tokenize(tokens[0], ':');
                     String id = requestTokens[0];
-                    MethodType methodType;
-                    try {
-                        methodType = MethodType.valueOf(requestTokens[1]);
-                    } catch (Exception e) {
-                        methodType = MethodType.UNKNOWN;
-                    }
+                    String methodType = requestTokens[1];
                     boolean shouldReply = !id.equals("IGNORED");
-                    if (tokens.length == 2 && methodType.equals(MethodType.REGISTER_VIDEO_STREAM)) {
-                        String name = tokens[1].trim();
-                        if (Utilities.validateName(name, false)) {
-                            if (clients.stream().anyMatch(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name))) {
-                                if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.FAIL_NAME_ALREADY_EXISTS.name());
-                                    out.println(responseInfo.parsed());
-                                    out.flush();
-                                }
-                            } else {
-                                if (streams == null) {
-                                    streams = Collections.synchronizedList(new ArrayList<>());
-                                }
-                                streams.add(name);
-                                if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.OKAY.name());
+
+                    switch (methodType) {
+                        case "REGISTER_VIDEO_STREAM" -> {
+                            if (tokens.length == 2) {
+                                String name = tokens[1].trim();
+                                if (Utilities.validateName(name, false)) {
+                                    if (clients.stream().anyMatch(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name))) {
+                                        if (shouldReply) {
+                                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, ImageStreamStatus.FAIL_NAME_ALREADY_EXISTS.name());
+                                            out.println(responseInfo.parsed());
+                                            out.flush();
+                                        }
+                                    } else {
+                                        if (streams == null) {
+                                            streams = Collections.synchronizedList(new ArrayList<>());
+                                        }
+                                        streams.add(name);
+                                        if (shouldReply) {
+                                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, ImageStreamStatus.OKAY.name());
+                                            out.println(responseInfo.parsed());
+                                            out.flush();
+                                        }
+                                    }
+                                } else if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, ImageStreamStatus.FAIL_INVALID_NAME.name());
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
                             }
-                        } else if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.REGISTER_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name());
-                            out.println(responseInfo.parsed());
-                            out.flush();
                         }
-                    } else if (shouldReply && tokens.length == 2 && methodType.equals(MethodType.GET_VIDEO_STREAM)) {
-                        String name = tokens[1];
-                        if (Utilities.validateName(name, false)) {
-                            Optional<ClientHandler> optional = clients.stream().filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name)).findFirst();
-                            ResponseInfo responseInfo;
-                            responseInfo = optional.map(clientHandler -> {
-                                        String clientAddress = clientHandler.clientSocket.getInetAddress().getHostAddress();
-                                        return new ResponseInfo(id, MethodType.GET_VIDEO_STREAM, gson.toJson(String.format("http://%1$s:4888/%2$s", clientAddress.equals("127.0.0.1") || clientAddress.equals("::1") ? Utilities.getLocalIPAddress() : clientAddress.replaceFirst("/", ""), name)));
-                                    })
-                                    .orElseGet(() -> new ResponseInfo(id, MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name()));
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        } else {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_VIDEO_STREAM, ImageStreamStatus.FAIL_INVALID_NAME.name());
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                    } else if (shouldReply && tokens.length == 2 && methodType.equals(MethodType.GET)) {
-                        String key = tokens[1];
-                        String result = gson.toJson(table.get(key));
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET, String.format("%1$s " + result, table.isFlaggedKey(key) ? "FLAGGED" : "GOOD"));
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (shouldReply && tokens.length == 2 && methodType.equals(MethodType.GET_TABLES)) {
-                        String key = tokens[1];
-                        String result = gson.toJson(table.getTables(key));
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (tokens.length >= 3 && methodType.equals(MethodType.PUT)) {
-                        String key = tokens[1];
-                        String value = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
-                        boolean response = table.put(key, value);
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.PUT, response ? "OK" : "FAIL");
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                        if (response) {
-                            notifyUpdateChangeClients(key, value);
-                        }
-                    } else if (tokens.length >= 2 && methodType.equals(MethodType.RUN_SCRIPT)) {
-                        String name = tokens[1];
-                        String customData = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
-                        if (scripts.containsKey(name)) {
-                            clientThreadPool.execute(() -> {
-                                long startTime = System.nanoTime();
-                                String returnValue;
-                                ResponseStatus status = ResponseStatus.OK;
-                                try {
-                                    returnValue = scripts.get(name).apply(new ScriptParameters(table, customData == null || customData.trim().isEmpty() ? null : customData.trim()));
-                                    long endTime = System.nanoTime();
-                                    double durationMillis = (endTime - startTime) / 1e6;
-                                    logger.info("The script '" + name + "' ran successfully.");
-                                    logger.info("Start time: " + startTime + " ns");
-                                    logger.info("End time: " + endTime + " ns");
-                                    logger.info("Duration: " + durationMillis + " ms");
-                                } catch (Exception e) {
-                                    long endTime = System.nanoTime();
-                                    double durationMillis = (endTime - startTime) / 1e6;
-                                    returnValue = e.getMessage();
-                                    status = ResponseStatus.FAIL;
-                                    logger.severe("The script '" + name + "' encountered an error.");
-                                    logger.severe("Error message: " + e.getMessage());
-                                    logger.severe("Start time: " + startTime + " ns");
-                                    logger.severe("End time: " + endTime + " ns");
-                                    logger.severe("Duration: " + durationMillis + " ms");
-                                }
-                                String response = returnValue == null || returnValue.trim().isEmpty() ? status.name() : status.name() + " " + returnValue.trim();
-                                if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, MethodType.RUN_SCRIPT, response);
+                        case "GET_VIDEO_STREAM" -> {
+                            if (tokens.length == 2) {
+                                String name = tokens[1];
+                                if (Utilities.validateName(name, false)) {
+                                    Optional<ClientHandler> optional = clients.stream()
+                                            .filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name))
+                                            .findFirst();
+
+                                    ResponseInfo responseInfo = optional
+                                            .map(clientHandler -> {
+                                                String clientAddress = clientHandler.clientSocket.getInetAddress().getHostAddress();
+                                                return new ResponseInfo(id, methodType, gson.toJson(String.format(
+                                                        "http://%1$s:4888/%2$s",
+                                                        clientAddress.equals("127.0.0.1") || clientAddress.equals("::1")
+                                                                ? Utilities.getLocalIPAddress()
+                                                                : clientAddress.replaceFirst("/", ""),
+                                                        name)));
+                                            })
+                                            .orElseGet(() -> new ResponseInfo(id, methodType, ImageStreamStatus.FAIL_INVALID_NAME.name()));
+
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                } else {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, ImageStreamStatus.FAIL_INVALID_NAME.name());
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
-                            });
-                        } else if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.PUT, "FAIL SCRIPT_NOT_FOUND");
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                    } else if (tokens.length == 3 && methodType.equals(MethodType.UPDATE_KEY)) {
-                        String key = tokens[1];
-                        String value = tokens[2];
-                        if (!Utilities.validateName(value, false)) {
-                            if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UPDATE_KEY, "FAIL");
-                                out.println(responseInfo.parsed());
-                                out.flush();
                             }
-                        } else {
-                            boolean response = table.renameKey(key, value);
-                            if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UPDATE_KEY, response ? "OK" : "FAIL");
+                        }
+                        case "GET" -> {
+                            if (tokens.length == 2 && shouldReply) {
+                                String key = tokens[1];
+                                String result = gson.toJson(table.get(key));
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, String.format("%1$s " + result, table.isFlaggedKey(key) ? "FLAGGED" : "GOOD"));
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }
                         }
-                    } else if (tokens.length == 2 && methodType.equals(MethodType.DELETE)) {
-                        String key = tokens[1];
-                        boolean response = table.delete(key);
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.DELETE, response ? "OK" : "FAIL");
-                            out.println(responseInfo.parsed());
-                            out.flush();
+                        case "PUT" -> {
+                            if (tokens.length >= 3) {
+                                String key = tokens[1];
+                                String value = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+                                boolean response = table.put(key, value);
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
+                                }
+                                if (response) {
+                                    notifyUpdateChangeClients(key, value);
+                                }
+                            }
                         }
-                        if (response) {
-                            notifyDeleteChangeClients(key);
+                        // Add more cases for other method types like RUN_SCRIPT, DELETE, etc.
+                        default -> {
+                            if (shouldReply) {
+                                ResponseInfo responseInfo = new ResponseInfo(id, "UNKNOWN", ResponseStatus.FAIL.name());
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            }
                         }
-                    } else if (tokens.length == 1 && methodType.equals(MethodType.DELETE)) {
-                        boolean response = table.delete("");
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.DELETE, response ? "OK" : "FAIL");
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                    } else if (tokens.length == 1 && methodType.equals(MethodType.SUBSCRIBE_DELETE)) {
-                        deleteEvent.set(true);
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.SUBSCRIBE_DELETE, "OK");
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (tokens.length == 1 && methodType.equals(MethodType.UNSUBSCRIBE_DELETE)) {
-                        deleteEvent.set(false);
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UNSUBSCRIBE_DELETE, "OK");
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (tokens.length == 2 && methodType.equals(MethodType.SUBSCRIBE_UPDATE)) {
-                        String key = tokens[1];
-                        updateEvents.add(key);
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.SUBSCRIBE_UPDATE, "OK");
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                    } else if (tokens.length == 1 && methodType.equals(MethodType.SUBSCRIBE_UPDATE)) {
-                        updateEvents.add("");
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.SUBSCRIBE_UPDATE, "OK");
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                    } else if (tokens.length == 2 && methodType.equals(MethodType.UNSUBSCRIBE_UPDATE)) {
-                        String key = tokens[1];
-                        boolean success = updateEvents.remove(key);
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                    } else if (tokens.length == 1 && methodType.equals(MethodType.UNSUBSCRIBE_UPDATE)) {
-                        boolean success = updateEvents.remove("");
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UNSUBSCRIBE_UPDATE, success ? "OK" : "FAIL");
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                    } else if (shouldReply && tokens.length == 1 && methodType.equals(MethodType.PING)) {
-                        SystemStatistics systemStatistics = new SystemStatistics(clients.size());
-                        int i = 0;
-                        for (ClientHandler client : clients) {
-                            i += client.totalMessages;
-                        }
-                        systemStatistics.setTotalMessages(i);
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.PING, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (shouldReply && tokens.length == 1 && methodType.equals(MethodType.GET_TABLES)) {
-                        String result = gson.toJson(table.getTables(""));
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (shouldReply && tokens.length == 1 && methodType.equals(MethodType.GET_RAW_JSON)) {
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_RAW_JSON, DataCompression.compressAndConvertBase64(table.toJSON()));
-                        out.println(responseInfo.parsed());
-                        out.flush();
-                    } else if (tokens.length == 1 && methodType.equals(MethodType.REBOOT_SERVER)) {
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, MethodType.REBOOT_SERVER, ResponseStatus.OK.name());
-                            out.println(responseInfo.parsed());
-                            out.flush();
-                        }
-                        rebootServer();
-                    } else if (shouldReply) {
-                        // Invalid command
-                        logger.warning("Unknown command received from " + clientSocket.getInetAddress().getHostAddress() + ": " + inputLine);
-
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.UNKNOWN, ResponseStatus.FAIL.name());
-                        out.println(responseInfo.parsed());
-                        out.flush();
-
                     }
+
                 }
             } catch (IOException e) {
                 String message = e.getMessage();
