@@ -1,6 +1,5 @@
 package org.kobe.xbot.Client;
 
-import com.sun.jdi.connect.spi.ClosedConnectionException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.*;
 
@@ -43,7 +42,7 @@ public class SocketClient {
         }
     };
     private final int MAX_THREADS;
-    public Boolean isConnected = false;
+    public boolean isConnected = false;
     private PrintWriter out = null;
     private BufferedReader in = null;
     private Socket socket;
