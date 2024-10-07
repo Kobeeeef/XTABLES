@@ -3,6 +3,7 @@ import logging
 import threading
 import time
 import uuid
+import json
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import Utilities
 
@@ -28,20 +29,30 @@ class XTablesClient:
         self.discover_service()
 
     def discover_service(self):
-        if self.name is None:
-            self.logger.info("Listening for first instance of XTABLES service on port 5353...")
-        else:
-            self.logger.info(f"Listening for '{self.name}' XTABLES services on port 5353...")
+        while not self.shutdown_event.is_set():
+            try:
+                if self.name is None:
+                    self.logger.info("Listening for first instance of XTABLES service on port 5353...")
+                else:
+                    self.logger.info(f"Listening for '{self.name}' XTABLES services on port 5353...")
 
-        self.service_found.wait()
-        self.logger.info("Service found, proceeding to close mDNS services...")
-        self.zeroconf.close()
-        self.logger.info("mDNS service closed.")
+                # Wait for the service to be found with a timeout
+                service_found = self.service_found.wait(timeout=5)  # Wait for 5 seconds
 
-        if self.server_ip is None or self.server_port is None:
-            raise RuntimeError("The service address or port could not be found.")
-        else:
-            self.initialize_client(self.server_ip, self.server_port)
+                if service_found:
+                    self.logger.info("Service found, proceeding to close mDNS services...")
+                    self.zeroconf.close()
+                    self.logger.info("mDNS service closed.")
+                    self.initialize_client(self.server_ip, self.server_port)
+                    break
+                else:
+                    self.logger.info("Service not found, retrying discovery...")
+                    # Reinitialize the service browser to keep trying
+                    self.zeroconf = Zeroconf()
+                    self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
+            except Exception as e:
+                self.logger.error(f"Error during service discovery: {e}. Retrying...")
+                time.sleep(1)
 
     def initialize_client(self, server_ip, server_port):
         self.close_socket()
@@ -89,6 +100,27 @@ class XTablesClient:
             Utilities.validate_key(key, True)
             self.send_data(f'IGNORED:PUT {key} "{value}"')
 
+    def executePutInteger(self, key, value):
+        if isinstance(value, int) and isinstance(key, str):
+            Utilities.validate_key(key, True)
+            self.send_data(f"IGNORED:PUT {key} {value}")
+
+    def executePutClass(self, key, obj):
+        """
+        Serializes the given class object into a JSON string and sends it to the server.
+
+        :param key: The key under which the class data will be stored.
+        :param obj: The class object to be serialized and sent.
+        """
+        if isinstance(key, str) and obj is not None:
+            # Convert the class object to a JSON string
+            json_string = json.dumps(obj, default=lambda o: o.__dict__)
+
+            Utilities.validate_key(key, True)
+            self.send_data(f'IGNORED:PUT {key} {json_string}')
+        else:
+            self.logger.error("Invalid key or object provided.")
+
     def getString(self, key, TIMEOUT=3000):
         if not isinstance(key, str):
             raise ValueError("Key must be a string.")
@@ -117,6 +149,53 @@ class XTablesClient:
             with self.response_lock:
                 self.response_map.pop(request_id, None)
             self.logger.error(f"Timeout waiting for response for key: {key}")
+            return None
+
+    def getClass(self, key, class_type, TIMEOUT=3000):
+        """
+        Retrieves a class object from the server for the given key by first fetching it as a JSON string
+        and then converting it to an instance of the specified class type.
+
+        :param key: The key for which to get the class object.
+        :param class_type: The class type to deserialize the JSON string into.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: An instance of the class if successful, or None if the key is not found or an error occurs.
+        """
+        # Use the existing getString method to fetch the value as a string
+        json_string = self.getString(key, TIMEOUT)
+
+        if json_string is not None:
+            try:
+                # Attempt to parse the JSON string and convert it to an instance of the class
+
+                json_dict = json.loads(json_string.replace('\\"', '"'))  # Parse the JSON string into a dictionary
+                return class_type(**json_dict)  # Create an instance of the class using the dictionary
+            except (ValueError, TypeError) as e:
+                self.logger.error(f"Error parsing value for key '{key}' into class {class_type.__name__}: {e}")
+                return None
+        else:
+            return None
+
+    def getInteger(self, key, TIMEOUT=3000):
+        """
+        Retrieves an integer value from the server for the given key by first fetching it as a string
+        and then converting it to an integer.
+
+        :param key: The key for which to get the integer value.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The integer value if successful, or None if the key is not found or the conversion fails.
+        """
+        # Use the existing getString method to fetch the value as a string
+        string_value = self.getString(key, TIMEOUT)
+
+        if string_value is not None:
+            try:
+                # Attempt to convert the string value to an integer
+                return int(string_value)
+            except ValueError:
+                self.logger.error(f"Value for key '{key}' is not a valid integer: {string_value}")
+                return None
+        else:
             return None
 
     def close_socket(self):
@@ -152,35 +231,39 @@ class XTablesServiceListener(ServiceListener):
     def __init__(self, client):
         self.client = client
         self.logger = logging.getLogger(__name__)
+        self.service_resolved = False  # Flag to avoid multiple resolutions
 
     def add_service(self, zeroconf, service_type, name):
-        self.logger.info(f"Service found: {name}")
-        info = zeroconf.get_service_info(service_type, name)
-        if info:
-            self.resolve_service(info)
+        if not self.service_resolved:
+            self.logger.info(f"Service found: {name}")
+            info = zeroconf.get_service_info(service_type, name)
+            if info:
+                self.resolve_service(info)
 
     def resolve_service(self, info):
-        service_address = socket.inet_ntoa(info.addresses[0])
-        port = info.port
-        port_str = info.properties.get(b'port')
+        if not self.service_resolved:  # Only resolve if not already resolved
+            service_address = socket.inet_ntoa(info.addresses[0])
+            port = info.port
+            port_str = info.properties.get(b'port')
 
-        if port_str:
-            try:
-                port = int(port_str.decode('utf-8'))
-            except ValueError:
-                self.logger.warning("Invalid port format from mDNS attribute. Waiting for next resolve...")
+            if port_str:
+                try:
+                    port = int(port_str.decode('utf-8'))
+                except ValueError:
+                    self.logger.warning("Invalid port format from mDNS attribute. Waiting for next resolve...")
 
-        if self.client.name and self.client.name.lower() == "localhost":
-            try:
-                service_address = socket.gethostbyname(socket.gethostname())
-            except Exception as e:
-                self.logger.fatal(f"Could not find localhost address: {e}")
+            if self.client.name and self.client.name.lower() == "localhost":
+                try:
+                    service_address = socket.gethostbyname(socket.gethostname())
+                except Exception as e:
+                    self.logger.fatal(f"Could not find localhost address: {e}")
 
-        if port != -1 and service_address and (self.client.name in [None, "localhost", info.name, service_address]):
-            self.logger.info(f"Service resolved: {info.name} at {service_address}:{port}")
-            self.client.server_ip = service_address
-            self.client.server_port = port
-            self.client.service_found.set()
+            if port != -1 and service_address and (self.client.name in [None, "localhost", info.name, service_address]):
+                self.logger.info(f"Service resolved: {info.name} at {service_address}:{port}")
+                self.client.server_ip = service_address
+                self.client.server_port = port
+                self.client.service_found.set()
+                self.service_resolved = True
 
 
 class ClientMessageListener(threading.Thread):
@@ -243,10 +326,9 @@ def parse_string(s):
         s = s[1:-1]
     return s
 
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    client = XTablesClient()
-    while True:
-        client.getString("SmartDashboard.test")
-        print(len(client.response_map))
+# if __name__ == "__main__":
+#     logging.basicConfig(level=logging.INFO)
+#     client = XTablesClient()
+#     while True:
+#         print(client.getClass("SmartDashboard.exampleClass", ExampleClass))
+#         time.sleep(1)
