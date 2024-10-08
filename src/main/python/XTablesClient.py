@@ -105,6 +105,15 @@ class XTablesClient:
             Utilities.validate_key(key, True)
             self.send_data(f"IGNORED:PUT {key} {value}")
 
+    def executePutArrayOrTuple(self, key, value):
+        if isinstance(key, str) and isinstance(value, (list, tuple)):
+            Utilities.validate_key(key, True)
+            # Only convert to a list if it's a tuple, otherwise keep it as is
+            formatted_values = str(value if isinstance(value, list) else list(value))
+            self.send_data(f"IGNORED:PUT {key} {formatted_values}")
+        else:
+            raise TypeError("Key must be a string and value must be a list or tuple")
+
     def executePutClass(self, key, obj):
         """
         Serializes the given class object into a JSON string and sends it to the server.
@@ -151,6 +160,33 @@ class XTablesClient:
             self.logger.error(f"Timeout waiting for response for key: {key}")
             return None
 
+    def getArray(self, key, TIMEOUT=3000):
+        """
+        Retrieves an array (list) value from the server for the given key by fetching it as a string
+        and then converting it to a Python list.
+
+        :param key: The key for which to get the array value.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The array as a Python list if successful, or None if the key is not found or the conversion fails.
+        """
+        # Use the existing getString method to fetch the value as a string
+        string_value = self.getString(key, TIMEOUT)
+
+        if string_value is not None:
+            try:
+                # Attempt to convert the string value to a list using json.loads
+                array_value = json.loads(string_value)
+
+                if isinstance(array_value, list):
+                    return array_value
+                else:
+                    self.logger.error(f"Value for key '{key}' is not a valid array: {string_value}")
+                    return None
+            except (ValueError, json.JSONDecodeError) as e:
+                self.logger.error(f"Failed to parse array for key '{key}': {e}")
+                return None
+        else:
+            return None
     def getClass(self, key, class_type, TIMEOUT=3000):
         """
         Retrieves a class object from the server for the given key by first fetching it as a JSON string
@@ -194,6 +230,29 @@ class XTablesClient:
                 return int(string_value)
             except ValueError:
                 self.logger.error(f"Value for key '{key}' is not a valid integer: {string_value}")
+                return None
+        else:
+            return None
+
+    def getBoolean(self, key, TIMEOUT=3000):
+        """
+        Retrieves a boolean value from the server for the given key by first fetching it as a string
+        and then converting it to a boolean.
+
+        :param key: The key for which to get the boolean value.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The boolean value if successful, or None if the key is not found or the conversion fails.
+        """
+        string_value = self.getString(key, TIMEOUT)
+
+        if string_value is not None:
+            string_value = string_value.strip().lower()
+            if string_value in ['true', '1']:
+                return True
+            elif string_value in ['false', '0']:
+                return False
+            else:
+                self.logger.error(f"Value for key '{key}' is not a valid boolean: {string_value}")
                 return None
         else:
             return None
@@ -330,5 +389,4 @@ def parse_string(s):
 #     logging.basicConfig(level=logging.INFO)
 #     client = XTablesClient()
 #     while True:
-#         print(client.getClass("SmartDashboard.exampleClass", ExampleClass))
-#         time.sleep(1)
+#         print(client.getArray("SmartDashboard.exampleClass"))
