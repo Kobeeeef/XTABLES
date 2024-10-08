@@ -6,6 +6,12 @@ import uuid
 import json
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import Utilities
+from enum import Enum
+
+
+class Status(Enum):
+    FAIL = "FAIL"
+    OK = "OK"
 
 
 class XTablesClient:
@@ -105,6 +111,43 @@ class XTablesClient:
             Utilities.validate_key(key, True)
             self.send_data(f"IGNORED:PUT {key} {value}")
 
+    def deleteTable(self, key=None):
+        try:
+            if key is not None and isinstance(key, str):
+                Utilities.validate_key(key, True)
+                response = self.getData("DELETE", key)
+                return Status[response.upper()] if response else Status.FAIL
+            else:
+                response = self.getData("DELETE")
+                return Status[response.upper()] if response else Status.FAIL
+        except (KeyError, Exception):
+            return Status.FAIL
+
+    def rebootServer(self):
+        try:
+
+            response = self.getData("REBOOT_SERVER")
+            return Status[response.upper()] if response else Status.FAIL
+        except (KeyError, Exception):
+            return Status.FAIL
+
+    def updateKey(self, oldKey, newKey):
+        try:
+            if isinstance(oldKey, str) and isinstance(newKey, str):
+                Utilities.validate_key(oldKey, True)
+                Utilities.validate_key(newKey, True)
+                response = self.getData("UPDATE_KEY", f"{oldKey} {newKey}")
+                return Status[response.upper()] if response else Status.FAIL
+        except (KeyError, Exception):
+            return Status.FAIL
+
+    def executePutFloat(self, key, value):
+        if isinstance(value, float) and isinstance(key, str):
+            Utilities.validate_key(key, True)
+            self.send_data(f"IGNORED:PUT {key} {value}")
+        else:
+            raise TypeError("Key must be a string and value must be a float")
+
     def executePutArrayOrTuple(self, key, value):
         if isinstance(key, str) and isinstance(value, (list, tuple)):
             Utilities.validate_key(key, True)
@@ -130,8 +173,16 @@ class XTablesClient:
         else:
             self.logger.error("Invalid key or object provided.")
 
-    def getString(self, key, TIMEOUT=3000):
-        if not isinstance(key, str):
+    def getData(self, command, value=None, TIMEOUT=3000):
+        """
+        Generalized method to send a request to the server and retrieve the response.
+
+        :param command: The type of command (e.g., GET or GET_TABLES).
+        :param value: The optional key for the command.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The response value or None if the request times out.
+        """
+        if value is not None and not isinstance(value, str):
             raise ValueError("Key must be a string.")
 
         # Generate a unique UUID for the request
@@ -146,19 +197,60 @@ class XTablesClient:
             }
 
         # Send the GET request to the server
-        self.send_data(f"{request_id}:GET {key}")
+        if value is None:
+            self.send_data(f"{request_id}:{command}")
+        else:
+            self.send_data(f"{request_id}:{command} {value}")
 
         # Wait for the response with the specified timeout
         if response_event.wait(TIMEOUT / 1000):  # Convert milliseconds to seconds
             with self.response_lock:
                 value = self.response_map.pop(request_id)['value']
-            return parse_string(value)
+            return value
         else:
             # Remove the request if it timed out
             with self.response_lock:
                 self.response_map.pop(request_id, None)
-            self.logger.error(f"Timeout waiting for response for key: {key}")
+            self.logger.error(f"Timeout waiting for response for command: {command}, key: {value}")
             return None
+
+    def getString(self, key, TIMEOUT=3000):
+        """
+        Retrieves a string value for the given key using the generalized getData method.
+
+        :param key: The key to retrieve.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The string value if successful, or None if the request times out or fails.
+        """
+        value = self.getData("GET", key, TIMEOUT)
+        if value:
+            # Parse the result to remove the request ID and return the actual string
+            parsed_value = " ".join(value.split(" ")[1:])
+            return parse_string(parsed_value)
+        return None
+
+    def getTables(self, key=None, TIMEOUT=3000):
+        """
+        Retrieves the list of tables using the generalized getData method.
+
+        :param key: The optional key for the specific table.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The list of tables if successful, or an empty list if the request fails or times out.
+        """
+        value = self.getData("GET_TABLES", key, TIMEOUT)
+        if value:
+            try:
+                # Attempt to parse the response value as a JSON array
+                array_value = json.loads(parse_string(value))
+                if isinstance(array_value, list):
+                    return array_value
+                else:
+                    self.logger.error(f"The GET_TABLES request returned an invalid data structure!")
+                    return []
+            except (ValueError, json.JSONDecodeError) as e:
+                self.logger.error(f"Failed to parse the GET_TABLES response: {e}")
+                return []
+        return []
 
     def getArray(self, key, TIMEOUT=3000):
         """
@@ -187,6 +279,29 @@ class XTablesClient:
                 return None
         else:
             return None
+
+    def getFloat(self, key, TIMEOUT=3000):
+        """
+        Retrieves a float value from the server for the given key by fetching it as a string
+        and then converting it to a float.
+
+        :param key: The key for which to get the float value.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The float value if successful, or None if the key is not found or the conversion fails.
+        """
+        # Use the existing getString method to fetch the value as a string
+        string_value = self.getString(key, TIMEOUT)
+
+        if string_value is not None:
+            try:
+                # Attempt to convert the string value to a float
+                return float(string_value)
+            except ValueError:
+                self.logger.error(f"Value for key '{key}' is not a valid float: {string_value}")
+                return None
+        else:
+            return None
+
     def getClass(self, key, class_type, TIMEOUT=3000):
         """
         Retrieves a class object from the server for the given key by first fetching it as a JSON string
@@ -231,6 +346,35 @@ class XTablesClient:
             except ValueError:
                 self.logger.error(f"Value for key '{key}' is not a valid integer: {string_value}")
                 return None
+        else:
+            return None
+
+    def getValue(self, key, TIMEOUT=3000):
+        """
+        Retrieves a value from the server for the given key and returns it in its appropriate Python type.
+        The method automatically handles arrays (lists), dictionaries, booleans, integers, floats, and strings.
+
+        :param key: The key for which to get the value.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The value in its appropriate Python type if successful, or None if the key is not found or the conversion fails.
+        """
+        # Use the existing getString method to fetch the value as a string
+        string_value = self.getString(key, TIMEOUT)
+
+        if string_value is not None:
+            try:
+                # Try to load the value as a JSON object first (for lists, dicts, etc.)
+                value = json.loads(string_value)
+
+                # Return the value directly if it is a known Python type (list, dict, etc.)
+                if isinstance(value, (list, dict, int, float, bool, tuple)):
+                    return value
+                else:
+                    self.logger.error(f"Value for key '{key}' is of an unsupported type: {type(value).__name__}")
+                    return None
+            except (ValueError, json.JSONDecodeError):
+                # If JSON loading fails, it's likely a simple string
+                return string_value
         else:
             return None
 
@@ -361,8 +505,7 @@ class ClientMessageListener(threading.Thread):
             request_id = parts[0].split(":")[0].strip()
 
             # Extract the value, which is everything after the first index
-            response_value = " ".join(parts[2:]).strip()
-
+            response_value = " ".join(parts[1:]).strip()
             # Check if the request_id matches any pending requests
             with self.client.response_lock:
                 if request_id in self.client.response_map:
@@ -388,5 +531,5 @@ def parse_string(s):
 # if __name__ == "__main__":
 #     logging.basicConfig(level=logging.INFO)
 #     client = XTablesClient()
-#     while True:
-#         print(client.getArray("SmartDashboard.exampleClass"))
+#
+#     print(client.updateKey("neawdaww", "neawadaww"))
