@@ -111,6 +111,7 @@ public class XTablesData {
     public boolean renameKey(String oldKey, String newKeyName) {
         Utilities.validateKey(oldKey, true);
         Utilities.validateName(newKeyName, true);
+
         if (oldKey == null || newKeyName == null || oldKey.isEmpty() || newKeyName.isEmpty()) {
             return false; // Invalid parameters
         }
@@ -120,22 +121,19 @@ public class XTablesData {
             return false; // No key to rename
         }
 
-        // Split the old key and construct the new key
-        String parentKey = String.join(".", Arrays.copyOf(oldKeys, oldKeys.length - 1));
-        String newKey = parentKey.isEmpty() ? newKeyName : parentKey + "." + newKeyName;
+        String parentKey = oldKeys.length > 1 ? String.join(".", Arrays.copyOf(oldKeys, oldKeys.length - 1)) : "";
+        XTablesData parentNode = parentKey.isEmpty() ? this : getLevelxTablesData(parentKey);
 
-        XTablesData parentNode = getLevelxTablesData(parentKey);
         if (parentNode == null || !parentNode.data.containsKey(oldKeys[oldKeys.length - 1])) {
             return false; // Old key does not exist
         }
 
-        // Get the old node
         XTablesData oldNode = parentNode.data.get(oldKeys[oldKeys.length - 1]);
         if (oldNode == null) {
             return false;
         }
 
-        // Check if new key already exists
+        // Check if new key already exists in the same parent node
         if (parentNode.data.containsKey(newKeyName)) {
             return false; // New key already exists
         }
@@ -144,14 +142,9 @@ public class XTablesData {
         parentNode.data.put(newKeyName, oldNode);
         parentNode.data.remove(oldKeys[oldKeys.length - 1]);
 
-        // Update flagged keys
-//        if (flaggedKeys.contains(oldKey)) {
-//            flaggedKeys.remove(oldKey);
-//            flaggedKeys.add(newKey);
-//        }
-
         return true; // Successfully renamed
     }
+
 
     // Method to get all tables at a given level
     public Set<String> getTables(String key) {
