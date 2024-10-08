@@ -1,3 +1,8 @@
+ # XTABLES - HIGH-PERFORMANCE NETWORK TABLES 
+
+![image](https://github.com/user-attachments/assets/d95c6d07-a409-471d-bcca-cfcb07864079)
+
+
 # XTablesClient Documentation
 
 `XTablesClient` is part of the `org.kobe.xbot.Client` package, providing an interface to interact with a server for storing, retrieving, and managing data updates in various formats. This document details the methods available in the `XTablesClient` class, including their usage and new enhancements related to caching and error handling.
@@ -352,7 +357,7 @@ The XTables local status page is hosted on port 4880. It provides real-time info
 - **Server Control**: Includes a button to reboot the server.
 - **Client Control**: Includes buttons to disconnect individual clients.
 
-![image](https://github.com/Kobeeeef/XTABLES/assets/83244503/2876500a-be71-45ae-a0f4-ef6dffde017e)
+![image](https://github.com/user-attachments/assets/7d32acf4-142c-4fa7-8d69-5accf4e771f7)
 
 https://github.com/Kobeeeef/XTABLES/assets/83244503/6a72c4f6-e875-4296-9e93-18b2d5d328e4
 
