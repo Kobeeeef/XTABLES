@@ -9,6 +9,7 @@ import Utilities
 from enum import Enum
 import base64
 
+
 class Status(Enum):
     FAIL = "FAIL"
     OK = "OK"
@@ -33,6 +34,21 @@ class XTablesClient:
         self.response_map = {}  # Map to track UUID responses
         self.response_lock = threading.Lock()  # Lock for thread-safe access to response_map
         self.discover_service()
+
+    def __init__(self, server_ip, server_port):
+        self.out = None
+        self.logger = logging.getLogger(__name__)
+        self.server_ip = server_ip
+        self.server_port = server_port
+        self.client_socket = None
+        self.service_found = threading.Event()
+        self.clientMessageListener = None
+        self.shutdown_event = threading.Event()
+        self.lock = threading.Lock()
+        self.isConnected = False
+        self.response_map = {}
+        self.response_lock = threading.Lock()
+        self.initialize_client(server_ip, server_port)
 
     def discover_service(self):
         while not self.shutdown_event.is_set():
@@ -387,9 +403,10 @@ class XTablesClient:
         Retrieves a value from the server for the given key and returns it in its appropriate Python type.
         The method automatically handles arrays (lists), dictionaries, booleans, integers, floats, and strings.
 
-        :param key: The key for which to get the value.
-        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
-        :return: The value in its appropriate Python type if successful, or None if the key is not found or the conversion fails.
+        :param TIMEOUT: The amount of time to wait before returning None
+        :param key: The key for which to get the value. :param TIMEOUT: Timeout in milliseconds to wait for the
+        response (default is 3000). :return: The value in its appropriate Python type if successful, or None if the
+        key is not found or the conversion fails.
         """
         # Use the existing getString method to fetch the value as a string
         string_value = self.getString(key, TIMEOUT)
@@ -563,7 +580,7 @@ def parse_string(s):
 
 # if __name__ == "__main__":
 #     logging.basicConfig(level=logging.INFO)
-#     client = XTablesClient()
+#     client = XTablesClient("localhost", 1735)
 #
 #     byte_array = b'\x01\x02\x03\x04'
 #
