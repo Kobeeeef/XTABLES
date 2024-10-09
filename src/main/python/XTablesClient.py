@@ -18,6 +18,7 @@ class Status(Enum):
 class XTablesClient:
     def __init__(self, name=None):
         self.out = None
+        self.subscriptions = {}
         self.name = name
         self.server_ip = None
         self.server_port = None
@@ -37,6 +38,7 @@ class XTablesClient:
 
     def __init__(self, server_ip, server_port):
         self.out = None
+        self.subscriptions = {}
         self.logger = logging.getLogger(__name__)
         self.server_ip = server_ip
         self.server_port = server_port
@@ -351,6 +353,56 @@ class XTablesClient:
         else:
             return None
 
+    def subscribeForAllUpdates(self, consumer):
+        """
+        Sends a SUBSCRIBE_UPDATE command for the given key and registers the consumer
+        to handle update events. Allows multiple consumers to subscribe to the same key.
+        Returns True if the subscription was successful, and False otherwise.
+        """
+        try:
+            # Send SUBSCRIBE_UPDATE command
+            response = self.getData("SUBSCRIBE_UPDATE")
+            if response == "OK":
+                self.logger.info(f"Subscribed to all updates.")
+
+                # Add the consumer to the subscriptions map (as a list of consumers)
+                if "" not in self.subscriptions:
+                    self.subscriptions[""] = []  # Initialize list if not present
+
+                self.subscriptions[""].append(consumer)  # Add consumer to list
+                return True
+            else:
+                self.logger.error(f"Failed to subscribe to all updates.")
+                return False
+        except Exception as e:
+            self.logger.error(f"Error subscribing to all updates: {e}")
+            return False
+
+    def subscribeForUpdates(self, key, consumer):
+        """
+        Sends a SUBSCRIBE_UPDATE command for the given key and registers the consumer
+        to handle update events. Allows multiple consumers to subscribe to the same key.
+        Returns True if the subscription was successful, and False otherwise.
+        """
+        try:
+            # Send SUBSCRIBE_UPDATE command
+            response = self.getData("SUBSCRIBE_UPDATE", key)
+            if response == "OK":
+                self.logger.info(f"Subscribed to updates for key: {key}")
+
+                # Add the consumer to the subscriptions map (as a list of consumers)
+                if key not in self.subscriptions:
+                    self.subscriptions[key] = []  # Initialize list if not present
+
+                self.subscriptions[key].append(consumer)  # Add consumer to list
+                return True
+            else:
+                self.logger.error(f"Failed to subscribe to updates for key: {key}")
+                return False
+        except Exception as e:
+            self.logger.error(f"Error subscribing to updates for key {key}: {e}")
+            return False
+
     def getClass(self, key, class_type, TIMEOUT=3000):
         """
         Retrieves a class object from the server for the given key by first fetching it as a JSON string
@@ -397,6 +449,17 @@ class XTablesClient:
                 return None
         else:
             return None
+
+    def resubscribe_all(self):
+        """
+        Re-subscribes to all previously subscribed keys after a reconnection.
+        """
+        for key, consumer in self.subscriptions.items():
+            self.logger.info("Attempting re-subscription to key: " + key)
+            if key == "":
+                self.subscribeForAllUpdates(consumer)
+            else:
+                self.subscribeForUpdates(key, consumer)
 
     def getValue(self, key, TIMEOUT=3000):
         """
@@ -471,6 +534,8 @@ class XTablesClient:
         self.logger.info("Attempting to reconnect...")
         self.isConnected = False
         self.initialize_client(self.server_ip, self.server_port)
+        if self.isConnected:
+            self.resubscribe_all()
 
     def shutdown(self):
         self.shutdown_event.set()
@@ -552,10 +617,25 @@ class ClientMessageListener(threading.Thread):
             parts = message.split(" ")
 
             # Extract UUID from the first part by splitting with ':'
-            request_id = parts[0].split(":")[0].strip()
-
-            # Extract the value, which is everything after the first index
+            tokens = parts[0].split(":")
+            request_id = tokens[0].strip()
+            method_type = tokens[1].strip()
             response_value = " ".join(parts[1:]).strip()
+
+            if method_type == "UPDATE_EVENT":
+                key = parts[1]
+                value = " ".join(parts[2:])
+                if "" in self.client.subscriptions:
+                    consumers = self.client.subscriptions[""]
+                    for consumer in consumers:
+                        consumer(key, value)
+                if key in self.client.subscriptions:
+                    consumers = self.client.subscriptions[key]
+                    for consumer in consumers:
+                        consumer(key, value)
+                else:
+                    self.logger.warning(f"Received update for unregistered key: {key}")
+
             # Check if the request_id matches any pending requests
             with self.client.response_lock:
                 if request_id in self.client.response_map:
@@ -578,12 +658,17 @@ def parse_string(s):
         s = s[1:-1]
     return s
 
+
+# def consumer1(key, value):
+#    print(f"Consumer 1 received update for {key}: {value}")
+#
+# def consumer2(key, value):
+#     print(f"Consumer 2 received update for {key}: {value}")
+#
+#
 # if __name__ == "__main__":
 #     logging.basicConfig(level=logging.INFO)
 #     client = XTablesClient("localhost", 1735)
 #
-#     byte_array = b'\x01\x02\x03\x04'
-#
-#     # Storing the byte array under a key
-#     while True:
-#         client.executePutInteger("myBinaryData", 2)
+#     print(client.subscribeForUpdates("data", consumer1))
+#     print(client.subscribeForAllUpdates(consumer2))
