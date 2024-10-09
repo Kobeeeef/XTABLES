@@ -568,4 +568,5 @@ def parse_string(s):
 #     byte_array = b'\x01\x02\x03\x04'
 #
 #     # Storing the byte array under a key
-#     print(client.getBytes("myBinaryData"))
+#     while True:
+#         client.executePutInteger("myBinaryData", 2)
