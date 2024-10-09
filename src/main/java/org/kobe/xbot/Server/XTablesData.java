@@ -48,8 +48,6 @@ public class XTablesData {
                 start = i + 1;
             }
         }
-
-// Handle the last part of the key
         if (start < length) {
             String k = key.substring(start);
 
