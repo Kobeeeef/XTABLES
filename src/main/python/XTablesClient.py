@@ -620,7 +620,7 @@ class ClientMessageListener(threading.Thread):
             tokens = parts[0].split(":")
             request_id = tokens[0].strip()
             method_type = tokens[1].strip()
-            response_value = " ".join(parts[1:]).strip()
+            response_value = " ".join(parts[1:].strip())
 
             if method_type == "UPDATE_EVENT":
                 key = parts[1]
