@@ -7,7 +7,7 @@ import json
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import Utilities
 from enum import Enum
-
+import base64
 
 class Status(Enum):
     FAIL = "FAIL"
@@ -148,6 +148,18 @@ class XTablesClient:
         else:
             raise TypeError("Key must be a string and value must be a float")
 
+    def executePutBytes(self, key, value):
+        if isinstance(value, bytes) and isinstance(key, str):
+            Utilities.validate_key(key, True)
+
+            # Encode byte array to Base64 string
+            base64_value = base64.b64encode(value).decode('utf-8')
+
+            # Send the Base64 string to the server
+            self.send_data(f"IGNORED:PUT {key} {base64_value}")
+        else:
+            self.logger.error("Key must be a string and value must be a byte array (bytes).")
+
     def executePutArrayOrTuple(self, key, value):
         if isinstance(key, str) and isinstance(value, (list, tuple)):
             Utilities.validate_key(key, True)
@@ -172,6 +184,27 @@ class XTablesClient:
             self.send_data(f'IGNORED:PUT {key} {json_string}')
         else:
             self.logger.error("Invalid key or object provided.")
+
+    def getBytes(self, key, TIMEOUT=3000):
+        """
+        Retrieves a Base64-encoded string from the server and decodes it back into a byte array.
+
+        :param key: The key to retrieve the byte array for.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The byte array if successful, or None if the request fails.
+        """
+        # Use the existing getString method to fetch the Base64-encoded string
+        base64_string = self.getString(key, TIMEOUT)
+
+        if base64_string is not None:
+            try:
+                # Decode the Base64 string back to a byte array
+                return base64.b64decode(base64_string)
+            except (ValueError, TypeError) as e:
+                self.logger.error(f"Error decoding Base64 value for key '{key}': {e}")
+                return None
+        else:
+            return None
 
     def getData(self, command, value=None, TIMEOUT=3000):
         """
@@ -532,4 +565,7 @@ def parse_string(s):
 #     logging.basicConfig(level=logging.INFO)
 #     client = XTablesClient()
 #
-#     print(client.updateKey("neawdaww", "neawadaww"))
+#     byte_array = b'\x01\x02\x03\x04'
+#
+#     # Storing the byte array under a key
+#     print(client.getBytes("myBinaryData"))
