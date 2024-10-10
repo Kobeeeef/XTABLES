@@ -613,7 +613,7 @@ class ClientMessageListener(threading.Thread):
                 return
             request_id = tokens[0].strip()
             method_type = tokens[1].strip()
-            response_value = " ".join(parts[1:]).strip()
+            response_value = " ".join(parts[1:].strip())
 
             if method_type == "UPDATE_EVENT":
                 if len(parts) < 3:
