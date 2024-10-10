@@ -653,9 +653,9 @@ def parse_string(s):
     return s
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    client = XTablesClient()
+# if __name__ == "__main__":
+#     logging.basicConfig(level=logging.INFO)
+#     client = XTablesClient()
 #     timestamps = []
 #
 #     # Run the function 1000 times
