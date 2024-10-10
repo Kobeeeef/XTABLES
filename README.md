@@ -1,4 +1,4 @@
- # XTABLES - HIGH-PERFORMANCE NETWORK TABLES 
+# XTABLES - HIGH-PERFORMANCE NETWORK TABLES 
 
 ![image](https://github.com/user-attachments/assets/d95c6d07-a409-471d-bcca-cfcb07864079)
 
@@ -358,8 +358,6 @@ The XTables local status page is hosted on port 4880. It provides real-time info
 - **Client Control**: Includes buttons to disconnect individual clients.
 
 ![image](https://github.com/user-attachments/assets/7d32acf4-142c-4fa7-8d69-5accf4e771f7)
-
-https://github.com/Kobeeeef/XTABLES/assets/83244503/6a72c4f6-e875-4296-9e93-18b2d5d328e4
 
 To access the status page, open your web browser and navigate to `http://localhost:4880`.
 
