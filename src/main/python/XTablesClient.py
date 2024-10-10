@@ -16,27 +16,7 @@ class Status(Enum):
 
 
 class XTablesClient:
-    def __init__(self, name=None):
-        self.out = None
-        self.subscriptions = {}
-        self.name = name
-        self.server_ip = None
-        self.server_port = None
-        self.client_socket = None
-        self.service_found = threading.Event()
-        self.logger = logging.getLogger(__name__)
-        self.zeroconf = Zeroconf()
-        self.listener = XTablesServiceListener(self)
-        self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
-        self.clientMessageListener = None
-        self.shutdown_event = threading.Event()
-        self.lock = threading.Lock()
-        self.isConnected = False  # Variable to track connection status
-        self.response_map = {}  # Map to track UUID responses
-        self.response_lock = threading.Lock()  # Lock for thread-safe access to response_map
-        self.discover_service()
-
-    def __init__(self, server_ip, server_port):
+    def __init__(self, server_ip=None, server_port=None, name=None):
         self.out = None
         self.subscriptions = {}
         self.logger = logging.getLogger(__name__)
@@ -50,7 +30,15 @@ class XTablesClient:
         self.isConnected = False
         self.response_map = {}
         self.response_lock = threading.Lock()
-        self.initialize_client(server_ip, server_port)
+        self.name = name
+        if self.server_ip and self.server_port:
+            self.initialize_client(self.server_ip, self.server_port)
+        else:
+
+            self.zeroconf = Zeroconf()
+            self.listener = XTablesServiceListener(self)
+            self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
+            self.discover_service()
 
     def discover_service(self):
         while not self.shutdown_event.is_set():
@@ -615,14 +603,22 @@ class ClientMessageListener(threading.Thread):
         try:
             # Split the message by spaces
             parts = message.split(" ")
-
+            if len(parts) < 2:
+                self.logger.error(f"Message format invalid: {message} (too few parts)")
+                return
             # Extract UUID from the first part by splitting with ':'
             tokens = parts[0].split(":")
+            if len(tokens) != 2:
+                self.logger.error(f"Invalid token format in message: {message}")
+                return
             request_id = tokens[0].strip()
             method_type = tokens[1].strip()
             response_value = " ".join(parts[1:]).strip()
 
             if method_type == "UPDATE_EVENT":
+                if len(parts) < 3:
+                    self.logger.error(f"UPDATE_EVENT message invalid: {message}")
+                    return
                 key = parts[1]
                 value = " ".join(parts[2:])
                 if "" in self.client.subscriptions:
@@ -633,8 +629,6 @@ class ClientMessageListener(threading.Thread):
                     consumers = self.client.subscriptions[key]
                     for consumer in consumers:
                         consumer(key, value)
-                else:
-                    self.logger.warning(f"Received update for unregistered key: {key}")
 
             # Check if the request_id matches any pending requests
             with self.client.response_lock:
@@ -659,16 +653,18 @@ def parse_string(s):
     return s
 
 
-# def consumer1(key, value):
-#    print(f"Consumer 1 received update for {key}: {value}")
-#
-# def consumer2(key, value):
-#     print(f"Consumer 2 received update for {key}: {value}")
-#
-#
 # if __name__ == "__main__":
 #     logging.basicConfig(level=logging.INFO)
-#     client = XTablesClient("localhost", 1735)
+#     client = XTablesClient()
+#     timestamps = []
 #
-#     print(client.subscribeForUpdates("data", consumer1))
-#     print(client.subscribeForAllUpdates(consumer2))
+#     # Run the function 1000 times
+#     for _ in range(1000):
+#         start_time = time.time()  # Start the timer
+#         client.executePutString("FRONT", "1")
+#         end_time = time.time()  # End the timer
+#         timestamps.append(end_time - start_time)  # Record the duration
+#
+#     # Calculate the average time taken
+#     average_time = sum(timestamps) / len(timestamps)
+#     print(average_time * 1000)
