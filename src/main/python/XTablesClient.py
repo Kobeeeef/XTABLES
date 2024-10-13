@@ -723,7 +723,7 @@ def parse_string(s):
 #     logging.basicConfig(level=logging.INFO)
 #     client = XTablesClient(useZeroMQ=True)
 #     client.subscribe("image")
-#
+#     key, value = client.recv_next()
 #     while True:
 #         key, value = client.recv_next()
 #         if key is None:
