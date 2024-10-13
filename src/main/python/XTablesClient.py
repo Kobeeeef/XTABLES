@@ -9,6 +9,9 @@ import Utilities
 from enum import Enum
 import base64
 import zmq
+import cv2
+import base64
+from io import BytesIO
 
 
 class Status(Enum):
@@ -90,11 +93,15 @@ class XTablesClient:
                     if self.useZeroMQ and self.push_socket is None and self.sub_socket is None:
                         self.push_socket = self.context.socket(zmq.PUSH)
                         self.push_socket.connect(f"tcp://{server_ip}:{self.zeroMQPullPort}")
+                        self.push_socket.setsockopt(zmq.CONFLATE, 1)
+                        self.push_socket.setsockopt(zmq.SNDHWM, 1)
                         self.sub_socket = self.context.socket(zmq.SUB)
                         self.sub_socket.connect(f"tcp://{server_ip}:{self.zeroMQPubPort}")
                         self.sub_socket.setsockopt(zmq.RCVTIMEO, 0)
                         self.sub_socket.setsockopt(zmq.RCVTIMEO, self.sub_timeout)
-
+                        self.sub_socket.setsockopt(zmq.CONFLATE, 1)
+                        self.push_socket.setsockopt(zmq.RCVHWM, 1)
+                        self.logger.info(f"ZeroMQ initialized: PULL {self.zeroMQPullPort} and PUB {self.zeroMQPubPort}")
                     if self.clientMessageListener:
                         self.logger.info("Stopping previous message listener...")
                         self.clientMessageListener.stop()
@@ -721,19 +728,14 @@ def parse_string(s):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     client = XTablesClient(useZeroMQ=True)
-    client.subscribe("ok")
 
-    message_count = 0
-    start_time = time.time()
+    cap = cv2.VideoCapture(0)
 
     while True:
-        key, value = client.recv_next()
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-        if key:
-            message_count += 1
-        elapsed_time = time.time() - start_time
-
-        if elapsed_time >= 1.0:
-            print(f"Messages per minute: {message_count * 60:,}")
-            message_count = 0
-            start_time = time.time()
+        _, buffer = cv2.imencode('.jpg', frame)
+        jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+        client.push_message("image", jpg_as_text)
