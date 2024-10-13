@@ -12,6 +12,7 @@ import zmq
 import cv2
 import base64
 from io import BytesIO
+import numpy as np
 
 
 class Status(Enum):
@@ -97,7 +98,6 @@ class XTablesClient:
                         self.push_socket.setsockopt(zmq.SNDHWM, 1)
                         self.sub_socket = self.context.socket(zmq.SUB)
                         self.sub_socket.connect(f"tcp://{server_ip}:{self.zeroMQPubPort}")
-                        self.sub_socket.setsockopt(zmq.RCVTIMEO, 0)
                         self.sub_socket.setsockopt(zmq.RCVTIMEO, self.sub_timeout)
                         self.sub_socket.setsockopt(zmq.CONFLATE, 1)
                         self.push_socket.setsockopt(zmq.RCVHWM, 1)
@@ -530,7 +530,6 @@ class XTablesClient:
         # Set the timeout for receiving the message
         if self.sub_socket is None:
             raise Exception("The zeroMQ is not initialized.")
-
 
         try:
             message = self.sub_socket.recv_string()
