@@ -20,6 +20,7 @@ class XTablesClient:
     def __init__(self, server_ip=None, server_port=None, name=None, zeroMQPullPort=None, zeroMQPubPort=None,
                  useZeroMQ=False):
         self.sub_socket = None
+        self.sub_timeout = 1500
         self.push_socket = None
         self.zeroMQPullPort = zeroMQPullPort
         self.zeroMQPubPort = zeroMQPubPort
@@ -86,12 +87,13 @@ class XTablesClient:
                     self.logger.info(f"Connected to server {server_ip}:{server_port}")
                     self.out = self.client_socket.makefile('w')
                     self.isConnected = True  # Set to True when connection is established
-                    if self.useZeroMQ:
+                    if self.useZeroMQ and self.push_socket is None and self.sub_socket is None:
                         self.push_socket = self.context.socket(zmq.PUSH)
                         self.push_socket.connect(f"tcp://{server_ip}:{self.zeroMQPullPort}")
                         self.sub_socket = self.context.socket(zmq.SUB)
                         self.sub_socket.connect(f"tcp://{server_ip}:{self.zeroMQPubPort}")
                         self.sub_socket.setsockopt(zmq.RCVTIMEO, 0)
+                        self.sub_socket.setsockopt(zmq.RCVTIMEO, self.sub_timeout)
 
                     if self.clientMessageListener:
                         self.logger.info("Stopping previous message listener...")
@@ -513,7 +515,7 @@ class XTablesClient:
         else:
             return None
 
-    def recv_next(self, timeout=1500):
+    def recv_next(self):
         """
         Receives the next message for the given topic (key).
         Supports a timeout.
@@ -522,7 +524,6 @@ class XTablesClient:
         if self.sub_socket is None:
             raise Exception("The zeroMQ is not initialized.")
 
-        self.sub_socket.setsockopt(zmq.RCVTIMEO, timeout)
 
         try:
             message = self.sub_socket.recv_string()
@@ -722,7 +723,17 @@ if __name__ == "__main__":
     client = XTablesClient(useZeroMQ=True)
     client.subscribe("ok")
 
+    message_count = 0
+    start_time = time.time()
+
     while True:
         key, value = client.recv_next()
-        print(key)
-        print(value)
+
+        if key:
+            message_count += 1
+        elapsed_time = time.time() - start_time
+
+        if elapsed_time >= 1.0:
+            print(f"Messages per minute: {message_count * 60:,}")
+            message_count = 0
+            start_time = time.time()
