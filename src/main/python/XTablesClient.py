@@ -9,8 +9,9 @@ import Utilities
 from enum import Enum
 import base64
 import zmq
-import numpy as np
 import cv2
+import base64
+from io import BytesIO
 
 
 class Status(Enum):
@@ -92,11 +93,15 @@ class XTablesClient:
                     if self.useZeroMQ and self.push_socket is None and self.sub_socket is None:
                         self.push_socket = self.context.socket(zmq.PUSH)
                         self.push_socket.connect(f"tcp://{server_ip}:{self.zeroMQPullPort}")
+                        self.push_socket.setsockopt(zmq.CONFLATE, 1)
+                        self.push_socket.setsockopt(zmq.SNDHWM, 1)
                         self.sub_socket = self.context.socket(zmq.SUB)
                         self.sub_socket.connect(f"tcp://{server_ip}:{self.zeroMQPubPort}")
                         self.sub_socket.setsockopt(zmq.RCVTIMEO, 0)
                         self.sub_socket.setsockopt(zmq.RCVTIMEO, self.sub_timeout)
-
+                        self.sub_socket.setsockopt(zmq.CONFLATE, 1)
+                        self.push_socket.setsockopt(zmq.RCVHWM, 1)
+                        self.logger.info(f"ZeroMQ initialized: PULL {self.zeroMQPullPort} and PUB {self.zeroMQPubPort}")
                     if self.clientMessageListener:
                         self.logger.info("Stopping previous message listener...")
                         self.clientMessageListener.stop()
@@ -526,6 +531,7 @@ class XTablesClient:
         if self.sub_socket is None:
             raise Exception("The zeroMQ is not initialized.")
 
+
         try:
             message = self.sub_socket.recv_string()
             key, value = message.split(" ", 1)  # Split only at the first space
@@ -719,24 +725,17 @@ def parse_string(s):
     return s
 
 
-# if __name__ == "__main__":
-#     logging.basicConfig(level=logging.INFO)
-#     client = XTablesClient(useZeroMQ=True)
-#     client.subscribe("image")
-#     key, value = client.recv_next()
-#     while True:
-#         key, value = client.recv_next()
-#         if key is None:
-#             continue
-#
-#         decoded_frame = base64.b64decode(value)
-#         np_data = np.frombuffer(decoded_frame, dtype=np.uint8)
-#         frame = cv2.imdecode(np_data, cv2.IMREAD_COLOR)
-#
-#         if frame is not None:
-#             cv2.imshow("Received Frame", frame)
-#
-#         if cv2.waitKey(1) & 0xFF == ord('q'):
-#             break
-#
-#     cv2.destroyAllWindows()
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    client = XTablesClient(useZeroMQ=True)
+
+    cap = cv2.VideoCapture(0)
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        _, buffer = cv2.imencode('.jpg', frame)
+        jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+        client.push_message("image", jpg_as_text)
