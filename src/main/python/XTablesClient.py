@@ -725,17 +725,24 @@ def parse_string(s):
     return s
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    client = XTablesClient(useZeroMQ=True)
-
-    cap = cv2.VideoCapture(0)
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        _, buffer = cv2.imencode('.jpg', frame)
-        jpg_as_text = base64.b64encode(buffer).decode('utf-8')
-        client.push_message("image", jpg_as_text)
+# if __name__ == "__main__":
+#     logging.basicConfig(level=logging.INFO)
+#     client = XTablesClient(useZeroMQ=True)
+#     client.subscribe("image")
+#     key, value = client.recv_next()
+#     while True:
+#         key, value = client.recv_next()
+#         if key is None:
+#             continue
+#
+#         decoded_frame = base64.b64decode(value)
+#         np_data = np.frombuffer(decoded_frame, dtype=np.uint8)
+#         frame = cv2.imdecode(np_data, cv2.IMREAD_COLOR)
+#
+#         if frame is not None:
+#             cv2.imshow("Received Frame", frame)
+#
+#         if cv2.waitKey(1) & 0xFF == ord('q'):
+#             break
+#
+#     cv2.destroyAllWindows()
