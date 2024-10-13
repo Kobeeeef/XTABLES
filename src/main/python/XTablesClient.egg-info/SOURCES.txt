@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+setup.py
+XTablesClient.egg-info/PKG-INFO
+XTablesClient.egg-info/SOURCES.txt
+XTablesClient.egg-info/dependency_links.txt
+XTablesClient.egg-info/requires.txt
+XTablesClient.egg-info/top_level.txt
