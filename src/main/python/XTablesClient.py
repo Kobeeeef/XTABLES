@@ -8,6 +8,7 @@ from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import Utilities
 from enum import Enum
 import base64
+import zmq
 
 
 class Status(Enum):
@@ -16,7 +17,12 @@ class Status(Enum):
 
 
 class XTablesClient:
-    def __init__(self, server_ip=None, server_port=None, name=None):
+    def __init__(self, server_ip=None, server_port=None, name=None, zeroMQPullPort=None, zeroMQPubPort=None,
+                 useZeroMQ=False):
+        self.sub_socket = None
+        self.push_socket = None
+        self.zeroMQPullPort = zeroMQPullPort
+        self.zeroMQPubPort = zeroMQPubPort
         self.out = None
         self.subscriptions = {}
         self.logger = logging.getLogger(__name__)
@@ -31,10 +37,11 @@ class XTablesClient:
         self.response_map = {}
         self.response_lock = threading.Lock()
         self.name = name
+        self.context = zmq.Context()
+        self.useZeroMQ = useZeroMQ
         if self.server_ip and self.server_port:
-            self.initialize_client(self.server_ip, self.server_port)
+            self.initialize_client(server_ip=self.server_ip, server_port=self.server_port)
         else:
-
             self.zeroconf = Zeroconf()
             self.listener = XTablesServiceListener(self)
             self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
@@ -49,7 +56,7 @@ class XTablesClient:
                     self.logger.info(f"Listening for '{self.name}' XTABLES services on port 5353...")
 
                 # Wait for the service to be found with a timeout
-                service_found = self.service_found.wait(timeout=5)  # Wait for 5 seconds
+                service_found = self.service_found.wait(timeout=2)  # Wait for 5 seconds
 
                 if service_found:
                     self.logger.info("Service found, proceeding to close mDNS services...")
@@ -79,14 +86,18 @@ class XTablesClient:
                     self.logger.info(f"Connected to server {server_ip}:{server_port}")
                     self.out = self.client_socket.makefile('w')
                     self.isConnected = True  # Set to True when connection is established
+                    if self.useZeroMQ:
+                        self.push_socket = self.context.socket(zmq.PUSH)
+                        self.push_socket.connect(f"tcp://{server_ip}:{self.zeroMQPullPort}")
+                        self.sub_socket = self.context.socket(zmq.SUB)
+                        self.sub_socket.connect(f"tcp://{server_ip}:{self.zeroMQPubPort}")
+                        self.sub_socket.setsockopt(zmq.RCVTIMEO, 0)
 
-                    # Stop the old message listener if it exists
                     if self.clientMessageListener:
                         self.logger.info("Stopping previous message listener...")
                         self.clientMessageListener.stop()
                         self.clientMessageListener = None
 
-                    # Start a new message listener
                     self.clientMessageListener = ClientMessageListener(self)
                     self.clientMessageListener.start()
                     break
@@ -455,7 +466,7 @@ class XTablesClient:
         The method automatically handles arrays (lists), dictionaries, booleans, integers, floats, and strings.
 
         :param TIMEOUT: The amount of time to wait before returning None
-        :param key: The key for which to get the value. :param TIMEOUT: Timeout in milliseconds to wait for the
+        :param key: The key for which to get the value. param TIMEOUT: Timeout in milliseconds to wait for the
         response (default is 3000). :return: The value in its appropriate Python type if successful, or None if the
         key is not found or the conversion fails.
         """
@@ -502,6 +513,40 @@ class XTablesClient:
         else:
             return None
 
+    def recv_next(self, timeout=1500):
+        """
+        Receives the next message for the given topic (key).
+        Supports a timeout.
+        """
+        # Set the timeout for receiving the message
+        if self.sub_socket is None:
+            raise Exception("The zeroMQ is not initialized.")
+
+        self.sub_socket.setsockopt(zmq.RCVTIMEO, timeout)
+
+        try:
+            message = self.sub_socket.recv_string()
+            key, value = message.split(" ", 1)  # Split only at the first space
+            return key, value
+        except zmq.Again:
+            return None, None
+
+    def push_message(self, identifier, message):
+        """
+        Pushes a message to the server (PUSH side).
+        """
+        if self.push_socket is None:
+            raise Exception("The zeroMQ is not initialized.")
+
+        self.push_socket.send_string(identifier + " " + message)
+
+    def subscribe(self, key):
+        """
+        Subscribe to a given topic (key).
+        """
+        self.sub_socket.setsockopt_string(zmq.SUBSCRIBE, key)
+        print(f"Subscribed to topic: {key}")
+
     def close_socket(self):
         with self.lock:  # Ensure cleanup is thread-safe
             if self.client_socket:
@@ -546,17 +591,31 @@ class XTablesServiceListener(ServiceListener):
             if info:
                 self.resolve_service(info)
 
+    def remove_service(self, zc: "Zeroconf", type_: str, name: str) -> None:
+        pass
+
     def resolve_service(self, info):
         if not self.service_resolved:  # Only resolve if not already resolved
             service_address = socket.inet_ntoa(info.addresses[0])
-            port = info.port
-            port_str = info.properties.get(b'port')
 
-            if port_str:
+            port_str = info.properties.get(b'port')
+            pull_port_str = info.properties.get(b'pull-port')
+            pub_port_str = info.properties.get(b'pub-port')
+            pull_port = None
+            pub_port = None
+            if port_str and (pull_port_str and pub_port_str if self.client.useZeroMQ else True):
                 try:
                     port = int(port_str.decode('utf-8'))
+                    if self.client.useZeroMQ and pull_port_str and pub_port_str:
+                        pull_port = int(pull_port_str.decode('utf-8'))
+                        pub_port = int(pub_port_str.decode('utf-8'))
                 except ValueError:
+                    port = None
+
                     self.logger.warning("Invalid port format from mDNS attribute. Waiting for next resolve...")
+            else:
+                port = None
+                self.logger.warning("Invalid data from mDNS attribute. Waiting for next resolve...")
 
             if self.client.name and self.client.name.lower() == "localhost":
                 try:
@@ -564,10 +623,15 @@ class XTablesServiceListener(ServiceListener):
                 except Exception as e:
                     self.logger.fatal(f"Could not find localhost address: {e}")
 
-            if port != -1 and service_address and (self.client.name in [None, "localhost", info.name, service_address]):
+            if (port is not None) and service_address and (
+                    self.client.name in [None, "localhost", info.name, service_address]):
                 self.logger.info(f"Service resolved: {info.name} at {service_address}:{port}")
                 self.client.server_ip = service_address
                 self.client.server_port = port
+                if self.client.useZeroMQ:
+                    self.logger.info(f"ZeroMQ resolved: {info.name} at PULL {pull_port} and PUB {pub_port}")
+                    self.client.zeroMQPullPort = pull_port
+                    self.client.zeroMQPubPort = pub_port
                 self.client.service_found.set()
                 self.service_resolved = True
 
@@ -653,18 +717,12 @@ def parse_string(s):
     return s
 
 
-# if __name__ == "__main__":
-#     logging.basicConfig(level=logging.INFO)
-#     client = XTablesClient()
-#     timestamps = []
-#
-#     # Run the function 1000 times
-#     for _ in range(1000):
-#         start_time = time.time()  # Start the timer
-#         client.executePutString("FRONT", "1")
-#         end_time = time.time()  # End the timer
-#         timestamps.append(end_time - start_time)  # Record the duration
-#
-#     # Calculate the average time taken
-#     average_time = sum(timestamps) / len(timestamps)
-#     print(average_time * 1000)
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    client = XTablesClient(useZeroMQ=True)
+    client.subscribe("ok")
+
+    while True:
+        key, value = client.recv_next()
+        print(key)
+        print(value)

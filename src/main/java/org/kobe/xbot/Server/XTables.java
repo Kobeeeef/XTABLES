@@ -29,6 +29,9 @@ import org.kobe.xbot.Utilities.Exceptions.ScriptAlreadyExistsException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeromq.SocketType;
+import org.zeromq.ZContext;
+import org.zeromq.ZMQ;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -60,30 +63,36 @@ public class XTables {
     private final XTablesData table = new XTablesData();
     private ServerSocket serverSocket;
     private final int port;
+    private final int zeroMQPullPort;
+    private final int zeroMQPubPort;
     private final ExecutorService clientThreadPool;
     private final HashMap<String, Function<ScriptParameters, String>> scripts = new HashMap<>();
     private static Thread mainThread;
     private static final CountDownLatch latch = new CountDownLatch(1);
     private ExecutorService mdnsExecutorService;
+    private ExecutorService zeroMQExecutorService;
     private Server userInterfaceServer;
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
+    private ZContext context;
 
-    private XTables(String SERVICE_NAME, int PORT) {
+    private XTables(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
         this.port = PORT;
+        this.zeroMQPullPort = zeroMQPullPort;
+        this.zeroMQPubPort = zeroMQPubPort;
         this.SERVICE_NAME = SERVICE_NAME;
         instance.set(this);
         this.clientThreadPool = Executors.newCachedThreadPool();
         startServer();
     }
 
-    public static XTables startInstance(String SERVICE_NAME, int PORT) {
+    public static XTables startInstance(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
         if (instance.get() == null) {
             if (PORT == 5353)
                 throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
             if (SERVICE_NAME.equalsIgnoreCase("localhost"))
                 throw new IllegalArgumentException("The mDNS service name cannot be localhost!");
             status.set(XTableStatus.STARTING);
-            Thread main = new Thread(() -> new XTables(SERVICE_NAME, PORT));
+            Thread main = new Thread(() -> new XTables(SERVICE_NAME, PORT, zeroMQPullPort, zeroMQPubPort));
             main.setName("XTABLES-SERVER");
             main.setDaemon(false);
             main.start();
@@ -136,9 +145,28 @@ public class XTables {
             if (mdnsExecutorService != null) {
                 mdnsExecutorService.shutdownNow();
             }
-            this.mdnsExecutorService = Executors.newCachedThreadPool();
+            this.mdnsExecutorService = Executors.newFixedThreadPool(1);
             mdnsExecutorService.execute(() -> initializeMDNSWithRetries(15));
+            logger.info("Initializing zeroMQ image server...");
+            try {
+                if(context != null) {
+                    context.destroy();
+                }
+                context = new ZContext();
+                if (zeroMQExecutorService != null) {
+                    zeroMQExecutorService.shutdownNow();
+                }
+                this.zeroMQExecutorService = Executors.newFixedThreadPool(1);
+                ZMQ.Socket pullSocket = context.createSocket(SocketType.PULL);
+                pullSocket.bind("tcp://*:" + zeroMQPullPort);
+                ZMQ.Socket pubSocket = context.createSocket(SocketType.PUB);
+                pubSocket.bind("tcp://*:" + zeroMQPubPort);
+                zeroMQExecutorService.execute(() -> ZMQ.proxy(pullSocket, pubSocket, null));
 
+                logger.info("Initialized zeroMQ image server successfully.");
+            } catch (Exception e) {
+                logger.severe("Failed to initialize zeroMQ server. Error: " + e.getMessage());
+            }
             try {
                 serverSocket = new ServerSocket(port);
             } catch (IOException e) {
@@ -304,6 +332,13 @@ public class XTables {
                 jmdns.close();
                 logger.info("mDNS service unregistered and mDNS closed");
             }
+            if(context != null) {
+                context.destroy();
+                logger.info("ZeroMQ server destroyed.");
+            }
+            if(zeroMQExecutorService != null) {
+                zeroMQExecutorService.shutdownNow();
+            }
             if (fullShutdown) {
                 mainThread.interrupt();
                 if (userInterfaceServer != null) userInterfaceServer.stop();
@@ -332,6 +367,8 @@ public class XTables {
                 // Create the service with additional attributes
                 Map<String, String> props = new HashMap<>();
                 props.put("port", String.valueOf(port));
+                props.put("pull-port", String.valueOf(zeroMQPullPort));
+                props.put("pub-port", String.valueOf(zeroMQPubPort));
                 serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
                 jmdns.registerService(serviceInfo);
                 logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
@@ -446,8 +483,6 @@ public class XTables {
                     totalMessages = 0;
                 }
             }, 60, 60, TimeUnit.SECONDS);
-
-            // try with resources for no memory leak
 
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
