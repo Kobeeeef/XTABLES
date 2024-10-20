@@ -74,6 +74,7 @@ public class XTables {
     private Server userInterfaceServer;
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
     private ZContext context;
+    private int framesReceived;
 
     private XTables(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
         this.port = PORT;
@@ -156,12 +157,29 @@ public class XTables {
                 if (zeroMQExecutorService != null) {
                     zeroMQExecutorService.shutdownNow();
                 }
-                this.zeroMQExecutorService = Executors.newFixedThreadPool(1);
+                this.zeroMQExecutorService = Executors.newFixedThreadPool(2);
                 ZMQ.Socket pullSocket = context.createSocket(SocketType.PULL);
                 pullSocket.bind("tcp://*:" + zeroMQPullPort);
                 ZMQ.Socket pubSocket = context.createSocket(SocketType.PUB);
                 pubSocket.bind("tcp://*:" + zeroMQPubPort);
-                zeroMQExecutorService.execute(() -> ZMQ.proxy(pullSocket, pubSocket, null));
+                ZMQ.Socket captureSocket = context.createSocket(SocketType.PAIR);
+                captureSocket.bind("inproc://capture");
+                zeroMQExecutorService.execute(() -> ZMQ.proxy(pullSocket, pubSocket, captureSocket));
+
+
+                zeroMQExecutorService.execute(() -> {
+                    ZMQ.Socket receiver = context.createSocket(SocketType.PAIR);
+                    receiver.connect("inproc://capture");
+
+                    long lastResetTime = System.currentTimeMillis();
+                    while (!Thread.currentThread().isInterrupted()) {
+                        receiver.recv();
+                        if (System.currentTimeMillis() - lastResetTime >= 60000) {
+                            framesReceived = 0;
+                            lastResetTime = System.currentTimeMillis();
+                        } else framesReceived++;
+                    }
+                });
 
                 logger.info("Initialized zeroMQ image server successfully.");
             } catch (Exception e) {
@@ -211,6 +229,7 @@ public class XTables {
                                     i += client.totalMessages;
                                 }
                                 systemStatistics.setTotalMessages(i);
+                                systemStatistics.setFramesForwarded(framesReceived);
                             }
                             resp.getWriter().println(gson.toJson(systemStatistics));
                         }

@@ -26,6 +26,7 @@ public class SystemStatistics {
     private XTableStatus status;
     private int totalMessages;
     private String ip;
+    private int framesForwarded;
     private List<ClientData> clientDataList;
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
@@ -69,6 +70,11 @@ public class SystemStatistics {
 
     public enum HealthStatus {
         GOOD, OKAY, STRESSED, OVERLOAD, CRITICAL, UNKNOWN
+    }
+
+    public SystemStatistics setFramesForwarded(int framesForwarded) {
+        this.framesForwarded = framesForwarded;
+        return this;
     }
 
     public String getIp() {
