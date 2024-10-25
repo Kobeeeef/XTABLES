@@ -174,7 +174,7 @@ public class XTables {
                     long lastResetTime = System.currentTimeMillis();
                     while (!Thread.currentThread().isInterrupted()) {
                         receiver.recv();
-                        if (System.currentTimeMillis() - lastResetTime >= 60000) {
+                        if ((System.currentTimeMillis() - lastResetTime) >= 60000) {
                             framesReceived = 0;
                             lastResetTime = System.currentTimeMillis();
                         } else framesReceived++;

@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: XTablesClient
-Version: 1.1
+Version: 1.6
 Summary: A high-performance Python client for real-time management of XTables network tables, designed for robotics and complex data-driven systems.
 Home-page: https://github.com/Kobeeeef/XTABLES
 Author: Kobe Lei
@@ -41,251 +41,85 @@ Requires-Dist: urllib3==2.2.3
 Requires-Dist: zeroconf==0.134.0
 Requires-Dist: zipp==3.20.2
 
+
 # XTablesClient
 
-**XTablesClient** is a Python client designed for managing XTABLES, making it easier to handle real-time data in distributed systems, such as robotics applications or other environments where real-time communication is critical. This package supports data manipulation, subscriptions for updates, and communication with servers using socket connections and mDNS discovery.
+`XTablesClient` is a Python client library for connecting to an XTABLES server, supporting both direct socket and ZeroMQ-based communication. This client provides methods for data operations on network tables and offers convenient functionality for interacting with robotic applications or distributed systems.
 
 ## Features
-
-- Automatically discovers services using mDNS (Zeroconf).
-- Supports sending and receiving various data types (e.g., booleans, strings, integers, arrays, bytes, and classes).
-- Provides efficient mechanisms for handling network table updates.
-- Allows subscription to updates for specific keys.
-- Robust reconnection mechanism and socket management.
+- **Flexible Initialization**: Connects to a server directly or discovers it via mDNS.
+- **Data Operations**: Supports multiple data types (`Boolean`, `String`, `Integer`, `Float`, `Array`, `Class`, `Bytes`) for seamless data transmission.
+- **ZeroMQ Support**: Configurable ZeroMQ PUSH/PULL and PUB/SUB communication for real-time message streaming.
+- **Robust Connection Management**: Includes automatic reconnection and resubscription after disconnection.
+- **Subscription**: Allows for subscriptions to data updates for specific keys, invoking consumer functions on updates.
 
 ## Installation
 
-1. Clone or download the project.
-2. Install dependencies using the provided `requirements.txt`:
-
+Install `xtables-client` from PyPI:
 ```bash
-pip install -r requirements.txt
+pip install xtables-client
 ```
 
-3. Import the client into your project:
+## Usage
 
+### Import and Initialization
 ```python
-from XTablesClient import XTablesClient
+from xtables_client import XTablesClient
+
+# Initialize the client
+client = XTablesClient(server_ip="192.168.1.10", server_port=1735, useZeroMQ=True)
 ```
 
-## Initialization
+### Data Operations
 
-To initialize the client, you can provide the server's IP and port if known. If not provided, the client will automatically discover services using mDNS.
+1. **Setting Values**
+   - **Boolean**: `client.executePutBoolean("key", True)`
+   - **String**: `client.executePutString("key", "value")`
+   - **Integer**: `client.executePutInteger("key", 42)`
+   - **Float**: `client.executePutFloat("key", 3.14)`
+
+2. **Retrieving Values**
+   - **Get Integer**: `value = client.getInteger("key")`
+   - **Get String**: `value = client.getString("key")`
+   - **Get Float**: `value = client.getFloat("key")`
+
+3. **Subscriptions**
+   - Subscribe to updates for a key and handle updates with a custom function:
+     ```python
+     def my_consumer(key, value):
+         print(f"Update for {key}: {value}")
+
+     client.subscribeForUpdates("key", my_consumer)
+     ```
+
+4. **ZeroMQ Operations**
+   - **Push Data**: `client.push_frame("identifier", "message")`
+   - **Receive Next**: `key, value = client.recv_next()`
+
+### Connection Management
+- **Reconnect**: Automatic reconnection and re-subscription to previously subscribed keys.
+- **Shutdown**: Gracefully shuts down the client connection.
+  ```python
+  client.shutdown()
+  ```
+
+## Example
 
 ```python
-client = XTablesClient(server_ip="192.168.0.1", server_port=1735)
-```
+from xtables_client import XTablesClient
 
-## Methods
+client = XTablesClient(useZeroMQ=True, server_port=1735)
+client.subscribe("image")
 
-### 1. `initialize_client(server_ip, server_port)`
-Connects to the server and starts a message listener for handling incoming messages.
-
-**Usage:**
-```python
-client.initialize_client("192.168.0.1", 1735)
-```
-
-### 2. `send_data(data)`
-Sends data to the server over the socket connection.
-
-**Usage:**
-```python
-client.send_data("PUT key value")
-```
-
-### 3. `executePutBoolean(key, value)`
-Sends a boolean value associated with the given key to the server.
-
-**Usage:**
-```python
-client.executePutBoolean("is_active", True)
-```
-
-### 4. `executePutString(key, value)`
-Sends a string value associated with the given key to the server.
-
-**Usage:**
-```python
-client.executePutString("robot_name", "XTABLES")
-```
-
-### 5. `executePutInteger(key, value)`
-Sends an integer value associated with the given key to the server.
-
-**Usage:**
-```python
-client.executePutInteger("robot_id", 123)
-```
-
-### 6. `executePutFloat(key, value)`
-Sends a float value associated with the given key to the server.
-
-**Usage:**
-```python
-client.executePutFloat("battery_voltage", 12.5)
-```
-
-### 7. `executePutBytes(key, value)`
-Sends a byte array encoded as a Base64 string to the server.
-
-**Usage:**
-```python
-client.executePutBytes("file_data", b'some_byte_data')
-```
-
-### 8. `executePutArrayOrTuple(key, value)`
-Sends an array or tuple associated with the given key to the server.
-
-**Usage:**
-```python
-client.executePutArrayOrTuple("sensor_data", [1, 2, 3, 4])
-```
-
-### 9. `executePutClass(key, obj)`
-Serializes a class object into a JSON string and sends it to the server.
-
-**Usage:**
-```python
-client.executePutClass("robot_status", status_object)
-```
-
-### 10. `getBytes(key, TIMEOUT=3000)`
-Retrieves a Base64-encoded string from the server and decodes it back into a byte array.
-
-**Usage:**
-```python
-byte_data = client.getBytes("file_data")
-```
-
-### 11. `getData(command, value=None, TIMEOUT=3000)`
-Sends a general request to the server and retrieves the response.
-
-**Usage:**
-```python
-response = client.getData("GET", "robot_name")
-```
-
-### 12. `getString(key, TIMEOUT=3000)`
-Retrieves a string value associated with the given key.
-
-**Usage:**
-```python
-robot_name = client.getString("robot_name")
-```
-
-### 13. `getTables(key=None, TIMEOUT=3000)`
-Retrieves the list of tables from the server.
-
-**Usage:**
-```python
-tables = client.getTables()
-```
-
-### 14. `getArray(key, TIMEOUT=3000)`
-Retrieves an array (list) from the server for the given key.
-
-**Usage:**
-```python
-sensor_data = client.getArray("sensor_data")
-```
-
-### 15. `getFloat(key, TIMEOUT=3000)`
-Retrieves a float value from the server for the given key.
-
-**Usage:**
-```python
-voltage = client.getFloat("battery_voltage")
-```
-
-### 16. `getBoolean(key, TIMEOUT=3000)`
-Retrieves a boolean value from the server for the given key.
-
-**Usage:**
-```python
-is_active = client.getBoolean("is_active")
-```
-
-### 17. `getInteger(key, TIMEOUT=3000)`
-Retrieves an integer value from the server for the given key.
-
-**Usage:**
-```python
-robot_id = client.getInteger("robot_id")
-```
-
-### 18. `getClass(key, class_type, TIMEOUT=3000)`
-Retrieves a class object from the server, deserializing it from a JSON string.
-
-**Usage:**
-```python
-robot_status = client.getClass("robot_status", StatusClass)
-```
-
-### 19. `getValue(key, TIMEOUT=3000)`
-Retrieves a value from the server and returns it in its appropriate Python type (e.g., list, dict, int, float, etc.).
-
-**Usage:**
-```python
-value = client.getValue("robot_status")
-```
-
-### 20. `subscribeForUpdates(key, consumer)`
-Subscribes for updates for a specific key and registers a consumer to handle update events.
-
-**Usage:**
-```python
-client.subscribeForUpdates("robot_name", update_handler)
-```
-
-### 21. `subscribeForAllUpdates(consumer)`
-Subscribes for updates for all keys and registers a consumer to handle update events.
-
-**Usage:**
-```python
-client.subscribeForAllUpdates(update_handler)
-```
-
-### 22. `deleteTable(key=None)`
-Deletes a table or specific key from the server.
-
-**Usage:**
-```python
-status = client.deleteTable("robot_table")
-```
-
-### 23. `updateKey(oldKey, newKey)`
-Renames a key in the server.
-
-**Usage:**
-```python
-status = client.updateKey("old_robot_name", "new_robot_name")
-```
-
-### 24. `rebootServer()`
-Reboots the server.
-
-**Usage:**
-```python
-status = client.rebootServer()
-```
-
-### 25. `resubscribe_all()`
-Re-subscribes to all previously subscribed keys after reconnection.
-
-**Usage:**
-```python
-client.resubscribe_all()
-```
-
-### 26. `shutdown()`
-Shuts down the client, stopping all listeners and closing the socket connection.
-
-**Usage:**
-```python
-client.shutdown()
+while True:
+    key, value = client.recv_next()
+    if key is not None:
+        print(f"Received data for {key}: {value}")
 ```
 
 ## License
-
 This project is licensed under the MIT License.
+
+```
+
+This README provides a clear overview of the clientâ€™s capabilities, installation instructions, and usage examples to facilitate integration with any XTABLES server.
