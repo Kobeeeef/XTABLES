@@ -4,6 +4,7 @@ import threading
 import time
 import uuid
 import json
+import zmq.constants
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import Utilities
 from enum import Enum
@@ -21,7 +22,7 @@ class Status(Enum):
 
 
 class XTablesClient:
-    def __init__(self, server_ip=None, server_port=None, name=None, zeroMQPullPort=None, zeroMQPubPort=None,
+    def __init__(self, server_ip=None, server_port=None, name=None, zeroMQPullPort=1736, zeroMQPubPort=1737,
                  useZeroMQ=False):
         self.sub_socket = None
         self.sub_timeout = 1500
@@ -45,6 +46,17 @@ class XTablesClient:
         self.context = zmq.Context()
         self.useZeroMQ = useZeroMQ
         if self.server_ip and self.server_port:
+            self.initialize_client(server_ip=self.server_ip, server_port=self.server_port)
+        elif self.server_port:
+            try:
+                self.logger.info("Attempting to resolve IP address using OS resolver.")
+                self.server_ip = socket.gethostbyname("XTABLES.local")
+            except Exception as e:
+                self.logger.fatal("Failed to resolve XTABLES server. Falling back to mDNS.")
+                self.zeroconf = Zeroconf()
+                self.listener = XTablesServiceListener(self)
+                self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
+                self.discover_service()
             self.initialize_client(server_ip=self.server_ip, server_port=self.server_port)
         else:
             self.zeroconf = Zeroconf()
@@ -545,12 +557,14 @@ class XTablesClient:
         if self.push_socket is None:
             raise Exception("The zeroMQ is not initialized.")
 
-        self.push_socket.send_string(identifier + " " + message)
+        self.push_socket.send_string(identifier + " " + message, zmq.constants.DONTWAIT)
 
     def subscribe(self, key):
         """
         Subscribe to a given topic (key).
         """
+        if self.sub_socket is None:
+            raise Exception("The zeroMQ is not initialized.")
         self.sub_socket.setsockopt_string(zmq.SUBSCRIBE, key)
         print(f"Subscribed to topic: {key}")
 
@@ -726,7 +740,7 @@ def parse_string(s):
 
 # if __name__ == "__main__":
 #     logging.basicConfig(level=logging.INFO)
-#     client = XTablesClient(useZeroMQ=True)
+#     client = XTablesClient(useZeroMQ=True, server_port=1735)
 #     client.subscribe("image")
 #     key, value = client.recv_next()
 #     while True:
