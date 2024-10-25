@@ -557,7 +557,7 @@ class XTablesClient:
         if self.push_socket is None:
             raise Exception("The zeroMQ is not initialized.")
 
-        self.push_socket.send_string(identifier + " " + message, zmq.constants.DONTWAIT)
+        self.push_socket.send_string(identifier + " " + message)
 
     def subscribe(self, key):
         """
