@@ -550,7 +550,7 @@ class XTablesClient:
         except zmq.Again:
             return None, None
 
-    def push_message(self, identifier, message):
+    def push_frame(self, identifier, message):
         """
         Pushes a message to the server (PUSH side).
         """
