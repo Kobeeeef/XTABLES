@@ -382,7 +382,7 @@ public class XTables {
                     throw new RuntimeException("No local IP address found!");
                 }
                 logger.info("Initializing mDNS with address: " + addr.getHostAddress());
-                jmdns = JmDNS.create(addr);
+                jmdns = JmDNS.create(addr, "XTABLES");
                 // Create the service with additional attributes
                 Map<String, String> props = new HashMap<>();
                 props.put("port", String.valueOf(port));
