@@ -4,16 +4,13 @@ import threading
 import time
 import uuid
 import json
-import zmq.constants
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
-import Utilities
 from enum import Enum
 import base64
 import zmq
-import cv2
 import base64
 from io import BytesIO
-import numpy as np
+from . import Utilities
 
 
 class Status(Enum):
@@ -51,7 +48,7 @@ class XTablesClient:
             try:
                 self.logger.info("Attempting to resolve IP address using OS resolver.")
                 self.server_ip = socket.gethostbyname("XTABLES.local")
-            except Exception as e:
+            except Exception:
                 self.logger.fatal("Failed to resolve XTABLES server. Falling back to mDNS.")
                 self.zeroconf = Zeroconf()
                 self.listener = XTablesServiceListener(self)
