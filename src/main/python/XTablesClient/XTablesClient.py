@@ -1,16 +1,17 @@
-import socket
+import base64
+import base64
+import json
 import logging
+import socket
 import threading
 import time
 import uuid
-import json
-from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 from enum import Enum
-import base64
-import zmq
-import base64
 from io import BytesIO
+
 from . import Utilities
+import zmq
+from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 
 
 class Status(Enum):
@@ -114,6 +115,7 @@ class XTablesClient:
                     if self.clientMessageListener:
                         self.logger.info("Stopping previous message listener...")
                         self.clientMessageListener.stop()
+                        self.clientMessageListener.join()
                         self.clientMessageListener = None
 
                     self.clientMessageListener = ClientMessageListener(self)
@@ -589,11 +591,34 @@ class XTablesClient:
             self.resubscribe_all()
 
     def shutdown(self):
+        # Set the shutdown event to signal threads to stop
         self.shutdown_event.set()
+
+        # Stop the message listener if it exists
         if self.clientMessageListener:
             self.clientMessageListener.stop()
+            self.clientMessageListener.join()
+            self.clientMessageListener = None
+
+        # Close the main client socket
         self.close_socket()
+
+        # Close ZeroMQ sockets if they are initialized
+        if self.push_socket:
+            self.push_socket.close()
+            self.push_socket = None
+        if self.sub_socket:
+            self.sub_socket.close()
+            self.sub_socket = None
+
+        # Terminate the ZeroMQ context
+        if self.context:
+            self.context.term()
+            self.context = None
+
+        # Set connection status to disconnected
         self.isConnected = False
+        self.logger.info("Client shutdown complete.")
 
 
 class XTablesServiceListener(ServiceListener):
@@ -666,15 +691,18 @@ class ClientMessageListener(threading.Thread):
     def run(self):
         while not self.stop_event.is_set():
             try:
+                # Use readline with a short timeout
+                self.client_socket.settimeout(5.0)
                 message = self.in_.readline().strip()
                 if message:
-
                     self.process_message(message)
                 else:
                     self.logger.warning("Received an empty message, attempting reconnection...")
                     self.client.isConnected = False
                     self.stop()
                     self.client.handle_reconnect()
+            except OSError:
+                continue
             except Exception as e:
                 self.logger.error(f"Error in message listener: {e}")
                 self.client.isConnected = False
@@ -734,6 +762,12 @@ def parse_string(s):
         s = s[1:-1]
     return s
 
+
+# if __name__ == "__main__":
+#     logging.basicConfig(level=logging.INFO)
+#     client = XTablesClient(useZeroMQ=True, server_port=1735, server_ip="10.4.88.176")
+#     while True:
+#         client.executePutString("ok", "ok")
 
 # if __name__ == "__main__":
 #     logging.basicConfig(level=logging.INFO)
