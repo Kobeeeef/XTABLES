@@ -3,6 +3,9 @@ package org.kobe.xbot.ClientLite;
 import org.kobe.xbot.Utilities.Entities.KeyValuePair;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.*;
+import org.zeromq.SocketType;
+import org.zeromq.ZContext;
+import org.zeromq.ZMQ;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,8 +53,9 @@ public class SocketClient {
     private Consumer<KeyValuePair<String>> updateConsumer;
     private Consumer<String> deleteConsumer;
     private final XTablesClient xTablesClient;
-
-    public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, long RECONNECT_DELAY_MS, int MAX_THREADS_ARG, XTablesClient xTablesClient) {
+    private ZContext ctx;
+    private ZMQ.Socket ZMQ_PUSH_SOCKET;
+    public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, boolean ENABLE_ZMQ, long RECONNECT_DELAY_MS, int MAX_THREADS_ARG, XTablesClient xTablesClient) {
         this.socket = null;
         this.MAX_THREADS = Math.max(MAX_THREADS_ARG, 1);
         this.SERVER_ADDRESS = SERVER_ADDRESS;
@@ -59,6 +63,13 @@ public class SocketClient {
         this.RECONNECT_DELAY_MS = RECONNECT_DELAY_MS;
         this.executor = getWorkerExecutor(MAX_THREADS);
         this.xTablesClient = xTablesClient;
+        this.ctx = new ZContext();
+        if(ENABLE_ZMQ) {
+            this.ZMQ_PUSH_SOCKET = ctx.createSocket(SocketType.PUSH);
+            this.ZMQ_PUSH_SOCKET.setImmediate(true);
+            this.ZMQ_PUSH_SOCKET.setTCPKeepAlive(1);
+            this.ZMQ_PUSH_SOCKET.setHWM(100);
+        }
     }
 
     public String getSERVER_ADDRESS() {
@@ -145,6 +156,11 @@ public class SocketClient {
                     logger.info("Subscribing to previously submitted delete event.");
                     new RequestAction<>(this, new ResponseInfo(null, MethodType.SUBSCRIBE_DELETE).parsed(), ResponseStatus.class).queue();
                     logger.info("Queued delete event subscription successfully!");
+                }
+                if(this.ZMQ_PUSH_SOCKET != null) {
+                    try {
+                        this.ZMQ_PUSH_SOCKET.connect("tcp://" + SERVER_ADDRESS + ":" + 1736);
+                    } catch (Exception ignored) {}
                 }
                 isConnected = true;
                 break;
@@ -335,6 +351,9 @@ public class SocketClient {
         } catch (IOException e) {
             logger.severe("Failed to close socket or streams: " + e.getMessage());
         }
+        if(this.ctx != null) {
+            this.ctx.destroy();
+        }
         double elapsedTimeMS = (System.nanoTime() - startTime) / 1e6;
         logger.severe("SocketClient is now closed. (" + elapsedTimeMS + "ms)");
     }
@@ -374,7 +393,13 @@ public class SocketClient {
         return socket;
     }
 
+    public ZMQ.Socket getZMQ_PUSH_SOCKET() {
+        return ZMQ_PUSH_SOCKET;
+    }
 
+    public boolean pushZMQ(String message) {
+       return this.ZMQ_PUSH_SOCKET.send(message, ZMQ.DONTWAIT);
+    }
     public CompletableFuture<String> sendAsync(String message, long timeoutMS) throws IOException {
         if (executor == null || executor.isShutdown())
             throw new IOException("The worker thread executor is shutdown and no new requests can be made.");

@@ -173,7 +173,8 @@ public class XTablesServer {
 
                     long lastResetTime = System.currentTimeMillis();
                     while (!Thread.currentThread().isInterrupted()) {
-                        receiver.recv();
+                       String msg = receiver.recvStr();
+                        String[] tokens = tokenize(msg, ' ');
                         if ((System.currentTimeMillis() - lastResetTime) >= 60000) {
                             framesReceived = 0;
                             lastResetTime = System.currentTimeMillis();
@@ -420,6 +421,7 @@ public class XTablesServer {
         try {
             status.set(XTableStatus.REBOOTING);
             stopServer(false);
+            framesReceived = 0;
             logger.info("Starting socket server in 1 second...");
             status.set(XTableStatus.STARTING);
             TimeUnit.SECONDS.sleep(1);
@@ -517,60 +519,17 @@ public class XTablesServer {
                     boolean shouldReply = !id.equals("IGNORED");
 
                     switch (methodType) {
-                        case "REGISTER_VIDEO_STREAM" -> {
-                            if (tokens.length == 2) {
-                                String name = tokens[1].trim();
-                                if (Utilities.validateName(name, false)) {
-                                    if (clients.stream().anyMatch(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name))) {
-                                        if (shouldReply) {
-                                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, ImageStreamStatus.FAIL_NAME_ALREADY_EXISTS.name());
-                                            out.println(responseInfo.parsed());
-                                            out.flush();
-                                        }
-                                    } else {
-                                        if (streams == null) {
-                                            streams = Collections.synchronizedList(new ArrayList<>());
-                                        }
-                                        streams.add(name);
-                                        if (shouldReply) {
-                                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, ImageStreamStatus.OKAY.name());
-                                            out.println(responseInfo.parsed());
-                                            out.flush();
-                                        }
-                                    }
-                                } else if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, ImageStreamStatus.FAIL_INVALID_NAME.name());
-                                    out.println(responseInfo.parsed());
+                        case "PUT" -> {
+                            if (tokens.length >= 3) {
+                                String key = tokens[1];
+                                String value = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+                                boolean response = table.put(key, value);
+                                if (shouldReply) {
+                                    out.println(id + ":" + methodType + " " + (response ? "OK" : "FAIL"));
                                     out.flush();
                                 }
-                            }
-                        }
-                        case "GET_VIDEO_STREAM" -> {
-                            if (tokens.length == 2) {
-                                String name = tokens[1];
-                                if (Utilities.validateName(name, false)) {
-                                    Optional<ClientHandler> optional = clients.stream()
-                                            .filter(clientHandler -> clientHandler.streams != null && clientHandler.streams.contains(name))
-                                            .findFirst();
-
-                                    ResponseInfo responseInfo = optional
-                                            .map(clientHandler -> {
-                                                String clientAddress = clientHandler.clientSocket.getInetAddress().getHostAddress();
-                                                return new ResponseInfo(id, methodType, gson.toJson(String.format(
-                                                        "http://%1$s:4888/%2$s",
-                                                        clientAddress.equals("127.0.0.1") || clientAddress.equals("::1")
-                                                                ? Utilities.getLocalIPAddress()
-                                                                : clientAddress.replaceFirst("/", ""),
-                                                        name)));
-                                            })
-                                            .orElseGet(() -> new ResponseInfo(id, methodType, ImageStreamStatus.FAIL_INVALID_NAME.name()));
-
-                                    out.println(responseInfo.parsed());
-                                    out.flush();
-                                } else {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, ImageStreamStatus.FAIL_INVALID_NAME.name());
-                                    out.println(responseInfo.parsed());
-                                    out.flush();
+                                if (response) {
+                                    notifyUpdateChangeClients(key, value);
                                 }
                             }
                         }
@@ -578,24 +537,40 @@ public class XTablesServer {
                             if (tokens.length == 2 && shouldReply) {
                                 String key = tokens[1];
                                 String result = table.get(key);
-                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, result);
-                                out.println(responseInfo.parsed());
+                                out.println(id + ":" + methodType + " " + (result.replace("\n", "")));
                                 out.flush();
                             }
                         }
-                        case "PUT" -> {
-                            if (tokens.length >= 3) {
+                        case "SUBSCRIBE_UPDATE" -> {
+                            if (tokens.length == 2) {
                                 String key = tokens[1];
-                                String value = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
-                                boolean response = table.put(key, value);
+                                updateEvents.add(key);
                                 if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
                                     out.println(responseInfo.parsed());
                                     out.flush();
                                 }
-                                if (response) {
-                                    notifyUpdateChangeClients(key, value);
+                            } else if (tokens.length == 1) {
+                                updateEvents.add("");
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
+                                    out.println(responseInfo.parsed());
+                                    out.flush();
                                 }
+                            }
+                        }
+                        case "GET_TABLES" -> {
+                            if (tokens.length == 1 && shouldReply) {
+                                String result = gson.toJson(table.getTables(""));
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, result);
+                                out.println(responseInfo.parsed());
+                                out.flush();
+                            } else if (tokens.length == 2 && shouldReply) {
+                                String key = tokens[1];
+                                String result = gson.toJson(table.getTables(key));
+                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
+                                out.println(responseInfo.parsed());
+                                out.flush();
                             }
                         }
                         case "RUN_SCRIPT" -> {
@@ -697,24 +672,6 @@ public class XTablesServer {
                                 out.flush();
                             }
                         }
-                        case "SUBSCRIBE_UPDATE" -> {
-                            if (tokens.length == 2) {
-                                String key = tokens[1];
-                                updateEvents.add(key);
-                                if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
-                                    out.println(responseInfo.parsed());
-                                    out.flush();
-                                }
-                            } else if (tokens.length == 1) {
-                                updateEvents.add("");
-                                if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
-                                    out.println(responseInfo.parsed());
-                                    out.flush();
-                                }
-                            }
-                        }
                         case "UNSUBSCRIBE_UPDATE" -> {
                             if (tokens.length == 2) {
                                 String key = tokens[1];
@@ -742,20 +699,6 @@ public class XTablesServer {
                                 }
                                 systemStatistics.setTotalMessages(i);
                                 ResponseInfo responseInfo = new ResponseInfo(id, methodType, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
-                                out.println(responseInfo.parsed());
-                                out.flush();
-                            }
-                        }
-                        case "GET_TABLES" -> {
-                            if (tokens.length == 1 && shouldReply) {
-                                String result = gson.toJson(table.getTables(""));
-                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, result);
-                                out.println(responseInfo.parsed());
-                                out.flush();
-                            } else if (tokens.length == 2 && shouldReply) {
-                                String key = tokens[1];
-                                String result = gson.toJson(table.getTables(key));
-                                ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }

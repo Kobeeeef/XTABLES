@@ -13,8 +13,11 @@ public class OverloadTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
-        XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, 5, false);
+        XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true,5, false);
 
+        while (true) {
+            client.getSocketClient().pushZMQ("test");
+        }
 
     }
 

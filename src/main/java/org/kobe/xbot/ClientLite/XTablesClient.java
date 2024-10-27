@@ -42,7 +42,7 @@ public class XTablesClient {
      * @param useCache    flag indicating whether to use caching.
      * @throws IllegalArgumentException if the server port is 5353, which is reserved for mDNS services.
      */
-    public XTablesClient(int SERVER_PORT, int MAX_THREADS, boolean useCache) {
+    public XTablesClient(int SERVER_PORT, boolean enableZMQ, int MAX_THREADS, boolean useCache) {
         if (SERVER_PORT == 5353)
             throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
 
@@ -66,7 +66,7 @@ public class XTablesClient {
             }
         }
 
-        initializeClient(address.getHostAddress(), SERVER_PORT, MAX_THREADS, useCache);
+        initializeClient(address.getHostAddress(), SERVER_PORT, enableZMQ, MAX_THREADS, useCache);
     }
 
 
@@ -85,8 +85,8 @@ public class XTablesClient {
     public final HashMap<String, List<UpdateConsumer<?>>> update_consumers = new HashMap<>();
     public final List<Consumer<String>> delete_consumers = new ArrayList<>();
 
-    private void initializeClient(String SERVER_ADDRESS, int SERVER_PORT, int MAX_THREADS, boolean useCache) {
-        this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, 10, MAX_THREADS, this);
+    private void initializeClient(String SERVER_ADDRESS, int SERVER_PORT, boolean enableZMQ, int MAX_THREADS, boolean useCache) {
+        this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, enableZMQ, 10, MAX_THREADS, this);
         Thread thread = new Thread(() -> {
             client.connect();
             client.setUpdateConsumer(this::on_update);
@@ -495,6 +495,9 @@ public class XTablesClient {
         client.sendMessageRaw("IGNORED:PUT " + key + " " + parsedValue);
     }
 
+    public boolean pushZMQMessage(String message) {
+       return client.pushZMQ(message);
+    }
 
     public RequestAction<ResponseStatus> renameKey(String key, String newName) {
         Utilities.validateKey(key, true);
