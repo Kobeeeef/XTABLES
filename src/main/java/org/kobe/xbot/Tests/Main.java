@@ -1,7 +1,9 @@
-package org.kobe.xbot.Client;
+package org.kobe.xbot.Tests;
 // EXAMPLE SETUP
 
-import org.kobe.xbot.Server.XTablesData;
+import org.kobe.xbot.Client.XTablesClient;
+import org.kobe.xbot.Utilities.XTablesData;
+import org.kobe.xbot.Utilities.Entities.KeyValuePair;
 import org.kobe.xbot.Utilities.ResponseStatus;
 import org.kobe.xbot.Utilities.ScriptResponse;
 
@@ -88,7 +90,7 @@ public class Main {
         System.out.println("Subscribe status: " + status);
 
         // Define a consumer for update events
-        Consumer<SocketClient.KeyValuePair<String>> updateConsumer = update -> {
+        Consumer<KeyValuePair<String>> updateConsumer = update -> {
             System.out.println("Update received: " + update);
         };
         // Subscribe to updates for a specific key

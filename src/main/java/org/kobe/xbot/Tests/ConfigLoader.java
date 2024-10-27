@@ -1,4 +1,4 @@
-package org.kobe.xbot.Server;
+package org.kobe.xbot.Tests;
 
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 

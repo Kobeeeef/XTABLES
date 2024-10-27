@@ -1,5 +1,5 @@
 /**
- * XTables class manages a server that allows clients to interact with a key-value data structure.
+ * XTablesServer class manages a server that allows clients to interact with a key-value data structure.
  * It provides methods to start the server, handle client connections, and process client requests.
  * The class also supports server reboot functionality and notification of clients upon data updates.
  *
@@ -50,11 +50,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class XTables {
-    private static final Logger log = LoggerFactory.getLogger(XTables.class);
+public class XTablesServer {
+    private static final Logger log = LoggerFactory.getLogger(XTablesServer.class);
     private final String SERVICE_NAME;
     private static final int SERVICE_PORT = 5353;
-    private static final AtomicReference<XTables> instance = new AtomicReference<>();
+    private static final AtomicReference<XTablesServer> instance = new AtomicReference<>();
     private static final Gson gson = new Gson();
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private JmDNS jmdns;
@@ -76,7 +76,7 @@ public class XTables {
     private ZContext context;
     private int framesReceived;
 
-    private XTables(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
+    private XTablesServer(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
         this.port = PORT;
         this.zeroMQPullPort = zeroMQPullPort;
         this.zeroMQPubPort = zeroMQPubPort;
@@ -86,14 +86,14 @@ public class XTables {
         startServer();
     }
 
-    public static XTables startInstance(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
+    public static XTablesServer startInstance(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
         if (instance.get() == null) {
             if (PORT == 5353)
                 throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
             if (SERVICE_NAME.equalsIgnoreCase("localhost"))
                 throw new IllegalArgumentException("The mDNS service name cannot be localhost!");
             status.set(XTableStatus.STARTING);
-            Thread main = new Thread(() -> new XTables(SERVICE_NAME, PORT, zeroMQPullPort, zeroMQPubPort));
+            Thread main = new Thread(() -> new XTablesServer(SERVICE_NAME, PORT, zeroMQPullPort, zeroMQPubPort));
             main.setName("XTABLES-SERVER");
             main.setDaemon(false);
             main.start();
@@ -115,13 +115,13 @@ public class XTables {
     }
 
     public static void stopInstance() {
-        XTables xTables = instance.get();
-        xTables.stopServer(false);
+        XTablesServer xTablesServer = instance.get();
+        xTablesServer.stopServer(false);
         mainThread.interrupt();
         instance.set(null);
     }
 
-    public static XTables getInstance() {
+    public static XTablesServer getInstance() {
         return instance.get();
     }
 
@@ -203,7 +203,7 @@ public class XTables {
                     // Static resource handler
                     ResourceHandler resourceHandler = new ResourceHandler();
                     resourceHandler.setDirectoriesListed(true);
-                    URL resourceURL = XTables.class.getResource("/static");
+                    URL resourceURL = XTablesServer.class.getResource("/static");
                     assert resourceURL != null;
                     String resourceBase = resourceURL.toExternalForm();
                     resourceHandler.setResourceBase(resourceBase);
@@ -221,7 +221,7 @@ public class XTables {
                             resp.setContentType("application/json");
                             resp.setCharacterEncoding("UTF-8");
                             SystemStatistics systemStatistics = new SystemStatistics(clients.size());
-                            systemStatistics.setStatus(XTables.getStatus());
+                            systemStatistics.setStatus(XTablesServer.getStatus());
                             synchronized (clients) {
                                 systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.totalMessages, m.identifier)).collect(Collectors.toList()));
                                 int i = 0;
@@ -577,8 +577,8 @@ public class XTables {
                         case "GET" -> {
                             if (tokens.length == 2 && shouldReply) {
                                 String key = tokens[1];
-                                String result = gson.toJson(table.get(key));
-                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, String.format("%1$s " + result, table.isFlaggedKey(key) ? "FLAGGED" : "GOOD"));
+                                String result = table.get(key);
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, result);
                                 out.println(responseInfo.parsed());
                                 out.flush();
                             }

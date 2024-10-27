@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="XTablesClient",  # Your package name
     version="2.2",  # Initial version
-    description="A high-performance Python client for real-time management of XTables network tables, designed for "
+    description="A high-performance Python client for real-time management of XTablesServer network tables, designed for "
                 "robotics and complex data-driven systems.",
     long_description=open('README.md').read(),  # Add a README file
     long_description_content_type="text/markdown",

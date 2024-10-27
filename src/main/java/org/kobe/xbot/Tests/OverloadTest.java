@@ -1,7 +1,9 @@
-package org.kobe.xbot.Client;
+package org.kobe.xbot.Tests;
 
 
 
+
+import org.kobe.xbot.ClientLite.XTablesClient;
 
 import java.io.IOException;
 
@@ -11,11 +13,8 @@ public class OverloadTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient();
+        XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, 5, false);
 
-        while(true) {
-          client.executePutDouble("SmartDashboard.test", Math.random());
-        }
 
     }
 
