@@ -422,31 +422,74 @@ public class XTablesClient {
         };
     }
 
+    /**
+     * Sends a raw string value to the server with the specified key.
+     *
+     * @param key   the key associated with the value.
+     * @param value the string value to send.
+     */
     public void executePutString(String key, String value) {
         client.sendMessageRaw("IGNORED:PUT " + key + " \"" + value + "\"");
     }
 
+    /**
+     * Sends an integer value to the server with the specified key.
+     *
+     * @param key   the key associated with the value.
+     * @param value the integer value to send.
+     */
     public void executePutInteger(String key, int value) {
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
 
+    /**
+     * Sends a double value to the server with the specified key.
+     *
+     * @param key   the key associated with the value.
+     * @param value the double value to send.
+     */
     public void executePutDouble(String key, double value) {
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
 
+    /**
+     * Sends a long value to the server with the specified key.
+     *
+     * @param key   the key associated with the value.
+     * @param value the long value to send.
+     */
     public void executePutLong(String key, long value) {
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
 
+    /**
+     * Sends a boolean value to the server with the specified key.
+     *
+     * @param key   the key associated with the value.
+     * @param value the boolean value to send.
+     */
     public void executePutBoolean(String key, boolean value) {
         client.sendMessageRaw("IGNORED:PUT " + key + " " + value);
     }
 
+    /**
+     * Sends an array to the server with the specified key.
+     *
+     * @param key   the key associated with the array.
+     * @param value the list of values to send, which is converted to JSON format.
+     * @param <T>   the type of the array elements.
+     */
     public <T> void executePutArray(String key, List<T> value) {
         String parsedValue = gson.toJson(value);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + parsedValue);
     }
 
+    /**
+     * Sends an object to the server with the specified key.
+     *
+     * @param key   the key associated with the object.
+     * @param value the object to send, which is converted to JSON format.
+     */
     public void executePutObject(String key, Object value) {
         String parsedValue = gson.toJson(value);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + parsedValue);
