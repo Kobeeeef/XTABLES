@@ -150,7 +150,7 @@ public class XTablesServer {
             mdnsExecutorService.execute(() -> initializeMDNSWithRetries(15));
             logger.info("Initializing zeroMQ image server...");
             try {
-                if(context != null) {
+                if (context != null) {
                     context.destroy();
                 }
                 context = new ZContext();
@@ -159,9 +159,11 @@ public class XTablesServer {
                 }
                 this.zeroMQExecutorService = Executors.newFixedThreadPool(2);
                 ZMQ.Socket pullSocket = context.createSocket(SocketType.PULL);
+                pullSocket.setRcvHWM(500);
                 pullSocket.bind("tcp://*:" + zeroMQPullPort);
                 ZMQ.Socket pubSocket = context.createSocket(SocketType.PUB);
                 pubSocket.bind("tcp://*:" + zeroMQPubPort);
+                pubSocket.setSndHWM(500);
                 ZMQ.Socket captureSocket = context.createSocket(SocketType.PAIR);
                 captureSocket.bind("inproc://capture");
                 zeroMQExecutorService.execute(() -> ZMQ.proxy(pullSocket, pubSocket, captureSocket));
@@ -170,11 +172,15 @@ public class XTablesServer {
                 zeroMQExecutorService.execute(() -> {
                     ZMQ.Socket receiver = context.createSocket(SocketType.PAIR);
                     receiver.connect("inproc://capture");
-
                     long lastResetTime = System.currentTimeMillis();
                     while (!Thread.currentThread().isInterrupted()) {
-                       String msg = receiver.recvStr();
-                        String[] tokens = tokenize(msg, ' ');
+                        String msg = receiver.recvStr();
+                        String[] tokens = tokenize(msg, ' ', 2);
+                        if(tokens.length == 2) {
+                            table.put(tokens[0], tokens[1]);
+                        }
+
+
                         if ((System.currentTimeMillis() - lastResetTime) >= 60000) {
                             framesReceived = 0;
                             lastResetTime = System.currentTimeMillis();
@@ -352,11 +358,11 @@ public class XTablesServer {
                 jmdns.close();
                 logger.info("mDNS service unregistered and mDNS closed");
             }
-            if(context != null) {
+            if (context != null) {
                 context.destroy();
                 logger.info("ZeroMQ server destroyed.");
             }
-            if(zeroMQExecutorService != null) {
+            if (zeroMQExecutorService != null) {
                 zeroMQExecutorService.shutdownNow();
             }
             if (fullShutdown) {
@@ -512,8 +518,8 @@ public class XTablesServer {
                 while ((inputLine = in.readLine()) != null && !this.isInterrupted()) {
                     totalMessages++;
                     String raw = inputLine.replace("\n", "").trim();
-                    String[] tokens = tokenize(raw, ' ');
-                    String[] requestTokens = tokenize(tokens[0], ':');
+                    String[] tokens = tokenize(raw, ' ', 3);
+                    String[] requestTokens = tokenize(tokens[0], ':', 2);
                     String id = requestTokens[0];
                     String methodType = requestTokens[1];
                     boolean shouldReply = !id.equals("IGNORED");
@@ -774,31 +780,37 @@ public class XTablesServer {
         }
     }
 
-    private String[] tokenize(String input, char delimiter) {
+    public static String[] tokenize(String input, char delimiter, int maxTokens) {
         int count = 1;
         int length = input.length();
-        for (int i = 0; i < length; i++) {
+
+        // First pass: Calculate the number of delimiters up to maxTokens
+        for (int i = 0; i < length && (maxTokens == 0 || count < maxTokens); i++) {
             if (input.charAt(i) == delimiter) {
                 count++;
             }
         }
 
-        // Allocate array for results
+        // Allocate array for results, with either full count or maxTokens
         String[] result = new String[count];
         int index = 0;
         int tokenStart = 0;
 
-        // Second pass: Extract tokens
+        // Second pass: Extract tokens up to maxTokens
         for (int i = 0; i < length; i++) {
             if (input.charAt(i) == delimiter) {
                 result[index++] = input.substring(tokenStart, i);
                 tokenStart = i + 1;
+                if (maxTokens > 0 && index == maxTokens - 1) {
+                    break;
+                }
             }
         }
 
-        // Add last token
+        // Add last token or the remainder if maxTokens was reached
         result[index] = input.substring(tokenStart);
 
         return result;
     }
+
 }

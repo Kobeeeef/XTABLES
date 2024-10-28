@@ -16,7 +16,7 @@ public class OverloadTest {
         XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true,5, false);
 
         while (true) {
-            client.getSocketClient().pushZMQ("test");
+            client.pushZMQStringUpdate("test", "okay");
         }
 
     }

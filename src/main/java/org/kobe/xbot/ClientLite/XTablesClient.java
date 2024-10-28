@@ -494,7 +494,9 @@ public class XTablesClient {
         String parsedValue = gson.toJson(value);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + parsedValue);
     }
-
+    public boolean pushZMQStringUpdate(String key, String value) {
+        return client.pushZMQ(key + " " + value);
+    }
     public boolean pushZMQMessage(String message) {
        return client.pushZMQ(message);
     }
