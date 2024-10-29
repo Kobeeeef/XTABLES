@@ -461,28 +461,30 @@ public class XTablesClient {
     }
 
     private <T> void processUpdate(KeyValuePair<String> keyValuePair, String key) {
-        List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
-        for (UpdateConsumer<?> updateConsumer : consumers) {
-            UpdateConsumer<T> typedUpdateConsumer = (UpdateConsumer<T>) updateConsumer;
-            Consumer<? super KeyValuePair<T>> consumer = typedUpdateConsumer.getConsumer();
-            Class<T> type = typedUpdateConsumer.getType();
-            if (type != null) {
-                try {
-                    T parsed = gson.fromJson(keyValuePair.getValue(), type);
-                    consumer.accept(new KeyValuePair<>(keyValuePair.getKey(), parsed));
-                } catch (JsonSyntaxException ignored) {
-                } catch (Exception e) {
-                    logger.severe("There was a exception while running update subscriber callback: " + e.getMessage());
+        if(update_consumers.containsKey(key)) {
+            List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
+            for (UpdateConsumer<?> updateConsumer : consumers) {
+                UpdateConsumer<T> typedUpdateConsumer = (UpdateConsumer<T>) updateConsumer;
+                Consumer<? super KeyValuePair<T>> consumer = typedUpdateConsumer.getConsumer();
+                Class<T> type = typedUpdateConsumer.getType();
+                if (type != null) {
+                    try {
+                        T parsed = gson.fromJson(keyValuePair.getValue(), type);
+                        consumer.accept(new KeyValuePair<>(keyValuePair.getKey(), parsed));
+                    } catch (JsonSyntaxException ignored) {
+                    } catch (Exception e) {
+                        logger.severe("There was a exception while running update subscriber callback: " + e.getMessage());
 
-                }
-            } else {
-                UpdateConsumer<String> typedUpdateConsumer2 = (UpdateConsumer<String>) updateConsumer;
-                Consumer<? super KeyValuePair<String>> consumer2 = typedUpdateConsumer2.getConsumer();
-                try {
-                    consumer2.accept(keyValuePair);
-                } catch (Exception e) {
-                    logger.severe("There was a exception while running subscriber callback: " + e.getMessage());
+                    }
+                } else {
+                    UpdateConsumer<String> typedUpdateConsumer2 = (UpdateConsumer<String>) updateConsumer;
+                    Consumer<? super KeyValuePair<String>> consumer2 = typedUpdateConsumer2.getConsumer();
+                    try {
+                        consumer2.accept(keyValuePair);
+                    } catch (Exception e) {
+                        logger.severe("There was a exception while running subscriber callback: " + e.getMessage());
 
+                    }
                 }
             }
         }

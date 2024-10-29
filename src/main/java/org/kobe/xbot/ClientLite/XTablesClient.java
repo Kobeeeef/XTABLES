@@ -8,6 +8,11 @@ import org.kobe.xbot.Utilities.Entities.KeyValuePair;
 import org.kobe.xbot.Utilities.Entities.UpdateConsumer;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceInfo;
+import javax.jmdns.ServiceListener;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -69,6 +74,92 @@ public class XTablesClient {
         initializeClient(address.getHostAddress(), SERVER_PORT, enableZMQ, MAX_THREADS, useCache);
     }
 
+    public XTablesClient(String name, int MAX_THREADS, boolean useCache) {
+        try {
+            InetAddress addr = null;
+            while (addr == null) {
+                addr = Utilities.getLocalInetAddress();
+                if(addr == null) {
+                    logger.severe("No non-loopback IPv4 address found. Trying again in 1 second...");
+                    Thread.sleep(1000);
+                }
+            }
+            try (JmDNS jmdns = JmDNS.create(addr)) {
+                CountDownLatch serviceLatch = new CountDownLatch(1);
+                final boolean[] serviceFound = {false};
+                final String[] serviceAddressIP = new String[1];
+                final Integer[] socketServiceServerPort = new Integer[1];
+
+                jmdns.addServiceListener("_xtables._tcp.local.", new ServiceListener() {
+                    @Override
+                    public void serviceAdded(ServiceEvent event) {
+                        logger.info("Service found: " + event.getName());
+                        jmdns.requestServiceInfo(event.getType(), event.getName(), true);
+                    }
+
+                    @Override
+                    public void serviceRemoved(ServiceEvent event) {
+                        logger.info("Service removed: " + event.getName());
+                    }
+
+                    @Override
+                    public void serviceResolved(ServiceEvent event) {
+                        synchronized (serviceFound) {
+                            if (!serviceFound[0]) {
+                                ServiceInfo serviceInfo = event.getInfo();
+                                String serviceAddress = serviceInfo.getInet4Addresses()[0].getHostAddress();
+                                int socketServerPort = -1;
+                                String portStr = serviceInfo.getPropertyString("port");
+                                try {
+                                    socketServerPort = Integer.parseInt(portStr);
+                                } catch (NumberFormatException e) {
+                                    logger.warning("Invalid port format from mDNS attribute. Waiting for next resolve...");
+                                }
+
+                                String localAddress = null;
+                                if (name != null && name.equalsIgnoreCase("localhost")) {
+                                    try {
+                                        localAddress = Utilities.getLocalIPAddress();
+                                        serviceAddress = localAddress;
+                                    } catch (Exception e) {
+                                        logger.severe("Could not find localhost address: " + e.getMessage());
+                                    }
+                                }
+                                if (socketServerPort != -1 && serviceAddress != null && !serviceAddress.trim().isEmpty() && (localAddress != null || serviceInfo.getName().equals(name) || serviceAddress.equals(name) || name == null)) {
+                                    serviceFound[0] = true;
+                                    logger.info("Service resolved: " + serviceInfo.getQualifiedName());
+                                    logger.info("Address: " + serviceAddress + " Port: " + socketServerPort);
+                                    serviceAddressIP[0] = serviceAddress;
+                                    socketServiceServerPort[0] = socketServerPort;
+                                    serviceLatch.countDown();
+                                }
+                            }
+                        }
+                    }
+                });
+                if (name == null) logger.info("Listening for first instance of XTABLES service on port 5353...");
+                else logger.info("Listening for '" + name + "' XTABLES services on port 5353...");
+                while(serviceLatch.getCount() > 0 && !serviceFound[0] && !Thread.currentThread().isInterrupted()) {
+                    try {
+                        jmdns.requestServiceInfo("_xtables._tcp.local.", "XTablesService", true, 1000);
+                    } catch (Exception ignored) {}
+                }
+                serviceLatch.await();
+                logger.info("Service latch released, proceeding to close mDNS services...");
+                jmdns.close();
+                logger.info("mDNS service successfully closed. Service discovery resolver shut down.");
+
+                if (serviceAddressIP[0] == null || socketServiceServerPort[0] == null) {
+                    throw new RuntimeException("The service address or port could not be found.");
+                } else {
+                    initializeClient(serviceAddressIP[0], socketServiceServerPort[0], true, MAX_THREADS, useCache);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            logger.severe("Service discovery error: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 
     // ---------------------------------------------------------------
     // ---------------- Methods and Fields ---------------------------
