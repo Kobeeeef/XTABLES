@@ -162,7 +162,12 @@ public class XTablesData {
     public String toJSON() {
         return gson.toJson(this.data);
     }
-
+    public Map<String, XTablesData> getTablesMap() {
+        return data;
+    }
+    public String getValue() {
+        return value;
+    }
     public void updateFromRawJSON(String json) {
 
         Map<String, XTablesData> newData = gson.fromJson(json, new TypeToken<Map<String, XTablesData>>() {

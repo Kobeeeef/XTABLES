@@ -250,7 +250,7 @@ public class SocketClient {
                         String value = String.join(" ", Arrays.copyOfRange(requestInfo.getTokens(), 2, requestInfo.getTokens().length));
                         if (updateConsumer != null) {
                             KeyValuePair<String> keyValuePair = new KeyValuePair<>(key, value);
-                            executor.execute(() -> updateConsumer.accept(keyValuePair)); // maybe implement a cachedThread instead of using the same executor as socket client
+                            updateConsumer.accept(keyValuePair); // maybe implement a cachedThread instead of using the same executor as socket client
                             if (CLEAR_UPDATE_MESSAGES) MESSAGES.remove(requestInfo);
                         }
                     } else if (requestInfo.getTokens().length >= 2 && requestInfo.getMethod().equals(MethodType.DELETE_EVENT)) {

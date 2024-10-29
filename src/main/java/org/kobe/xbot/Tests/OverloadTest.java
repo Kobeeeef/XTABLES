@@ -16,7 +16,10 @@ public class OverloadTest {
         XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true,5, false);
 
         while (true) {
-            client.pushZMQStringUpdate("test", "okay");
+            try {
+                client.putString("tawd", Math.random() + "").complete();
+                Thread.sleep(1);
+            } catch (Exception ex) {}
         }
 
     }
