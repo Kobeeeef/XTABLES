@@ -415,6 +415,9 @@ public class SocketClient {
     public ZMQ.Socket getZMQ_PUSH_SOCKET() {
         return ZMQ_PUSH_SOCKET;
     }
+    public ZMQ.Socket getZMQ_SUB_SOCKET() {
+        return ZMQ_SUB_SOCKET;
+    }
 
     public boolean pushZMQ(String message) {
        return this.ZMQ_PUSH_SOCKET.send(message, ZMQ.DONTWAIT);
