@@ -108,8 +108,10 @@ public class XTablesServer {
             mainThread = main;
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("Shutdown hook triggered. Stopping server...");
-                instance.get().stopServer(true);
-                logger.info("Server stopped gracefully.");
+                if(instance.get() != null) {
+                    instance.get().stopServer(true);
+                    logger.info("Server stopped gracefully.");
+                }
             }));
 
         }
@@ -175,18 +177,23 @@ public class XTablesServer {
                     ZMQ.Socket receiver = context.createSocket(SocketType.PAIR);
                     receiver.connect("inproc://capture");
                     long lastResetTime = System.currentTimeMillis();
+
                     while (!Thread.currentThread().isInterrupted()) {
-                        String msg = receiver.recvStr();
-                        String[] tokens = tokenize(msg, ' ', 2);
-                        if(tokens.length == 2) {
-                            table.put(tokens[0], tokens[1]);
+                        try {
+                            String msg = receiver.recvStr();
+                            String[] tokens = tokenize(msg, ' ', 2);
+                            if (tokens.length == 2) {
+                                table.put(tokens[0], tokens[1]);
+                            }
+
+
+                            if ((System.currentTimeMillis() - lastResetTime) >= 60000) {
+                                framesReceived = 0;
+                                lastResetTime = System.currentTimeMillis();
+                            } else framesReceived++;
+                        } catch (Exception e) {
+                            logger.info("Error occurred in ZeroMQ capture socket: " + e.getMessage());
                         }
-
-
-                        if ((System.currentTimeMillis() - lastResetTime) >= 60000) {
-                            framesReceived = 0;
-                            lastResetTime = System.currentTimeMillis();
-                        } else framesReceived++;
                     }
                 });
 
@@ -361,8 +368,12 @@ public class XTablesServer {
                 logger.info("mDNS service unregistered and mDNS closed");
             }
             if (context != null) {
-                context.destroy();
-                logger.info("ZeroMQ server destroyed.");
+                try {
+                    context.destroy();
+                    logger.info("ZeroMQ server destroyed.");
+                } catch (Exception e) {
+                    logger.severe("Failed to destroy ZeroMQ server context.");
+                }
             }
             if (zeroMQExecutorService != null) {
                 zeroMQExecutorService.shutdownNow();
