@@ -13,13 +13,9 @@ public class OverloadTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
-        XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true,5, false);
-
+        XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true, 10, false);
         while (true) {
-            try {
-                client.putString("tawd", Math.random() + "").complete();
-                Thread.sleep(1);
-            } catch (Exception ex) {}
+               client.pushZMQStringUpdate("tawd", Math.random() + "");
         }
 
     }

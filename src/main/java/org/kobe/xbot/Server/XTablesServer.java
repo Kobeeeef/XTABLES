@@ -50,6 +50,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.kobe.xbot.Utilities.Utilities.tokenize;
+
 public class XTablesServer {
     private static final Logger log = LoggerFactory.getLogger(XTablesServer.class);
     private final String SERVICE_NAME;
@@ -780,37 +782,6 @@ public class XTablesServer {
         }
     }
 
-    public static String[] tokenize(String input, char delimiter, int maxTokens) {
-        int count = 1;
-        int length = input.length();
 
-        // First pass: Calculate the number of delimiters up to maxTokens
-        for (int i = 0; i < length && (maxTokens == 0 || count < maxTokens); i++) {
-            if (input.charAt(i) == delimiter) {
-                count++;
-            }
-        }
-
-        // Allocate array for results, with either full count or maxTokens
-        String[] result = new String[count];
-        int index = 0;
-        int tokenStart = 0;
-
-        // Second pass: Extract tokens up to maxTokens
-        for (int i = 0; i < length; i++) {
-            if (input.charAt(i) == delimiter) {
-                result[index++] = input.substring(tokenStart, i);
-                tokenStart = i + 1;
-                if (maxTokens > 0 && index == maxTokens - 1) {
-                    break;
-                }
-            }
-        }
-
-        // Add last token or the remainder if maxTokens was reached
-        result[index] = input.substring(tokenStart);
-
-        return result;
-    }
 
 }

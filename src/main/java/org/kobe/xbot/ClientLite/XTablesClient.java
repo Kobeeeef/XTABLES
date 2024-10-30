@@ -2,7 +2,6 @@ package org.kobe.xbot.ClientLite;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.kobe.xbot.Utilities.XTablesData;
 import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.KeyValuePair;
 import org.kobe.xbot.Utilities.Entities.UpdateConsumer;
@@ -44,13 +43,40 @@ public class XTablesClient {
      *
      * @param SERVER_PORT the port of the server to connect to.
      * @param MAX_THREADS the maximum number of threads to use for client operations.
-     * @param useCache    flag indicating whether to use caching.
      * @throws IllegalArgumentException if the server port is 5353, which is reserved for mDNS services.
      */
-    public XTablesClient(int SERVER_PORT, boolean enableZMQ, int MAX_THREADS, boolean useCache) {
+    public XTablesClient(int SERVER_PORT, boolean enableZMQ, int MAX_THREADS, boolean async) {
         if (SERVER_PORT == 5353)
             throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
 
+        if (async) {
+            this.client = new SocketClient(null, SERVER_PORT, enableZMQ, 10, MAX_THREADS, this);
+            Thread thread = new Thread(() -> {
+                InetAddress address = resolveHostByName();
+                if (address == null) {
+                    logger.fatal("Failed to find address...");
+                    return;
+                }
+                client.setSERVER_ADDRESS(address.getHostAddress());
+                client.connect();
+                client.setUpdateConsumer(this::on_update);
+                client.setDeleteConsumer(this::on_delete);
+            });
+            thread.setDaemon(true);
+            thread.start();
+        } else {
+            InetAddress address = resolveHostByName();
+            if (address == null) {
+                logger.fatal("Failed to find address...");
+                return;
+            }
+            initializeClient(address.getHostAddress(), SERVER_PORT, enableZMQ, MAX_THREADS, false);
+
+        }
+    }
+
+
+    private InetAddress resolveHostByName() {
         InetAddress address = null;
         while (address == null) {
             try {
@@ -66,12 +92,11 @@ public class XTablesClient {
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     logger.warning("Retry wait interrupted. Exiting...");
-                    return;
+                    return null;
                 }
             }
         }
-
-        initializeClient(address.getHostAddress(), SERVER_PORT, enableZMQ, MAX_THREADS, useCache);
+        return address;
     }
 
     public XTablesClient(String name, int MAX_THREADS, boolean useCache) {
@@ -79,7 +104,7 @@ public class XTablesClient {
             InetAddress addr = null;
             while (addr == null) {
                 addr = Utilities.getLocalInetAddress();
-                if(addr == null) {
+                if (addr == null) {
                     logger.severe("No non-loopback IPv4 address found. Trying again in 1 second...");
                     Thread.sleep(1000);
                 }
@@ -139,10 +164,11 @@ public class XTablesClient {
                 });
                 if (name == null) logger.info("Listening for first instance of XTABLES service on port 5353...");
                 else logger.info("Listening for '" + name + "' XTABLES services on port 5353...");
-                while(serviceLatch.getCount() > 0 && !serviceFound[0] && !Thread.currentThread().isInterrupted()) {
+                while (serviceLatch.getCount() > 0 && !serviceFound[0] && !Thread.currentThread().isInterrupted()) {
                     try {
                         jmdns.requestServiceInfo("_xtables._tcp.local.", "XTablesService", true, 1000);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
                 serviceLatch.await();
                 logger.info("Service latch released, proceeding to close mDNS services...");
@@ -161,9 +187,9 @@ public class XTablesClient {
         }
     }
 
-    // ---------------------------------------------------------------
-    // ---------------- Methods and Fields ---------------------------
-    // ---------------------------------------------------------------
+// ---------------------------------------------------------------
+// ---------------- Methods and Fields ---------------------------
+// ---------------------------------------------------------------
 
     private final XTablesLogger logger = XTablesLogger.getLogger();
     private SocketClient client;
@@ -436,7 +462,7 @@ public class XTablesClient {
     }
 
     private <T> void processUpdate(KeyValuePair<String> keyValuePair, String key) {
-        if(update_consumers.containsKey(key)) {
+        if (update_consumers.containsKey(key)) {
             List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
             for (UpdateConsumer<?> updateConsumer : consumers) {
                 UpdateConsumer<T> typedUpdateConsumer = (UpdateConsumer<T>) updateConsumer;
@@ -587,12 +613,17 @@ public class XTablesClient {
         String parsedValue = gson.toJson(value);
         client.sendMessageRaw("IGNORED:PUT " + key + " " + parsedValue);
     }
+
     public boolean pushZMQStringUpdate(String key, String value) {
+        return client.pushZMQ(key + " \"" + value + "\"");
+    }
+    public boolean pushZMQRawUpdate(String key, String value) {
         return client.pushZMQ(key + " " + value);
     }
-    public boolean pushZMQMessage(String message) {
-       return client.pushZMQ(message);
+    public String[] receiveNextZMQ() {
+       return client.receive_nextZMQ();
     }
+
 
     public RequestAction<ResponseStatus> renameKey(String key, String newName) {
         Utilities.validateKey(key, true);
@@ -653,6 +684,7 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<ByteFrame> getByteFrame(String key) {
         Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), ByteFrame.class) {
@@ -668,6 +700,7 @@ public class XTablesClient {
             }
         };
     }
+
     public RequestAction<String> getString(String key) {
         Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);

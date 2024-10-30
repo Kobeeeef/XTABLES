@@ -55,6 +55,7 @@ public class SocketClient {
     private final XTablesClient xTablesClient;
     private ZContext ctx;
     private ZMQ.Socket ZMQ_PUSH_SOCKET;
+    private ZMQ.Socket ZMQ_SUB_SOCKET;
     public SocketClient(String SERVER_ADDRESS, int SERVER_PORT, boolean ENABLE_ZMQ, long RECONNECT_DELAY_MS, int MAX_THREADS_ARG, XTablesClient xTablesClient) {
         this.socket = null;
         this.MAX_THREADS = Math.max(MAX_THREADS_ARG, 1);
@@ -69,6 +70,10 @@ public class SocketClient {
             this.ZMQ_PUSH_SOCKET.setImmediate(true);
             this.ZMQ_PUSH_SOCKET.setTCPKeepAlive(1);
             this.ZMQ_PUSH_SOCKET.setHWM(100);
+            this.ZMQ_SUB_SOCKET = ctx.createSocket(SocketType.SUB);
+            this.ZMQ_SUB_SOCKET.setImmediate(true);
+            this.ZMQ_SUB_SOCKET.setTCPKeepAlive(1);
+            this.ZMQ_SUB_SOCKET.setHWM(100);
         }
     }
 
@@ -160,6 +165,11 @@ public class SocketClient {
                 if(this.ZMQ_PUSH_SOCKET != null) {
                     try {
                         this.ZMQ_PUSH_SOCKET.connect("tcp://" + SERVER_ADDRESS + ":" + 1736);
+                    } catch (Exception ignored) {}
+                }
+                if(this.ZMQ_SUB_SOCKET != null) {
+                    try {
+                        this.ZMQ_SUB_SOCKET.connect("tcp://" + SERVER_ADDRESS + ":" + 1737);
                     } catch (Exception ignored) {}
                 }
                 isConnected = true;
@@ -315,13 +325,17 @@ public class SocketClient {
     }
 
     public void sendMessage(ResponseInfo responseInfo) {
-        out.println(responseInfo.parsed());
-        out.flush();
+        if(out != null) {
+            out.println(responseInfo.parsed());
+            out.flush();
+        }
     }
 
     public void sendMessageRaw(String raw) {
-        out.println(raw);
-        out.flush();
+        if(out != null) {
+            out.println(raw);
+            out.flush();
+        }
     }
 
     public void stopAll() {
@@ -388,6 +402,11 @@ public class SocketClient {
         this.connect();
     }
 
+    public boolean isReady() {
+        return isConnected && !socket.isClosed() && out != null && in != null;
+    }
+
+
 
     public Socket getSocket() {
         return socket;
@@ -399,6 +418,9 @@ public class SocketClient {
 
     public boolean pushZMQ(String message) {
        return this.ZMQ_PUSH_SOCKET.send(message, ZMQ.DONTWAIT);
+    }
+    public String[] receive_nextZMQ() {
+        return Utilities.tokenize(this.ZMQ_SUB_SOCKET.recvStr(), ' ', 2);
     }
     public CompletableFuture<String> sendAsync(String message, long timeoutMS) throws IOException {
         if (executor == null || executor.isShutdown())
