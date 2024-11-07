@@ -556,7 +556,7 @@ public class XTablesServer {
                             if (tokens.length == 2 && shouldReply) {
                                 String key = tokens[1];
                                 String result = table.get(key);
-                                out.println(id + ":" + methodType + " " + (result.replace("\n", "")));
+                                out.println(id + ":" + methodType + " " + (result != null ? result.replace("\n", "") : "null"));
                                 out.flush();
                             }
                         }

@@ -1,7 +1,8 @@
 package org.kobe.xbot.Tests;
 // EXAMPLE SETUP
 
-import org.kobe.xbot.Client.XTablesClient;
+import org.kobe.xbot.ClientLite.XTablesClient;
+import org.kobe.xbot.Utilities.LatencyInfo;
 import org.kobe.xbot.Utilities.XTablesData;
 import org.kobe.xbot.Utilities.Entities.KeyValuePair;
 import org.kobe.xbot.Utilities.ResponseStatus;
@@ -16,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) {
         // Initialize a new client with address and port
-        XTablesClient client = new XTablesClient(SERVER_ADDRESS, SERVER_PORT, 3, true);
+        XTablesClient client = new XTablesClient();
         // Thread blocks until connection is successful
 
         // Get raw JSON from server
@@ -26,7 +27,7 @@ public class Main {
         // Variable for connection status, updates on every message
         System.out.println("Connected? " + client.getSocketClient().isConnected);
         // Get latency from server
-        XTablesClient.LatencyInfo info = client.ping_latency().complete();
+        LatencyInfo info = client.ping_latency().complete();
         System.out.println("Network Latency: " + info.getNetworkLatencyMS() + "ms");
         System.out.println("Round Trip Latency: " + info.getRoundTripLatencyMS() + "ms");
         System.out.println("CPU Usage: " + info.getSystemStatistics().getProcessCpuLoadPercentage());
@@ -75,8 +76,8 @@ public class Main {
         System.out.println(sub_tables);
 
         // Get string from sub-table
-        String value = client.getString("SmartDashboard.somevalue").complete();
-        System.out.println(value);
+        String value = client.getString("SmartDashboard.somethingnotexists").complete();
+        System.out.println("Value from SmartDashboard: " + value);
 
         // Get integer from sub-table
         Integer integer = client.getInteger("SmartDashboard.somevalue").complete();

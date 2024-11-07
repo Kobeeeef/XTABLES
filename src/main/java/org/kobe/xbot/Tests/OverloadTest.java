@@ -15,7 +15,7 @@ public class OverloadTest {
         // Initialize a new client with address and port
         XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true, 10, false);
         while (true) {
-               client.pushZMQStringUpdate("tawd", Math.random() + "");
+              System.out.println(client.getString("ok").complete());
         }
 
     }

@@ -37,7 +37,9 @@ import java.util.function.Consumer;
 
 
 public class XTablesClient {
-
+    public XTablesClient() {
+        this(1735, true, 10, false);
+    }
     /**
      * Connects to the XTablesServer instance using the system-level DNS resolver and port with direct connection settings.
      *
@@ -771,7 +773,26 @@ public class XTablesClient {
     public RequestAction<ResponseStatus> rebootServer() {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.REBOOT_SERVER).parsed(), ResponseStatus.class);
     }
+    public RequestAction<LatencyInfo> ping_latency() {
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.PING).parsed()) {
+            @Override
+            public LatencyInfo parseResponse(long startTime, String result) {
+                RequestInfo info = new RequestInfo(result);
+                if (info.getTokens().length == 2 && info.getTokens()[0].equals("OK")) {
+                    SystemStatistics stats = gson.fromJson(info.getTokens()[1], SystemStatistics.class);
+                    long serverTime = stats.getNanoTime();
+                    long currentTime = System.nanoTime();
+                    long networkLatency = Math.abs(currentTime - serverTime);
+                    long roundTripLatency = Math.abs(currentTime - startTime);
+                    return new LatencyInfo(networkLatency / 1e6, roundTripLatency / 1e6, stats);
+                } else {
+                    return null;
+                }
 
+            }
+        };
+
+    }
     public <T> RequestAction<T> sendCustomMessage(MethodType method, String message, Class<T> type) {
         return new RequestAction<>(client, new ResponseInfo(null, method, message).parsed(), type);
     }
