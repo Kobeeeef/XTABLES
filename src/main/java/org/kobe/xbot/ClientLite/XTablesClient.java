@@ -710,7 +710,10 @@ public class XTablesClient {
         Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
     }
-
+    public RequestAction<String> getRaw(String key) {
+        Utilities.validateKey(key, true);
+        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), null);
+    }
     public RequestAction<Boolean> getBoolean(String key) {
         Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Boolean.class);
@@ -755,11 +758,6 @@ public class XTablesClient {
     public RequestAction<Integer> getInteger(String key) {
         Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Integer.class);
-    }
-
-    public <T> RequestAction<T> getArray(String key, Class<T> type) {
-        Utilities.validateKey(key, true);
-        return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), type);
     }
 
 
