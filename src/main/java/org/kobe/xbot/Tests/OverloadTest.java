@@ -19,14 +19,17 @@ public class OverloadTest {
         XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true, 10, false);
         List<Integer> a = new ArrayList<>();
         a.add(123);
-        client.executePutArray("test", a);
-        Double[] response = client.getObject("test", Double[].class).complete();
-        System.out.println(Arrays.toString(response));
+        while(true) {
+            client.executePutString("test", "12");
 
-
-        String b = client.getString("test").complete();
-        System.out.println(b);
-        System.out.println(b == null);
+        }
+//        Double[] response = client.getObject("test", Double[].class).complete();
+//        System.out.println(Arrays.toString(response));
+//
+//
+//        String b = client.getString("test").complete();
+//        System.out.println(b);
+//        System.out.println(b == null);
 
     }
 

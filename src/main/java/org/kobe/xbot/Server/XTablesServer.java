@@ -239,13 +239,17 @@ public class XTablesServer {
                             SystemStatistics systemStatistics = new SystemStatistics(clients.size());
                             systemStatistics.setStatus(XTablesServer.getStatus());
                             synchronized (clients) {
-                                systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.totalMessages, m.identifier)).collect(Collectors.toList()));
+                                systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.clientSocket.getInetAddress().getHostName(), m.totalMessages, m.identifier)).collect(Collectors.toList()));
                                 int i = 0;
                                 for (ClientHandler client : clients) {
                                     i += client.totalMessages;
                                 }
                                 systemStatistics.setTotalMessages(i);
                                 systemStatistics.setFramesForwarded(framesReceived);
+                                try {
+                                    systemStatistics.setHostname(InetAddress.getLocalHost().getHostName());
+                                } catch (Exception ignored) {
+                                }
                             }
                             resp.getWriter().println(gson.toJson(systemStatistics));
                         }

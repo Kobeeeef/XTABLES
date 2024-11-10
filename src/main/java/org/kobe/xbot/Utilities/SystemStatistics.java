@@ -26,6 +26,7 @@ public class SystemStatistics {
     private XTableStatus status;
     private int totalMessages;
     private String ip;
+    private String hostname;
     private int framesForwarded;
     private List<ClientData> clientDataList;
 
@@ -74,6 +75,11 @@ public class SystemStatistics {
 
     public SystemStatistics setFramesForwarded(int framesForwarded) {
         this.framesForwarded = framesForwarded;
+        return this;
+    }
+
+    public SystemStatistics setHostname(String hostname) {
+        this.hostname = hostname;
         return this;
     }
 
