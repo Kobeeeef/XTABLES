@@ -763,11 +763,11 @@ def parse_string(s):
     return s
 
 
-# if __name__ == "__main__":
-#     logging.basicConfig(level=logging.INFO)
-#     client = XTablesClient(useZeroMQ=True, server_port=1735, server_ip="10.4.88.176")
-#     while True:
-#         client.executePutString("ok", "ok")
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    client = XTablesClient(useZeroMQ=True, server_port=1735)
+    while True:
+        client.push_frame("ok", "ok")
 
 # if __name__ == "__main__":
 #     logging.basicConfig(level=logging.INFO)
