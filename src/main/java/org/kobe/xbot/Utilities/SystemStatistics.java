@@ -29,6 +29,7 @@ public class SystemStatistics {
     private String hostname;
     private int framesForwarded;
     private List<ClientData> clientDataList;
+    private String version;
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -54,13 +55,13 @@ public class SystemStatistics {
         this.powerUsageWatts = getEstimatedPowerConsumption();
         this.totalThreads = threadMXBean.getThreadCount();
         this.ip = Utilities.getLocalIPAddress();
-        if (usedMemoryMB <= maxMemoryMB * 0.5 && processCpuLoadPercentage < 50 && totalThreads <= availableProcessors * 4) {
+        if (usedMemoryMB <= maxMemoryMB * 0.5 && processCpuLoadPercentage < 50 && totalThreads <= availableProcessors * 4L) {
             this.health = HealthStatus.GOOD.name();
-        } else if (usedMemoryMB <= maxMemoryMB * 0.6 && processCpuLoadPercentage < 70 && totalThreads <= availableProcessors * 6) {
+        } else if (usedMemoryMB <= maxMemoryMB * 0.6 && processCpuLoadPercentage < 70 && totalThreads <= availableProcessors * 6L) {
             this.health = HealthStatus.OKAY.name();
-        } else if (usedMemoryMB <= maxMemoryMB * 0.7 && processCpuLoadPercentage < 85 && totalThreads <= availableProcessors * 8) {
+        } else if (usedMemoryMB <= maxMemoryMB * 0.7 && processCpuLoadPercentage < 85 && totalThreads <= availableProcessors * 8L) {
             this.health = HealthStatus.STRESSED.name();
-        } else if (usedMemoryMB <= maxMemoryMB * 0.85 && processCpuLoadPercentage < 95 && totalThreads <= availableProcessors * 10) {
+        } else if (usedMemoryMB <= maxMemoryMB * 0.85 && processCpuLoadPercentage < 95 && totalThreads <= availableProcessors * 10L) {
             this.health = HealthStatus.OVERLOAD.name();
         } else {
             this.health = HealthStatus.CRITICAL.name();
@@ -85,6 +86,11 @@ public class SystemStatistics {
 
     public String getIp() {
         return ip;
+    }
+
+    public SystemStatistics setVersion(String version) {
+        this.version = version;
+        return this;
     }
 
     public int getTotalMessages() {

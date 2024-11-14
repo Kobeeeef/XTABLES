@@ -5,7 +5,7 @@ public class ClientData {
     private final String hostname;
     private final int messages;
     private final String identifier;
-
+    private String stats;
     public ClientData(String clientIP, String hostname, int messages, String identifier) {
         this.clientIP = clientIP;
         this.hostname = hostname;
@@ -15,6 +15,11 @@ public class ClientData {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    public ClientData setStats(String stats) {
+        this.stats = stats;
+        return this;
     }
 
     public int getMessages() {

@@ -239,12 +239,17 @@ public class XTablesServer {
                             SystemStatistics systemStatistics = new SystemStatistics(clients.size());
                             systemStatistics.setStatus(XTablesServer.getStatus());
                             synchronized (clients) {
-                                systemStatistics.setClientDataList(clients.stream().map(m -> new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.clientSocket.getInetAddress().getHostName(), m.totalMessages, m.identifier)).collect(Collectors.toList()));
+                                systemStatistics.setClientDataList(clients.stream().map(m -> {
+                                    ClientData data = new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.clientSocket.getInetAddress().getHostName(), m.totalMessages, m.identifier);
+                                    if(m.statistics != null) data.setStats(gson.toJson(m.statistics));
+                                    return data;
+                                }).collect(Collectors.toList()));
                                 int i = 0;
                                 for (ClientHandler client : clients) {
                                     i += client.totalMessages;
                                 }
                                 systemStatistics.setTotalMessages(i);
+                                systemStatistics.setVersion(Main.XTABLES_SERVER_VERSION);
                                 systemStatistics.setFramesForwarded(framesReceived);
                                 try {
                                     systemStatistics.setHostname(InetAddress.getLocalHost().getHostName());
@@ -254,6 +259,7 @@ public class XTablesServer {
                             resp.getWriter().println(gson.toJson(systemStatistics));
                         }
                     }), "/api/get");
+
                     servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
                         @Override
                         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -269,6 +275,48 @@ public class XTablesServer {
                             }
                         }
                     }), "/api/reboot");
+                    servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+                        @Override
+                        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                            String uuidParam = req.getParameter("uuid");
+
+                            resp.setContentType("application/json");
+                            resp.setCharacterEncoding("UTF-8");
+                            if (uuidParam == null || uuidParam.isEmpty()) {
+                                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"No UUID found in parameter!\"}");
+                                return;
+                            }
+                            UUID uuid;
+
+                            try {
+                                uuid = UUID.fromString(uuidParam);
+                            } catch (IllegalArgumentException e) {
+                                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Invalid UUID format!\"}");
+                                return;
+                            }
+
+                            synchronized (clients) {
+                                Optional<ClientHandler> clientHandler = clients.stream().filter(f -> f.identifier.equals(uuid.toString())).findFirst();
+                                if (clientHandler.isPresent()) {
+                                   ClientStatistics statistics = clientHandler.get().pingServerForInformationAndWait(3000);
+                                   if(statistics != null) {
+                                       resp.setStatus(HttpServletResponse.SC_OK);
+                                       resp.getWriter().println(String.format("{ \"status\": \"success\", \"message\": %1$s}", gson.toJson(statistics)));
+                                   } else {
+                                       resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                       resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"The client did not respond!\"}");
+                                   }
+                                } else {
+                                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
+                                }
+                            }
+
+
+                        }
+                    }), "/api/ping");
                     servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
                         @Override
                         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -498,6 +546,7 @@ public class XTablesServer {
         private int totalMessages = 0;
         private final String identifier;
         private List<String> streams;
+        private ClientStatistics statistics;
 
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
@@ -721,6 +770,7 @@ public class XTablesServer {
                                     i += client.totalMessages;
                                 }
                                 systemStatistics.setTotalMessages(i);
+                                systemStatistics.setVersion(Main.XTABLES_SERVER_VERSION);
                                 ResponseInfo responseInfo = new ResponseInfo(id, methodType, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
                                 out.println(responseInfo.parsed());
                                 out.flush();
@@ -741,6 +791,15 @@ public class XTablesServer {
                                     out.flush();
                                 }
                                 rebootServer();
+                            }
+                        }
+                        case "INFORMATION" -> {
+                            if (tokens.length >= 2) {
+                               try {
+                                   this.statistics = gson.fromJson(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)), ClientStatistics.class);
+                               } catch (Exception e) {
+                                   logger.info("Could not parse client information: " + e.getMessage());
+                               }
                             }
                         }
                         default -> {
@@ -779,7 +838,32 @@ public class XTablesServer {
 
             }
         }
-
+        public void pingServerForInformation() {
+            out.println("null:INFORMATION");
+            out.flush();
+        }
+        public ClientStatistics pingServerForInformationAndWait(long timeout) {
+            long startTime = System.currentTimeMillis();
+            pingServerForInformation();
+            if(this.statistics == null) {
+                while (System.currentTimeMillis() - startTime < timeout) {
+                    if (this.statistics != null) {
+                        return this.statistics;
+                    }
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+                if (this.statistics == null) {
+                    logger.info("Timeout reached. Server did not respond with information.");
+                    return null;
+                }
+            }
+            return this.statistics;
+        }
         public void disconnect() throws IOException {
             clientSocket.close();
             clients.remove(this);

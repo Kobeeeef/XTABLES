@@ -1,5 +1,6 @@
 package org.kobe.xbot.ClientLite;
 
+import com.google.gson.Gson;
 import org.kobe.xbot.Utilities.Entities.KeyValuePair;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.*;
@@ -25,6 +26,7 @@ public class SocketClient {
     private ExecutorService executor;
     private ThreadPoolExecutor socketExecutor;
     private String SERVER_ADDRESS;
+    private static final Gson gson = new Gson();
     private int SERVER_PORT;
     private long RECONNECT_DELAY_MS;
     private boolean CLEAR_UPDATE_MESSAGES = true;
@@ -270,6 +272,11 @@ public class SocketClient {
                                 executor.execute(() -> deleteConsumer.accept(key));
                             }
                         }
+                    }else if (requestInfo.getMethod().equals(MethodType.INFORMATION)) {
+                        ClientStatistics clientStatistics = new ClientStatistics();
+                        clientStatistics.setVersion(XTablesClient.XTABLES_CLIENT_VERSION);
+                        String json = gson.toJson(clientStatistics);
+                        sendMessage(new ResponseInfo(null, MethodType.INFORMATION, json));
                     } else {
                         MESSAGES.add(requestInfo);
                     }
