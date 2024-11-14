@@ -13,6 +13,15 @@ You can access the Javadocs for XTABLES at the following link:
 
 [XTABLES Javadocs](https://kobeeeef.github.io/XTABLES/org/kobe/xbot/ClientLite/XTablesClient.html)
 
+
+## New Dashboard
+
+# Client & Server Debugging Information
+![image](https://github.com/user-attachments/assets/e7fa937a-262c-4db3-9df0-ada2719fd4c2)
+
+# Main Page
+![image](https://github.com/user-attachments/assets/3caf458d-e911-4097-ac2e-52d52d1ed9be)
+
 ## Comparison with FRC Network Tables
 
 `XTablesClient` boasts superior performance and efficiency compared to traditional FRC Network Tables. Here are some key statistics highlighting the differences:
