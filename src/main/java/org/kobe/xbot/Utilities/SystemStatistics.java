@@ -7,6 +7,7 @@ import oshi.hardware.HardwareAbstractionLayer;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
+import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,6 +27,10 @@ public class SystemStatistics {
     private XTableStatus status;
     private int totalMessages;
     private String ip;
+    private final String processId;
+    private final String javaVersion;
+    private final String javaVendor;
+    private final String jvmName;
     private String hostname;
     private int framesForwarded;
     private List<ClientData> clientDataList;
@@ -38,7 +43,7 @@ public class SystemStatistics {
     private static final SystemInfo systemInfo = new SystemInfo();
     private static final HardwareAbstractionLayer hal = systemInfo.getHardware();
     private static final CentralProcessor processor = hal.getProcessor();
-
+    private static final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     private static final AtomicReference<long[]> prevTicks = new AtomicReference<>();
     private static final AtomicLong lastUpdateTime = new AtomicLong();
     private static final AtomicReference<Double> lastPowerUsageWatts = new AtomicReference<>(0.0);
@@ -54,6 +59,10 @@ public class SystemStatistics {
         this.availableProcessors = osMXBean.getAvailableProcessors();
         this.powerUsageWatts = getEstimatedPowerConsumption();
         this.totalThreads = threadMXBean.getThreadCount();
+        this.processId = runtimeMXBean.getName().split("@")[0];
+        this.javaVersion = System.getProperty("java.version");
+        this.javaVendor = System.getProperty("java.vendor");
+        this.jvmName = System.getProperty("java.vm.name");
         this.ip = Utilities.getLocalIPAddress();
         if (usedMemoryMB <= maxMemoryMB * 0.5 && processCpuLoadPercentage < 50 && totalThreads <= availableProcessors * 4L) {
             this.health = HealthStatus.GOOD.name();

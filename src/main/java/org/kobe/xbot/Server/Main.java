@@ -5,7 +5,7 @@ import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 public class Main {
 
     public static final String XTABLES_SERVER_VERSION =
-            "XTABLES Server v4.0.0 | Build Date: 11/13/2024 | Build: Stable | Java 17";
+            "XTABLES Server v4.0.0 | Build Date: 11/13/2024 | Java 17";
 
 
     private static final XTablesLogger logger = XTablesLogger.getLogger();

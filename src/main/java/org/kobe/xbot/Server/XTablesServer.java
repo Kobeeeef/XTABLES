@@ -576,7 +576,7 @@ public class XTablesServer {
                     totalMessages = 0;
                 }
             }, 60, 60, TimeUnit.SECONDS);
-
+            pingServerForInformation();
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 

@@ -19,7 +19,10 @@ public class OverloadTest {
         XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true, 10, false);
         List<Integer> a = new ArrayList<>();
         a.add(123);
+        while(true) {
+            client.executePutDouble("test", Math.random());
 
+        }
 //        Double[] response = client.getObject("test", Double[].class).complete();
 //        System.out.println(Arrays.toString(response));
 //
