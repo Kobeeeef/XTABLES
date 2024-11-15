@@ -35,6 +35,7 @@ public class SystemStatistics {
     private int framesForwarded;
     private List<ClientData> clientDataList;
     private String version;
+    private final String type = "JAVA";
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();

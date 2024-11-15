@@ -23,14 +23,19 @@ public class ClientStatistics {
     private final String javaVersion;
     private final String javaVendor;
     private final String jvmName;
+    private  String pythonVersion;
+    private  String pythonVendor;
+    private  String pythonCompiler;
     private String version;
+    private final String type;
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     private static final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
     private static final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
 
-    public ClientStatistics() {
+    public ClientStatistics(String type) {
+        this.type = "JAVA";
         this.nanoTime = System.nanoTime();
         this.maxMemoryMB = osMXBean.getTotalPhysicalMemorySize() / (1024 * 1024);
         this.freeMemoryMB = osMXBean.getFreePhysicalMemorySize() / (1024 * 1024);
@@ -50,6 +55,7 @@ public class ClientStatistics {
         this.hostname = localHostname;
 
         // Process and Java environment information
+
         this.processId = runtimeMXBean.getName().split("@")[0];
         this.javaVersion = System.getProperty("java.version");
         this.javaVendor = System.getProperty("java.vendor");

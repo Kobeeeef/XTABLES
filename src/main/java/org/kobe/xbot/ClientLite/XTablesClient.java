@@ -40,7 +40,7 @@ public class XTablesClient {
 
 
     public static final String XTABLES_CLIENT_VERSION =
-            "XTABLES Client v4.0.0 | Build Date: 11/13/2024";
+            "XTABLES Client v4.0.0 | Build Date: 11/14/2024";
 
 
 
