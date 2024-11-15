@@ -108,7 +108,7 @@ public class XTablesServer {
             mainThread = main;
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("Shutdown hook triggered. Stopping server...");
-                if(instance.get() != null) {
+                if (instance.get() != null) {
                     instance.get().stopServer(true);
                     logger.info("Server stopped gracefully.");
                 }
@@ -241,7 +241,7 @@ public class XTablesServer {
                             synchronized (clients) {
                                 systemStatistics.setClientDataList(clients.stream().map(m -> {
                                     ClientData data = new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.clientSocket.getInetAddress().getHostName(), m.totalMessages, m.identifier);
-                                    if(m.statistics != null) data.setStats(gson.toJson(m.statistics));
+                                    if (m.statistics != null) data.setStats(gson.toJson(m.statistics));
                                     return data;
                                 }).collect(Collectors.toList()));
                                 int i = 0;
@@ -300,14 +300,14 @@ public class XTablesServer {
                             synchronized (clients) {
                                 Optional<ClientHandler> clientHandler = clients.stream().filter(f -> f.identifier.equals(uuid.toString())).findFirst();
                                 if (clientHandler.isPresent()) {
-                                   ClientStatistics statistics = clientHandler.get().pingServerForInformationAndWait(3000);
-                                   if(statistics != null) {
-                                       resp.setStatus(HttpServletResponse.SC_OK);
-                                       resp.getWriter().println(String.format("{ \"status\": \"success\", \"message\": %1$s}", gson.toJson(statistics)));
-                                   } else {
-                                       resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                                       resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"The client did not respond!\"}");
-                                   }
+                                    ClientStatistics statistics = clientHandler.get().pingServerForInformationAndWait(3000);
+                                    if (statistics != null) {
+                                        resp.setStatus(HttpServletResponse.SC_OK);
+                                        resp.getWriter().println(String.format("{ \"status\": \"success\", \"message\": %1$s}", gson.toJson(statistics)));
+                                    } else {
+                                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                        resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"The client did not respond!\"}");
+                                    }
                                 } else {
                                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                                     resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
@@ -576,7 +576,10 @@ public class XTablesServer {
                     totalMessages = 0;
                 }
             }, 60, 60, TimeUnit.SECONDS);
-            pingServerForInformation();
+            try {
+                pingServerForInformation();
+            } catch (Exception ignored) {
+            }
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
@@ -795,11 +798,11 @@ public class XTablesServer {
                         }
                         case "INFORMATION" -> {
                             if (tokens.length >= 2) {
-                               try {
-                                   this.statistics = gson.fromJson(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)), ClientStatistics.class);
-                               } catch (Exception e) {
-                                   logger.info("Could not parse client information: " + e.getMessage());
-                               }
+                                try {
+                                    this.statistics = gson.fromJson(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)), ClientStatistics.class);
+                                } catch (Exception e) {
+                                    logger.info("Could not parse client information: " + e.getMessage());
+                                }
                             }
                         }
                         default -> {
@@ -838,14 +841,16 @@ public class XTablesServer {
 
             }
         }
+
         public void pingServerForInformation() {
             out.println("null:INFORMATION");
             out.flush();
         }
+
         public ClientStatistics pingServerForInformationAndWait(long timeout) {
             long startTime = System.currentTimeMillis();
             pingServerForInformation();
-            if(this.statistics == null) {
+            if (this.statistics == null) {
                 while (System.currentTimeMillis() - startTime < timeout) {
                     if (this.statistics != null) {
                         return this.statistics;
@@ -864,6 +869,7 @@ public class XTablesServer {
             }
             return this.statistics;
         }
+
         public void disconnect() throws IOException {
             clientSocket.close();
             clients.remove(this);
@@ -880,7 +886,6 @@ public class XTablesServer {
             out.flush();
         }
     }
-
 
 
 }
