@@ -72,7 +72,7 @@ class SocketClient:
         """
         try:
             # Send SUBSCRIBE_UPDATE command
-            response = self.getData("SUBSCRIBE_UPDATE", key)
+            response = self.send_request_and_retrieve("SUBSCRIBE_UPDATE", key)
             if response == "OK":
                 self.logger.info(f"Subscribed to updates for key: {key}")
 

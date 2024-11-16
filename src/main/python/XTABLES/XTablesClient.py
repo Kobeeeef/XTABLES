@@ -1,6 +1,5 @@
 from enum import Enum
 from io import BytesIO
-import zmq
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import logging
 import socket
