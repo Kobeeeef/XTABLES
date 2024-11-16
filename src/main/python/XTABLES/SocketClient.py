@@ -2,7 +2,7 @@ import logging
 import socket
 import threading
 import uuid
-
+import traceback
 from . import ClientStatistics
 
 
@@ -184,6 +184,7 @@ class SocketClient:
                     return
                 key = parts[1]
                 value = " ".join(parts[2:])
+
                 if "" in self.subscriptions:
                     consumers = self.subscriptions[""]
                     for consumer in consumers:
@@ -197,7 +198,9 @@ class SocketClient:
                     self.response_map[request_id]['value'] = response_value
                     self.response_map[request_id]['event'].set()
         except Exception as e:
+
             self.logger.error(f"Invalid message format: {message}. Error: {e}")
+            traceback.print_exc()
 
     def _message_listener(self):
         buffer = ""
