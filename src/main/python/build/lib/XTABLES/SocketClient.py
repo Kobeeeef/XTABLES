@@ -1,6 +1,6 @@
 import socket
 import threading
-import ClientStatistics as ClientStats
+from . import ClientStatistics
 import logging
 import uuid
 
@@ -160,7 +160,7 @@ class SocketClient:
                 if len(parts) < 1:
                     self.logger.error(f"INFORMATION message invalid: {message}")
                     return
-                self.send_message("null:INFORMATION " + ClientStats.ClientStatistics(self.version).to_json())
+                self.send_message("null:INFORMATION " + ClientStatistics.ClientStatistics(self.version).to_json())
                 return
             if len(parts) < 2:
                 self.logger.error(f"Message format invalid: {message} (too few parts)")

@@ -10,7 +10,7 @@ import json
 
 from . import SocketClient as sc
 from . import Utilities
-from . import ClientStatistics as ClientStats
+
 
 class Status(Enum):
     FAIL = "FAIL"
