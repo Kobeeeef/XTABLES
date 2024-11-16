@@ -40,6 +40,15 @@ def validate_key(key, throw_error):
     return True
 
 
+def parse_string(s):
+    # Check if the string starts and ends with \" and remove them
+    if s.startswith('"\\"') and s.endswith('\\""'):
+        s = s[3:-3]
+    elif s.startswith('"') and s.endswith('"'):
+        s = s[1:-1]
+    return s
+
+
 def validate_name(name, throw_error):
     # Check if the name is null or empty
     if name is None:

@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: XTablesClient
-Version: 2.2
-Summary: A high-performance Python client for real-time management of XTables network tables, designed for robotics and complex data-driven systems.
+Version: 4.0.0
+Summary: A high-performance Python client for real-time management of XTablesServer network tables, designed for robotics and complex data-driven systems.
 Home-page: https://github.com/Kobeeeef/XTABLES
 Author: Kobe Lei
 Author-email: kobelei335@gmail.com
@@ -25,6 +25,7 @@ Requires-Dist: mdurl==0.1.2
 Requires-Dist: more-itertools==10.5.0
 Requires-Dist: nh3==0.2.18
 Requires-Dist: pkginfo==1.10.0
+Requires-Dist: psutil==6.1.0
 Requires-Dist: Pygments==2.18.0
 Requires-Dist: pywin32-ctypes==0.2.3
 Requires-Dist: pyzmq==26.2.0
