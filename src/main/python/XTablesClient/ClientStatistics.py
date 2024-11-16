@@ -5,6 +5,7 @@ import os
 import time
 import json
 
+
 class ClientStatistics:
     class HealthStatus:
         GOOD = "GOOD"
@@ -14,13 +15,12 @@ class ClientStatistics:
         CRITICAL = "CRITICAL"
         UNKNOWN = "UNKNOWN"
 
-    def __init__(self):
-        # System information
-        self.nanoTime = time.time_ns()
+    def __init__(self, version):
+        self.version = version
         self.maxMemoryMB = psutil.virtual_memory().total // (1024 * 1024)
         self.freeMemoryMB = psutil.virtual_memory().available // (1024 * 1024)
         self.usedMemoryMB = self.maxMemoryMB - self.freeMemoryMB
-        self.processCpuLoadPercentage = psutil.cpu_percent(interval=1)
+        self.processCpuLoadPercentage = psutil.cpu_percent(interval=0)
         self.availableProcessors = os.cpu_count()
         self.totalThreads = len(psutil.pids())
         self.ip = self.get_local_ip_address()
@@ -56,10 +56,8 @@ class ClientStatistics:
         self.version = version
         return self
 
-    # Method to convert attributes to JSON with Java-compatible names
     def to_json(self):
         return json.dumps({
-            "nanoTime": self.nanoTime,
             "maxMemoryMB": self.maxMemoryMB,
             "freeMemoryMB": self.freeMemoryMB,
             "usedMemoryMB": self.usedMemoryMB,
@@ -69,10 +67,10 @@ class ClientStatistics:
             "ip": self.ip,
             "hostname": self.hostname,
             "processId": self.processId,
+            "version": self.version,
             "pythonVersion": self.pythonVersion,
             "pythonVendor": self.pythonVendor,
             "pythonCompiler": self.pythonCompiler,
-            "health": self.health
-        }, indent=4)
-
-
+            "health": self.health,
+            "type": "PYTHON"
+        }, indent=0).replace("\n", "")

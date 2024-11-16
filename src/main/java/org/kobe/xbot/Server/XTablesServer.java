@@ -581,8 +581,7 @@ public class XTablesServer {
             } catch (Exception ignored) {
             }
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
-
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
                 String inputLine;
                 while ((inputLine = in.readLine()) != null && !this.isInterrupted()) {
                     totalMessages++;
