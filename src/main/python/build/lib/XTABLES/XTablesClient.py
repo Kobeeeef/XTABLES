@@ -1,6 +1,5 @@
 from enum import Enum
 from io import BytesIO
-import zmq
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 import logging
 import socket
@@ -156,7 +155,7 @@ class XTablesClient:
 
     def getString(self, key, TIMEOUT=3000):
         """
-        Retrieves a string value for the given key using the generalized getData method.
+        Retrieves a string value for the given key using the generalized method.
 
         :param key: The key to retrieve.
         :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).

@@ -1,8 +1,9 @@
+import logging
 import socket
 import threading
-from . import ClientStatistics
-import logging
 import uuid
+
+from . import ClientStatistics
 
 
 class SocketClient:
@@ -61,8 +62,20 @@ class SocketClient:
         while not self.connected and not self.stop_threads.is_set():
             try:
                 self._connect()
+                self._resubscribe_all()
             except:
                 pass
+
+    def _resubscribe_all(self):
+        """
+        Re-subscribes to all previously subscribed keys after a reconnection.
+        """
+        for key, consumer in self.subscriptions.items():
+            self.logger.info("Attempting re-subscription to key: " + key)
+            if key == "":
+                self.subscribeForAllUpdates(consumer)
+            else:
+                self.subscribeForUpdates(key, consumer)
 
     def subscribeForUpdates(self, key, consumer):
         """
