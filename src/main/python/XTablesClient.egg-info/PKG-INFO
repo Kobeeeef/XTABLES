@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: XTablesClient
-Version: 4.1.1
+Version: 4.1.3
 Summary: A high-performance Python client for real-time management of XTablesServer network tables, designed for robotics and complex data-driven systems.
 Home-page: https://github.com/Kobeeeef/XTABLES
 Author: Kobe Lei
@@ -10,6 +10,35 @@ Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
+Requires-Dist: certifi==2024.8.30
+Requires-Dist: charset-normalizer==3.4.0
+Requires-Dist: docutils==0.21.2
+Requires-Dist: idna==3.10
+Requires-Dist: ifaddr==0.2.0
+Requires-Dist: importlib_metadata==8.5.0
+Requires-Dist: jaraco.classes==3.4.0
+Requires-Dist: jaraco.context==6.0.1
+Requires-Dist: jaraco.functools==4.1.0
+Requires-Dist: keyring==25.4.1
+Requires-Dist: markdown-it-py==3.0.0
+Requires-Dist: mdurl==0.1.2
+Requires-Dist: more-itertools==10.5.0
+Requires-Dist: nh3==0.2.18
+Requires-Dist: pkginfo==1.10.0
+Requires-Dist: psutil==6.1.0
+Requires-Dist: Pygments==2.18.0
+Requires-Dist: pywin32-ctypes==0.2.3
+Requires-Dist: pyzmq==26.2.0
+Requires-Dist: readme_renderer==44.0
+Requires-Dist: requests==2.32.3
+Requires-Dist: requests-toolbelt==1.0.0
+Requires-Dist: rfc3986==2.0.0
+Requires-Dist: rich==13.9.2
+Requires-Dist: setuptools==75.1.0
+Requires-Dist: twine==5.1.1
+Requires-Dist: urllib3==2.2.3
+Requires-Dist: zeroconf==0.134.0
+Requires-Dist: zipp==3.20.2
 
 
 # XTablesClient
