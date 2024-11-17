@@ -3,11 +3,14 @@ import socket
 import threading
 import uuid
 import traceback
+
+
 from . import ClientStatistics
+from . import CircularBuffer
 
 
 class SocketClient:
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, buffer_size=100):
         self.version = "XTABLES Client v4.0.0 | Python"
         self.logger = logging.getLogger(__name__)
         self.ip = ip
@@ -15,16 +18,17 @@ class SocketClient:
         self.sock = None
         self.subscriptions = {}
         self.response_map = {}
-        self.logger = logging.getLogger(__name__)
         self.response_lock = threading.Lock()
         self.connected = False
-        self.lock = threading.Lock()
         self.stop_threads = threading.Event()
+        self.lock = threading.Lock()
+        self.circular_buffer = CircularBuffer.CircularBuffer(buffer_size)  # Initialize circular buffer
 
     def connect(self):
         self._connect()
         self.stop_threads.clear()
         threading.Thread(target=self._message_listener, daemon=True).start()
+        threading.Thread(target=self._process_buffered_messages, daemon=True).start()
 
     def shutdown(self):
         self.stop_threads.set()
@@ -159,48 +163,31 @@ class SocketClient:
             self.logger.error(f"Timeout waiting for response for command: {command}, key: {value}")
             return None
 
-    def _process_message(self, message):
+    def _process_update(self, parts):
         try:
-            parts = message.split(" ")
-            tokens = parts[0].split(":")
-            if len(tokens) != 2:
-                self.logger.error(f"Invalid token format in message: {message}")
-                return
-            request_id = tokens[0].strip()
-            method_type = tokens[1].strip()
-            response_value = " ".join(parts[1:]).strip()
-            if method_type == "INFORMATION":
-                if len(parts) < 1:
-                    self.logger.error(f"INFORMATION message invalid: {message}")
-                    return
-                self.send_message("null:INFORMATION " + ClientStatistics.ClientStatistics(self.version).to_json())
-                return
-            if len(parts) < 2:
-                self.logger.error(f"Message format invalid: {message} (too few parts)")
-                return
-            if method_type == "UPDATE_EVENT":
-                if len(parts) < 3:
-                    self.logger.error(f"UPDATE_EVENT message invalid: {message}")
-                    return
-                key = parts[1]
-                value = " ".join(parts[2:])
+            key = parts[1]
+            value = " ".join(parts[2:])
 
-                if "" in self.subscriptions:
-                    consumers = self.subscriptions[""]
-                    for consumer in consumers:
-                        consumer(key, value)
-                if key in self.subscriptions:
-                    consumers = self.subscriptions[key]
-                    for consumer in consumers:
-                        consumer(key, value)
-            with self.response_lock:
-                if request_id in self.response_map:
-                    self.response_map[request_id]['value'] = response_value
-                    self.response_map[request_id]['event'].set()
+            if "" in self.subscriptions:
+                consumers = self.subscriptions[""]
+                for consumer in consumers:
+                    consumer(key, value)
+            if key in self.subscriptions:
+                consumers = self.subscriptions[key]
+                for consumer in consumers:
+                    consumer(key, value)
         except Exception as e:
-
-            self.logger.error(f"Invalid message format: {message}. Error: {e}")
+            self.logger.error(f"Invalid message format: {" ".join(parts)}. Error: {e}")
             traceback.print_exc()
+
+    def _process_buffered_messages(self):
+        while not self.stop_threads.is_set():
+            with self.circular_buffer.condition:
+                while self.circular_buffer.count == 0:
+                    self.circular_buffer.condition.wait()  # Wait until notified
+                message = self.circular_buffer.read_latest()
+            if message is not None:
+                self._process_update(message)
 
     def _message_listener(self):
         buffer = ""
@@ -216,8 +203,40 @@ class SocketClient:
                 buffer += data
                 while "\n" in buffer:
                     line, buffer = buffer.split("\n", 1)
-                    self._process_message(line.strip())
+
+                    try:
+                        line = line.strip()
+                        parts = line.split(" ")
+                        tokens = parts[0].split(":")
+                        if len(tokens) != 2:
+                            self.logger.error(f"Invalid token format in message: {line}")
+                            continue
+                        request_id = tokens[0].strip()
+                        method_type = tokens[1].strip()
+                        response_value = " ".join(parts[1:]).strip()
+                        if method_type == "INFORMATION":
+                            if len(parts) < 1:
+                                self.logger.error(f"INFORMATION message invalid: {line}")
+                                continue
+                            self.send_message(
+                                "null:INFORMATION " + ClientStatistics.ClientStatistics(self.version).to_json())
+                            continue
+                        if len(parts) < 2:
+                            self.logger.error(f"Message format invalid: {line} (too few parts)")
+                            continue
+                        with self.response_lock:
+                            if request_id in self.response_map:
+                                self.response_map[request_id]['value'] = response_value
+                                self.response_map[request_id]['event'].set()
+                        if method_type == "UPDATE_EVENT":
+                            if len(parts) < 3:
+                                self.logger.error(f"UPDATE_EVENT message invalid: {line}")
+                                continue
+                            self.circular_buffer.write(parts)
+                    except Exception as e:
+                        print(e)
             except Exception as e:
+                traceback.print_exc()
                 self.logger.fatal("Exception occurred in message listener: " + str(e))
                 self.connected = False
                 self._reconnect()
