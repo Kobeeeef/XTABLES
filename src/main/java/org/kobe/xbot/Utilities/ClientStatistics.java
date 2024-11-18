@@ -1,6 +1,7 @@
 package org.kobe.xbot.Utilities;
 
 import com.sun.management.OperatingSystemMXBean;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.RuntimeMXBean;
@@ -23,9 +24,9 @@ public class ClientStatistics {
     private final String javaVersion;
     private final String javaVendor;
     private final String jvmName;
-    private  String pythonVersion;
-    private  String pythonVendor;
-    private  String pythonCompiler;
+    private String pythonVersion;
+    private String pythonVendor;
+    private String pythonCompiler;
     private String version;
     private final String type;
 
@@ -61,13 +62,13 @@ public class ClientStatistics {
         this.javaVendor = System.getProperty("java.vendor");
         this.jvmName = System.getProperty("java.vm.name");
 
-        if (usedMemoryMB <= maxMemoryMB * 0.5 && processCpuLoadPercentage < 50 && totalThreads <= availableProcessors * 4L) {
+        if (usedMemoryMB <= maxMemoryMB * 0.5 && processCpuLoadPercentage < 50) {
             this.health = HealthStatus.GOOD.name();
-        } else if (usedMemoryMB <= maxMemoryMB * 0.6 && processCpuLoadPercentage < 70 && totalThreads <= availableProcessors * 6L) {
+        } else if (usedMemoryMB <= maxMemoryMB * 0.6 && processCpuLoadPercentage < 70) {
             this.health = HealthStatus.OKAY.name();
-        } else if (usedMemoryMB <= maxMemoryMB * 0.7 && processCpuLoadPercentage < 85 && totalThreads <= availableProcessors * 8L) {
+        } else if (usedMemoryMB <= maxMemoryMB * 0.7 && processCpuLoadPercentage < 85) {
             this.health = HealthStatus.STRESSED.name();
-        } else if (usedMemoryMB <= maxMemoryMB * 0.85 && processCpuLoadPercentage < 95 && totalThreads <= availableProcessors * 10L) {
+        } else if (usedMemoryMB <= maxMemoryMB * 0.85 && processCpuLoadPercentage < 95) {
             this.health = HealthStatus.OVERLOAD.name();
         } else {
             this.health = HealthStatus.CRITICAL.name();
