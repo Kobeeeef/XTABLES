@@ -177,7 +177,7 @@ class SocketClient:
                 for consumer in consumers:
                     consumer(key, value)
         except Exception as e:
-            self.logger.error(f"Invalid message format: {" ".join(parts)}. Error: {e}")
+            self.logger.error(f"Invalid message format: {' '.join(parts)}. Error: {e}")
             traceback.print_exc()
 
     def _process_buffered_messages(self):

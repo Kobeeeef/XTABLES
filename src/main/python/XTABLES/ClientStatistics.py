@@ -35,13 +35,13 @@ class ClientStatistics:
         self.pythonCompiler = platform.python_compiler()
 
         # Health status based on system usage
-        if self.usedMemoryMB <= self.maxMemoryMB * 0.5 and self.processCpuLoadPercentage < 50 and self.totalThreads <= self.availableProcessors * 4:
+        if self.usedMemoryMB <= self.maxMemoryMB * 0.5 and self.processCpuLoadPercentage < 50:
             self.health = self.HealthStatus.GOOD
-        elif self.usedMemoryMB <= self.maxMemoryMB * 0.6 and self.processCpuLoadPercentage < 70 and self.totalThreads <= self.availableProcessors * 6:
+        elif self.usedMemoryMB <= self.maxMemoryMB * 0.6 and self.processCpuLoadPercentage < 70:
             self.health = self.HealthStatus.OKAY
-        elif self.usedMemoryMB <= self.maxMemoryMB * 0.7 and self.processCpuLoadPercentage < 85 and self.totalThreads <= self.availableProcessors * 8:
+        elif self.usedMemoryMB <= self.maxMemoryMB * 0.7 and self.processCpuLoadPercentage < 85:
             self.health = self.HealthStatus.STRESSED
-        elif self.usedMemoryMB <= self.maxMemoryMB * 0.85 and self.processCpuLoadPercentage < 95 and self.totalThreads <= self.availableProcessors * 10:
+        elif self.usedMemoryMB <= self.maxMemoryMB * 0.85 and self.processCpuLoadPercentage < 95:
             self.health = self.HealthStatus.OVERLOAD
         else:
             self.health = self.HealthStatus.CRITICAL
