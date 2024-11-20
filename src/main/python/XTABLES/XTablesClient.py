@@ -1,14 +1,14 @@
-from enum import Enum
-from io import BytesIO
-from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
+import json
 import logging
 import socket
 import threading
 import time
-import json
+from enum import Enum
+from io import BytesIO
 
-from . import SocketClient as sc
-from . import Utilities
+import SocketClient as sc
+import Utilities
+from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 
 
 class Status(Enum):
@@ -316,6 +316,39 @@ class XTablesClient:
         else:
             return None
 
+    def getBytes(self, key, TIMEOUT=3000):
+        """
+        Retrieves a Base64-encoded string from the server and decodes it back into a byte array.
+
+        :param key: The key to retrieve the byte array for.
+        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
+        :return: The byte array if successful, or None if the request fails.
+        """
+        # Use the existing getString method to fetch the Base64-encoded string
+        base64_string = self.getString(key, TIMEOUT)
+
+        if base64_string is not None:
+            try:
+                # Decode the Base64 string back to a byte array
+                return base64.b64decode(base64_string)
+            except (ValueError, TypeError) as e:
+                self.logger.error(f"Error decoding Base64 value for key '{key}': {e}")
+                return None
+        else:
+            return None
+
+    def executePutBytes(self, key, value):
+        if isinstance(value, bytes) and isinstance(key, str):
+            Utilities.validate_key(key, True)
+
+            # Encode byte array to Base64 string
+            base64_value = base64.b64encode(value).decode('utf-8')
+
+            # Send the Base64 string to the server
+            self.send_data(f"IGNORED:PUT {key} {base64_value}")
+        else:
+            self.logger.error("Key must be a string and value must be a byte array (bytes).")
+
     def executePutBoolean(self, key, value):
         if isinstance(value, bool) and isinstance(key, str):
             Utilities.validate_key(key, True)
@@ -406,3 +439,13 @@ class XTablesClient:
             self.logger.error("Invalid key or object provided.")
 
     """--------------------------------METHODS--------------------------------"""
+
+
+c = XTablesClient("10.4.88.175", 1735)
+
+
+def a(key, value):
+    print(f"{key}, {value}")
+
+
+c.subscribe_to_all(a)
