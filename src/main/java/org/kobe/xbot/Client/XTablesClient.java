@@ -2,7 +2,6 @@ package org.kobe.xbot.Client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.kobe.xbot.Utilities.XTablesData;
 import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.KeyValuePair;
 import org.kobe.xbot.Utilities.Entities.UpdateConsumer;
@@ -99,11 +98,11 @@ public class XTablesClient {
         try {
             InetAddress addr = null;
             while (addr == null) {
-                    addr = Utilities.getLocalInetAddress();
-                    if(addr == null) {
-                        logger.severe("No non-loopback IPv4 address found. Trying again in 1 second...");
-                        Thread.sleep(1000);
-                    }
+                addr = Utilities.getLocalInetAddress();
+                if (addr == null) {
+                    logger.severe("No non-loopback IPv4 address found. Trying again in 1 second...");
+                    Thread.sleep(1000);
+                }
             }
             try (JmDNS jmdns = JmDNS.create(addr)) {
                 CountDownLatch serviceLatch = new CountDownLatch(1);
@@ -160,10 +159,11 @@ public class XTablesClient {
                 });
                 if (name == null) logger.info("Listening for first instance of XTABLES service on port 5353...");
                 else logger.info("Listening for '" + name + "' XTABLES services on port 5353...");
-                while(serviceLatch.getCount() > 0 && !serviceFound[0] && !Thread.currentThread().isInterrupted()) {
+                while (serviceLatch.getCount() > 0 && !serviceFound[0] && !Thread.currentThread().isInterrupted()) {
                     try {
                         jmdns.requestServiceInfo("_xtables._tcp.local.", "XTablesService", true, 1000);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
                 serviceLatch.await();
                 logger.info("Service latch released, proceeding to close mDNS services...");
@@ -439,8 +439,6 @@ public class XTablesClient {
     }
 
 
-
-
     private <T> void on_update(KeyValuePair<String> keyValuePair) {
         processUpdate(keyValuePair, keyValuePair.getKey());
         if (update_consumers.containsKey(" ")) {
@@ -461,7 +459,7 @@ public class XTablesClient {
     }
 
     private <T> void processUpdate(KeyValuePair<String> keyValuePair, String key) {
-        if(update_consumers.containsKey(key)) {
+        if (update_consumers.containsKey(key)) {
             List<UpdateConsumer<?>> consumers = update_consumers.computeIfAbsent(key, k -> new ArrayList<>());
             for (UpdateConsumer<?> updateConsumer : consumers) {
                 UpdateConsumer<T> typedUpdateConsumer = (UpdateConsumer<T>) updateConsumer;
@@ -944,11 +942,10 @@ public class XTablesClient {
                 RequestInfo info = new RequestInfo(result);
                 if (info.getTokens().length == 2 && info.getTokens()[0].equals("OK")) {
                     SystemStatistics stats = gson.fromJson(info.getTokens()[1], SystemStatistics.class);
-                    long serverTime = stats.getNanoTime();
+
                     long currentTime = System.nanoTime();
-                    long networkLatency = Math.abs(currentTime - serverTime);
                     long roundTripLatency = Math.abs(currentTime - startTime);
-                    return new LatencyInfo(networkLatency / 1e6, roundTripLatency / 1e6, stats);
+                    return new LatencyInfo(((double) roundTripLatency / 2) / 1e6, roundTripLatency / 1e6, stats);
                 } else {
                     return null;
                 }
@@ -957,8 +954,6 @@ public class XTablesClient {
         };
 
     }
-
-
 
 
 }

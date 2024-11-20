@@ -787,11 +787,9 @@ public class XTablesClient {
                 RequestInfo info = new RequestInfo(result);
                 if (info.getTokens().length == 2 && info.getTokens()[0].equals("OK")) {
                     SystemStatistics stats = gson.fromJson(info.getTokens()[1], SystemStatistics.class);
-                    long serverTime = stats.getNanoTime();
                     long currentTime = System.nanoTime();
-                    long networkLatency = Math.abs(currentTime - serverTime);
                     long roundTripLatency = Math.abs(currentTime - startTime);
-                    return new LatencyInfo(networkLatency / 1e6, roundTripLatency / 1e6, stats);
+                    return new LatencyInfo(((double) roundTripLatency / 2) / 1e6, roundTripLatency / 1e6, stats);
                 } else {
                     return null;
                 }
