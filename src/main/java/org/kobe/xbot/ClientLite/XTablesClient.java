@@ -215,7 +215,7 @@ public class XTablesClient {
     public final List<Consumer<String>> delete_consumers = new ArrayList<>();
 
     private void initializeClient(String SERVER_ADDRESS, int SERVER_PORT, boolean enableZMQ, int MAX_THREADS, boolean useCache) {
-        this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, enableZMQ, 10, MAX_THREADS, this);
+        this.client = new SocketClient(SERVER_ADDRESS, SERVER_PORT, enableZMQ, 500, MAX_THREADS, this);
         Thread thread = new Thread(() -> {
             client.connect();
             client.setUpdateConsumer(this::on_update);

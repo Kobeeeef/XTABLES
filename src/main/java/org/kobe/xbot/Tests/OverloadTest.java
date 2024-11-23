@@ -6,9 +6,6 @@ package org.kobe.xbot.Tests;
 import org.kobe.xbot.ClientLite.XTablesClient;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class OverloadTest {
     private static final String SERVER_ADDRESS = "localhost"; // Server address
@@ -16,12 +13,12 @@ public class OverloadTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
-        XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true, 10, false);
+        XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient("localhost", 1735);
         int i = 0;
         while(true) {
             client.executePutInteger("test", i);
-            System.out.println(i);
-            i++;
+
+         i++;
 
 
         }

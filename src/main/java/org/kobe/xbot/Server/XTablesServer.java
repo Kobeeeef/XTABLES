@@ -29,9 +29,6 @@ import org.kobe.xbot.Utilities.Exceptions.ScriptAlreadyExistsException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.SocketType;
-import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -72,10 +69,10 @@ public class XTablesServer {
     private static Thread mainThread;
     private static final CountDownLatch latch = new CountDownLatch(1);
     private ExecutorService mdnsExecutorService;
-    private ExecutorService zeroMQExecutorService;
+//    private ExecutorService zeroMQExecutorService;
+//    private ZContext context;
     private Server userInterfaceServer;
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
-    private ZContext context;
     private int framesReceived;
 
     private XTablesServer(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
@@ -153,54 +150,56 @@ public class XTablesServer {
             this.mdnsExecutorService = Executors.newFixedThreadPool(1);
             mdnsExecutorService.execute(() -> initializeMDNSWithRetries(15));
             logger.info("Initializing zeroMQ image server...");
-            try {
-                if (context != null) {
-                    context.destroy();
-                }
-                context = new ZContext();
-                if (zeroMQExecutorService != null) {
-                    zeroMQExecutorService.shutdownNow();
-                }
-                this.zeroMQExecutorService = Executors.newFixedThreadPool(2);
-                ZMQ.Socket pullSocket = context.createSocket(SocketType.PULL);
-                pullSocket.setRcvHWM(500);
-                pullSocket.bind("tcp://*:" + zeroMQPullPort);
-                ZMQ.Socket pubSocket = context.createSocket(SocketType.PUB);
-                pubSocket.bind("tcp://*:" + zeroMQPubPort);
-                pubSocket.setSndHWM(500);
-                ZMQ.Socket captureSocket = context.createSocket(SocketType.PAIR);
-                captureSocket.bind("inproc://capture");
-                zeroMQExecutorService.execute(() -> ZMQ.proxy(pullSocket, pubSocket, captureSocket));
+//            try {
+//                if (context != null) {
+//                    context.destroy();
+//                }
+//                context = new ZContext();
+//                if (zeroMQExecutorService != null) {
+//                    zeroMQExecutorService.shutdownNow();
+//                }
+//                this.zeroMQExecutorService = Executors.newFixedThreadPool(2);
+//                ZMQ.Socket pullSocket = context.createSocket(SocketType.PULL);
+//                pullSocket.setRcvHWM(500);
+//                pullSocket.bind("tcp://*:" + zeroMQPullPort);
+//                ZMQ.Socket pubSocket = context.createSocket(SocketType.PUB);
+//                pubSocket.bind("tcp://*:" + zeroMQPubPort);
+//                pubSocket.setSndHWM(500);
+//                ZMQ.Socket captureSocket = context.createSocket(SocketType.PAIR);
+//                captureSocket.bind("inproc://capture");
+//                zeroMQExecutorService.execute(() -> ZMQ.proxy(pullSocket, pubSocket, captureSocket));
+//
+//
+//                zeroMQExecutorService.execute(() -> {
+//                    ZMQ.Socket receiver = context.createSocket(SocketType.PAIR);
+//                    receiver.connect("inproc://capture");
+//                    long lastResetTime = System.currentTimeMillis();
+//
+//                    while (!Thread.currentThread().isInterrupted()) {
+//                        try {
+//                            String msg = receiver.recvStr();
+//                            String[] tokens = tokenize(msg, ' ', 2);
+//                            if (tokens.length == 2) {
+//                                table.put(tokens[0], tokens[1]);
+//                            }
+//
+//
+//                            if ((System.currentTimeMillis() - lastResetTime) >= 60000) {
+//                                framesReceived = 0;
+//                                lastResetTime = System.currentTimeMillis();
+//                            } else framesReceived++;
+//                        } catch (Exception e) {
+//                            logger.info("Error occurred in ZeroMQ capture socket: " + e.getMessage());
+//                        }
+//                    }
+//                });
+//
+//                logger.info("Initialized zeroMQ image server successfully.");
+//            } catch (Exception e) {
+//                logger.severe("Failed to initialize zeroMQ server. Error: " + e.getMessage());
+//            }
 
 
-                zeroMQExecutorService.execute(() -> {
-                    ZMQ.Socket receiver = context.createSocket(SocketType.PAIR);
-                    receiver.connect("inproc://capture");
-                    long lastResetTime = System.currentTimeMillis();
-
-                    while (!Thread.currentThread().isInterrupted()) {
-                        try {
-                            String msg = receiver.recvStr();
-                            String[] tokens = tokenize(msg, ' ', 2);
-                            if (tokens.length == 2) {
-                                table.put(tokens[0], tokens[1]);
-                            }
-
-
-                            if ((System.currentTimeMillis() - lastResetTime) >= 60000) {
-                                framesReceived = 0;
-                                lastResetTime = System.currentTimeMillis();
-                            } else framesReceived++;
-                        } catch (Exception e) {
-                            logger.info("Error occurred in ZeroMQ capture socket: " + e.getMessage());
-                        }
-                    }
-                });
-
-                logger.info("Initialized zeroMQ image server successfully.");
-            } catch (Exception e) {
-                logger.severe("Failed to initialize zeroMQ server. Error: " + e.getMessage());
-            }
             try {
                 serverSocket = new ServerSocket(port);
             } catch (IOException e) {
@@ -419,17 +418,17 @@ public class XTablesServer {
                 jmdns.close();
                 logger.info("mDNS service unregistered and mDNS closed");
             }
-            if (context != null) {
-                try {
-                    context.destroy();
-                    logger.info("ZeroMQ server destroyed.");
-                } catch (Exception e) {
-                    logger.severe("Failed to destroy ZeroMQ server context.");
-                }
-            }
-            if (zeroMQExecutorService != null) {
-                zeroMQExecutorService.shutdownNow();
-            }
+//            if (context != null) {
+//                try {
+//                    context.destroy();
+//                    logger.info("ZeroMQ server destroyed.");
+//                } catch (Exception e) {
+//                    logger.severe("Failed to destroy ZeroMQ server context.");
+//                }
+//            }
+//            if (zeroMQExecutorService != null) {
+//                zeroMQExecutorService.shutdownNow();
+//            }
             if (fullShutdown) {
                 mainThread.interrupt();
                 if (userInterfaceServer != null) userInterfaceServer.stop();
@@ -508,23 +507,23 @@ public class XTablesServer {
     }
 
     private void notifyUpdateChangeClients(String key, String value) {
+        List<ClientHandler> snapshot;
         synchronized (clients) {
-            Iterator<ClientHandler> iterator = clients.iterator();
-            if (iterator.hasNext()) {
-                do {
-                    ClientHandler client = iterator.next();
-                    try {
-                        Set<String> updateEvents = client.getUpdateEvents();
-                        if (updateEvents.contains("") || updateEvents.contains(key)) {
-                            client.sendUpdate(key, value);
-                        }
-                    } catch (Exception | Error e) {
-                        logger.warning("Failed to push updates to client: " + e.getMessage());
-                    }
-                } while (iterator.hasNext());
+            snapshot = new ArrayList<>(clients);
+        }
+
+        for (ClientHandler client : snapshot) {
+            try {
+                Set<String> updateEvents = client.getUpdateEvents();
+                if (updateEvents.contains("") || updateEvents.contains(key)) {
+                    client.sendUpdate(key, value);
+                }
+            } catch (Exception | Error e) {
+                logger.warning("Failed to push updates to client: " + e.getMessage());
             }
         }
     }
+
 
 
     private void notifyDeleteChangeClients(String key) {
@@ -596,8 +595,15 @@ public class XTablesServer {
                         case "PUT" -> {
                             if (tokens.length >= 3) {
                                 String key = tokens[1];
-                                String value = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+                                StringBuilder valueBuilder = new StringBuilder();
+                                for (int i = 2; i < tokens.length; i++) {
+                                    valueBuilder.append(tokens[i]);
+                                    if (i < tokens.length - 1) valueBuilder.append(" ");
+                                }
+                                String value = valueBuilder.toString();
+
                                 boolean response = table.put(key, value);
+
                                 if (shouldReply) {
                                     out.println(id + ":" + methodType + " " + (response ? "OK" : "FAIL"));
                                     out.flush();

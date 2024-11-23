@@ -29,3 +29,16 @@ class CircularBuffer:
             self.tail = self.head  # Clear all old data
             self.count = 0
             return latest_data
+
+    def read(self):
+        with self.condition:
+            while self.count == 0:
+                self.condition.wait()
+            data = self.buffer[self.tail]
+            self.tail = (self.tail + 1) % self.size
+            self.count -= 1
+            return data
+
+    def get_size(self):
+        with self.condition:
+            return self.count
