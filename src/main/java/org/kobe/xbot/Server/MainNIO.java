@@ -5,7 +5,7 @@ import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 public class MainNIO {
 
     public static final String XTABLES_SERVER_VERSION =
-            "XTABLES NIO Server v1.0.0 | Build Date: 11/25/2024 | Java 17";
+            "XTABLES NIO Server v1.5.0 | Build Date: 11/25/2024 | Java 17";
 
 
     private static final XTablesLogger logger = XTablesLogger.getLogger();
