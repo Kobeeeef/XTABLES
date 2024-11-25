@@ -239,7 +239,7 @@ public class XTablesServer {
                             systemStatistics.setStatus(XTablesServer.getStatus());
                             synchronized (clients) {
                                 systemStatistics.setClientDataList(clients.stream().map(m -> {
-                                    ClientData data = new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.clientSocket.getInetAddress().getHostName(), m.totalMessages, m.identifier);
+                                    ClientData data = new ClientData(m.clientSocket.getInetAddress().getHostAddress(), m.clientSocket.getInetAddress().getHostName(), m.totalMessages, m.identifier, -1);
                                     if (m.statistics != null) data.setStats(gson.toJson(m.statistics));
                                     return data;
                                 }).collect(Collectors.toList()));

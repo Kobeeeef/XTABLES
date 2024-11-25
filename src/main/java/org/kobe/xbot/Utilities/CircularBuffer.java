@@ -1,13 +1,12 @@
 package org.kobe.xbot.Utilities;
 
-import java.util.Arrays;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class CircularBuffer<T> {
     private final Object[] buffer;
     private int writeIndex = 0;
-    private int size = 0; // Tracks the current size of the buffer
+    public int size = 0; // Tracks the current size of the buffer
     private final int capacity;
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition notEmpty = lock.newCondition();
@@ -35,7 +34,7 @@ public class CircularBuffer<T> {
             lock.unlock();
         }
     }
-    public T read() {
+    public T readAndBlock() {
         lock.lock();
         try {
             while (size == 0) {
@@ -54,6 +53,23 @@ public class CircularBuffer<T> {
             lock.unlock();
         }
     }
+    public T read() {
+        lock.lock();
+        try {
+            if (size == 0) {
+                return null;
+            }
+            // Read the data in FIFO order
+            int readIndex = (writeIndex - size + capacity) % capacity;
+            T data = (T) buffer[readIndex];
+            buffer[readIndex] = null; // Clear the read slot
+            size--;
+            return data;
+        } finally {
+            lock.unlock();
+        }
+    }
+
     // Read the latest data and clear the buffer, blocking if necessary
     public T readLatestAndClear() {
         lock.lock();

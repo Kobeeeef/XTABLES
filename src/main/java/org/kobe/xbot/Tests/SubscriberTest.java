@@ -11,6 +11,11 @@ public class SubscriberTest {
 
         client.subscribeUpdateEvent((stringKeyValuePair -> {
            System.out.println(stringKeyValuePair.getValue());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         })).complete();
 
 

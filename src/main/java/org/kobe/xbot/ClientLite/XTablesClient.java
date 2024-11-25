@@ -562,7 +562,6 @@ public class XTablesClient {
     public void executePutString(String key, String value) {
         client.sendMessageRaw("IGNORED:PUT " + key + " \"" + value + "\"");
     }
-
     /**
      * Sends an integer value to the server with the specified key.
      *

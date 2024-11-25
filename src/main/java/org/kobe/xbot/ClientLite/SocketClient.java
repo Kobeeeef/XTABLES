@@ -360,7 +360,14 @@ public class SocketClient {
             out.flush();
         }
     }
-
+    public void sendMessageNoDelimit(String raw) {
+        if (out != null) {
+            out.print(raw);
+        }
+    }
+    public void flush() {
+        out.flush();
+    }
     public void stopAll() {
         long startTime = System.nanoTime();
         logger.severe("Shutting down all threads and processes.");

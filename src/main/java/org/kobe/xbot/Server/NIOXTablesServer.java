@@ -67,8 +67,6 @@ public class NIOXTablesServer {
     private static Thread mainThread;
     private static final CountDownLatch latch = new CountDownLatch(1);
     private ExecutorService mdnsExecutorService;
-//    private ExecutorService zeroMQExecutorService;
-//    private ZContext context;
     private Server userInterfaceServer;
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
     private int framesReceived;
@@ -366,6 +364,8 @@ public class NIOXTablesServer {
         private final String identifier;
         private List<String> streams;
         private ClientStatistics statistics;
+        private final CircularBuffer<String> messageQueue = new CircularBuffer<>(1000);
+        private final AtomicBoolean isWriting = new AtomicBoolean(false);
 
         public ClientHandler(AsynchronousSocketChannel clientChannel) {
             this.clientChannel = clientChannel;
@@ -673,17 +673,14 @@ public class NIOXTablesServer {
             }
         }
 
-        private final Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
-        private final AtomicBoolean isWriting = new AtomicBoolean(false);
-
         private void writeToClient(String message) {
-            messageQueue.offer(message);
+            messageQueue.write(message);
             processQueue();
         }
 
         private void processQueue() {
             if (isWriting.compareAndSet(false, true)) {
-                String message = messageQueue.poll();
+                String message = messageQueue.read();
                 if (message != null) {
                     ByteBuffer buffer = ByteBuffer.wrap((message + "\n").getBytes());
                     clientChannel.write(buffer, null, new java.nio.channels.CompletionHandler<>() {
@@ -774,7 +771,8 @@ public class NIOXTablesServer {
                         ClientData data = new ClientData(m.getAddress(),
                                 m.getHostname(),
                                 m.totalMessages,
-                                m.identifier);
+                                m.identifier,
+                                m.messageQueue.size);
                         if (m.statistics != null) data.setStats(gson.toJson(m.statistics));
                         return data;
                     }).collect(Collectors.toList()));
