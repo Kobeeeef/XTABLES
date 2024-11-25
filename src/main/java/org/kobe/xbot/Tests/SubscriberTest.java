@@ -10,7 +10,7 @@ public class SubscriberTest {
         XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient(1735, true, 10, false);
 
         client.subscribeUpdateEvent((stringKeyValuePair -> {
-           
+           System.out.println(stringKeyValuePair.getValue());
         })).complete();
 
 

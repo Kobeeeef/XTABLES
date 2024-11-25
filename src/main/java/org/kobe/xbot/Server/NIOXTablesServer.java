@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.kobe.xbot.Server.MainNIO.XTABLES_SERVER_VERSION;
 import static org.kobe.xbot.Utilities.Utilities.tokenize;
 
 public class NIOXTablesServer {
@@ -57,7 +58,7 @@ public class NIOXTablesServer {
     private ServiceInfo serviceInfo;
     private final Set<ClientHandler> clients = new HashSet<>();
     private final XTablesData table = new XTablesData();
-    private ServerSocket serverSocket;
+    private AsynchronousServerSocketChannel serverSocketChannel;
     private final int port;
     private final int zeroMQPullPort;
     private final int zeroMQPubPort;
@@ -149,8 +150,8 @@ public class NIOXTablesServer {
             this.mdnsExecutorService = Executors.newFixedThreadPool(1);
             mdnsExecutorService.execute(() -> initializeMDNSWithRetries(15));
 
-            AsynchronousServerSocketChannel serverChannel = AsynchronousServerSocketChannel.open();
-            serverChannel.bind(new InetSocketAddress(port));
+            serverSocketChannel = AsynchronousServerSocketChannel.open();
+            serverSocketChannel.bind(new InetSocketAddress(port));
             logger.info("Server started. Listening on port " + port);
 
             if (userInterfaceServer == null || !userInterfaceServer.isRunning()) {
@@ -196,7 +197,7 @@ public class NIOXTablesServer {
             status.set(XTableStatus.ONLINE);
 
             // Accept connections asynchronously
-            serverChannel.accept(null, new java.nio.channels.CompletionHandler<>() {
+            serverSocketChannel.accept(null, new java.nio.channels.CompletionHandler<>() {
                 @Override
                 public void completed(AsynchronousSocketChannel clientChannel, Object attachment) {
                     try {
@@ -209,7 +210,7 @@ public class NIOXTablesServer {
                     }
 
                     // Accept the next connection
-                    serverChannel.accept(null, this);
+                    serverSocketChannel.accept(null, this);
                 }
 
                 @Override
@@ -229,18 +230,21 @@ public class NIOXTablesServer {
 
     public void stopServer(boolean fullShutdown) {
         try {
-            logger.info("Closing connections to all clients...");
+
+
             status.set(XTableStatus.OFFLINE);
+            logger.info("Closing socket server...");
+            if (serverSocketChannel != null && serverSocketChannel.isOpen()) {
+                serverSocketChannel.close();
+            }
+            logger.info("Closing connections to all clients...");
             synchronized (clients) {
                 for (ClientHandler client : clients) {
                     if (client != null) client.closeClient();
                 }
             }
             clients.clear();
-            logger.info("Closing socket server...");
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-            }
+
             table.delete("");
             mdnsExecutorService.shutdownNow();
             if (jmdns != null && serviceInfo != null) {
@@ -309,12 +313,11 @@ public class NIOXTablesServer {
             return false;
         }
         try {
-            status.set(XTableStatus.REBOOTING);
             stopServer(false);
             framesReceived = 0;
+            status.set(XTableStatus.REBOOTING);
             logger.info("Starting socket server in 1 second...");
-            status.set(XTableStatus.STARTING);
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(1500);
             logger.info("Starting server...");
             status.set(XTableStatus.STARTING);
             Thread thread = new Thread(this::startServer);
@@ -408,12 +411,13 @@ public class NIOXTablesServer {
                     }
                     totalMessages = 0;
                 }
-            }, 1, 1, TimeUnit.SECONDS);
+            }, 60, 60, TimeUnit.SECONDS);
 
             readFromClient(buffer);
+            pingServerForInformation();
         }
 
-        private StringBuilder messageBuffer = new StringBuilder();
+        private final StringBuilder messageBuffer = new StringBuilder();
 
         private void readFromClient(ByteBuffer buffer) {
             clientChannel.read(buffer, buffer, new java.nio.channels.CompletionHandler<>() {
@@ -505,7 +509,162 @@ public class NIOXTablesServer {
                         }
                     }
                 }
-                // Add more case handlers as needed (e.g., DELETE, RUN_SCRIPT, etc.)
+                case "GET_TABLES" -> {
+                    if (tokens.length == 1 && shouldReply) {
+                        String result = gson.toJson(table.getTables(""));
+                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, result);
+                        writeToClient(responseInfo.parsed());
+                    } else if (tokens.length == 2 && shouldReply) {
+                        String key = tokens[1];
+                        String result = gson.toJson(table.getTables(key));
+                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
+                        writeToClient(responseInfo.parsed());
+                    }
+                }
+                case "RUN_SCRIPT" -> {
+                    if (tokens.length >= 2) {
+                        String name = tokens[1];
+                        String customData = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+                        if (scripts.containsKey(name)) {
+                            clientThreadPool.execute(() -> {
+                                long startTime = System.nanoTime();
+                                String returnValue;
+                                ResponseStatus status = ResponseStatus.OK;
+                                try {
+                                    returnValue = scripts.get(name).apply(new ScriptParameters(table, customData == null || customData.trim().isEmpty() ? null : customData.trim()));
+                                    long endTime = System.nanoTime();
+                                    double durationMillis = (endTime - startTime) / 1e6;
+                                    logger.info("The script '" + name + "' ran successfully.");
+                                    logger.info("Start time: " + startTime + " ns");
+                                    logger.info("End time: " + endTime + " ns");
+                                    logger.info("Duration: " + durationMillis + " ms");
+                                } catch (Exception e) {
+                                    long endTime = System.nanoTime();
+                                    double durationMillis = (endTime - startTime) / 1e6;
+                                    returnValue = e.getMessage();
+                                    status = ResponseStatus.FAIL;
+                                    logger.severe("The script '" + name + "' encountered an error.");
+                                    logger.severe("Error message: " + e.getMessage());
+                                    logger.severe("Start time: " + startTime + " ns");
+                                    logger.severe("End time: " + endTime + " ns");
+                                    logger.severe("Duration: " + durationMillis + " ms");
+                                }
+                                String response = returnValue == null || returnValue.trim().isEmpty() ? status.name() : status.name() + " " + returnValue.trim();
+                                if (shouldReply) {
+                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, response);
+                                    writeToClient(responseInfo.parsed());
+                                }
+                            });
+                        } else if (shouldReply) {
+                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, "FAIL SCRIPT_NOT_FOUND");
+                            writeToClient(responseInfo.parsed());
+                        }
+                    }
+                }
+                case "UPDATE_KEY" -> {
+                    if (tokens.length == 3) {
+                        String key = tokens[1];
+                        String value = tokens[2];
+                        if (!Utilities.validateName(value, false)) {
+                            if (shouldReply) {
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, "FAIL");
+                                writeToClient(responseInfo.parsed());
+                            }
+                        } else {
+                            boolean response = table.renameKey(key, value);
+                            if (shouldReply) {
+                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
+                                writeToClient(responseInfo.parsed());
+                            }
+                        }
+                    }
+                }
+                case "DELETE" -> {
+                    if (tokens.length == 2) {
+                        String key = tokens[1];
+                        boolean response = table.delete(key);
+                        if (shouldReply) {
+                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
+                            writeToClient(responseInfo.parsed());
+                        }
+                        if (response) {
+                            notifyDeleteChangeClients(key);
+                        }
+                    } else if (tokens.length == 1) {
+                        boolean response = table.delete("");
+                        if (shouldReply) {
+                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
+                            writeToClient(responseInfo.parsed());
+                        }
+                    }
+                }
+                case "SUBSCRIBE_DELETE" -> {
+                    if (tokens.length == 1) {
+                        deleteEvent.set(true);
+                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
+                        writeToClient(responseInfo.parsed());
+                    }
+                }
+                case "UNSUBSCRIBE_DELETE" -> {
+                    if (tokens.length == 1) {
+                        deleteEvent.set(false);
+                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
+                        writeToClient(responseInfo.parsed());
+                    }
+                }
+                case "UNSUBSCRIBE_UPDATE" -> {
+                    if (tokens.length == 2) {
+                        String key = tokens[1];
+                        boolean success = updateEvents.remove(key);
+                        if (shouldReply) {
+                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, success ? "OK" : "FAIL");
+                            writeToClient(responseInfo.parsed());
+                        }
+                    } else if (tokens.length == 1) {
+                        boolean success = updateEvents.remove("");
+                        if (shouldReply) {
+                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, success ? "OK" : "FAIL");
+                            writeToClient(responseInfo.parsed());
+                        }
+                    }
+                }
+                case "PING" -> {
+                    if (tokens.length == 1 && shouldReply) {
+                        SystemStatistics systemStatistics = new SystemStatistics(clients.size());
+                        int i = 0;
+                        for (ClientHandler client : clients) {
+                            i += client.totalMessages;
+                        }
+                        systemStatistics.setTotalMessages(i);
+                        systemStatistics.setVersion(XTABLES_SERVER_VERSION);
+                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
+                        writeToClient(responseInfo.parsed());
+                    }
+                }
+                case "GET_RAW_JSON" -> {
+                    if (tokens.length == 1 && shouldReply) {
+                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, DataCompression.compressAndConvertBase64(table.toJSON()));
+                        writeToClient(responseInfo.parsed());
+                    }
+                }
+                case "REBOOT_SERVER" -> {
+                    if (tokens.length == 1) {
+                        if (shouldReply) {
+                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, ResponseStatus.OK.name());
+                            writeToClient(responseInfo.parsed());
+                        }
+                        rebootServer();
+                    }
+                }
+                case "INFORMATION" -> {
+                    if (tokens.length >= 2) {
+                        try {
+                            this.statistics = gson.fromJson(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)), ClientStatistics.class);
+                        } catch (Exception e) {
+                            logger.info("Could not parse client information: " + e.getMessage());
+                        }
+                    }
+                }
                 default -> {
                     if (shouldReply) {
                         writeToClient(id + ":UNKNOWN FAIL");
@@ -514,21 +673,39 @@ public class NIOXTablesServer {
             }
         }
 
-        private void writeToClient(String message) {
-            ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
-            clientChannel.write(buffer, null, new java.nio.channels.CompletionHandler<>() {
-                @Override
-                public void completed(Integer result, Object attachment) {
-                    // Successfully wrote to client
-                }
+        private final Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
+        private final AtomicBoolean isWriting = new AtomicBoolean(false);
 
-                @Override
-                public void failed(Throwable exc, Object attachment) {
-                    logger.warning("Failed to write to client: " + exc.getMessage());
-                    closeClient();
-                }
-            });
+        private void writeToClient(String message) {
+            messageQueue.offer(message);
+            processQueue();
         }
+
+        private void processQueue() {
+            if (isWriting.compareAndSet(false, true)) {
+                String message = messageQueue.poll();
+                if (message != null) {
+                    ByteBuffer buffer = ByteBuffer.wrap((message + "\n").getBytes());
+                    clientChannel.write(buffer, null, new java.nio.channels.CompletionHandler<>() {
+                        @Override
+                        public void completed(Integer result, Object attachment) {
+                            isWriting.set(false);
+                            processQueue(); // Process the next message in the queue
+                        }
+
+                        @Override
+                        public void failed(Throwable exc, Object attachment) {
+                            isWriting.set(false);
+                            logger.warning("Failed to write to client: " + exc.getMessage());
+                            closeClient();
+                        }
+                    });
+                } else {
+                    isWriting.set(false); // No messages to write
+                }
+            }
+        }
+
 
         public void closeClient() {
             try {
@@ -540,7 +717,32 @@ public class NIOXTablesServer {
                 clients.remove(this);
             }
         }
+        public void pingServerForInformation() {
+            writeToClient("null:INFORMATION");
+        }
 
+        public ClientStatistics pingServerForInformationAndWait(long timeout) {
+            long startTime = System.currentTimeMillis();
+            pingServerForInformation();
+            if (this.statistics == null) {
+                while (System.currentTimeMillis() - startTime < timeout) {
+                    if (this.statistics != null) {
+                        return this.statistics;
+                    }
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+                if (this.statistics == null) {
+                    logger.info("Timeout reached. Server did not respond with information.");
+                    return null;
+                }
+            }
+            return this.statistics;
+        }
         public void sendUpdate(String key, String value) {
             writeToClient("null:UPDATE_EVENT " + key + " " + value);
         }
@@ -581,7 +783,7 @@ public class NIOXTablesServer {
                         i += client.totalMessages;
                     }
                     systemStatistics.setTotalMessages(i);
-                    systemStatistics.setVersion(Main.XTABLES_SERVER_VERSION);
+                    systemStatistics.setVersion(XTABLES_SERVER_VERSION);
                     systemStatistics.setFramesForwarded(framesReceived);
                     try {
                         systemStatistics.setHostname(InetAddress.getLocalHost().getHostName());
@@ -591,7 +793,48 @@ public class NIOXTablesServer {
                 resp.getWriter().println(gson.toJson(systemStatistics));
             }
         }), "/api/get");
+        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                String uuidParam = req.getParameter("uuid");
 
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                if (uuidParam == null || uuidParam.isEmpty()) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"No UUID found in parameter!\"}");
+                    return;
+                }
+                UUID uuid;
+
+                try {
+                    uuid = UUID.fromString(uuidParam);
+                } catch (IllegalArgumentException e) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Invalid UUID format!\"}");
+                    return;
+                }
+
+                synchronized (clients) {
+                    Optional<ClientHandler> clientHandler = clients.stream().filter(f -> f.identifier.equals(uuid.toString())).findFirst();
+                    if (clientHandler.isPresent()) {
+                        ClientStatistics statistics = clientHandler.get().pingServerForInformationAndWait(3000);
+                        if (statistics != null) {
+                            resp.setStatus(HttpServletResponse.SC_OK);
+                            resp.getWriter().println(String.format("{ \"status\": \"success\", \"message\": %1$s}", gson.toJson(statistics)));
+                        } else {
+                            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"The client did not respond!\"}");
+                        }
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
+                    }
+                }
+
+
+            }
+        }), "/api/ping");
         // Add a servlet to handle server reboot POST requests
         servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
             @Override

@@ -15,6 +15,7 @@ public class OverloadTest {
         // Initialize a new client with address and port
         XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient("localhost", 1735);
         int i = 0;
+
         while(true) {
             client.executePutInteger("test", i);
 
