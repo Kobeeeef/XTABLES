@@ -399,11 +399,7 @@ public class NIOXTablesServer {
 
             messagesLogExecutor.scheduleAtFixedRate(() -> {
                 if (totalMessages > 0) {
-                    try {
-                        logger.info("Received " + String.format("%,d", totalMessages) + " messages from " + clientChannel.getRemoteAddress());
-                    } catch (IOException e) {
-                        logger.warning("Could not get client address: " + e.getMessage());
-                    }
+                        logger.info("Received " + String.format("%,d", totalMessages) + " messages from " + getAddress());
                     totalMessages = 0;
                 }
             }, 60, 60, TimeUnit.SECONDS);
