@@ -60,8 +60,6 @@ public class NIOXTablesServer {
     private final XTablesData table = new XTablesData();
     private AsynchronousServerSocketChannel serverSocketChannel;
     private final int port;
-    private final int zeroMQPullPort;
-    private final int zeroMQPubPort;
     private final ExecutorService clientThreadPool;
     private final HashMap<String, Function<ScriptParameters, String>> scripts = new HashMap<>();
     private static Thread mainThread;
@@ -71,24 +69,22 @@ public class NIOXTablesServer {
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
     private int framesReceived;
 
-    private NIOXTablesServer(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
+    private NIOXTablesServer(String SERVICE_NAME, int PORT) {
         this.port = PORT;
-        this.zeroMQPullPort = zeroMQPullPort;
-        this.zeroMQPubPort = zeroMQPubPort;
         this.SERVICE_NAME = SERVICE_NAME;
         instance.set(this);
         this.clientThreadPool = Executors.newCachedThreadPool();
         startServer();
     }
 
-    public static NIOXTablesServer startInstance(String SERVICE_NAME, int PORT, int zeroMQPullPort, int zeroMQPubPort) {
+    public static NIOXTablesServer startInstance(String SERVICE_NAME, int PORT) {
         if (instance.get() == null) {
             if (PORT == 5353)
                 throw new IllegalArgumentException("The port 5353 is reserved for mDNS services.");
             if (SERVICE_NAME.equalsIgnoreCase("localhost"))
                 throw new IllegalArgumentException("The mDNS service name cannot be localhost!");
             status.set(XTableStatus.STARTING);
-            Thread main = new Thread(() -> new NIOXTablesServer(SERVICE_NAME, PORT, zeroMQPullPort, zeroMQPubPort));
+            Thread main = new Thread(() -> new NIOXTablesServer(SERVICE_NAME, PORT));
             main.setName("XTABLES-SERVER");
             main.setDaemon(false);
             main.start();
@@ -236,13 +232,14 @@ public class NIOXTablesServer {
                 serverSocketChannel.close();
             }
             logger.info("Closing connections to all clients...");
-            synchronized (clients) {
-                for (ClientHandler client : clients) {
-                    if (client != null) client.closeClient();
+            try {
+                synchronized (clients) {
+                    for (ClientHandler client : clients) {
+                        if (client != null) client.closeClient();
+                    }
                 }
-            }
-            clients.clear();
-
+                clients.clear();
+            } catch (Exception ignored) {}
             table.delete("");
             mdnsExecutorService.shutdownNow();
             if (jmdns != null && serviceInfo != null) {
@@ -279,8 +276,6 @@ public class NIOXTablesServer {
                 // Create the service with additional attributes
                 Map<String, String> props = new HashMap<>();
                 props.put("port", String.valueOf(port));
-                props.put("pull-port", String.valueOf(zeroMQPullPort));
-                props.put("pub-port", String.valueOf(zeroMQPubPort));
                 serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
                 jmdns.registerService(serviceInfo);
                 logger.info("mDNS service registered: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT);
