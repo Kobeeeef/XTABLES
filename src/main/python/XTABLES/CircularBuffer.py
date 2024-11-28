@@ -1,13 +1,15 @@
 from threading import Condition
+from typing import Any, Optional, Callable
 
 
 class CircularBuffer:
-    def __init__(self, size):
+    def __init__(self, size, dedupe_buffer_key: Optional[Callable[[Any], Optional[str]]] = None):
         self.size = size
-        self.buffer = [""] * size
+        self.buffer = [None] * size
         self.head = 0
         self.tail = 0
         self.count = 0
+        self.dedupe_buffer_key = dedupe_buffer_key
         self.condition = Condition()  # Condition for notifying consumers
 
     def write(self, data):
@@ -25,9 +27,14 @@ class CircularBuffer:
             if self.count == 0:
                 return None  # Buffer is empty
             latest_index = (self.head - 1 + self.size) % self.size
+            if self.buffer[latest_index] is None:
+                return None
             latest_data = self.buffer[latest_index]
-            self.tail = self.head  # Clear all old data
-            self.count = 0
+            if self.dedupe_buffer_key is None:
+                self.tail = self.head  # Clear all old data
+            else:
+                self._increment_tail_and_manage_duplicates(latest_data)
+            self.count = self.tail - self.head if self.tail >= self.head else (self.size - self.tail) + self.head
             return latest_data
 
     def read(self):
@@ -42,3 +49,28 @@ class CircularBuffer:
     def get_size(self):
         with self.condition:
             return self.count
+
+
+    def _increment_tail_and_manage_duplicates(self, data: Any) -> None:
+        assert self.dedupe_buffer_key is not None
+        buffer_key = self.dedupe_buffer_key(data)
+        while (self.dedupe_buffer_key(self.buffer[self.tail]) == buffer_key and self.tail != self.head):
+            self.tail = (self.tail + 1) % self.size
+
+        if self.tail == self.head:
+            return
+
+        counter = self.tail
+        while (counter != self.head):
+            if self.buffer[counter] == buffer_key:
+                self.buffer[counter] = None
+
+            counter = (counter + 1) % self.size
+
+        self.head = (self.head - 1 + self.size) % self.size
+
+        if self.tail == self.head:
+            return
+
+        while (self.buffer[self.head] is None and self.tail != self.head):
+            self.head = (self.head - 1 + self.size) % self.size

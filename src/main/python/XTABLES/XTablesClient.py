@@ -6,8 +6,8 @@ import time
 from enum import Enum
 from io import BytesIO
 
-import SocketClient as sc
-import Utilities
+from . import SocketClient as sc
+from . import Utilities
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 
 

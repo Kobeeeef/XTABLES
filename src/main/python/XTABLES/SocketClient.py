@@ -9,6 +9,15 @@ from . import ClientStatistics
 from . import CircularBuffer
 
 
+def _dedupe_buffer_key_func(event: list[str]) -> Optional[str]:
+    if len(event) < 3:
+        return None
+    event_parts = event[0].strip(":")
+    if len(event_parts) < 2:
+        return None
+
+    return f"{event_parts[1]}_{event[1]}"
+
 class SocketClient:
     def __init__(self, ip, port, buffer_size=100):
         self.version = "XTABLES Client v4.0.0 | Python"
@@ -22,7 +31,7 @@ class SocketClient:
         self.connected = False
         self.stop_threads = threading.Event()
         self.lock = threading.Lock()
-        self.circular_buffer = CircularBuffer.CircularBuffer(buffer_size)  # Initialize circular buffer
+        self.circular_buffer = CircularBuffer.CircularBuffer(buffer_size, dedupe_buffer_key=_dedupe_buffer_key_func)  # Initialize circular buffer
 
     def connect(self):
         self._connect()
