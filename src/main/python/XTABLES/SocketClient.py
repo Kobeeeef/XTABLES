@@ -10,8 +10,8 @@ from . import ClientStatistics
 from . import CircularBuffer
 
 
-def _dedupe_buffer_key_func(event: list[str]) -> Optional[str]:
-    if len(event) < 3:
+def _dedupe_buffer_key_func(event: Optional[list[str]]) -> Optional[str]:
+    if event is None or len(event) < 3:
         return None
     event_parts = event[0].strip(":")
     if len(event_parts) < 2:

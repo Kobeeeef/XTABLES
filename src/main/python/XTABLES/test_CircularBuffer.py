@@ -32,8 +32,8 @@ class TestCircularBuffer(TestCase):
         )
 
     def test_circular_buffer_with_dedup(self) -> None:
-        def dedupe_event_func(event: list[str]) -> Optional[str]:
-            if len(event) < 3:
+        def dedupe_event_func(event: Optional[list[str]]) -> Optional[str]:
+            if event is None or len(event) < 3:
                 return None
             event_parts = event[0].strip(":")
             if len(event_parts) < 2:
@@ -70,7 +70,6 @@ class TestCircularBuffer(TestCase):
             circular_buffer.read_latest()
         )
 
-        circular_buffer.write(["101:UPDATE_EVENT", "REAR_LEFT", "ABDC"])
         circular_buffer.write(["101:UPDATE_EVENT", "REAR_LEFT", "ABDC"])
         circular_buffer.write(["101:UPDATE_EVENT", "FRONT_LEFT", "DCBA"])
         circular_buffer.write(["101:UPDATE_EVENT", "REAR_LEFT", "ABDC"])
