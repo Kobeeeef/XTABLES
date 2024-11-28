@@ -3,6 +3,7 @@ import socket
 import threading
 import uuid
 import traceback
+from typing import Optional
 
 
 from . import ClientStatistics
