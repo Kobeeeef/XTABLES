@@ -34,9 +34,6 @@ class CircularBuffer:
                 self.tail = self.head  # Clear all old data
             else:
                 self._increment_tail_and_manage_duplicates(latest_data)
-                print(f'self.buffer: {self.buffer}')
-                print(f'self.head: {self.head}')
-                print(f'self.tail: {self.tail}')
             self.count = self.tail - self.head if self.tail >= self.head else (self.size - self.tail) + self.head
             return latest_data
 
@@ -65,7 +62,6 @@ class CircularBuffer:
         """
         assert self.dedupe_buffer_key is not None
         buffer_key = self.dedupe_buffer_key(data)
-        print(f'buffer_key: {buffer_key}')
         # Increment tail until the either the head is found or no more duplicates have been found.
         while (self.dedupe_buffer_key(self.buffer[self.tail]) == buffer_key and self.tail != self.head):
             self.buffer[self.tail] = None
