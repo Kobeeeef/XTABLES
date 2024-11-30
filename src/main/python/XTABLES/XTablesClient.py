@@ -34,6 +34,7 @@ class XTablesClient:
             try:
                 self.logger.info("Attempting to resolve IP address using OS resolver.")
                 self.server_ip = socket.gethostbyname("XTABLES.local")
+                self._initialize_client(server_ip=self.server_ip, server_port=self.server_port)
             except Exception:
                 self.logger.fatal("Failed to resolve XTABLES server. Falling back to mDNS.")
                 self.zeroconf = Zeroconf()
