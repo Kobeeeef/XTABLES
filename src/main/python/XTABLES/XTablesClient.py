@@ -440,12 +440,11 @@ class XTablesClient:
 
     """--------------------------------METHODS--------------------------------"""
 
+if __name__ == "__main__":
+    c = XTablesClient("10.4.88.175", 1735)
 
-c = XTablesClient("10.4.88.175", 1735)
+    def a(key, value):
+        print(f"{key}, {value}")
 
 
-def a(key, value):
-    print(f"{key}, {value}")
-
-
-c.subscribe_to_all(a)
+    c.subscribe_to_all(a)
