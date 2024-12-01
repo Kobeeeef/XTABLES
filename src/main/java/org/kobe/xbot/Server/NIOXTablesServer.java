@@ -150,7 +150,7 @@ public class NIOXTablesServer {
 
             if (userInterfaceServer == null || !userInterfaceServer.isRunning()) {
                 try {
-                    userInterfaceServer = new Server(4880);
+                    userInterfaceServer = new Server(new InetSocketAddress("0.0.0.0", 4880));
                     // Static resource handler
                     ResourceHandler resourceHandler = new ResourceHandler();
                     resourceHandler.setDirectoriesListed(true);
