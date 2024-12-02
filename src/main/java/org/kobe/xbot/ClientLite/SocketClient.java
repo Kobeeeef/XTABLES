@@ -289,7 +289,7 @@ public class SocketClient {
                         }
                     } else if (requestInfo.getMethod().equals(MethodType.INFORMATION)) {
                         ClientStatistics clientStatistics = new ClientStatistics("JAVA");
-                        clientStatistics.setVersion(XTablesClient.XTABLES_CLIENT_VERSION);
+                        clientStatistics.setVersion(xTablesClient.getVersion());
                         String json = gson.toJson(clientStatistics);
                         sendMessage(new ResponseInfo(null, MethodType.INFORMATION, json));
                     } else {

@@ -39,10 +39,16 @@ import java.util.function.Consumer;
 public class XTablesClient {
 
 
-    public static final String XTABLES_CLIENT_VERSION =
+    private String XTABLES_CLIENT_VERSION =
             "XTABLES Client v4.0.0 | Build Date: 11/14/2024";
 
-
+    public String getVersion() {
+        return XTABLES_CLIENT_VERSION;
+    }
+    public String addVersionProperty(String prop) {
+        XTABLES_CLIENT_VERSION = XTABLES_CLIENT_VERSION + " | " + prop;
+        return XTABLES_CLIENT_VERSION;
+    }
 
     public XTablesClient() {
         this(1735, true, 10, false);
