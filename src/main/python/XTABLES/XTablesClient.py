@@ -6,8 +6,8 @@ import time
 from enum import Enum
 from io import BytesIO
 
-import SocketClient as sc
-import Utilities
+from . import SocketClient as sc
+from . import Utilities
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 
 
@@ -34,6 +34,7 @@ class XTablesClient:
             try:
                 self.logger.info("Attempting to resolve IP address using OS resolver.")
                 self.server_ip = socket.gethostbyname("XTABLES.local")
+                self._initialize_client(server_ip=self.server_ip, server_port=self.server_port)
             except Exception:
                 self.logger.fatal("Failed to resolve XTABLES server. Falling back to mDNS.")
                 self.zeroconf = Zeroconf()
@@ -440,12 +441,11 @@ class XTablesClient:
 
     """--------------------------------METHODS--------------------------------"""
 
+if __name__ == "__main__":
+    c = XTablesClient("10.4.88.175", 1735)
 
-c = XTablesClient("10.4.88.175", 1735)
+    def a(key, value):
+        print(f"{key}, {value}")
 
 
-def a(key, value):
-    print(f"{key}, {value}")
-
-
-c.subscribe_to_all(a)
+    c.subscribe_to_all(a)
