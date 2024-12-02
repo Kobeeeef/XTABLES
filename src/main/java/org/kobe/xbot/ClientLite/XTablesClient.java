@@ -46,7 +46,7 @@ public class XTablesClient {
         return XTABLES_CLIENT_VERSION;
     }
     public String addVersionProperty(String prop) {
-        XTABLES_CLIENT_VERSION = XTABLES_CLIENT_VERSION + " | " + prop;
+        XTABLES_CLIENT_VERSION = XTABLES_CLIENT_VERSION + " | " + prop.trim();
         return XTABLES_CLIENT_VERSION;
     }
 
