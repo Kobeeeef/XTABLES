@@ -17,9 +17,8 @@ public class OverloadTest {
         int i = 0;
 
         while(true) {
-            client.executePutInteger("test", i);
-            System.out.println(i);
-         i++;
+            client.executePutInteger("test.test.testawdawda", i);
+
 
 
         }

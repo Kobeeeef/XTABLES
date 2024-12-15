@@ -35,7 +35,6 @@ import java.util.function.Consumer;
  * @author Kobe
  */
 
-
 public class XTablesClient {
 
 
@@ -45,6 +44,7 @@ public class XTablesClient {
     public String getVersion() {
         return XTABLES_CLIENT_VERSION;
     }
+
     public String addVersionProperty(String prop) {
         XTABLES_CLIENT_VERSION = XTABLES_CLIENT_VERSION + " | " + prop.trim();
         return XTABLES_CLIENT_VERSION;
@@ -53,6 +53,7 @@ public class XTablesClient {
     public XTablesClient() {
         this(1735, true, 10, false);
     }
+
     /**
      * Connects to the XTablesServer instance using the system-level DNS resolver and port with direct connection settings.
      *
@@ -201,6 +202,7 @@ public class XTablesClient {
             throw new RuntimeException(e);
         }
     }
+
     public XTablesClient(String ip, int port) {
         initializeClient(ip, port, true, 10, false);
 
@@ -568,6 +570,7 @@ public class XTablesClient {
     public void executePutString(String key, String value) {
         client.sendMessageRaw("IGNORED:PUT " + key + " \"" + value + "\"");
     }
+
     /**
      * Sends an integer value to the server with the specified key.
      *
@@ -634,11 +637,13 @@ public class XTablesClient {
     public boolean pushZMQStringUpdate(String key, String value) {
         return client.pushZMQ(key + " \"" + value + "\"");
     }
+
     public boolean pushZMQRawUpdate(String key, String value) {
         return client.pushZMQ(key + " " + value);
     }
+
     public String[] receiveNextZMQ() {
-       return client.receive_nextZMQ();
+        return client.receive_nextZMQ();
     }
 
 
@@ -722,10 +727,12 @@ public class XTablesClient {
         Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), String.class);
     }
+
     public RequestAction<String> getRaw(String key) {
         Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), null);
     }
+
     public RequestAction<Boolean> getBoolean(String key) {
         Utilities.validateKey(key, true);
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.GET, key).parsed(), Boolean.class);
@@ -785,6 +792,7 @@ public class XTablesClient {
     public RequestAction<ResponseStatus> rebootServer() {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.REBOOT_SERVER).parsed(), ResponseStatus.class);
     }
+
     public RequestAction<LatencyInfo> ping_latency() {
         return new RequestAction<>(client, new ResponseInfo(null, MethodType.PING).parsed()) {
             @Override
@@ -803,6 +811,7 @@ public class XTablesClient {
         };
 
     }
+
     public <T> RequestAction<T> sendCustomMessage(MethodType method, String message, Class<T> type) {
         return new RequestAction<>(client, new ResponseInfo(null, method, message).parsed(), type);
     }
