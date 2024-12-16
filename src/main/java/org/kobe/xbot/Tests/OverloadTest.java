@@ -17,10 +17,12 @@ public class OverloadTest {
         int i = 0;
 
         while(true) {
-            client.executePutInteger("test.test.testawdawda", i);
+            client.executePutInteger("SmartDashboard.blackmeta", i);
+            client.executePutInteger("SmartDashboard.motorWheelSpeed", i);
+            client.executePutString("robot", "DISABLED");
+            i++;
 
-
-
+            Thread.sleep(1);
         }
 //        Double[] response = client.getObject("test", Double[].class).complete();
 //        System.out.println(Arrays.toString(response));

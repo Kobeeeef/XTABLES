@@ -92,6 +92,7 @@ public class RequestAction<T> {
                         return null;
                     });
         } catch (IOException e) {
+            onFailure.accept(e);
             logger.severe(e.getMessage());
         }
     }
@@ -145,6 +146,7 @@ public class RequestAction<T> {
                 onResponse(parsed == null ? res : parsed);
             });
         } catch (IOException e) {
+
             logger.severe(e.getMessage());
         }
     }
