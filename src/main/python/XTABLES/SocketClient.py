@@ -4,10 +4,9 @@ import threading
 import uuid
 import traceback
 from typing import Optional
-
-
-from . import ClientStatistics
-from . import CircularBuffer
+import time
+import ClientStatistics
+import CircularBuffer
 
 
 def _dedupe_buffer_key_func(event: Optional[list[str]]) -> Optional[str]:
@@ -19,11 +18,13 @@ def _dedupe_buffer_key_func(event: Optional[list[str]]) -> Optional[str]:
 
     return f"{event_parts[1]}_{event[1]}"
 
+
 class SocketClient:
     def __init__(self, ip, port, buffer_size=100):
         self.version = "XTABLES Client v4.0.0 | Python"
         self.logger = logging.getLogger(__name__)
         self.ip = ip
+        self.debug = False
         self.port = port
         self.sock = None
         self.subscriptions = {}
@@ -32,10 +33,17 @@ class SocketClient:
         self.connected = False
         self.stop_threads = threading.Event()
         self.lock = threading.Lock()
-        self.circular_buffer = CircularBuffer.CircularBuffer(buffer_size, dedupe_buffer_key=_dedupe_buffer_key_func)  # Initialize circular buffer
+        self.circular_buffer = CircularBuffer.CircularBuffer(buffer_size,
+                                                             dedupe_buffer_key=_dedupe_buffer_key_func)
+
+    def add_version_property(self, str):
+        self.version = self.version + " | " + str
+
+    def set_debug(self, bool):
+        self.debug(bool is True)
 
     def connect(self):
-        self._connect()
+        self.__connect()
         self.stop_threads.clear()
         threading.Thread(target=self._message_listener, daemon=True).start()
         threading.Thread(target=self._process_buffered_messages, daemon=True).start()
@@ -48,6 +56,8 @@ class SocketClient:
                 try:
                     self.sock.shutdown(socket.SHUT_RDWR)
                 except:
+                    if self.debug:
+                        traceback.print_exc()
                     pass
                 self.sock.close()
                 self.sock = None
@@ -57,27 +67,48 @@ class SocketClient:
             if self.connected:
                 try:
                     self.sock.sendall((message + "\n").encode())
-
                 except:
+                    if self.debug:
+                        traceback.print_exc()
                     self.connected = False
                     self._reconnect()
 
-    def _connect(self):
+    def send_bytes(self, message):
+        with self.lock:
+            if self.connected:
+                try:
+                    # Ensure the message is in bytes, without encoding
+                    self.sock.sendall(message + b"\n")
+                except:
+                    if self.debug:
+                        traceback.print_exc()
+                    self.connected = False
+                    self._reconnect()
+
+    def __connect(self):
         try:
             self.logger.info(f"Connecting to {self.ip}:{self.port}...")
+            if self.sock:
+                self.sock.close()
             self.sock = socket.create_connection((self.ip, self.port))
+            self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, True)
             self.connected = True
             self.logger.info(f"Connected to {self.ip}:{self.port}...")
         except Exception as e:
+            if self.debug:
+                traceback.print_exc()
             self.connected = False
             self.logger.fatal(f"Connection failed: " + str(e))
 
     def _reconnect(self):
         while not self.connected and not self.stop_threads.is_set():
             try:
-                self._connect()
+                self.__connect()
                 self._resubscribe_all()
             except:
+                if self.debug:
+                    traceback.print_exc()
+                time.sleep(0.1)
                 pass
 
     def _resubscribe_all(self):
@@ -188,7 +219,8 @@ class SocketClient:
                     consumer(key, value)
         except Exception as e:
             self.logger.error(f"Invalid message format: {' '.join(parts)}. Error: {e}")
-            traceback.print_exc()
+            if self.debug:
+                traceback.print_exc()
 
     def _process_buffered_messages(self):
         while not self.stop_threads.is_set():
@@ -244,9 +276,11 @@ class SocketClient:
                                 continue
                             self.circular_buffer.write(parts)
                     except Exception as e:
-                        print(e)
+                        if self.debug:
+                            traceback.print_exc()
             except Exception as e:
-                traceback.print_exc()
-                self.logger.fatal("Exception occurred in message listener: " + str(e))
+                if self.debug:
+                    traceback.print_exc()
                 self.connected = False
+                self.logger.info("Reconnecting due to an error in the message listener.")
                 self._reconnect()

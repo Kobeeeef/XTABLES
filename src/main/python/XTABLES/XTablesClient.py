@@ -6,8 +6,8 @@ import time
 from enum import Enum
 from io import BytesIO
 
-from . import SocketClient as sc
-from . import Utilities
+import SocketClient as sc
+import Utilities
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
 
 
@@ -32,8 +32,10 @@ class XTablesClient:
             self._initialize_client(server_ip=self.server_ip, server_port=self.server_port)
         elif self.server_port:
             try:
+
                 self.logger.info("Attempting to resolve IP address using OS resolver.")
                 self.server_ip = socket.gethostbyname("XTABLES.local")
+
                 self._initialize_client(server_ip=self.server_ip, server_port=self.server_port)
             except Exception:
                 self.logger.fatal("Failed to resolve XTABLES server. Falling back to mDNS.")
@@ -41,7 +43,6 @@ class XTablesClient:
                 self.listener = self.XTablesServiceListener(self)
                 self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
                 self.discover_service()
-            self._initialize_client(server_ip=self.server_ip, server_port=self.server_port)
         else:
             self.zeroconf = Zeroconf()
             self.listener = self.XTablesServiceListener(self)
@@ -341,12 +342,8 @@ class XTablesClient:
     def executePutBytes(self, key, value):
         if isinstance(value, bytes) and isinstance(key, str):
             Utilities.validate_key(key, True)
-
-            # Encode byte array to Base64 string
-            base64_value = base64.b64encode(value).decode('utf-8')
-
-            # Send the Base64 string to the server
-            self.send_data(f"IGNORED:PUT {key} {base64_value}")
+            message = f"IGNORED:PUT {key} ".encode() + value
+            self.socket_client.send_bytes(message)
         else:
             self.logger.error("Key must be a string and value must be a byte array (bytes).")
 
@@ -402,18 +399,6 @@ class XTablesClient:
         else:
             raise TypeError("Key must be a string and value must be a float")
 
-    def executePutBytes(self, key, value):
-        if isinstance(value, bytes) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-
-            # Encode byte array to Base64 string
-            base64_value = base64.b64encode(value).decode('utf-8')
-
-            # Send the Base64 string to the server
-            self.socket_client.send_message(f"IGNORED:PUT {key} {base64_value}")
-        else:
-            self.logger.error("Key must be a string and value must be a byte array (bytes).")
-
     def executePutArrayOrTuple(self, key, value):
         if isinstance(key, str) and isinstance(value, (list, tuple)):
             Utilities.validate_key(key, True)
@@ -441,11 +426,14 @@ class XTablesClient:
 
     """--------------------------------METHODS--------------------------------"""
 
+
 if __name__ == "__main__":
-    c = XTablesClient("10.4.88.175", 1735)
-
-    def a(key, value):
-        print(f"{key}, {value}")
-
-
-    c.subscribe_to_all(a)
+    c = XTablesClient()
+    b = bytes([17, 24, 32])
+    while True:
+        c.executePutBytes("test", b)
+    # def a(key, value):
+    #     print(f"{key}, {value}")
+    #
+    #
+    # c.subscribe_to_all(a)
