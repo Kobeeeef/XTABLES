@@ -5,8 +5,8 @@ import uuid
 import traceback
 from typing import Optional
 import time
-import ClientStatistics
-import CircularBuffer
+from . import ClientStatistics
+from . import CircularBuffer
 
 
 def _dedupe_buffer_key_func(event: Optional[list[str]]) -> Optional[str]:

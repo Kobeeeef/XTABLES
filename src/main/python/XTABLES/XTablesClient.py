@@ -5,11 +5,11 @@ import threading
 import time
 from enum import Enum
 from io import BytesIO
-
-import SocketClient as sc
-import Utilities
+import random
+from . import SocketClient as sc
+from . import Utilities
 from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
-
+import ast
 
 class Status(Enum):
     FAIL = "FAIL"
@@ -327,14 +327,14 @@ class XTablesClient:
         :return: The byte array if successful, or None if the request fails.
         """
         # Use the existing getString method to fetch the Base64-encoded string
-        base64_string = self.getString(key, TIMEOUT)
+        bytes_str = self.getString(key, TIMEOUT)
 
-        if base64_string is not None:
+        if bytes_str is not None:
             try:
                 # Decode the Base64 string back to a byte array
-                return base64.b64decode(base64_string)
+                return ast.literal_eval(bytes_str)
             except (ValueError, TypeError) as e:
-                self.logger.error(f"Error decoding Base64 value for key '{key}': {e}")
+                self.logger.error(f"Error decoding bytes value for key '{key}': {e}")
                 return None
         else:
             return None
@@ -342,10 +342,7 @@ class XTablesClient:
     def executePutBytes(self, key, value):
         if isinstance(value, bytes) and isinstance(key, str):
             Utilities.validate_key(key, True)
-            message = f"IGNORED:PUT {key} ".encode() + value
-            self.socket_client.send_bytes(message)
-        else:
-            self.logger.error("Key must be a string and value must be a byte array (bytes).")
+            self.socket_client.send_message(f'IGNORED:PUT {key} {value}')
 
     def executePutBoolean(self, key, value):
         if isinstance(value, bool) and isinstance(key, str):
@@ -408,6 +405,7 @@ class XTablesClient:
         else:
             raise TypeError("Key must be a string and value must be a list or tuple")
 
+
     def executePutClass(self, key, obj):
         """
         Serializes the given class object into a JSON string and sends it to the server.
@@ -426,14 +424,13 @@ class XTablesClient:
 
     """--------------------------------METHODS--------------------------------"""
 
+#
+# if __name__ == "__main__":
+#     c = XTablesClient(server_port=1735, server_ip="localhost")
+#     b = bytes([72, 22,79,79,76,76])
+#
+#     c.executePutString("test", "HRLLOOO")
+#
+#     b = c.getBytes("test")
+#     print(b)
 
-if __name__ == "__main__":
-    c = XTablesClient()
-    b = bytes([17, 24, 32])
-    while True:
-        c.executePutBytes("test", b)
-    # def a(key, value):
-    #     print(f"{key}, {value}")
-    #
-    #
-    # c.subscribe_to_all(a)
