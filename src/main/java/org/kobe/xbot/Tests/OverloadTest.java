@@ -13,16 +13,20 @@ public class OverloadTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Initialize a new client with address and port
+        Object a = new byte[] { 1, 2, 3 };
+        System.out.println(a);
+        if(1==1) return;
         XTablesClient client = new org.kobe.xbot.ClientLite.XTablesClient("localhost", 1735);
         int i = 0;
 
         while(true) {
+            client.executePutInteger("SmartDashboard", i+25);
             client.executePutInteger("SmartDashboard.blackmeta", i);
             client.executePutInteger("SmartDashboard.motorWheelSpeed", i);
             client.executePutString("robot", "DISABLED");
             i++;
 
-            Thread.sleep(1);
+
         }
 //        Double[] response = client.getObject("test", Double[].class).complete();
 //        System.out.println(Arrays.toString(response));

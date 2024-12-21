@@ -22,11 +22,10 @@ public class XTablesData {
         XTablesData current = this;
         int start = 0;
         int length = key.length();
-
         for (int i = 0; i < length; i++) {
             if (key.charAt(i) == '.') {
                 if (i > start) {
-                    String k = key.substring(start, i); // Extract the part of the key
+                    String k = key.substring(start, i);
 
                     if (current.data == null) {
                         current.data = new HashMap<>();
@@ -46,9 +45,8 @@ public class XTablesData {
             current.data.putIfAbsent(k, new XTablesData());
             current = current.data.get(k);
         }
-
         current.value = value;
-        return true; // Operation successful
+        return true;
 
     }
 

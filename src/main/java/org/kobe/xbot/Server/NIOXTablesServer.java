@@ -33,7 +33,10 @@ import org.slf4j.LoggerFactory;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 import java.io.IOException;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -146,6 +149,7 @@ public class NIOXTablesServer {
 
             serverSocketChannel = AsynchronousServerSocketChannel.open();
             serverSocketChannel.bind(new InetSocketAddress(port));
+            serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             logger.info("Server started. Listening on port " + port);
 
             if (userInterfaceServer == null || !userInterfaceServer.isRunning()) {
@@ -239,7 +243,8 @@ public class NIOXTablesServer {
                     }
                 }
                 clients.clear();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             table.delete("");
             mdnsExecutorService.shutdownNow();
             if (jmdns != null && serviceInfo != null) {
@@ -330,14 +335,13 @@ public class NIOXTablesServer {
 
         for (ClientHandler client : snapshot) {
 
-                Set<String> updateEvents = client.getUpdateEvents();
-                if (updateEvents.contains("") || updateEvents.contains(key)) {
-                    client.sendUpdate(key, value);
-                }
+            Set<String> updateEvents = client.getUpdateEvents();
+            if (updateEvents.contains("") || updateEvents.contains(key)) {
+                client.sendUpdate(key, value);
+            }
 
         }
     }
-
 
 
     private void notifyDeleteChangeClients(String key) {
@@ -367,6 +371,7 @@ public class NIOXTablesServer {
             this.identifier = UUID.randomUUID().toString();
 
         }
+
         public String getAddress() {
             try {
                 return clientChannel.getRemoteAddress().toString();
@@ -374,13 +379,15 @@ public class NIOXTablesServer {
                 return null;
             }
         }
+
         public String getHostname() {
             try {
-                return  ((InetSocketAddress) clientChannel.getRemoteAddress()).getHostName();
+                return ((InetSocketAddress) clientChannel.getRemoteAddress()).getHostName();
             } catch (IOException e) {
                 return null;
             }
         }
+
         public Set<String> getUpdateEvents() {
             return updateEvents;
         }
@@ -399,7 +406,7 @@ public class NIOXTablesServer {
 
             messagesLogExecutor.scheduleAtFixedRate(() -> {
                 if (totalMessages > 0) {
-                        logger.info("Received " + String.format("%,d", totalMessages) + " messages from " + getAddress());
+                    logger.info("Received " + String.format("%,d", totalMessages) + " messages from " + getAddress());
                     totalMessages = 0;
                 }
             }, 60, 60, TimeUnit.SECONDS);
@@ -457,7 +464,6 @@ public class NIOXTablesServer {
             String id = requestTokens[0];
             String methodType = requestTokens[1];
             boolean shouldReply = !id.equals("IGNORED");
-
             switch (methodType) {
                 case "PUT" -> {
                     if (tokens.length >= 3) {
@@ -468,7 +474,6 @@ public class NIOXTablesServer {
                             if (i < tokens.length - 1) valueBuilder.append(" ");
                         }
                         String value = valueBuilder.toString();
-
                         boolean response = table.put(key, value);
 
                         if (shouldReply) {
@@ -705,6 +710,7 @@ public class NIOXTablesServer {
                 clients.remove(this);
             }
         }
+
         public void pingServerForInformation() {
             writeToClient("null:INFORMATION");
         }
@@ -731,6 +737,7 @@ public class NIOXTablesServer {
             }
             return this.statistics;
         }
+
         public void sendUpdate(String key, String value) {
             writeToClient("null:UPDATE_EVENT " + key + " " + value);
         }
@@ -739,13 +746,6 @@ public class NIOXTablesServer {
             writeToClient("null:DELETE_EVENT " + key);
         }
     }
-
-
-
-
-
-
-
 
 
     private void addServlets(ServletContextHandler servletContextHandler) {
@@ -840,6 +840,17 @@ public class NIOXTablesServer {
                 }
             }
         }), "/api/reboot");
+        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                String data = table.toJSON();
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().println(data);
+
+            }
+        }), "/api/data");
 
         // Add more servlets as needed, e.g., ping or disconnect
         servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {

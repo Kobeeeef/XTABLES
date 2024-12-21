@@ -68,7 +68,7 @@ public class AsyncNIOServer {
                 }
 
                 buffer.flip();
-                String message = new String(buffer.array(), 0, buffer.limit()).trim();
+
                 messagesPerSecond++; // Increment the message counter
                 buffer.clear();
                 handleClient(clientChannel);
