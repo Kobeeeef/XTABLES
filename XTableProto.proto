@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+message XTableMessage {
+  optional int64 id = 1;
+  optional Command command = 2;
+  optional string key = 3;
+  optional bytes value = 4;
+  optional Type type = 5;
+
+  enum Type {
+    UNKNOWN = 0;
+    STRING = 1;
+    DOUBLE = 2;
+    INT64 = 5;
+    BOOL = 6;
+    BYTES = 7;
+    ENUM = 8;
+    MESSAGE = 9;
+    ARRAY = 10;
+    OBJECT = 11;
+  }
+
+  enum Command {
+    UNKNOWN_COMMAND = 0;
+    PUT = 1;
+    GET = 2;
+    SUBSCRIBE_UPDATE = 3;
+    GET_TABLES = 4;
+    RUN_SCRIPT = 5;
+    UPDATE_KEY = 6;
+    DELETE = 7;
+    PUBLISH = 8;
+    SUBSCRIBE_DELETE = 9;
+    UNSUBSCRIBE_DELETE = 10;
+    UNSUBSCRIBE_UPDATE = 11;
+    PING = 12;
+    GET_RAW_JSON = 13;
+    DELETE_EVENT = 14;
+    UPDATE_EVENT = 15;
+    INFORMATION = 16;
+    REBOOT_SERVER = 17;
+  }
+}

@@ -1,23 +1,31 @@
 package org.kobe.xbot.Utilities;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class XTablesData {
     private static final XTablesLogger logger = XTablesLogger.getLogger();
-    private static final Gson gson = new GsonBuilder().create();
+    private static final Gson gson;
+    static {
+        // Register custom serializer for XTablesData class
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(XTablesData.class, new XTablesDataSerializer());
+        gson = gsonBuilder.create();
+    }
     private Map<String, XTablesData> data;
-    private String value;
-
+    private byte[] value;
+    private XTableProto.XTableMessage.Type type;
     public XTablesData() {
         // Initialize the data map lazily
     }
 
-    public boolean put(String key, String value) {
+
+    public boolean put(String key, byte[] value, XTableProto.XTableMessage.Type type) {
         Utilities.validateKey(key, true);
         XTablesData current = this;
         int start = 0;
@@ -45,6 +53,7 @@ public class XTablesData {
             current.data.putIfAbsent(k, new XTablesData());
             current = current.data.get(k);
         }
+        current.type = type;
         current.value = value;
         return true;
 
@@ -60,14 +69,14 @@ public class XTablesData {
         return count;
     }
 
-    public String get(String key) {
+    public byte[] get(String key) {
         XTablesData current = getLevelxTablesData(key);
         return (current != null) ? current.value : null;
     }
 
-    public String get(String key, String defaultValue) {
+    public byte[] get(String key, byte[] defaultValue) {
         Utilities.validateKey(key, true);
-        String result = get(key);
+        byte[] result = get(key);
         return (result != null) ? result : defaultValue;
     }
 
@@ -161,8 +170,8 @@ public class XTablesData {
      *
      * @return A map containing all key-value pairs in dot notation.
      */
-    public Map<String, String> getKeyValuePairs() {
-        Map<String, String> keyValuePairs = new HashMap<>();
+    public Map<String, byte[]> getKeyValuePairs() {
+        Map<String, byte[]> keyValuePairs = new HashMap<>();
         collectKeyValuePairs("", this, keyValuePairs);
         return keyValuePairs;
     }
@@ -174,7 +183,7 @@ public class XTablesData {
      * @param node   The current XTablesData node.
      * @param result The map to store key-value pairs.
      */
-    private void collectKeyValuePairs(String prefix, XTablesData node, Map<String, String> result) {
+    private void collectKeyValuePairs(String prefix, XTablesData node, Map<String, byte[]> result) {
         if (node.value != null) {
             result.put(prefix, node.value);
         }
@@ -193,7 +202,7 @@ public class XTablesData {
     public Map<String, XTablesData> getTablesMap() {
         return data;
     }
-    public String getValue() {
+    public byte[] getValue() {
         return value;
     }
     public void updateFromRawJSON(String json) {
@@ -208,4 +217,84 @@ public class XTablesData {
 
         this.data = newData; // Directly assign the new data
     }
+    private static class XTablesDataSerializer implements JsonSerializer<XTablesData> {
+        @Override
+        public JsonElement serialize(XTablesData src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject jsonObject = new JsonObject();
+
+            // Serialize the `value` field if it exists at the root level
+            if (src.value != null) {
+                jsonObject.add("value", serializeValue(src));
+            }
+
+            // Serialize the `data` map if it exists
+            if (src.data != null && !src.data.isEmpty()) {
+                JsonObject dataObject = new JsonObject();
+                for (Map.Entry<String, XTablesData> entry : src.data.entrySet()) {
+                    String key = entry.getKey();
+                    XTablesData childNode = entry.getValue();
+
+                    // Recursively serialize each child node
+                    dataObject.add(key, serialize(childNode, typeOfSrc, context));
+                }
+                jsonObject.add("data", dataObject);
+            }
+
+            return jsonObject;
+        }
+
+
+
+        private JsonElement serializeValue(XTablesData node) {
+            if (node.value != null && node.type != null) {
+                return switch (node.type) {
+                    case STRING -> new JsonPrimitive(new String(node.value));
+                    case INT64 -> new JsonPrimitive(bytesToLong(node.value));
+                    case BOOL -> new JsonPrimitive(node.value[0] == 0x01);
+                    case DOUBLE -> new JsonPrimitive(bytesToDouble(node.value));
+                    case BYTES -> {
+                        JsonArray byteArray = new JsonArray();
+                        for (byte b : node.value) {
+                            byteArray.add(b);
+                        }
+                        yield byteArray;
+                    }
+                    default -> JsonNull.INSTANCE;
+                };
+            }
+            return JsonNull.INSTANCE;
+        }
+
+        private long bytesToLong(byte[] bytes) {
+            if (bytes.length > 8) {
+                throw new IllegalArgumentException("Byte array is too large to fit in a long");
+            }
+
+            long result = 0;
+            for (int i = 0; i < bytes.length; i++) {
+                result |= (bytes[i] & 0xFFL) << ((bytes.length - 1 - i) * 8);
+            }
+            return result;
+        }
+
+
+
+        private double bytesToDouble(byte[] bytes) {
+            if (bytes.length >= 8) {
+                long longBits = ((long) bytes[0] << 56) |
+                        ((long) (bytes[1] & 0xFF) << 48) |
+                        ((long) (bytes[2] & 0xFF) << 40) |
+                        ((long) (bytes[3] & 0xFF) << 32) |
+                        ((long) (bytes[4] & 0xFF) << 24) |
+                        ((long) (bytes[5] & 0xFF) << 16) |
+                        ((long) (bytes[6] & 0xFF) << 8) |
+                        ((long) (bytes[7] & 0xFF));
+                return Double.longBitsToDouble(longBits);
+            }
+            return 0.0;
+        }
+    }
+
+
+
 }

@@ -11,6 +11,8 @@
 package org.kobe.xbot.Server;
 
 import com.google.gson.Gson;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +27,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.ScriptParameters;
+import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.ScriptAlreadyExistsException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.slf4j.Logger;
@@ -40,6 +43,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,7 +52,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.kobe.xbot.Server.MainNIO.XTABLES_SERVER_VERSION;
-import static org.kobe.xbot.Utilities.Utilities.tokenize;
 
 public class NIOXTablesServer {
     private static final Logger log = LoggerFactory.getLogger(NIOXTablesServer.class);
@@ -72,6 +75,11 @@ public class NIOXTablesServer {
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
     private int framesReceived;
 
+    private final byte[] success = new byte[]{(byte) 0x01};
+    private final byte[] fail = new byte[]{(byte) 0x00};
+    private final ByteString successByte = ByteString.copyFrom(success);
+    private final ByteString failByte = ByteString.copyFrom(fail);
+
     private NIOXTablesServer(String SERVICE_NAME, int PORT) {
         this.port = PORT;
         this.SERVICE_NAME = SERVICE_NAME;
@@ -87,6 +95,7 @@ public class NIOXTablesServer {
             if (SERVICE_NAME.equalsIgnoreCase("localhost"))
                 throw new IllegalArgumentException("The mDNS service name cannot be localhost!");
             status.set(XTableStatus.STARTING);
+            Utilities.warmupProtobuf();
             Thread main = new Thread(() -> new NIOXTablesServer(SERVICE_NAME, PORT));
             main.setName("XTABLES-SERVER");
             main.setDaemon(false);
@@ -327,28 +336,28 @@ public class NIOXTablesServer {
         }
     }
 
-    private void notifyUpdateChangeClients(String key, String value) {
+    private void notifyUpdateChangeClients(XTableProto.XTableMessage message) {
         List<ClientHandler> snapshot;
         synchronized (clients) {
             snapshot = new ArrayList<>(clients);
         }
-
+        String key = message.getKey();
         for (ClientHandler client : snapshot) {
-
             Set<String> updateEvents = client.getUpdateEvents();
             if (updateEvents.contains("") || updateEvents.contains(key)) {
-                client.sendUpdate(key, value);
+
+                client.writeToClient(message.toByteArray());
             }
 
         }
     }
 
 
-    private void notifyDeleteChangeClients(String key) {
+    private void notifyDeleteChangeClients(XTableProto.XTableMessage message) {
         synchronized (clients) {
             for (ClientHandler client : clients) {
                 if (client.getDeleteEvent()) {
-                    client.sendDelete(key);
+                    client.writeToClient(message.toByteArray());
                 }
             }
         }
@@ -363,8 +372,9 @@ public class NIOXTablesServer {
         private final String identifier;
         private List<String> streams;
         private ClientStatistics statistics;
-        private final CircularBuffer<String> messageQueue = new CircularBuffer<>(1000);
+        private final CircularBuffer<byte[]> messageQueue = new CircularBuffer<>(1000);
         private final AtomicBoolean isWriting = new AtomicBoolean(false);
+        private ScheduledExecutorService messagesLogExecutor;
 
         public ClientHandler(AsynchronousSocketChannel clientChannel) {
             this.clientChannel = clientChannel;
@@ -397,8 +407,8 @@ public class NIOXTablesServer {
         }
 
         public void start() {
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            ScheduledExecutorService messagesLogExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+            ByteBuffer buffer = ByteBuffer.allocate(1024 * 10000);
+            messagesLogExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
                 Thread thread = new Thread(r);
                 thread.setDaemon(true);
                 return thread;
@@ -416,6 +426,7 @@ public class NIOXTablesServer {
         }
 
         private final StringBuilder messageBuffer = new StringBuilder();
+        private final byte DELIMITER = (byte) 0x0A;
 
         private void readFromClient(ByteBuffer buffer) {
             clientChannel.read(buffer, buffer, new java.nio.channels.CompletionHandler<>() {
@@ -426,26 +437,48 @@ public class NIOXTablesServer {
                         closeClient();
                         return;
                     }
-
                     buffer.flip();
-                    String chunk = new String(buffer.array(), 0, buffer.limit());
-                    buffer.clear();
 
-                    // Append the received chunk to the message buffer
-                    messageBuffer.append(chunk);
+                    // Flag to detect if we are processing the buffer completely
+                    boolean isBufferFullWithoutDelimiter = false;
 
-                    // Process complete messages
-                    int delimiterIndex;
-                    while ((delimiterIndex = messageBuffer.indexOf("\n")) != -1) {
-                        // Extract the complete message up to the delimiter
-                        String message = messageBuffer.substring(0, delimiterIndex).trim();
-                        messageBuffer.delete(0, delimiterIndex + 1);
+                    // Process all messages in the buffer
+                    while (buffer.remaining() > 0) {
+                        int delimiterIndex = findDelimiter(buffer);
+                        if (delimiterIndex != -1) {
+                            totalMessages++;
+                            byte[] messageBytes = new byte[delimiterIndex];
+                            buffer.get(messageBytes);
 
-                        totalMessages++;
-                        processMessage(message); // Process the complete message
+                            try {
+                                XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(messageBytes);
+                                processMessage(message);
+                            } catch (InvalidProtocolBufferException ignored) {
+                                totalMessages--; // Handle failed message parsing
+                            }
+
+                            // Skip over the delimiter byte
+                            buffer.position(buffer.position() + 1);
+                        } else {
+                            // If the buffer is full but no delimiter found, break out and clear buffer to prevent infinite loop
+                            if (buffer.remaining() == buffer.capacity()) {
+                                isBufferFullWithoutDelimiter = true;
+                            }
+                            break;
+                        }
                     }
 
-                    // Continue reading from the client
+                    // Clear or compact the buffer based on processing
+                    if (isBufferFullWithoutDelimiter) {
+                        logger.warning("Buffer full with no delimiter found. Clearing buffer to prevent infinite loop.");
+                        buffer.clear();
+                    } else if (buffer.remaining() > 0) {
+                        buffer.compact();  // Prepare for the next read if there are remaining bytes
+                    } else {
+                        buffer.clear();  // Reset buffer for a fresh read if completely processed
+                    }
+
+                    // Continue reading from the client if there's more data
                     readFromClient(buffer);
                 }
 
@@ -458,174 +491,206 @@ public class NIOXTablesServer {
         }
 
 
-        private void processMessage(String raw) {
-            String[] tokens = tokenize(raw, ' ', 3);
-            String[] requestTokens = tokenize(tokens[0], ':', 2);
-            String id = requestTokens[0];
-            String methodType = requestTokens[1];
-            boolean shouldReply = !id.equals("IGNORED");
-            switch (methodType) {
-                case "PUT" -> {
-                    if (tokens.length >= 3) {
-                        String key = tokens[1];
-                        StringBuilder valueBuilder = new StringBuilder();
-                        for (int i = 2; i < tokens.length; i++) {
-                            valueBuilder.append(tokens[i]);
-                            if (i < tokens.length - 1) valueBuilder.append(" ");
-                        }
-                        String value = valueBuilder.toString();
-                        boolean response = table.put(key, value);
+        private int findDelimiter(ByteBuffer buffer) {
+            for (int i = buffer.position(); i < buffer.limit(); i++) {
+                if (buffer.get(i) == DELIMITER) {
+                    return i - buffer.position();
+                }
+            }
+            return -1;
+        }
 
-                        if (shouldReply) {
-                            writeToClient(id + ":" + methodType + " " + (response ? "OK" : "FAIL"));
+        private void processMessage(XTableProto.XTableMessage message) {
+            ByteString value = message.getValue();
+            long id = message.getId();
+            XTableProto.XTableMessage.Command command = message.getCommand();
+            switch (command) {
+                case PUT -> {
+                    if (message.hasKey() && message.hasValue()) {
+                        String key = message.getKey();
+                        boolean response = table.put(key, message.getValue().toByteArray(), message.getType());
+                        if (message.hasId()) {
+
+                            writeToClient(XTableProto.XTableMessage.newBuilder()
+                                    .setId(id)
+                                    .setCommand(command)
+                                    .setValue(response ? successByte : failByte)
+                                    .build().toByteArray());
                         }
                         if (response) {
-                            notifyUpdateChangeClients(key, value);
+                            notifyUpdateChangeClients(message.toBuilder()
+                                    .setCommand(XTableProto.XTableMessage.Command.UPDATE_EVENT).build());
                         }
                     }
                 }
-                case "GET" -> {
-                    if (tokens.length == 2 && shouldReply) {
-                        String key = tokens[1];
-                        String result = table.get(key);
-                        writeToClient(id + ":" + methodType + " " + (result != null ? result.replace("\n", "") : "null"));
+                case GET -> {
+                    if (message.hasKey()) {
+                        byte[] result = table.get(message.getKey());
+                        writeToClient(XTableProto.XTableMessage.newBuilder()
+                                .setId(id)
+                                .setCommand(command)
+                                .setValue(ByteString.copyFrom(result))
+                                .build().toByteArray());
                     }
                 }
-                case "SUBSCRIBE_UPDATE" -> {
-                    if (tokens.length == 2) {
-                        String key = tokens[1];
-                        updateEvents.add(key);
-                        if (shouldReply) {
-                            writeToClient(id + ":" + methodType + " OK");
-                        }
-                    } else if (tokens.length == 1) {
+                case SUBSCRIBE_UPDATE -> {
+                    if (message.hasKey()) {
+                        updateEvents.add(message.getKey());
+                    } else {
                         updateEvents.add("");
-                        if (shouldReply) {
-                            writeToClient(id + ":" + methodType + " OK");
+                    }
+                    if (message.hasId()) {
+                        writeToClient(XTableProto.XTableMessage.newBuilder()
+                                .setId(id)
+                                .setCommand(command)
+                                .setValue(successByte)
+                                .build().toByteArray());
+
+                    }
+
+                }
+                case GET_TABLES -> {
+                    if (message.hasKey()) {
+                        Set<String> tables = table.getTables(message.getKey());
+
+                        XTableProto.XTableMessage.Builder builder = XTableProto.XTableMessage.newBuilder()
+                                .setId(id)
+                                .setCommand(command);
+                        if(tables != null && !tables.isEmpty()) {
+                            builder.setValue(ByteString.copyFrom( String.join(",", tables).getBytes(StandardCharsets.UTF_8)));
                         }
-                    }
-                }
-                case "GET_TABLES" -> {
-                    if (tokens.length == 1 && shouldReply) {
-                        String result = gson.toJson(table.getTables(""));
-                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, result);
-                        writeToClient(responseInfo.parsed());
-                    } else if (tokens.length == 2 && shouldReply) {
-                        String key = tokens[1];
-                        String result = gson.toJson(table.getTables(key));
-                        ResponseInfo responseInfo = new ResponseInfo(id, MethodType.GET_TABLES, result);
-                        writeToClient(responseInfo.parsed());
-                    }
-                }
-                case "RUN_SCRIPT" -> {
-                    if (tokens.length >= 2) {
-                        String name = tokens[1];
-                        String customData = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
-                        if (scripts.containsKey(name)) {
-                            clientThreadPool.execute(() -> {
-                                long startTime = System.nanoTime();
-                                String returnValue;
-                                ResponseStatus status = ResponseStatus.OK;
-                                try {
-                                    returnValue = scripts.get(name).apply(new ScriptParameters(table, customData == null || customData.trim().isEmpty() ? null : customData.trim()));
-                                    long endTime = System.nanoTime();
-                                    double durationMillis = (endTime - startTime) / 1e6;
-                                    logger.info("The script '" + name + "' ran successfully.");
-                                    logger.info("Start time: " + startTime + " ns");
-                                    logger.info("End time: " + endTime + " ns");
-                                    logger.info("Duration: " + durationMillis + " ms");
-                                } catch (Exception e) {
-                                    long endTime = System.nanoTime();
-                                    double durationMillis = (endTime - startTime) / 1e6;
-                                    returnValue = e.getMessage();
-                                    status = ResponseStatus.FAIL;
-                                    logger.severe("The script '" + name + "' encountered an error.");
-                                    logger.severe("Error message: " + e.getMessage());
-                                    logger.severe("Start time: " + startTime + " ns");
-                                    logger.severe("End time: " + endTime + " ns");
-                                    logger.severe("Duration: " + durationMillis + " ms");
-                                }
-                                String response = returnValue == null || returnValue.trim().isEmpty() ? status.name() : status.name() + " " + returnValue.trim();
-                                if (shouldReply) {
-                                    ResponseInfo responseInfo = new ResponseInfo(id, methodType, response);
-                                    writeToClient(responseInfo.parsed());
-                                }
-                            });
-                        } else if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, "FAIL SCRIPT_NOT_FOUND");
-                            writeToClient(responseInfo.parsed());
+                        writeToClient(builder.build().toByteArray());
+                    } else {
+                        Set<String> tables = table.getTables("");
+
+                        XTableProto.XTableMessage.Builder builder = XTableProto.XTableMessage.newBuilder()
+                                .setId(id)
+                                .setCommand(command);
+                        if(tables != null && !tables.isEmpty()) {
+                              builder.setValue(ByteString.copyFrom(  String.join(",", tables).replace("\n", "").getBytes(StandardCharsets.UTF_8)));
                         }
+                        writeToClient(builder.build().toByteArray());
                     }
                 }
-                case "UPDATE_KEY" -> {
-                    if (tokens.length == 3) {
-                        String key = tokens[1];
-                        String value = tokens[2];
-                        if (!Utilities.validateName(value, false)) {
-                            if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, "FAIL");
-                                writeToClient(responseInfo.parsed());
-                            }
-                        } else {
-                            boolean response = table.renameKey(key, value);
-                            if (shouldReply) {
-                                ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
-                                writeToClient(responseInfo.parsed());
-                            }
-                        }
-                    }
-                }
-                case "DELETE" -> {
-                    if (tokens.length == 2) {
-                        String key = tokens[1];
-                        boolean response = table.delete(key);
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
-                            writeToClient(responseInfo.parsed());
+//                case "RUN_SCRIPT" -> {
+//                    if (tokens.length >= 2) {
+//                        String name = tokens[1];
+//                        String customData = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+//                        if (scripts.containsKey(name)) {
+//                            clientThreadPool.execute(() -> {
+//                                long startTime = System.nanoTime();
+//                                String returnValue;
+//                                ResponseStatus status = ResponseStatus.OK;
+//                                try {
+//                                    returnValue = scripts.get(name).apply(new ScriptParameters(table, customData == null || customData.trim().isEmpty() ? null : customData.trim()));
+//                                    long endTime = System.nanoTime();
+//                                    double durationMillis = (endTime - startTime) / 1e6;
+//                                    logger.info("The script '" + name + "' ran successfully.");
+//                                    logger.info("Start time: " + startTime + " ns");
+//                                    logger.info("End time: " + endTime + " ns");
+//                                    logger.info("Duration: " + durationMillis + " ms");
+//                                } catch (Exception e) {
+//                                    long endTime = System.nanoTime();
+//                                    double durationMillis = (endTime - startTime) / 1e6;
+//                                    returnValue = e.getMessage();
+//                                    status = ResponseStatus.FAIL;
+//                                    logger.severe("The script '" + name + "' encountered an error.");
+//                                    logger.severe("Error message: " + e.getMessage());
+//                                    logger.severe("Start time: " + startTime + " ns");
+//                                    logger.severe("End time: " + endTime + " ns");
+//                                    logger.severe("Duration: " + durationMillis + " ms");
+//                                }
+//                                String response = returnValue == null || returnValue.trim().isEmpty() ? status.name() : status.name() + " " + returnValue.trim();
+//                                if (shouldReply) {
+//                                    ResponseInfo responseInfo = new ResponseInfo(id, command, response);
+//                                    writeToClient(responseInfo.parsed());
+//                                }
+//                            });
+//                        } else if (shouldReply) {
+//                            ResponseInfo responseInfo = new ResponseInfo(id, command, "FAIL SCRIPT_NOT_FOUND");
+//                            writeToClient(responseInfo.parsed());
+//                        }
+//                    }
+//                }
+//                case "UPDATE_KEY" -> {
+//                    if (tokens.length == 3) {
+//                        String key = tokens[1];
+//                        String value = tokens[2];
+//                        if (!Utilities.validateName(value, false)) {
+//                            if (shouldReply) {
+//                                ResponseInfo responseInfo = new ResponseInfo(id, command, "FAIL");
+//                                writeToClient(responseInfo.parsed());
+//                            }
+//                        } else {
+//                            boolean response = table.renameKey(key, value);
+//                            if (shouldReply) {
+//                                ResponseInfo responseInfo = new ResponseInfo(id, command, response ? "OK" : "FAIL");
+//                                writeToClient(responseInfo.parsed());
+//                            }
+//                        }
+//                    }
+//                }
+                case DELETE -> {
+                    if (message.hasKey()) {
+                        boolean response = table.delete(message.getKey());
+                        if (message.hasId()) {
+                            writeToClient(XTableProto.XTableMessage.newBuilder()
+                                    .setId(id)
+                                    .setCommand(command)
+                                    .setValue(response? successByte : failByte)
+                                    .build().toByteArray());
                         }
                         if (response) {
-                            notifyDeleteChangeClients(key);
+                            notifyDeleteChangeClients(message.toBuilder()
+                                    .setCommand(XTableProto.XTableMessage.Command.DELETE_EVENT).build());
                         }
-                    } else if (tokens.length == 1) {
+                    } else  {
                         boolean response = table.delete("");
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, response ? "OK" : "FAIL");
-                            writeToClient(responseInfo.parsed());
+                        if (message.hasId()) {
+                            writeToClient(XTableProto.XTableMessage.newBuilder()
+                                    .setId(id)
+                                    .setCommand(command)
+                                    .setValue(response? successByte : failByte)
+                                    .build().toByteArray());
+                        }
+                        if (response) {
+                            notifyDeleteChangeClients(message.toBuilder()
+                                    .setCommand(XTableProto.XTableMessage.Command.DELETE_EVENT).build());
                         }
                     }
                 }
-                case "SUBSCRIBE_DELETE" -> {
-                    if (tokens.length == 1) {
-                        deleteEvent.set(true);
-                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
-                        writeToClient(responseInfo.parsed());
-                    }
-                }
-                case "UNSUBSCRIBE_DELETE" -> {
-                    if (tokens.length == 1) {
-                        deleteEvent.set(false);
-                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, "OK");
-                        writeToClient(responseInfo.parsed());
-                    }
-                }
-                case "UNSUBSCRIBE_UPDATE" -> {
-                    if (tokens.length == 2) {
-                        String key = tokens[1];
-                        boolean success = updateEvents.remove(key);
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, success ? "OK" : "FAIL");
-                            writeToClient(responseInfo.parsed());
-                        }
-                    } else if (tokens.length == 1) {
-                        boolean success = updateEvents.remove("");
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, success ? "OK" : "FAIL");
-                            writeToClient(responseInfo.parsed());
-                        }
-                    }
-                }
-                case "PING" -> {
-                    if (tokens.length == 1 && shouldReply) {
+//                case "SUBSCRIBE_DELETE" -> {
+//                    if (tokens.length == 1) {
+//                        deleteEvent.set(true);
+//                        ResponseInfo responseInfo = new ResponseInfo(id, command, "OK");
+//                        writeToClient(responseInfo.parsed());
+//                    }
+//                }
+//                case "UNSUBSCRIBE_DELETE" -> {
+//                    if (tokens.length == 1) {
+//                        deleteEvent.set(false);
+//                        ResponseInfo responseInfo = new ResponseInfo(id, command, "OK");
+//                        writeToClient(responseInfo.parsed());
+//                    }
+//                }
+//                case "UNSUBSCRIBE_UPDATE" -> {
+//                    if (tokens.length == 2) {
+//                        String key = tokens[1];
+//                        boolean success = updateEvents.remove(key);
+//                        if (shouldReply) {
+//                            ResponseInfo responseInfo = new ResponseInfo(id, command, success ? "OK" : "FAIL");
+//                            writeToClient(responseInfo.parsed());
+//                        }
+//                    } else if (tokens.length == 1) {
+//                        boolean success = updateEvents.remove("");
+//                        if (shouldReply) {
+//                            ResponseInfo responseInfo = new ResponseInfo(id, command, success ? "OK" : "FAIL");
+//                            writeToClient(responseInfo.parsed());
+//                        }
+//                    }
+//                }
+                case PING -> {
+                    if (message.hasId()) {
                         SystemStatistics systemStatistics = new SystemStatistics(clients.size());
                         int i = 0;
                         for (ClientHandler client : clients) {
@@ -633,53 +698,68 @@ public class NIOXTablesServer {
                         }
                         systemStatistics.setTotalMessages(i);
                         systemStatistics.setVersion(XTABLES_SERVER_VERSION);
-                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, ResponseStatus.OK.name() + " " + gson.toJson(systemStatistics).replaceAll(" ", ""));
-                        writeToClient(responseInfo.parsed());
+                        writeToClient(XTableProto.XTableMessage.newBuilder()
+                                .setId(id)
+                                .setCommand(command)
+                                .setValue(ByteString.copyFrom(gson.toJson(systemStatistics).replace(" ", "").replace("\n", "").getBytes(StandardCharsets.UTF_8)))
+                                .build().toByteArray());
                     }
                 }
-                case "GET_RAW_JSON" -> {
-                    if (tokens.length == 1 && shouldReply) {
-                        ResponseInfo responseInfo = new ResponseInfo(id, methodType, DataCompression.compressAndConvertBase64(table.toJSON()));
-                        writeToClient(responseInfo.parsed());
-                    }
+                case GET_RAW_JSON -> {
+                    writeToClient(XTableProto.XTableMessage.newBuilder()
+                            .setId(id)
+                            .setCommand(command)
+                            .setValue(ByteString.copyFrom(DataCompression.compressAndConvertBase64(table.toJSON()).getBytes(StandardCharsets.UTF_8)))
+                            .build().toByteArray());
+
                 }
-                case "REBOOT_SERVER" -> {
-                    if (tokens.length == 1) {
-                        if (shouldReply) {
-                            ResponseInfo responseInfo = new ResponseInfo(id, methodType, ResponseStatus.OK.name());
-                            writeToClient(responseInfo.parsed());
-                        }
-                        rebootServer();
+                case REBOOT_SERVER -> {
+                    if (message.hasId()) {
+                        writeToClient(XTableProto.XTableMessage.newBuilder()
+                                .setId(id)
+                                .setCommand(command)
+                                .setValue(successByte)
+                                .build().toByteArray());
                     }
+                    rebootServer();
+
                 }
-                case "INFORMATION" -> {
-                    if (tokens.length >= 2) {
+                case INFORMATION -> {
+                    if (message.hasValue()) {
                         try {
-                            this.statistics = gson.fromJson(String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length)), ClientStatistics.class);
+                            this.statistics = gson.fromJson(message.getValue().toStringUtf8(), ClientStatistics.class);
                         } catch (Exception e) {
                             logger.info("Could not parse client information: " + e.getMessage());
                         }
                     }
                 }
                 default -> {
-                    if (shouldReply) {
-                        writeToClient(id + ":UNKNOWN FAIL");
+                    if (message.hasId()) {
+                        writeToClient(XTableProto.XTableMessage.newBuilder()
+                                .setId(id)
+                                .setCommand(XTableProto.XTableMessage.Command.UNKNOWN_COMMAND)
+                                .setValue(ByteString.copyFromUtf8("UNKNOWN COMMAND RECEIVED"))
+                                .build().toByteArray());
                     }
                 }
             }
         }
 
-        private void writeToClient(String message) {
-            messageQueue.write(message);
+        private void writeToClient(byte[] bytesA) {
+            messageQueue.write(bytesA);
             processQueue();
         }
 
         private void processQueue() {
             if (isWriting.compareAndSet(false, true)) {
-                String message = messageQueue.read();
+                byte[] message = messageQueue.read();
                 if (message != null) {
-                    ByteBuffer buffer = ByteBuffer.wrap((message + "\n").getBytes());
-                    clientChannel.write(buffer, null, new java.nio.channels.CompletionHandler<>() {
+                    // Append newline delimiter
+                    byte[] messageWithDelimiter = new byte[message.length + 1];
+                    System.arraycopy(message, 0, messageWithDelimiter, 0, message.length);
+                    messageWithDelimiter[message.length] = '\n'; // Add newline as the delimiter
+
+                    clientChannel.write(ByteBuffer.wrap(messageWithDelimiter), null, new java.nio.channels.CompletionHandler<>() {
                         @Override
                         public void completed(Integer result, Object attachment) {
                             isWriting.set(false);
@@ -703,6 +783,7 @@ public class NIOXTablesServer {
         public void closeClient() {
             try {
                 logger.info("Closing connection with client: " + clientChannel.getRemoteAddress());
+                messagesLogExecutor.shutdownNow();
                 clientChannel.close();
             } catch (IOException e) {
                 logger.severe("Error closing client connection: " + e.getMessage());
@@ -712,7 +793,10 @@ public class NIOXTablesServer {
         }
 
         public void pingServerForInformation() {
-            writeToClient("null:INFORMATION");
+            writeToClient(XTableProto.XTableMessage.newBuilder()
+                    .setCommand(XTableProto.XTableMessage.Command.INFORMATION)
+                    .build()
+                    .toByteArray());
         }
 
         public ClientStatistics pingServerForInformationAndWait(long timeout) {
@@ -738,12 +822,13 @@ public class NIOXTablesServer {
             return this.statistics;
         }
 
-        public void sendUpdate(String key, String value) {
-            writeToClient("null:UPDATE_EVENT " + key + " " + value);
-        }
 
         public void sendDelete(String key) {
-            writeToClient("null:DELETE_EVENT " + key);
+            writeToClient(XTableProto.XTableMessage.newBuilder()
+                    .setId(1)
+                    .setCommand(XTableProto.XTableMessage.Command.DELETE_EVENT)
+                    .build()
+                    .toByteArray());
         }
     }
 
