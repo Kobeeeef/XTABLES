@@ -5,10 +5,14 @@ import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
@@ -205,7 +209,22 @@ public class Utilities {
 
         return true;
     }
-
+    // Convert any List to byte array
+    public static byte[] toByteArray(List<?> list) {
+        if (list == null) {
+            return new byte[0];
+        }
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
+                objectOutputStream.writeObject(list);
+                objectOutputStream.flush();
+            }
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            return null;
+        }
+    }
     private static XTableProto.XTableMessage.Command getRandomCommand() {
         XTableProto.XTableMessage.Command[] commands = XTableProto.XTableMessage.Command.values();
         int randomIndex = ThreadLocalRandom.current().nextInt(commands.length -1);

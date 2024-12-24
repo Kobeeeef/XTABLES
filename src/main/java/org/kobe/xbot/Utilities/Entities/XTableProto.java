@@ -39,17 +39,12 @@ public final class XTableProto {
     long getId();
 
     /**
-     * <code>optional .XTableMessage.Command command = 2;</code>
-     * @return Whether the command field is set.
-     */
-    boolean hasCommand();
-    /**
-     * <code>optional .XTableMessage.Command command = 2;</code>
+     * <code>.XTableMessage.Command command = 2;</code>
      * @return The enum numeric value on the wire for command.
      */
     int getCommandValue();
     /**
-     * <code>optional .XTableMessage.Command command = 2;</code>
+     * <code>.XTableMessage.Command command = 2;</code>
      * @return The command.
      */
     XTableProto.XTableMessage.Command getCommand();
@@ -589,6 +584,925 @@ public final class XTableProto {
       // @@protoc_insertion_point(enum_scope:XTableMessage.Command)
     }
 
+    public interface XTableUpdateOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:XTableMessage.XTableUpdate)
+        com.google.protobuf.MessageOrBuilder {
+
+      /**
+       * <code>string key = 1;</code>
+       * @return The key.
+       */
+      java.lang.String getKey();
+      /**
+       * <code>string key = 1;</code>
+       * @return The bytes for key.
+       */
+      com.google.protobuf.ByteString
+          getKeyBytes();
+
+      /**
+       * <code>bytes value = 2;</code>
+       * @return The value.
+       */
+      com.google.protobuf.ByteString getValue();
+
+      /**
+       * <code>.XTableMessage.Type type = 3;</code>
+       * @return The enum numeric value on the wire for type.
+       */
+      int getTypeValue();
+      /**
+       * <code>.XTableMessage.Type type = 3;</code>
+       * @return The type.
+       */
+      XTableProto.XTableMessage.Type getType();
+
+      /**
+       * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+       * @return The enum numeric value on the wire for category.
+       */
+      int getCategoryValue();
+      /**
+       * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+       * @return The category.
+       */
+      XTableProto.XTableMessage.XTableUpdate.Category getCategory();
+    }
+    /**
+     * Protobuf type {@code XTableMessage.XTableUpdate}
+     */
+    public static final class XTableUpdate extends
+        com.google.protobuf.GeneratedMessage implements
+        // @@protoc_insertion_point(message_implements:XTableMessage.XTableUpdate)
+        XTableUpdateOrBuilder {
+    private static final long serialVersionUID = 0L;
+      static {
+        com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+          com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+          /* major= */ 4,
+          /* minor= */ 29,
+          /* patch= */ 2,
+          /* suffix= */ "",
+          XTableUpdate.class.getName());
+      }
+      // Use XTableUpdate.newBuilder() to construct.
+      private XTableUpdate(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+        super(builder);
+      }
+      private XTableUpdate() {
+        key_ = "";
+        value_ = com.google.protobuf.ByteString.EMPTY;
+        type_ = 0;
+        category_ = 0;
+      }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return XTableProto.internal_static_XTableMessage_XTableUpdate_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return XTableProto.internal_static_XTableMessage_XTableUpdate_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                XTableProto.XTableMessage.XTableUpdate.class, XTableProto.XTableMessage.XTableUpdate.Builder.class);
+      }
+
+      /**
+       * Protobuf enum {@code XTableMessage.XTableUpdate.Category}
+       */
+      public enum Category
+          implements com.google.protobuf.ProtocolMessageEnum {
+        /**
+         * <code>UNKNOWN = 0;</code>
+         */
+        UNKNOWN(0),
+        /**
+         * <code>UPDATE = 1;</code>
+         */
+        UPDATE(1),
+        /**
+         * <code>DELETE = 2;</code>
+         */
+        DELETE(2),
+        UNRECOGNIZED(-1),
+        ;
+
+        static {
+          com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+            com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+            /* major= */ 4,
+            /* minor= */ 29,
+            /* patch= */ 2,
+            /* suffix= */ "",
+            Category.class.getName());
+        }
+        /**
+         * <code>UNKNOWN = 0;</code>
+         */
+        public static final int UNKNOWN_VALUE = 0;
+        /**
+         * <code>UPDATE = 1;</code>
+         */
+        public static final int UPDATE_VALUE = 1;
+        /**
+         * <code>DELETE = 2;</code>
+         */
+        public static final int DELETE_VALUE = 2;
+
+
+        public final int getNumber() {
+          if (this == UNRECOGNIZED) {
+            throw new java.lang.IllegalArgumentException(
+                "Can't get the number of an unknown enum value.");
+          }
+          return value;
+        }
+
+        /**
+         * @param value The numeric wire value of the corresponding enum entry.
+         * @return The enum associated with the given numeric wire value.
+         * @deprecated Use {@link #forNumber(int)} instead.
+         */
+        @java.lang.Deprecated
+        public static Category valueOf(int value) {
+          return forNumber(value);
+        }
+
+        /**
+         * @param value The numeric wire value of the corresponding enum entry.
+         * @return The enum associated with the given numeric wire value.
+         */
+        public static Category forNumber(int value) {
+          switch (value) {
+            case 0: return UNKNOWN;
+            case 1: return UPDATE;
+            case 2: return DELETE;
+            default: return null;
+          }
+        }
+
+        public static com.google.protobuf.Internal.EnumLiteMap<Category>
+            internalGetValueMap() {
+          return internalValueMap;
+        }
+        private static final com.google.protobuf.Internal.EnumLiteMap<
+            Category> internalValueMap =
+              new com.google.protobuf.Internal.EnumLiteMap<Category>() {
+                public Category findValueByNumber(int number) {
+                  return Category.forNumber(number);
+                }
+              };
+
+        public final com.google.protobuf.Descriptors.EnumValueDescriptor
+            getValueDescriptor() {
+          if (this == UNRECOGNIZED) {
+            throw new java.lang.IllegalStateException(
+                "Can't get the descriptor of an unrecognized enum value.");
+          }
+          return getDescriptor().getValues().get(ordinal());
+        }
+        public final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptorForType() {
+          return getDescriptor();
+        }
+        public static final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptor() {
+          return XTableProto.XTableMessage.XTableUpdate.getDescriptor().getEnumTypes().get(0);
+        }
+
+        private static final Category[] VALUES = values();
+
+        public static Category valueOf(
+            com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+          if (desc.getType() != getDescriptor()) {
+            throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+          }
+          if (desc.getIndex() == -1) {
+            return UNRECOGNIZED;
+          }
+          return VALUES[desc.getIndex()];
+        }
+
+        private final int value;
+
+        private Category(int value) {
+          this.value = value;
+        }
+
+        // @@protoc_insertion_point(enum_scope:XTableMessage.XTableUpdate.Category)
+      }
+
+      public static final int KEY_FIELD_NUMBER = 1;
+      @SuppressWarnings("serial")
+      private volatile java.lang.Object key_ = "";
+      /**
+       * <code>string key = 1;</code>
+       * @return The key.
+       */
+      @java.lang.Override
+      public java.lang.String getKey() {
+        java.lang.Object ref = key_;
+        if (ref instanceof java.lang.String) {
+          return (java.lang.String) ref;
+        } else {
+          com.google.protobuf.ByteString bs = 
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          key_ = s;
+          return s;
+        }
+      }
+      /**
+       * <code>string key = 1;</code>
+       * @return The bytes for key.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString
+          getKeyBytes() {
+        java.lang.Object ref = key_;
+        if (ref instanceof java.lang.String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          key_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+
+      public static final int VALUE_FIELD_NUMBER = 2;
+      private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes value = 2;</code>
+       * @return The value.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString getValue() {
+        return value_;
+      }
+
+      public static final int TYPE_FIELD_NUMBER = 3;
+      private int type_ = 0;
+      /**
+       * <code>.XTableMessage.Type type = 3;</code>
+       * @return The enum numeric value on the wire for type.
+       */
+      @java.lang.Override public int getTypeValue() {
+        return type_;
+      }
+      /**
+       * <code>.XTableMessage.Type type = 3;</code>
+       * @return The type.
+       */
+      @java.lang.Override public XTableProto.XTableMessage.Type getType() {
+        XTableProto.XTableMessage.Type result = XTableProto.XTableMessage.Type.forNumber(type_);
+        return result == null ? XTableProto.XTableMessage.Type.UNRECOGNIZED : result;
+      }
+
+      public static final int CATEGORY_FIELD_NUMBER = 4;
+      private int category_ = 0;
+      /**
+       * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+       * @return The enum numeric value on the wire for category.
+       */
+      @java.lang.Override public int getCategoryValue() {
+        return category_;
+      }
+      /**
+       * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+       * @return The category.
+       */
+      @java.lang.Override public XTableProto.XTableMessage.XTableUpdate.Category getCategory() {
+        XTableProto.XTableMessage.XTableUpdate.Category result = XTableProto.XTableMessage.XTableUpdate.Category.forNumber(category_);
+        return result == null ? XTableProto.XTableMessage.XTableUpdate.Category.UNRECOGNIZED : result;
+      }
+
+      private byte memoizedIsInitialized = -1;
+      @java.lang.Override
+      public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized == 1) return true;
+        if (isInitialized == 0) return false;
+
+        memoizedIsInitialized = 1;
+        return true;
+      }
+
+      @java.lang.Override
+      public void writeTo(com.google.protobuf.CodedOutputStream output)
+                          throws java.io.IOException {
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(key_)) {
+          com.google.protobuf.GeneratedMessage.writeString(output, 1, key_);
+        }
+        if (!value_.isEmpty()) {
+          output.writeBytes(2, value_);
+        }
+        if (type_ != XTableProto.XTableMessage.Type.UNKNOWN.getNumber()) {
+          output.writeEnum(3, type_);
+        }
+        if (category_ != XTableProto.XTableMessage.XTableUpdate.Category.UNKNOWN.getNumber()) {
+          output.writeEnum(4, category_);
+        }
+        getUnknownFields().writeTo(output);
+      }
+
+      @java.lang.Override
+      public int getSerializedSize() {
+        int size = memoizedSize;
+        if (size != -1) return size;
+
+        size = 0;
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(key_)) {
+          size += com.google.protobuf.GeneratedMessage.computeStringSize(1, key_);
+        }
+        if (!value_.isEmpty()) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(2, value_);
+        }
+        if (type_ != XTableProto.XTableMessage.Type.UNKNOWN.getNumber()) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(3, type_);
+        }
+        if (category_ != XTableProto.XTableMessage.XTableUpdate.Category.UNKNOWN.getNumber()) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(4, category_);
+        }
+        size += getUnknownFields().getSerializedSize();
+        memoizedSize = size;
+        return size;
+      }
+
+      @java.lang.Override
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof XTableProto.XTableMessage.XTableUpdate)) {
+          return super.equals(obj);
+        }
+        XTableProto.XTableMessage.XTableUpdate other = (XTableProto.XTableMessage.XTableUpdate) obj;
+
+        if (!getKey()
+            .equals(other.getKey())) return false;
+        if (!getValue()
+            .equals(other.getValue())) return false;
+        if (type_ != other.type_) return false;
+        if (category_ != other.category_) return false;
+        if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+        return true;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptor().hashCode();
+        hash = (37 * hash) + KEY_FIELD_NUMBER;
+        hash = (53 * hash) + getKey().hashCode();
+        hash = (37 * hash) + VALUE_FIELD_NUMBER;
+        hash = (53 * hash) + getValue().hashCode();
+        hash = (37 * hash) + TYPE_FIELD_NUMBER;
+        hash = (53 * hash) + type_;
+        hash = (37 * hash) + CATEGORY_FIELD_NUMBER;
+        hash = (53 * hash) + category_;
+        hash = (29 * hash) + getUnknownFields().hashCode();
+        memoizedHashCode = hash;
+        return hash;
+      }
+
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(
+          java.nio.ByteBuffer data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(
+          java.nio.ByteBuffer data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(
+          com.google.protobuf.ByteString data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(
+          com.google.protobuf.ByteString data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(byte[] data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(
+          byte[] data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
+      }
+
+      public static XTableProto.XTableMessage.XTableUpdate parseDelimitedFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
+      }
+
+      public static XTableProto.XTableMessage.XTableUpdate parseDelimitedFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(
+          com.google.protobuf.CodedInputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
+      }
+      public static XTableProto.XTableMessage.XTableUpdate parseFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
+      }
+
+      @java.lang.Override
+      public Builder newBuilderForType() { return newBuilder(); }
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
+      }
+      public static Builder newBuilder(XTableProto.XTableMessage.XTableUpdate prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      @java.lang.Override
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
+
+      @java.lang.Override
+      protected Builder newBuilderForType(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+      }
+      /**
+       * Protobuf type {@code XTableMessage.XTableUpdate}
+       */
+      public static final class Builder extends
+          com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+          // @@protoc_insertion_point(builder_implements:XTableMessage.XTableUpdate)
+          XTableProto.XTableMessage.XTableUpdateOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+          return XTableProto.internal_static_XTableMessage_XTableUpdate_descriptor;
+        }
+
+        @java.lang.Override
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+          return XTableProto.internal_static_XTableMessage_XTableUpdate_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                  XTableProto.XTableMessage.XTableUpdate.class, XTableProto.XTableMessage.XTableUpdate.Builder.class);
+        }
+
+        // Construct using XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        private Builder() {
+
+        }
+
+        private Builder(
+            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          super(parent);
+
+        }
+        @java.lang.Override
+        public Builder clear() {
+          super.clear();
+          bitField0_ = 0;
+          key_ = "";
+          value_ = com.google.protobuf.ByteString.EMPTY;
+          type_ = 0;
+          category_ = 0;
+          return this;
+        }
+
+        @java.lang.Override
+        public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+          return XTableProto.internal_static_XTableMessage_XTableUpdate_descriptor;
+        }
+
+        @java.lang.Override
+        public XTableProto.XTableMessage.XTableUpdate getDefaultInstanceForType() {
+          return XTableProto.XTableMessage.XTableUpdate.getDefaultInstance();
+        }
+
+        @java.lang.Override
+        public XTableProto.XTableMessage.XTableUpdate build() {
+          XTableProto.XTableMessage.XTableUpdate result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(result);
+          }
+          return result;
+        }
+
+        @java.lang.Override
+        public XTableProto.XTableMessage.XTableUpdate buildPartial() {
+          XTableProto.XTableMessage.XTableUpdate result = new XTableProto.XTableMessage.XTableUpdate(this);
+          if (bitField0_ != 0) { buildPartial0(result); }
+          onBuilt();
+          return result;
+        }
+
+        private void buildPartial0(XTableProto.XTableMessage.XTableUpdate result) {
+          int from_bitField0_ = bitField0_;
+          if (((from_bitField0_ & 0x00000001) != 0)) {
+            result.key_ = key_;
+          }
+          if (((from_bitField0_ & 0x00000002) != 0)) {
+            result.value_ = value_;
+          }
+          if (((from_bitField0_ & 0x00000004) != 0)) {
+            result.type_ = type_;
+          }
+          if (((from_bitField0_ & 0x00000008) != 0)) {
+            result.category_ = category_;
+          }
+        }
+
+        @java.lang.Override
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+          if (other instanceof XTableProto.XTableMessage.XTableUpdate) {
+            return mergeFrom((XTableProto.XTableMessage.XTableUpdate)other);
+          } else {
+            super.mergeFrom(other);
+            return this;
+          }
+        }
+
+        public Builder mergeFrom(XTableProto.XTableMessage.XTableUpdate other) {
+          if (other == XTableProto.XTableMessage.XTableUpdate.getDefaultInstance()) return this;
+          if (!other.getKey().isEmpty()) {
+            key_ = other.key_;
+            bitField0_ |= 0x00000001;
+            onChanged();
+          }
+          if (other.getValue() != com.google.protobuf.ByteString.EMPTY) {
+            setValue(other.getValue());
+          }
+          if (other.type_ != 0) {
+            setTypeValue(other.getTypeValue());
+          }
+          if (other.category_ != 0) {
+            setCategoryValue(other.getCategoryValue());
+          }
+          this.mergeUnknownFields(other.getUnknownFields());
+          onChanged();
+          return this;
+        }
+
+        @java.lang.Override
+        public final boolean isInitialized() {
+          return true;
+        }
+
+        @java.lang.Override
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+          if (extensionRegistry == null) {
+            throw new java.lang.NullPointerException();
+          }
+          try {
+            boolean done = false;
+            while (!done) {
+              int tag = input.readTag();
+              switch (tag) {
+                case 0:
+                  done = true;
+                  break;
+                case 10: {
+                  key_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+                case 18: {
+                  value_ = input.readBytes();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+                case 24: {
+                  type_ = input.readEnum();
+                  bitField0_ |= 0x00000004;
+                  break;
+                } // case 24
+                case 32: {
+                  category_ = input.readEnum();
+                  bitField0_ |= 0x00000008;
+                  break;
+                } // case 32
+                default: {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+              } // switch (tag)
+            } // while (!done)
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            throw e.unwrapIOException();
+          } finally {
+            onChanged();
+          } // finally
+          return this;
+        }
+        private int bitField0_;
+
+        private java.lang.Object key_ = "";
+        /**
+         * <code>string key = 1;</code>
+         * @return The key.
+         */
+        public java.lang.String getKey() {
+          java.lang.Object ref = key_;
+          if (!(ref instanceof java.lang.String)) {
+            com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            key_ = s;
+            return s;
+          } else {
+            return (java.lang.String) ref;
+          }
+        }
+        /**
+         * <code>string key = 1;</code>
+         * @return The bytes for key.
+         */
+        public com.google.protobuf.ByteString
+            getKeyBytes() {
+          java.lang.Object ref = key_;
+          if (ref instanceof String) {
+            com.google.protobuf.ByteString b = 
+                com.google.protobuf.ByteString.copyFromUtf8(
+                    (java.lang.String) ref);
+            key_ = b;
+            return b;
+          } else {
+            return (com.google.protobuf.ByteString) ref;
+          }
+        }
+        /**
+         * <code>string key = 1;</code>
+         * @param value The key to set.
+         * @return This builder for chaining.
+         */
+        public Builder setKey(
+            java.lang.String value) {
+          if (value == null) { throw new NullPointerException(); }
+          key_ = value;
+          bitField0_ |= 0x00000001;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string key = 1;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearKey() {
+          key_ = getDefaultInstance().getKey();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string key = 1;</code>
+         * @param value The bytes for key to set.
+         * @return This builder for chaining.
+         */
+        public Builder setKeyBytes(
+            com.google.protobuf.ByteString value) {
+          if (value == null) { throw new NullPointerException(); }
+          checkByteStringIsUtf8(value);
+          key_ = value;
+          bitField0_ |= 0x00000001;
+          onChanged();
+          return this;
+        }
+
+        private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+        /**
+         * <code>bytes value = 2;</code>
+         * @return The value.
+         */
+        @java.lang.Override
+        public com.google.protobuf.ByteString getValue() {
+          return value_;
+        }
+        /**
+         * <code>bytes value = 2;</code>
+         * @param value The value to set.
+         * @return This builder for chaining.
+         */
+        public Builder setValue(com.google.protobuf.ByteString value) {
+          if (value == null) { throw new NullPointerException(); }
+          value_ = value;
+          bitField0_ |= 0x00000002;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>bytes value = 2;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearValue() {
+          bitField0_ = (bitField0_ & ~0x00000002);
+          value_ = getDefaultInstance().getValue();
+          onChanged();
+          return this;
+        }
+
+        private int type_ = 0;
+        /**
+         * <code>.XTableMessage.Type type = 3;</code>
+         * @return The enum numeric value on the wire for type.
+         */
+        @java.lang.Override public int getTypeValue() {
+          return type_;
+        }
+        /**
+         * <code>.XTableMessage.Type type = 3;</code>
+         * @param value The enum numeric value on the wire for type to set.
+         * @return This builder for chaining.
+         */
+        public Builder setTypeValue(int value) {
+          type_ = value;
+          bitField0_ |= 0x00000004;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>.XTableMessage.Type type = 3;</code>
+         * @return The type.
+         */
+        @java.lang.Override
+        public XTableProto.XTableMessage.Type getType() {
+          XTableProto.XTableMessage.Type result = XTableProto.XTableMessage.Type.forNumber(type_);
+          return result == null ? XTableProto.XTableMessage.Type.UNRECOGNIZED : result;
+        }
+        /**
+         * <code>.XTableMessage.Type type = 3;</code>
+         * @param value The type to set.
+         * @return This builder for chaining.
+         */
+        public Builder setType(XTableProto.XTableMessage.Type value) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bitField0_ |= 0x00000004;
+          type_ = value.getNumber();
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>.XTableMessage.Type type = 3;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearType() {
+          bitField0_ = (bitField0_ & ~0x00000004);
+          type_ = 0;
+          onChanged();
+          return this;
+        }
+
+        private int category_ = 0;
+        /**
+         * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+         * @return The enum numeric value on the wire for category.
+         */
+        @java.lang.Override public int getCategoryValue() {
+          return category_;
+        }
+        /**
+         * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+         * @param value The enum numeric value on the wire for category to set.
+         * @return This builder for chaining.
+         */
+        public Builder setCategoryValue(int value) {
+          category_ = value;
+          bitField0_ |= 0x00000008;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+         * @return The category.
+         */
+        @java.lang.Override
+        public XTableProto.XTableMessage.XTableUpdate.Category getCategory() {
+          XTableProto.XTableMessage.XTableUpdate.Category result = XTableProto.XTableMessage.XTableUpdate.Category.forNumber(category_);
+          return result == null ? XTableProto.XTableMessage.XTableUpdate.Category.UNRECOGNIZED : result;
+        }
+        /**
+         * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+         * @param value The category to set.
+         * @return This builder for chaining.
+         */
+        public Builder setCategory(XTableProto.XTableMessage.XTableUpdate.Category value) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bitField0_ |= 0x00000008;
+          category_ = value.getNumber();
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>.XTableMessage.XTableUpdate.Category category = 4;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearCategory() {
+          bitField0_ = (bitField0_ & ~0x00000008);
+          category_ = 0;
+          onChanged();
+          return this;
+        }
+
+        // @@protoc_insertion_point(builder_scope:XTableMessage.XTableUpdate)
+      }
+
+      // @@protoc_insertion_point(class_scope:XTableMessage.XTableUpdate)
+      private static final XTableProto.XTableMessage.XTableUpdate DEFAULT_INSTANCE;
+      static {
+        DEFAULT_INSTANCE = new XTableProto.XTableMessage.XTableUpdate();
+      }
+
+      public static XTableProto.XTableMessage.XTableUpdate getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      private static final com.google.protobuf.Parser<XTableUpdate>
+          PARSER = new com.google.protobuf.AbstractParser<XTableUpdate>() {
+        @java.lang.Override
+        public XTableUpdate parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          Builder builder = newBuilder();
+          try {
+            builder.mergeFrom(input, extensionRegistry);
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            throw e.setUnfinishedMessage(builder.buildPartial());
+          } catch (com.google.protobuf.UninitializedMessageException e) {
+            throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+          } catch (java.io.IOException e) {
+            throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                .setUnfinishedMessage(builder.buildPartial());
+          }
+          return builder.buildPartial();
+        }
+      };
+
+      public static com.google.protobuf.Parser<XTableUpdate> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<XTableUpdate> getParserForType() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public XTableProto.XTableMessage.XTableUpdate getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
+    }
+
     private int bitField0_;
     public static final int ID_FIELD_NUMBER = 1;
     private long id_ = 0L;
@@ -612,21 +1526,14 @@ public final class XTableProto {
     public static final int COMMAND_FIELD_NUMBER = 2;
     private int command_ = 0;
     /**
-     * <code>optional .XTableMessage.Command command = 2;</code>
-     * @return Whether the command field is set.
-     */
-    @java.lang.Override public boolean hasCommand() {
-      return ((bitField0_ & 0x00000002) != 0);
-    }
-    /**
-     * <code>optional .XTableMessage.Command command = 2;</code>
+     * <code>.XTableMessage.Command command = 2;</code>
      * @return The enum numeric value on the wire for command.
      */
     @java.lang.Override public int getCommandValue() {
       return command_;
     }
     /**
-     * <code>optional .XTableMessage.Command command = 2;</code>
+     * <code>.XTableMessage.Command command = 2;</code>
      * @return The command.
      */
     @java.lang.Override public XTableProto.XTableMessage.Command getCommand() {
@@ -643,7 +1550,7 @@ public final class XTableProto {
      */
     @java.lang.Override
     public boolean hasKey() {
-      return ((bitField0_ & 0x00000004) != 0);
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
      * <code>optional string key = 3;</code>
@@ -689,7 +1596,7 @@ public final class XTableProto {
      */
     @java.lang.Override
     public boolean hasValue() {
-      return ((bitField0_ & 0x00000008) != 0);
+      return ((bitField0_ & 0x00000004) != 0);
     }
     /**
      * <code>optional bytes value = 4;</code>
@@ -707,7 +1614,7 @@ public final class XTableProto {
      * @return Whether the type field is set.
      */
     @java.lang.Override public boolean hasType() {
-      return ((bitField0_ & 0x00000010) != 0);
+      return ((bitField0_ & 0x00000008) != 0);
     }
     /**
      * <code>optional .XTableMessage.Type type = 5;</code>
@@ -742,16 +1649,16 @@ public final class XTableProto {
       if (((bitField0_ & 0x00000001) != 0)) {
         output.writeInt64(1, id_);
       }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (command_ != XTableProto.XTableMessage.Command.UNKNOWN_COMMAND.getNumber()) {
         output.writeEnum(2, command_);
       }
-      if (((bitField0_ & 0x00000004) != 0)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 3, key_);
       }
-      if (((bitField0_ & 0x00000008) != 0)) {
+      if (((bitField0_ & 0x00000004) != 0)) {
         output.writeBytes(4, value_);
       }
-      if (((bitField0_ & 0x00000010) != 0)) {
+      if (((bitField0_ & 0x00000008) != 0)) {
         output.writeEnum(5, type_);
       }
       getUnknownFields().writeTo(output);
@@ -767,18 +1674,18 @@ public final class XTableProto {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(1, id_);
       }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (command_ != XTableProto.XTableMessage.Command.UNKNOWN_COMMAND.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(2, command_);
       }
-      if (((bitField0_ & 0x00000004) != 0)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(3, key_);
       }
-      if (((bitField0_ & 0x00000008) != 0)) {
+      if (((bitField0_ & 0x00000004) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(4, value_);
       }
-      if (((bitField0_ & 0x00000010) != 0)) {
+      if (((bitField0_ & 0x00000008) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(5, type_);
       }
@@ -802,10 +1709,7 @@ public final class XTableProto {
         if (getId()
             != other.getId()) return false;
       }
-      if (hasCommand() != other.hasCommand()) return false;
-      if (hasCommand()) {
-        if (command_ != other.command_) return false;
-      }
+      if (command_ != other.command_) return false;
       if (hasKey() != other.hasKey()) return false;
       if (hasKey()) {
         if (!getKey()
@@ -836,10 +1740,8 @@ public final class XTableProto {
         hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
             getId());
       }
-      if (hasCommand()) {
-        hash = (37 * hash) + COMMAND_FIELD_NUMBER;
-        hash = (53 * hash) + command_;
-      }
+      hash = (37 * hash) + COMMAND_FIELD_NUMBER;
+      hash = (53 * hash) + command_;
       if (hasKey()) {
         hash = (37 * hash) + KEY_FIELD_NUMBER;
         hash = (53 * hash) + getKey().hashCode();
@@ -1028,19 +1930,18 @@ public final class XTableProto {
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.command_ = command_;
-          to_bitField0_ |= 0x00000002;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.key_ = key_;
-          to_bitField0_ |= 0x00000004;
+          to_bitField0_ |= 0x00000002;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
           result.value_ = value_;
-          to_bitField0_ |= 0x00000008;
+          to_bitField0_ |= 0x00000004;
         }
         if (((from_bitField0_ & 0x00000010) != 0)) {
           result.type_ = type_;
-          to_bitField0_ |= 0x00000010;
+          to_bitField0_ |= 0x00000008;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -1060,8 +1961,8 @@ public final class XTableProto {
         if (other.hasId()) {
           setId(other.getId());
         }
-        if (other.hasCommand()) {
-          setCommand(other.getCommand());
+        if (other.command_ != 0) {
+          setCommandValue(other.getCommandValue());
         }
         if (other.hasKey()) {
           key_ = other.key_;
@@ -1184,21 +2085,14 @@ public final class XTableProto {
 
       private int command_ = 0;
       /**
-       * <code>optional .XTableMessage.Command command = 2;</code>
-       * @return Whether the command field is set.
-       */
-      @java.lang.Override public boolean hasCommand() {
-        return ((bitField0_ & 0x00000002) != 0);
-      }
-      /**
-       * <code>optional .XTableMessage.Command command = 2;</code>
+       * <code>.XTableMessage.Command command = 2;</code>
        * @return The enum numeric value on the wire for command.
        */
       @java.lang.Override public int getCommandValue() {
         return command_;
       }
       /**
-       * <code>optional .XTableMessage.Command command = 2;</code>
+       * <code>.XTableMessage.Command command = 2;</code>
        * @param value The enum numeric value on the wire for command to set.
        * @return This builder for chaining.
        */
@@ -1209,7 +2103,7 @@ public final class XTableProto {
         return this;
       }
       /**
-       * <code>optional .XTableMessage.Command command = 2;</code>
+       * <code>.XTableMessage.Command command = 2;</code>
        * @return The command.
        */
       @java.lang.Override
@@ -1218,7 +2112,7 @@ public final class XTableProto {
         return result == null ? XTableProto.XTableMessage.Command.UNRECOGNIZED : result;
       }
       /**
-       * <code>optional .XTableMessage.Command command = 2;</code>
+       * <code>.XTableMessage.Command command = 2;</code>
        * @param value The command to set.
        * @return This builder for chaining.
        */
@@ -1232,7 +2126,7 @@ public final class XTableProto {
         return this;
       }
       /**
-       * <code>optional .XTableMessage.Command command = 2;</code>
+       * <code>.XTableMessage.Command command = 2;</code>
        * @return This builder for chaining.
        */
       public Builder clearCommand() {
@@ -1477,6 +2371,11 @@ public final class XTableProto {
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_XTableMessage_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_XTableMessage_XTableUpdate_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_XTableMessage_XTableUpdate_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1486,23 +2385,27 @@ public final class XTableProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021XTableProto.proto\"\201\005\n\rXTableMessage\022\017\n" +
-      "\002id\030\001 \001(\003H\000\210\001\001\022,\n\007command\030\002 \001(\0162\026.XTable" +
-      "Message.CommandH\001\210\001\001\022\020\n\003key\030\003 \001(\tH\002\210\001\001\022\022" +
-      "\n\005value\030\004 \001(\014H\003\210\001\001\022&\n\004type\030\005 \001(\0162\023.XTabl" +
-      "eMessage.TypeH\004\210\001\001\"y\n\004Type\022\013\n\007UNKNOWN\020\000\022" +
-      "\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT64\020\005\022\010\n\004BO" +
-      "OL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007MESSAGE\020\t\022\t" +
-      "\n\005ARRAY\020\n\022\n\n\006OBJECT\020\013\"\271\002\n\007Command\022\023\n\017UNK" +
-      "NOWN_COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GET\020\002\022\024\n\020SUBS" +
-      "CRIBE_UPDATE\020\003\022\016\n\nGET_TABLES\020\004\022\016\n\nRUN_SC" +
-      "RIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE\020\007\022\013\n\007PU" +
-      "BLISH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n\022UNSUBSC" +
-      "RIBE_DELETE\020\n\022\026\n\022UNSUBSCRIBE_UPDATE\020\013\022\010\n" +
-      "\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DELETE_EVEN" +
-      "T\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFORMATION\020\020\022\021" +
-      "\n\rREBOOT_SERVER\020\021B\005\n\003_idB\n\n\010_commandB\006\n\004" +
-      "_keyB\010\n\006_valueB\007\n\005_typeb\006proto3"
+      "\n\021XTableProto.proto\"\251\006\n\rXTableMessage\022\017\n" +
+      "\002id\030\001 \001(\003H\000\210\001\001\022\'\n\007command\030\002 \001(\0162\026.XTable" +
+      "Message.Command\022\020\n\003key\030\003 \001(\tH\001\210\001\001\022\022\n\005val" +
+      "ue\030\004 \001(\014H\002\210\001\001\022&\n\004type\030\005 \001(\0162\023.XTableMess" +
+      "age.TypeH\003\210\001\001\032\266\001\n\014XTableUpdate\022\013\n\003key\030\001 " +
+      "\001(\t\022\r\n\005value\030\002 \001(\014\022!\n\004type\030\003 \001(\0162\023.XTabl" +
+      "eMessage.Type\0226\n\010category\030\004 \001(\0162$.XTable" +
+      "Message.XTableUpdate.Category\"/\n\010Categor" +
+      "y\022\013\n\007UNKNOWN\020\000\022\n\n\006UPDATE\020\001\022\n\n\006DELETE\020\002\"y" +
+      "\n\004Type\022\013\n\007UNKNOWN\020\000\022\n\n\006STRING\020\001\022\n\n\006DOUBL" +
+      "E\020\002\022\t\n\005INT64\020\005\022\010\n\004BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004E" +
+      "NUM\020\010\022\013\n\007MESSAGE\020\t\022\t\n\005ARRAY\020\n\022\n\n\006OBJECT\020" +
+      "\013\"\271\002\n\007Command\022\023\n\017UNKNOWN_COMMAND\020\000\022\007\n\003PU" +
+      "T\020\001\022\007\n\003GET\020\002\022\024\n\020SUBSCRIBE_UPDATE\020\003\022\016\n\nGE" +
+      "T_TABLES\020\004\022\016\n\nRUN_SCRIPT\020\005\022\016\n\nUPDATE_KEY" +
+      "\020\006\022\n\n\006DELETE\020\007\022\013\n\007PUBLISH\020\010\022\024\n\020SUBSCRIBE" +
+      "_DELETE\020\t\022\026\n\022UNSUBSCRIBE_DELETE\020\n\022\026\n\022UNS" +
+      "UBSCRIBE_UPDATE\020\013\022\010\n\004PING\020\014\022\020\n\014GET_RAW_J" +
+      "SON\020\r\022\020\n\014DELETE_EVENT\020\016\022\020\n\014UPDATE_EVENT\020" +
+      "\017\022\017\n\013INFORMATION\020\020\022\021\n\rREBOOT_SERVER\020\021B\005\n" +
+      "\003_idB\006\n\004_keyB\010\n\006_valueB\007\n\005_typeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1514,6 +2417,12 @@ public final class XTableProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_XTableMessage_descriptor,
         new java.lang.String[] { "Id", "Command", "Key", "Value", "Type", });
+    internal_static_XTableMessage_XTableUpdate_descriptor =
+      internal_static_XTableMessage_descriptor.getNestedTypes().get(0);
+    internal_static_XTableMessage_XTableUpdate_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_XTableMessage_XTableUpdate_descriptor,
+        new java.lang.String[] { "Key", "Value", "Type", "Category", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

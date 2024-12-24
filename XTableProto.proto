@@ -2,7 +2,7 @@ syntax = "proto3";
 
 message XTableMessage {
   optional int64 id = 1;
-  optional Command command = 2;
+  Command command = 2;
   optional string key = 3;
   optional bytes value = 4;
   optional Type type = 5;
@@ -19,7 +19,6 @@ message XTableMessage {
     ARRAY = 10;
     OBJECT = 11;
   }
-
   enum Command {
     UNKNOWN_COMMAND = 0;
     PUT = 1;
@@ -39,5 +38,16 @@ message XTableMessage {
     UPDATE_EVENT = 15;
     INFORMATION = 16;
     REBOOT_SERVER = 17;
+  }
+  message XTableUpdate {
+    string key = 1;
+    bytes value = 2;
+    XTableMessage.Type type = 3;
+    Category category = 4;
+    enum Category {
+      UNKNOWN = 0;
+      UPDATE = 1;
+      DELETE = 2;
+    }
   }
 }
