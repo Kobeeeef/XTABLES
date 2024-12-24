@@ -5,8 +5,9 @@ import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -209,6 +210,7 @@ public class Utilities {
 
         return true;
     }
+
     // Convert any List to byte array
     public static byte[] toByteArray(List<?> list) {
         if (list == null) {
@@ -225,80 +227,77 @@ public class Utilities {
             return null;
         }
     }
+    public static <T> List<T> fromByteArray(byte[] byteArray, Class<T> type) {
+        if (byteArray == null || byteArray.length == 0) {
+            return null;
+        }
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
+             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+
+            // This cast is safe if the list was serialized correctly as a List
+            @SuppressWarnings("unchecked")
+            List<T> list = (List<T>) objectInputStream.readObject();
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     private static XTableProto.XTableMessage.Command getRandomCommand() {
         XTableProto.XTableMessage.Command[] commands = XTableProto.XTableMessage.Command.values();
-        int randomIndex = ThreadLocalRandom.current().nextInt(commands.length -1);
+        int randomIndex = ThreadLocalRandom.current().nextInt(commands.length - 1);
         return commands[randomIndex];
     }
 
     public static void warmupProtobuf() {
-        long id;
-        logger.info("Starting String Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
+        logger.info("Starting Protobuf warmup with 1,000,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
             String stringValue = "Hello, world!";
-            id = ThreadLocalRandom.current().nextLong();
             byte[] stringBytes = stringValue.getBytes(StandardCharsets.UTF_8);
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(stringBytes))
                     .build()
                     .toByteArray();
         }
-
-        logger.info("Starting Integer Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
             int intValue = 12345;
             byte[] intBytes = ByteBuffer.allocate(4).putInt(intValue).array();
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(intBytes))
                     .build()
                     .toByteArray();
         }
-        logger.info("Starting Long Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
             long longValue = 123456789L;
             byte[] longBytes = ByteBuffer.allocate(8).putLong(longValue).array();
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(longBytes))
                     .build()
                     .toByteArray();
         }
-        logger.info("Starting Float Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
             float floatValue = 3.14f;
             byte[] floatBytes = ByteBuffer.allocate(4).putFloat(floatValue).array();
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(floatBytes))
                     .build()
                     .toByteArray();
         }
-        logger.info("Starting Double Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
             double doubleValue = 3.14159265359;
             byte[] doubleBytes = ByteBuffer.allocate(8).putDouble(doubleValue).array();
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(doubleBytes))
                     .build()
                     .toByteArray();
         }
-        logger.info("Starting String Array Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
             String[] stringArray = {"Hello", "world", "this", "is", "protobuf"};  // Example String array
-            // Calculate the total byte size of the array
             int totalSize = 0;
             for (String s : stringArray) {
                 totalSize += s.getBytes(StandardCharsets.UTF_8).length;  // Add the length of each string in bytes
@@ -313,16 +312,13 @@ public class Utilities {
             }
 
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(stringArrayBytes))
                     .build()
                     .toByteArray();
         }
 
-        logger.info("Starting Integer Array Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
             int[] intArray = {12345, 67890, 111213};  // Example array
             byte[] intArrayBytes = new byte[intArray.length * 4];
             ByteBuffer buffer = ByteBuffer.wrap(intArrayBytes);
@@ -330,16 +326,13 @@ public class Utilities {
                 buffer.putInt(value);
             }
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(intArrayBytes))
                     .build()
                     .toByteArray();
         }
 
-        logger.info("Starting Long Array Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
             long[] longArray = {123456789L, 987654321L};  // Example array
             byte[] longArrayBytes = new byte[longArray.length * 8];
             ByteBuffer buffer = ByteBuffer.wrap(longArrayBytes);
@@ -347,16 +340,13 @@ public class Utilities {
                 buffer.putLong(value);
             }
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(longArrayBytes))
                     .build()
                     .toByteArray();
         }
 
-        logger.info("Starting Float Array Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
             float[] floatArray = {3.14f, 1.618f};  // Example array
             byte[] floatArrayBytes = new byte[floatArray.length * 4];
             ByteBuffer buffer = ByteBuffer.wrap(floatArrayBytes);
@@ -364,16 +354,14 @@ public class Utilities {
                 buffer.putFloat(value);
             }
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(floatArrayBytes))
                     .build()
                     .toByteArray();
         }
 
-        logger.info("Starting Double Array Protobuf warmup with 10,000 iterations to allow JIT compiler optimizations...");
         for (int i = 0; i < 10000; i++) {
-            id = ThreadLocalRandom.current().nextLong();
+
             double[] doubleArray = {3.14159265359, 2.71828182846};  // Example array
             byte[] doubleArrayBytes = new byte[doubleArray.length * 8];
             ByteBuffer buffer = ByteBuffer.wrap(doubleArrayBytes);
@@ -381,11 +369,11 @@ public class Utilities {
                 buffer.putDouble(value);
             }
             XTableProto.XTableMessage.newBuilder()
-                    .setId(id)
                     .setCommand(getRandomCommand())
                     .setValue(ByteString.copyFrom(doubleArrayBytes))
                     .build()
                     .toByteArray();
         }
+        logger.info("Protobuf warmup has finished to allow JIT compiler optimizations.");
     }
 }

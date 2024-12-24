@@ -1,8 +1,3 @@
-org.kobe.xbot.Client
-org.kobe.xbot.ClientLite
-org.kobe.xbot.Server
-org.kobe.xbot.Tests
-org.kobe.xbot.Utilities
-org.kobe.xbot.Utilities.Entities
+org.kobe.xbot.JClient
+org.kobe.xbot.JServer
 org.kobe.xbot.Utilities.Exceptions
-org.kobe.xbot.Utilities.Logger

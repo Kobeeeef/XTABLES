@@ -1,15 +1,19 @@
-import base64
+
 import logging
 import time
 
-import cv2
-from XTablesClient import XTablesClient
+
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    client = XTablesClient(useZeroMQ=True)
-    client.
-
+    c = XTablesClient(server_port=1735, server_ip="localhost")
+    # Usage example
+    image_path = 'D:\\stuff\\IdeaProjects\\XTABLES\\src\\main\\python\\DSC_0841_1.jpg'
+    image_bytes = image_to_bytes(image_path).replace(b'\n', b'')
+    i = 0
+    while True:
+        c.executePutBytes("test", b'ad')
+    #c.subscribe_to_key("test", consumer)
+    time.sleep(1000000)
 # if __name__ == "__main__":
 #     logging.basicConfig(level=logging.INFO)
 #     client = XTablesClient(useZeroMQ=True, server_port=1735)

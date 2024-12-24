@@ -68,6 +68,19 @@ public class XTablesData {
         }
         return count;
     }
+    /**
+     * Retrieves the value and its type for the given key.
+     *
+     * @param key The key for which to retrieve the value and type.
+     * @return A Map.Entry containing the value as a byte array and its type as XTableProto.XTableMessage.Type, or null if the key doesn't exist.
+     */
+    public Map.Entry<byte[], XTableProto.XTableMessage.Type> getWithType(String key) {
+        XTablesData current = getLevelxTablesData(key);
+        if (current != null && current.value != null && current.type != null) {
+            return new AbstractMap.SimpleEntry<>(current.value, current.type);
+        }
+        return null;
+    }
 
     public byte[] get(String key) {
         XTablesData current = getLevelxTablesData(key);

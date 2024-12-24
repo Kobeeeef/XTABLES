@@ -18,8 +18,6 @@ public class PullPushProducer {
             socket.connect("tcp://*:1735");
             System.out.println("Producer started. Sending image...");
 
-            // Specify the path to your image
-            String imagePath = "path/to/your/image.jpg";
             byte[] imageBytes = Files.readAllBytes(Paths.get("ping_page.png"));
 
             while (!Thread.currentThread().isInterrupted()) {
@@ -30,7 +28,7 @@ public class PullPushProducer {
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.newBuilder()
                             .setCommand(XTableProto.XTableMessage.Command.PUT)
                             .setKey("imageKey")
-                            .setValue(ByteString.copyFrom(new byte[] {72, 12,12,12,12,12,12,12,4,24,12,24,123,15,123,51,123,51,123,12})) // Send the image as bytes
+                            .setValue(ByteString.copyFrom(imageBytes)) // Send the image as bytes
                             .build();
                     // Send the message to the socket
                     socket.send(message.toByteArray(), ZMQ.DONTWAIT);

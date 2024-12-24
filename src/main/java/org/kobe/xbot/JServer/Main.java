@@ -5,7 +5,7 @@ import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 public class Main {
 
     public static final String XTABLES_SERVER_VERSION =
-            "XTABLES Jero Server v1.0.0 | Build Date: 12/23/2024 | Java 17";
+            "XTABLES Jero Server v1.0.0 | Build Date: 12/24/2024 | Java 17";
 
 
     private static final XTablesLogger logger = XTablesLogger.getLogger();
@@ -29,7 +29,6 @@ public class Main {
         } else {
             logger.info("No port number provided. Default ports 1735 (pull), 1736 (reply), 1737 (publish) is being used.");
             XTablesServer.initialize(1735, 1736, 1737);
-            XTablesServer.getInstance().restart();
         }
     }
 }

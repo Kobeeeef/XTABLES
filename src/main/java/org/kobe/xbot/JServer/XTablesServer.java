@@ -19,8 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 /**
  * XTablesServer - A server class for managing JeroMQ-based messaging and mDNS service registration.
@@ -64,6 +66,7 @@ public class XTablesServer {
     private final int pullPort;
     private final int repPort;
     private final int pubPort;
+    private final AtomicBoolean debug = new AtomicBoolean(false);
 
     /**
      * Constructor for initializing the server with specified ports.
@@ -90,8 +93,8 @@ public class XTablesServer {
             logger.fatal("There was an error cleaning up the server: " + exception.getMessage());
             System.exit(1);
         }
+        Utilities.warmupProtobuf();
         this.context = new ZContext();
-
         pubSocket = context.createSocket(SocketType.PUB);
         pubSocket.setHWM(500);
         pubSocket.bind("tcp://localhost:" + pubPort);
@@ -191,7 +194,7 @@ public class XTablesServer {
                 if (attempt >= maxRetries) {
                     logger.severe("Max retries reached. Giving up on mDNS initialization.");
                     shutdown();
-                    System.exit(0);
+                    System.exit(1);
                     return;
                 }
                 try {
@@ -300,4 +303,38 @@ public class XTablesServer {
     public void notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate update) {
         pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT);
     }
+
+    /**
+     * Checks if debug mode is enabled.
+     *
+     * @return boolean - true if debug mode is enabled, false otherwise.
+     * This method retrieves the current value of the debug mode flag.
+     */
+    public boolean isDebug() {
+        return debug.get();
+    }
+
+    /**
+     * Sets the debug mode state.
+     *
+     * @param value boolean - the value to set for debug mode.
+     *              This method sets the debug mode flag to the provided value.
+     *              When enabled, the system starts publishing logs to the clients for debugging purposes.
+     */
+    public void setDebug(boolean value) {
+        debug.set(value);
+        XTablesLogger.setHandler((level, s) -> {
+            if(debug.get() && pubSocket != null) {
+                notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                        .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
+                        .setValue(XTableProto.XTableMessage.XTableLog.newBuilder()
+                                .setLevel(level.equals(Level.INFO) ? XTableProto.XTableMessage.XTableLog.Level.INFO :level.equals(Level.WARNING) ? XTableProto.XTableMessage.XTableLog.Level.WARNING : level.equals(Level.SEVERE) ? XTableProto.XTableMessage.XTableLog.Level.SEVERE : level.equals(XTablesLogger.FATAL) ? XTableProto.XTableMessage.XTableLog.Level.FATAL : XTableProto.XTableMessage.XTableLog.Level.UNKNOWN)
+                                .setMessage(s)
+                                .build()
+                                .toByteString())
+                        .build());
+            }
+        });
+    }
+
 }

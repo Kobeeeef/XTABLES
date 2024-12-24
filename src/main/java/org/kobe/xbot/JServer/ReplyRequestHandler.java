@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.kobe.xbot.Server.MainNIO.XTABLES_SERVER_VERSION;
+import static org.kobe.xbot.JServer.Main.XTABLES_SERVER_VERSION;
 
 /**
  * ReplyRequestHandler - A handler for processing reply requests using JeroMQ.
@@ -61,105 +61,109 @@ public class ReplyRequestHandler extends BaseHandler {
                 byte[] bytes = socket.recv();
                 instance.messages.incrementAndGet();
                 try {
-                    XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
 
-                        XTableProto.XTableMessage.Command command = message.getCommand();
-                        switch (command) {
-                            case GET -> {
-                                if (message.hasKey()) {
-                                    String key = message.getKey();
-                                    Map.Entry<byte[], XTableProto.XTableMessage.Type> response = XTablesServer.table.getWithType(key);
+                    XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
+                    XTableProto.XTableMessage.Command command = message.getCommand();
+                    switch (command) {
+                        case GET -> {
+                            if (message.hasKey()) {
+                                String key = message.getKey();
+                                Map.Entry<byte[], XTableProto.XTableMessage.Type> response = XTablesServer.table.getWithType(key);
+                                if (response != null)
                                     socket.send(XTableProto.XTableMessage.newBuilder()
                                             .setKey(key)
                                             .setValue(ByteString.copyFrom(response.getKey()))
                                             .setType(response.getValue())
                                             .build()
                                             .toByteArray(), ZMQ.DONTWAIT);
-                                }
-                            }
-                            case GET_RAW_JSON -> socket.send(XTableProto.XTableMessage.newBuilder()
-                                    .setCommand(command)
-                                    .setValue(ByteString.copyFrom(DataCompression.compressAndConvertBase64(XTablesServer.table.toJSON()).getBytes(StandardCharsets.UTF_8)))
-                                    .build().toByteArray(), ZMQ.DONTWAIT);
-                            case REBOOT_SERVER -> {
-                                socket.send(XTableProto.XTableMessage.newBuilder()
-                                        .setValue(successByte)
+                                else socket.send(XTableProto.XTableMessage.newBuilder()
+                                        .setKey(key)
                                         .build()
                                         .toByteArray(), ZMQ.DONTWAIT);
-                                instance.restart();
                             }
-                            case GET_TABLES -> {
-                                Set<String> tables;
-                                XTableProto.XTableMessage.Builder builder = XTableProto.XTableMessage.newBuilder()
-                                        .setCommand(command);
-                                if (message.hasKey()) {
-                                    tables = XTablesServer.table.getTables(message.getKey());
+                        }
+                        case GET_RAW_JSON -> socket.send(XTableProto.XTableMessage.newBuilder()
+                                .setCommand(command)
+                                .setValue(ByteString.copyFrom(DataCompression.compressAndConvertBase64(XTablesServer.table.toJSON()).getBytes(StandardCharsets.UTF_8)))
+                                .build().toByteArray(), ZMQ.DONTWAIT);
+                        case REBOOT_SERVER -> {
+                            socket.send(XTableProto.XTableMessage.newBuilder()
+                                    .setValue(successByte)
+                                    .build()
+                                    .toByteArray(), ZMQ.DONTWAIT);
+                            instance.restart();
+                        }
+                        case GET_TABLES -> {
+                            Set<String> tables;
+                            XTableProto.XTableMessage.Builder builder = XTableProto.XTableMessage.newBuilder()
+                                    .setCommand(command);
+                            if (message.hasKey()) {
+                                tables = XTablesServer.table.getTables(message.getKey());
 
-                                    byte[] resp = Utilities.toByteArray((List<?>) tables);
-                                    if (tables != null && !tables.isEmpty() && resp != null) {
-                                        builder.setValue(ByteString.copyFrom(resp));
-                                    }
-                                } else {
-                                    tables = XTablesServer.table.getTables("");
-                                    byte[] resp = Utilities.toByteArray((List<?>) tables);
-                                    if (tables != null && !tables.isEmpty() && resp != null) {
-                                        builder.setValue(ByteString.copyFrom(resp));
-                                    }
+                                byte[] resp = Utilities.toByteArray((List<?>) tables);
+                                if (tables != null && !tables.isEmpty() && resp != null) {
+                                    builder.setValue(ByteString.copyFrom(resp));
                                 }
-                                socket.send(builder.build().toByteArray(), ZMQ.DONTWAIT);
-
-                            }
-                            case DELETE -> {
-                                if (message.hasKey()) {
-                                    String key = message.getKey();
-                                    boolean response = XTablesServer.table.delete(key);
-
-                                    socket.send(XTableProto.XTableMessage.newBuilder()
-                                            .setCommand(command)
-                                            .setValue(response ? successByte : failByte)
-                                            .build()
-                                            .toByteArray(), ZMQ.DONTWAIT);
-
-                                    if (response) {
-                                        instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
-                                                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.DELETE)
-                                                .setKey(key)
-                                                .build()
-                                        );
-                                    }
-                                } else {
-                                    boolean response = XTablesServer.table.delete("");
-
-                                    socket.send(XTableProto.XTableMessage.newBuilder()
-                                            .setCommand(command)
-                                            .setValue(response ? successByte : failByte)
-                                            .build()
-                                            .toByteArray(), ZMQ.DONTWAIT);
-
-                                    if (response) {
-                                        instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
-                                                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.DELETE)
-                                                .setKey("")
-                                                .build()
-                                        );
-                                    }
+                            } else {
+                                tables = XTablesServer.table.getTables("");
+                                byte[] resp = Utilities.toByteArray((List<?>) tables);
+                                if (tables != null && !tables.isEmpty() && resp != null) {
+                                    builder.setValue(ByteString.copyFrom(resp));
                                 }
                             }
-                            case PING -> {
-                                SystemStatistics systemStatistics = new SystemStatistics(0);
-                                systemStatistics.setTotalMessages(instance.messages.get());
-                                systemStatistics.setVersion(XTABLES_SERVER_VERSION);
+                            socket.send(builder.build().toByteArray(), ZMQ.DONTWAIT);
+
+                        }
+                        case DELETE -> {
+                            if (message.hasKey()) {
+                                String key = message.getKey();
+                                boolean response = XTablesServer.table.delete(key);
+
                                 socket.send(XTableProto.XTableMessage.newBuilder()
                                         .setCommand(command)
-                                        .setValue(ByteString.copyFrom(gson.toJson(systemStatistics).replace(" ", "").replace("\n", "").getBytes(StandardCharsets.UTF_8)))
-                                        .build().toByteArray(), ZMQ.DONTWAIT);
-                            }
-                            default -> {
-                                logger.warning("Unhandled reply command: " + command);
+                                        .setValue(response ? successByte : failByte)
+                                        .build()
+                                        .toByteArray(), ZMQ.DONTWAIT);
+
+                                if (response) {
+                                    instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                            .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.DELETE)
+                                            .setKey(key)
+                                            .build()
+                                    );
+                                }
+                            } else {
+                                boolean response = XTablesServer.table.delete("");
+
                                 socket.send(XTableProto.XTableMessage.newBuilder()
-                                        .setCommand(XTableProto.XTableMessage.Command.UNKNOWN_COMMAND)
-                                        .setValue(failByte).build().toByteArray(), ZMQ.DONTWAIT);
+                                        .setCommand(command)
+                                        .setValue(response ? successByte : failByte)
+                                        .build()
+                                        .toByteArray(), ZMQ.DONTWAIT);
+
+                                if (response) {
+                                    instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                            .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.DELETE)
+                                            .build()
+                                    );
+                                }
                             }
+                        }
+                        case PING -> {
+                            SystemStatistics systemStatistics = new SystemStatistics(0);
+                            systemStatistics.setTotalMessages(instance.messages.get());
+                            systemStatistics.setVersion(XTABLES_SERVER_VERSION);
+                            socket.send(XTableProto.XTableMessage.newBuilder()
+                                    .setCommand(command)
+                                    .setValue(ByteString.copyFrom(gson.toJson(systemStatistics).replace(" ", "").replace("\n", "").getBytes(StandardCharsets.UTF_8)))
+                                    .build().toByteArray(), ZMQ.DONTWAIT);
+                        }
+                        default -> {
+                            logger.warning("Unhandled reply command: " + command);
+                            socket.send(XTableProto.XTableMessage.newBuilder()
+                                    .setCommand(XTableProto.XTableMessage.Command.UNKNOWN_COMMAND)
+                                    .setValue(failByte).build().toByteArray(), ZMQ.DONTWAIT);
+                        }
                     }
                 } catch (Exception e) {
                     handleException(e);
