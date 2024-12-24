@@ -11,7 +11,7 @@
 
 You can access the Javadocs for XTABLES at the following link:
 
-[XTABLES Javadocs](https://kobeeeef.github.io/XTABLES/org/kobe/xbot/ClientLite/XTablesClient.html)
+[XTABLES Javadocs](https://kobeeeef.github.io/XTABLES/index.html)
 
 
 ## New Dashboard
