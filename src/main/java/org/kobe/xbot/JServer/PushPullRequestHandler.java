@@ -45,7 +45,7 @@ public class PushPullRequestHandler extends BaseHandler {
                 instance.messages.incrementAndGet();
                 try {
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
-                    if (message.hasCommand() && message.hasKey() && message.hasValue()) {
+                    if (message.hasKey() && message.hasValue()) {
                         processMessage(message);
                     }
                 } catch (Exception e) {

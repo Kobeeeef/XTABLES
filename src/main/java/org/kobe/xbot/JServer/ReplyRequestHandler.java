@@ -62,7 +62,7 @@ public class ReplyRequestHandler extends BaseHandler {
                 instance.messages.incrementAndGet();
                 try {
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
-                    if (message.hasCommand()) {
+
                         XTableProto.XTableMessage.Command command = message.getCommand();
                         switch (command) {
                             case GET -> {
@@ -160,7 +160,6 @@ public class ReplyRequestHandler extends BaseHandler {
                                         .setCommand(XTableProto.XTableMessage.Command.UNKNOWN_COMMAND)
                                         .setValue(failByte).build().toByteArray(), ZMQ.DONTWAIT);
                             }
-                        }
                     }
                 } catch (Exception e) {
                     handleException(e);
