@@ -234,8 +234,7 @@ public class XTablesClient {
     /**
      * Sends a PUT request with a List of values to the server.
      * <p>
-     * This method serializes the provided List to a byte array and sends it to the server with the DOUBLE type.
-     * The `toByteArray` method of the Utilities class is assumed to handle the serialization of the list to a byte array.
+     * This method serializes the provided List to a byte array and sends it to the server with the ARRAY type.
      *
      * @param key   The key associated with the List value.
      * @param value The List of values to be sent.
@@ -473,7 +472,7 @@ public class XTablesClient {
      * Deletes the default table or data.
      * <p>
      * This method calls the {@link #delete(String)} method with a null value for the key,
-     * effectively deleting the default item.
+     * effectively deleting all the tables.
      *
      * @return true if the deletion was successful, false otherwise
      */
