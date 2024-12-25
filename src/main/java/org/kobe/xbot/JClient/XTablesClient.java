@@ -2,7 +2,9 @@ package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.kobe.xbot.Utilities.Entities.PingResponse;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.Utilities;
@@ -15,7 +17,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 /**
  * XTablesClient - A client class for interacting with the XTABLES server.
@@ -53,6 +57,9 @@ public class XTablesClient {
     private final ZMQ.Socket subSocket;
     private final ZMQ.Socket pushSocket;
     private final ZMQ.Socket reqSocket;
+    private final SubscribeHandler subscribeHandler;
+    public final AtomicInteger subscribeMessagesCount = new AtomicInteger(0);
+    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> subscriptionConsumers;
 
     /**
      * Default constructor for XTablesClient.
@@ -117,6 +124,10 @@ public class XTablesClient {
         this.subSocket = context.createSocket(SocketType.SUB);
         this.subSocket.setHWM(500);
         this.subSocket.connect("tcp://" + ip + ":" + subscribeSocketPort);
+        this.subscriptionConsumers = new HashMap<>();
+        this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
+        this.subscribeHandler.start();
+
     }
 
     /**
@@ -129,7 +140,7 @@ public class XTablesClient {
      * @param value The byte array value to be sent.
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean executePutBytes(String key, byte[] value) {
+    public boolean putBytes(String key, byte[] value) {
         return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, value, XTableProto.XTableMessage.Type.UNKNOWN);
     }
 
@@ -144,7 +155,7 @@ public class XTablesClient {
      * @param type  The type of the value being sent (e.g., STRING, INT64, etc.).
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean executePutBytes(String key, byte[] value, XTableProto.XTableMessage.Type type) {
+    public boolean putBytes(String key, byte[] value, XTableProto.XTableMessage.Type type) {
         return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, value, type);
     }
 
@@ -157,7 +168,7 @@ public class XTablesClient {
      * @param value The string value to be sent.
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean executePutString(String key, String value) {
+    public boolean putString(String key, String value) {
         return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, value.getBytes(StandardCharsets.UTF_8), XTableProto.XTableMessage.Type.STRING);
     }
 
@@ -171,7 +182,7 @@ public class XTablesClient {
      * @param value The Integer value to be sent.
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean executePutInteger(String key, Integer value) {
+    public boolean putInteger(String key, Integer value) {
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(value).array();
         return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 4-byte Integer
     }
@@ -185,7 +196,7 @@ public class XTablesClient {
      * @param value The Long value to be sent.
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean executePutLong(String key, Long value) {
+    public boolean putLong(String key, Long value) {
         byte[] valueBytes = ByteBuffer.allocate(8).putLong(value).array();
         return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 8-byte Long
     }
@@ -199,7 +210,7 @@ public class XTablesClient {
      * @param value The Double value to be sent.
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean executePutDouble(String key, Double value) {
+    public boolean putDouble(String key, Double value) {
         byte[] valueBytes = ByteBuffer.allocate(8).putDouble(value).array();
         return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, valueBytes, XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE for 8-byte Double
     }
@@ -216,7 +227,7 @@ public class XTablesClient {
      * @param value The boolean value to be sent (true or false).
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean executePutBoolean(String key, boolean value) {
+    public boolean putBoolean(String key, boolean value) {
         return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, value ? success : fail, XTableProto.XTableMessage.Type.BOOL); // Using DOUBLE for 8-byte Double
     }
 
@@ -231,7 +242,7 @@ public class XTablesClient {
      * @param <T>   The type of the elements in the list.
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public <T> boolean executePutList(String key, List<T> value) {
+    public <T> boolean putList(String key, List<T> value) {
         return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, Utilities.toByteArray(value), XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE as the type for List serialization
     }
 
@@ -247,13 +258,17 @@ public class XTablesClient {
      * @return True if the message was sent successfully; otherwise, false.
      */
     private boolean sendPushMessage(XTableProto.XTableMessage.Command command, String key, byte[] value, XTableProto.XTableMessage.Type type) {
-        return pushSocket.send(XTableProto.XTableMessage.newBuilder()
-                .setKey(key)
-                .setCommand(command)
-                .setValue(ByteString.copyFrom(value))
-                .setType(type)
-                .build()
-                .toByteArray(), ZMQ.DONTWAIT);
+        try {
+            return pushSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setKey(key)
+                    .setCommand(command)
+                    .setValue(ByteString.copyFrom(value))
+                    .setType(type)
+                    .build()
+                    .toByteArray(), ZMQ.DONTWAIT);
+        } catch (Exception e) {
+            throw new XTablesException(e);
+        }
     }
 
     /**
@@ -267,7 +282,7 @@ public class XTablesClient {
      * @return The String value associated with the given key.
      * @throws IllegalArgumentException If the returned message type is not STRING.
      */
-    public String executeGetString(String key) {
+    public String getString(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.STRING)) {
             return message.getValue().toStringUtf8();
@@ -289,7 +304,7 @@ public class XTablesClient {
      * @return The Integer value associated with the given key.
      * @throws IllegalArgumentException If the returned message type is not INT64.
      */
-    public Integer executeGetInteger(String key) {
+    public Integer getInteger(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
             byte[] valueBytes = message.getValue().toByteArray();
@@ -312,7 +327,7 @@ public class XTablesClient {
      * @return The Boolean value associated with the given key.
      * @throws IllegalArgumentException If the returned message type is not BOOL.
      */
-    public Boolean executeGetBoolean(String key) {
+    public Boolean getBoolean(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.BOOL)) {
             return message.getValue().equals(successByte);
@@ -334,7 +349,7 @@ public class XTablesClient {
      * @return The Long value associated with the given key.
      * @throws IllegalArgumentException If the returned message type is not INT64.
      */
-    public Long executeGetLong(String key) {
+    public Long getLong(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
             byte[] valueBytes = message.getValue().toByteArray();
@@ -357,7 +372,7 @@ public class XTablesClient {
      * @return The Double value associated with the given key.
      * @throws IllegalArgumentException If the returned message type is not DOUBLE.
      */
-    public Double executeGetDouble(String key) {
+    public Double getDouble(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.DOUBLE)) {
             byte[] valueBytes = message.getValue().toByteArray();
@@ -383,7 +398,7 @@ public class XTablesClient {
      * @return A List of values associated with the given key.
      * @throws IllegalArgumentException If the returned message type is not ARRAY.
      */
-    public <T> List<T> executeGetList(String key, Class<T> type) {
+    public <T> List<T> getList(String key, Class<T> type) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.ARRAY)) {
             byte[] valueBytes = message.getValue().toByteArray();
@@ -418,6 +433,217 @@ public class XTablesClient {
         }
     }
 
+    /**
+     * Deletes a table or data identified by the provided key.
+     * <p>
+     * This method sends a request to delete a table or data.
+     * If a key is provided, the request will specify the key.
+     * The response is checked to determine if the
+     * deletion was successful.
+     *
+     * @param key The key identifying the table or data to be deleted, or null to delete the default item
+     * @return true if the deletion was successful, false otherwise
+     */
+    public boolean delete(String key) {
+        try {
+            if (key == null) {
+                reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                        .setCommand(XTableProto.XTableMessage.Command.DELETE)
+                        .build()
+                        .toByteArray());
+            } else {
+                reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                        .setCommand(XTableProto.XTableMessage.Command.DELETE)
+                        .setKey(key)
+                        .build()
+                        .toByteArray());
+            }
+            byte[] response = reqSocket.recv();
+            if (response == null) return false;
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            if (!message.hasValue())
+                return false;
+            return message.getValue().equals(successByte);
+        } catch (InvalidProtocolBufferException | NullPointerException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Deletes the default table or data.
+     * <p>
+     * This method calls the {@link #delete(String)} method with a null value for the key,
+     * effectively deleting the default item.
+     *
+     * @return true if the deletion was successful, false otherwise
+     */
+    public boolean delete() {
+        return delete(null);
+    }
+
+
+    /**
+     * Retrieves a list of table names based on the provided key.
+     * <p>
+     * This method sends a request to retrieve the available tables. If a key is provided,
+     * the request includes the key. The response is parsed and returned as a list of strings.
+     *
+     * @param key The key used to retrieve the tables or null to get all root tables
+     * @return A list of table names or an empty list if the request fails
+     */
+    public List<String> getTables(String key) {
+        try {
+            if (key == null) {
+                reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                        .setCommand(XTableProto.XTableMessage.Command.GET_TABLES)
+                        .build()
+                        .toByteArray());
+            } else {
+                reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                        .setCommand(XTableProto.XTableMessage.Command.GET_TABLES)
+                        .setKey(key)
+                        .build()
+                        .toByteArray());
+            }
+            byte[] response = reqSocket.recv();
+            if (response == null) return Collections.EMPTY_LIST;
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            if (!message.hasValue())
+                return Collections.EMPTY_LIST;
+            return Utilities.fromByteArray(message.getValue().toByteArray(), String.class);
+        } catch (InvalidProtocolBufferException | NullPointerException e) {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    /**
+     * Retrieves a list of all root table names.
+     * <p>
+     * This method calls the {@link #getTables(String)} method with a null value for the key,
+     * effectively requesting the root tables.
+     *
+     * @return A list of root table names or an empty list if the request fails
+     */
+    public List<String> getTables() {
+        return getTables(null);
+    }
+
+    /**
+     * Reboots the server and checks the success of the operation.
+     * <p>
+     * This method sends a reboot request to the server and waits for a response.
+     * It checks if the server acknowledges the reboot request and returns true if successful.
+     *
+     * @return true if the server was successfully rebooted, false otherwise
+     */
+    public boolean reboot() {
+        try {
+            reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setCommand(XTableProto.XTableMessage.Command.REBOOT_SERVER)
+                    .build()
+                    .toByteArray());
+            byte[] response = reqSocket.recv();
+            if (response == null) return false;
+
+
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            if (message.hasValue())
+                return message.getValue().equals(successByte);
+            else return false;
+        } catch (InvalidProtocolBufferException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Sends a ping request to the server and measures the round-trip time.
+     * <p>
+     * This method sends a ping request to the server, measures the time taken for the response,
+     * and returns a PingResponse object containing the result of the ping and the round-trip time.
+     *
+     * @return A PingResponse containing the success status and round-trip time
+     */
+    public PingResponse ping() {
+        try {
+            long time = System.nanoTime();
+            reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setCommand(XTableProto.XTableMessage.Command.PING)
+                    .build()
+                    .toByteArray());
+            byte[] response = reqSocket.recv();
+            long diff = System.nanoTime() - time;
+            if (response == null) return new PingResponse(false, -1);
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            if (message.hasValue()) {
+                return new PingResponse(message.getValue().equals(successByte), diff);
+            } else return new PingResponse(false, -1);
+        } catch (InvalidProtocolBufferException e) {
+            return new PingResponse(false, -1);
+        }
+    }
+
+    /**
+     * Subscribes to a specific key and associates a consumer to process updates for that key.
+     *
+     * @param key      The key to subscribe to.
+     * @param consumer The consumer function that processes updates for the specified key.
+     * @return true if the subscription and consumer addition were successful, false otherwise.
+     */
+    public boolean subscribe(String key, Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
+        boolean success = this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                .setKey(key)
+                .build()
+                .toByteArray());
+        if (success) {
+            return this.subscriptionConsumers.computeIfAbsent(key, (k) -> new ArrayList<>()).add(consumer);
+        }
+        return false;
+    }
+
+    /**
+     * Unsubscribes a specific consumer from a given key. If no consumers remain for the key,
+     * it unsubscribes the key from the subscription socket.
+     *
+     * @param key      The key to unsubscribe from.
+     * @param consumer The consumer function to remove from the key's subscription.
+     * @return true if the consumer was successfully removed or the key was unsubscribed, false otherwise.
+     */
+    public boolean unsubscribe(String key, Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
+        if (this.subscriptionConsumers.containsKey(key)) {
+            List<Consumer<XTableProto.XTableMessage.XTableUpdate>> list = this.subscriptionConsumers.get(key);
+            boolean success = list.remove(consumer);
+            if (list.isEmpty()) {
+                this.subscriptionConsumers.remove(key);
+                return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                        .setKey(key)
+                        .build()
+                        .toByteArray());
+            }
+            return success;
+        } else {
+            return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                    .setKey(key)
+                    .build()
+                    .toByteArray());
+        }
+    }
+
+
+    /**
+     * Gracefully shuts down the XTablesClient.
+     * - Destroys the ZMQ context if it exists and is not yet closed.
+     * - Interrupts and stops the subscription handler thread if it's active.
+     * - Logs the shutdown event for debugging and monitoring.
+     */
+    public void shutdown() {
+        if (this.context != null && !this.context.isClosed()) {
+            this.context.destroy();
+        }
+        if (this.subscribeHandler != null && !this.subscribeHandler.isInterrupted() && this.subscribeHandler.isAlive()) {
+            this.subscribeHandler.interrupt();
+        }
+        logger.info("XTablesClient has been shutdown gracefully.");
+    }
 
     /**
      * Returns the version information of the XTables client.

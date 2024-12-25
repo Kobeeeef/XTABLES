@@ -216,17 +216,22 @@ public class Utilities {
         if (list == null) {
             return new byte[0];
         }
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
-                objectOutputStream.writeObject(list);
-                objectOutputStream.flush();
-            }
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
+
+            // Serialize the list into the byte array
+            objectOutputStream.writeObject(list);
+            objectOutputStream.flush();
+
+            // Return the serialized byte array
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
+            // Handle serialization errors (log or print stack trace)
+            e.printStackTrace();
             return null;
         }
     }
+
     public static <T> List<T> fromByteArray(byte[] byteArray, Class<T> type) {
         if (byteArray == null || byteArray.length == 0) {
             return null;
@@ -234,15 +239,23 @@ public class Utilities {
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
              ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
 
-            // This cast is safe if the list was serialized correctly as a List
-            @SuppressWarnings("unchecked")
+            // Deserialize the byte array into a list
             List<T> list = (List<T>) objectInputStream.readObject();
+
+            // Return the deserialized list
             return list;
+        } catch (java.io.InvalidClassException | java.io.StreamCorruptedException e) {
+            // Specific deserialization errors (invalid stream or corrupted data)
+            System.err.println("Deserialization failed: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         } catch (Exception e) {
+            // Catch all other exceptions
             e.printStackTrace();
             return null;
         }
     }
+
     private static XTableProto.XTableMessage.Command getRandomCommand() {
         XTableProto.XTableMessage.Command[] commands = XTableProto.XTableMessage.Command.values();
         int randomIndex = ThreadLocalRandom.current().nextInt(commands.length - 1);

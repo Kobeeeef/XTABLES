@@ -2,6 +2,7 @@ package org.kobe.xbot.Utilities;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiFunction;
 
 public class CircularBuffer<T> {
     private final Object[] buffer;
@@ -10,14 +11,16 @@ public class CircularBuffer<T> {
     private final int capacity;
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition notEmpty = lock.newCondition();
+    private final BiFunction<T, T, Boolean> shouldRemove;
 
-    // Constructor to initialize the buffer with a specific size
-    public CircularBuffer(int capacity) {
+    // Constructor to initialize the buffer with a specific size and removal function
+    public CircularBuffer(int capacity, BiFunction<T, T, Boolean> shouldRemove) {
         if (capacity <= 0) {
             throw new IllegalArgumentException("Buffer size must be greater than 0");
         }
         this.capacity = capacity;
         this.buffer = new Object[capacity];
+        this.shouldRemove = shouldRemove;
     }
 
     // Write data to the buffer
@@ -34,6 +37,7 @@ public class CircularBuffer<T> {
             lock.unlock();
         }
     }
+
     public T readAndBlock() {
         lock.lock();
         try {
@@ -53,6 +57,7 @@ public class CircularBuffer<T> {
             lock.unlock();
         }
     }
+
     public T read() {
         lock.lock();
         try {
@@ -70,8 +75,8 @@ public class CircularBuffer<T> {
         }
     }
 
-    // Read the latest data and clear the buffer, blocking if necessary
-    public T readLatestAndClear() {
+    // Read the latest data and clear the buffer based on the removal function
+    public T readLatestAndClearOnFunction() {
         lock.lock();
         try {
             while (size == 0) {
@@ -79,7 +84,23 @@ public class CircularBuffer<T> {
             }
             int latestIndex = (writeIndex - 1 + capacity) % capacity;
             T latestData = (T) buffer[latestIndex];
-            clear();
+
+            // Filter the buffer using the removal function
+            int newSize = 0;
+            int currentIndex = (writeIndex - size + capacity) % capacity;
+            for (int i = 0; i < size; i++) {
+                T currentData = (T) buffer[currentIndex];
+                if (!shouldRemove.apply(latestData, currentData)) {
+                    buffer[newSize] = currentData;
+                    newSize++;
+                }
+                currentIndex = (currentIndex + 1) % capacity;
+            }
+
+            // Update buffer metadata
+            size = newSize;
+            writeIndex = newSize % capacity;
+
             return latestData;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore interrupt status
@@ -89,14 +110,6 @@ public class CircularBuffer<T> {
         }
     }
 
-    // Clear the buffer
-    private void clear() {
-        for (int i = 0; i < size; i++) {
-            buffer[i] = null;
-        }
-        size = 0;
-        writeIndex = 0;
-    }
 
     // Optional: Check if the buffer is empty
     public boolean isEmpty() {

@@ -10,6 +10,7 @@ import org.kobe.xbot.Utilities.Utilities;
 import org.zeromq.ZMQ;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,9 +107,13 @@ public class ReplyRequestHandler extends BaseHandler {
                                 }
                             } else {
                                 tables = XTablesServer.table.getTables("");
-                                byte[] resp = Utilities.toByteArray((List<?>) tables);
-                                if (tables != null && !tables.isEmpty() && resp != null) {
-                                    builder.setValue(ByteString.copyFrom(resp));
+                                if (tables != null && !tables.isEmpty()) {
+                                    List<String> tablesList = new ArrayList<>(tables);
+
+                                    byte[] resp = Utilities.toByteArray(tablesList);
+                                    if(resp != null) {
+                                        builder.setValue(ByteString.copyFrom(resp));
+                                    }
                                 }
                             }
                             socket.send(builder.build().toByteArray(), ZMQ.DONTWAIT);
@@ -149,7 +154,7 @@ public class ReplyRequestHandler extends BaseHandler {
                                 }
                             }
                         }
-                        case PING -> {
+                        case INFORMATION -> {
                             SystemStatistics systemStatistics = new SystemStatistics(0);
                             systemStatistics.setTotalMessages(instance.messages.get());
                             systemStatistics.setVersion(XTABLES_SERVER_VERSION);
@@ -158,6 +163,10 @@ public class ReplyRequestHandler extends BaseHandler {
                                     .setValue(ByteString.copyFrom(gson.toJson(systemStatistics).replace(" ", "").replace("\n", "").getBytes(StandardCharsets.UTF_8)))
                                     .build().toByteArray(), ZMQ.DONTWAIT);
                         }
+                        case PING -> socket.send(XTableProto.XTableMessage.newBuilder()
+                                .setValue(successByte)
+                                .build()
+                                .toByteArray(), ZMQ.DONTWAIT);
                         default -> {
                             logger.warning("Unhandled reply command: " + command);
                             socket.send(XTableProto.XTableMessage.newBuilder()

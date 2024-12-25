@@ -6,6 +6,7 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,25 +20,26 @@ public class PullPushProducer {
             System.out.println("Producer started. Sending image...");
 
             byte[] imageBytes = Files.readAllBytes(Paths.get("ping_page.png"));
-
+            int i = 0;
             while (!Thread.currentThread().isInterrupted()) {
 
                     // Read the image file into a byte array
-
+                    i++;
                     long id = ThreadLocalRandom.current().nextLong();
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.newBuilder()
                             .setCommand(XTableProto.XTableMessage.Command.PUT)
                             .setKey("imageKey")
-                            .setValue(ByteString.copyFrom(imageBytes)) // Send the image as bytes
+                            .setType(XTableProto.XTableMessage.Type.STRING)
+                            .setValue(ByteString.copyFrom(("" + i).getBytes(StandardCharsets.UTF_8))) // Send the image as bytes
                             .build();
                     // Send the message to the socket
                     socket.send(message.toByteArray(), ZMQ.DONTWAIT);
-                    System.out.println("sent");
+                    System.out.println(i);
 
-                Thread.sleep(1000);
+
             }
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException  e) {
             throw new RuntimeException(e);
         }
     }

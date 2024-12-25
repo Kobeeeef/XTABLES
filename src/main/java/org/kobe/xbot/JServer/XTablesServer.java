@@ -1,6 +1,7 @@
 package org.kobe.xbot.JServer;
 
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.Utilities;
 import org.kobe.xbot.Utilities.XTableStatus;
@@ -126,6 +127,7 @@ public class XTablesServer {
             context.destroy();
             logger.info("ZMQ context destroyed successfully.");
         }
+
         if (jmdns != null && serviceInfo != null) {
             logger.info("Attempting to unregister mDNS service: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT + "...");
             jmdns.unregisterService(serviceInfo);
@@ -139,6 +141,7 @@ public class XTablesServer {
             replyRequestHandler.interrupt();
         }
         table.delete("");
+
     }
 
     /**
@@ -149,19 +152,43 @@ public class XTablesServer {
         try {
             status.set(XTableStatus.REBOOTING);
             logger.info("Restarting server...");
-            cleanup();
-            status.set(XTableStatus.OFFLINE);
-            logger.info("Starting server in 3 seconds...");
-            status.set(XTableStatus.STARTING);
-            Thread.sleep(3000);
-            start();
-            status.set(XTableStatus.ONLINE);
-            logger.info("Server restarted successfully.");
+
+            if (Thread.currentThread() == main) {
+                performRestart();
+            } else {
+                Thread restartThread = new Thread(() -> {
+                    try {
+                        performRestart();
+                    } catch (Exception e) {
+                        logger.fatal("Failed to restart server from main thread: " + e.getMessage());
+                        throw new XTablesException("Server restart failed from main thread", e);
+                    }
+                });
+                restartThread.setName("XTABLES-RESTART");
+                restartThread.setDaemon(false);
+                restartThread.start();
+            }
         } catch (Exception e) {
             logger.fatal("Failed to restart server: " + e.getMessage());
-            throw new RuntimeException("Server restart failed", e);
+            throw new XTablesException("Server restart failed", e);
         }
     }
+
+    /**
+     * Performs the actual restart logic, ensuring cleanup and resource management.
+     * This method should only be called from the main thread.
+     */
+    private void performRestart() throws Exception {
+        cleanup();
+        status.set(XTableStatus.OFFLINE);
+        logger.info("Starting server in 3 seconds...");
+        status.set(XTableStatus.STARTING);
+        Thread.sleep(3000);
+        start();
+        status.set(XTableStatus.ONLINE);
+        logger.info("Server restarted successfully.");
+    }
+
 
     /**
      * Initializes mDNS (Multicast DNS) service with a specified number of retry attempts.
