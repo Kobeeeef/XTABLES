@@ -351,11 +351,11 @@ public class XTablesServer {
     public void setDebug(boolean value) {
         debug.set(value);
         XTablesLogger.setHandler((level, s) -> {
-            if(debug.get() && pubSocket != null) {
+            if (debug.get() && pubSocket != null) {
                 notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                         .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
                         .setValue(XTableProto.XTableMessage.XTableLog.newBuilder()
-                                .setLevel(level.equals(Level.INFO) ? XTableProto.XTableMessage.XTableLog.Level.INFO :level.equals(Level.WARNING) ? XTableProto.XTableMessage.XTableLog.Level.WARNING : level.equals(Level.SEVERE) ? XTableProto.XTableMessage.XTableLog.Level.SEVERE : level.equals(XTablesLogger.FATAL) ? XTableProto.XTableMessage.XTableLog.Level.FATAL : XTableProto.XTableMessage.XTableLog.Level.UNKNOWN)
+                                .setLevel(level.equals(Level.INFO) ? XTableProto.XTableMessage.XTableLog.Level.INFO : level.equals(Level.WARNING) ? XTableProto.XTableMessage.XTableLog.Level.WARNING : level.equals(Level.SEVERE) ? XTableProto.XTableMessage.XTableLog.Level.SEVERE : level.equals(XTablesLogger.FATAL) ? XTableProto.XTableMessage.XTableLog.Level.FATAL : XTableProto.XTableMessage.XTableLog.Level.UNKNOWN)
                                 .setMessage(s)
                                 .build()
                                 .toByteString())

@@ -111,7 +111,7 @@ public class ReplyRequestHandler extends BaseHandler {
                                     List<String> tablesList = new ArrayList<>(tables);
 
                                     byte[] resp = Utilities.toByteArray(tablesList);
-                                    if(resp != null) {
+                                    if (resp != null) {
                                         builder.setValue(ByteString.copyFrom(resp));
                                     }
                                 }

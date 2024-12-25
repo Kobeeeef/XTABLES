@@ -8,6 +8,19 @@ import org.zeromq.ZMQ;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * SubscribeHandler - A handler for processing incoming subscription messages using JeroMQ.
+ * <p>
+ * This class handles the reception of messages on a ZeroMQ socket, processes them, and stores the updates in a circular buffer.
+ * It also manages a separate consumer thread that handles the subscription consumers and invokes their functions for each new update.
+ * The handler supports both UPDATE and PUBLISH message categories.
+ * <p>
+ * Author: Kobe Lei
+ * Version: 1.0
+ * Package: org.kobe.xbot.JClient
+ * <p>
+ * This is part of the XTABLES project and facilitates subscribing and handling incoming messages from the server.
+ */
 public class SubscribeHandler extends BaseHandler {
     private final XTablesClient instance;
     private final CircularBuffer<XTableProto.XTableMessage.XTableUpdate> buffer;
