@@ -83,9 +83,9 @@ public class PushPullRequestHandler extends BaseHandler {
             case PUBLISH -> {
                 if (message.hasKey() && message.hasValue()) {
                         instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                .setKey(message.getKey())
                                 .setType(message.getType())
                                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.PUBLISH)
-                                .setKey(message.getKey())
                                 .setValue(ByteString.copyFrom(message.getValue().toByteArray()))
                                 .build()
                         );

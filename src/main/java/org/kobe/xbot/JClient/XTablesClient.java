@@ -60,6 +60,7 @@ public class XTablesClient {
     private final SubscribeHandler subscribeHandler;
     public final AtomicInteger subscribeMessagesCount = new AtomicInteger(0);
     public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> subscriptionConsumers;
+    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> publishConsumers;
 
     /**
      * Default constructor for XTablesClient.
@@ -125,6 +126,7 @@ public class XTablesClient {
         this.subSocket.setHWM(500);
         this.subSocket.connect("tcp://" + ip + ":" + subscribeSocketPort);
         this.subscriptionConsumers = new HashMap<>();
+        this.publishConsumers = new HashMap<>();
         this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
         this.subscribeHandler.start();
 
@@ -600,6 +602,20 @@ public class XTablesClient {
     }
 
     /**
+     * Subscribes to updates for all keys and associates a consumer to process updates for all keys.
+     *
+     * @param consumer The consumer function that processes updates for any key.
+     * @return true if the subscription and consumer addition were successful, false otherwise.
+     */
+    public boolean subscribe(Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
+        boolean success = this.subSocket.subscribe("");
+        if (success) {
+            return this.subscriptionConsumers.computeIfAbsent("", (k) -> new ArrayList<>()).add(consumer);
+        }
+        return false;
+    }
+
+    /**
      * Unsubscribes a specific consumer from a given key. If no consumers remain for the key,
      * it unsubscribes the key from the subscription socket.
      *
@@ -627,6 +643,26 @@ public class XTablesClient {
         }
     }
 
+    /**
+     * Unsubscribes a specific consumer from all keys. If no consumers remain for all keys,
+     * it unsubscribes from the subscription socket for all keys.
+     *
+     * @param consumer The consumer function to remove from all key subscriptions.
+     * @return true if the consumer was successfully removed or unsubscribed from all keys, false otherwise.
+     */
+    public boolean unsubscribe(Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
+        if (this.subscriptionConsumers.containsKey("")) {
+            List<Consumer<XTableProto.XTableMessage.XTableUpdate>> list = this.subscriptionConsumers.get("");
+            boolean success = list.remove(consumer);
+            if (list.isEmpty()) {
+                this.subscriptionConsumers.remove("");
+                return this.subSocket.unsubscribe("");
+            }
+            return success;
+        } else {
+            return this.subSocket.unsubscribe("");
+        }
+    }
 
     /**
      * Gracefully shuts down the XTablesClient.

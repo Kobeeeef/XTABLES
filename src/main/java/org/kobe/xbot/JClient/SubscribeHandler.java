@@ -12,6 +12,7 @@ public class SubscribeHandler extends BaseHandler {
     private final XTablesClient instance;
     private final CircularBuffer<XTableProto.XTableMessage.XTableUpdate> buffer;
     private final Thread consumerHandlingThread;
+
     /**
      * Constructor that initializes the handler with the provided socket and server instance.
      *
@@ -56,15 +57,24 @@ public class SubscribeHandler extends BaseHandler {
             setName("XTABLES-CONSUMER-HANDLER-DAEMON");
             setDaemon(true);
         }
+
         @Override
         public void run() {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
                     XTableProto.XTableMessage.XTableUpdate update = buffer.readLatestAndClearOnFunction();
-                    if (instance.subscriptionConsumers.containsKey(update.getKey())) {
-                        List<Consumer<XTableProto.XTableMessage.XTableUpdate>> consumers = instance.subscriptionConsumers.get(update.getKey());
-                        for (Consumer<XTableProto.XTableMessage.XTableUpdate> consumer : consumers) {
-                            consumer.accept(update);
+                    if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.UPDATE) || update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.PUBLISH)) {
+                        if (instance.subscriptionConsumers.containsKey(update.getKey())) {
+                            List<Consumer<XTableProto.XTableMessage.XTableUpdate>> consumers = instance.subscriptionConsumers.get(update.getKey());
+                            for (Consumer<XTableProto.XTableMessage.XTableUpdate> consumer : consumers) {
+                                consumer.accept(update);
+                            }
+                        }
+                        if (instance.subscriptionConsumers.containsKey("")) {
+                            List<Consumer<XTableProto.XTableMessage.XTableUpdate>> consumers = instance.subscriptionConsumers.get("");
+                            for (Consumer<XTableProto.XTableMessage.XTableUpdate> consumer : consumers) {
+                                consumer.accept(update);
+                            }
                         }
                     }
                 }
