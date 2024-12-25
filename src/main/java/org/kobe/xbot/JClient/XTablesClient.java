@@ -308,7 +308,7 @@ public class XTablesClient {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.STRING)) {
             return message.getValue().toStringUtf8();
-        } else if (message == null || (message != null && message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
+        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
             throw new IllegalArgumentException("Expected STRING type, but got: " + (message.getType()));
@@ -331,7 +331,7 @@ public class XTablesClient {
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
             byte[] valueBytes = message.getValue().toByteArray();
             return ByteBuffer.wrap(valueBytes).getInt();
-        } else if (message == null || (message != null && message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
+        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
             throw new IllegalArgumentException("Expected INT64 type, but got: " + message.getType());
@@ -353,7 +353,7 @@ public class XTablesClient {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.BOOL)) {
             return message.getValue().equals(successByte);
-        } else if (message == null || (message != null && message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
+        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
             throw new IllegalArgumentException("Expected BOOL type, but got: " + message.getType());
@@ -376,7 +376,7 @@ public class XTablesClient {
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
             byte[] valueBytes = message.getValue().toByteArray();
             return ByteBuffer.wrap(valueBytes).getLong();
-        } else if (message == null || (message != null && message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
+        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
             throw new IllegalArgumentException("Expected INT64 type, but got: " + message.getType());
@@ -399,7 +399,7 @@ public class XTablesClient {
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.DOUBLE)) {
             byte[] valueBytes = message.getValue().toByteArray();
             return ByteBuffer.wrap(valueBytes).getDouble();
-        } else if (message == null || (message != null && message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
+        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
             throw new IllegalArgumentException("Expected DOUBLE type, but got: " + message.getType());
@@ -425,7 +425,7 @@ public class XTablesClient {
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.ARRAY)) {
             byte[] valueBytes = message.getValue().toByteArray();
             return Utilities.fromByteArray(valueBytes, type);
-        } else if (message == null || (message != null && message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
+        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
             throw new IllegalArgumentException("Expected ARRAY type, but got: " + message.getType());
