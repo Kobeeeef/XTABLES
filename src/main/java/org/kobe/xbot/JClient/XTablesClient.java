@@ -143,7 +143,7 @@ public class XTablesClient {
      * @return True if the message was sent successfully; otherwise, false.
      */
     public boolean putBytes(String key, byte[] value) {
-        return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, value, XTableProto.XTableMessage.Type.UNKNOWN);
+        return sendPutMessage(key, value, XTableProto.XTableMessage.Type.UNKNOWN);
     }
 
     /**
@@ -158,7 +158,7 @@ public class XTablesClient {
      * @return True if the message was sent successfully; otherwise, false.
      */
     public boolean putBytes(String key, byte[] value, XTableProto.XTableMessage.Type type) {
-        return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, value, type);
+        return sendPutMessage(key, value, type);
     }
 
     /**
@@ -171,7 +171,7 @@ public class XTablesClient {
      * @return True if the message was sent successfully; otherwise, false.
      */
     public boolean putString(String key, String value) {
-        return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, value.getBytes(StandardCharsets.UTF_8), XTableProto.XTableMessage.Type.STRING);
+        return sendPutMessage(key, value.getBytes(StandardCharsets.UTF_8), XTableProto.XTableMessage.Type.STRING);
     }
 
     /**
@@ -186,7 +186,7 @@ public class XTablesClient {
      */
     public boolean putInteger(String key, Integer value) {
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(value).array();
-        return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 4-byte Integer
+        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 4-byte Integer
     }
 
     /**
@@ -200,7 +200,7 @@ public class XTablesClient {
      */
     public boolean putLong(String key, Long value) {
         byte[] valueBytes = ByteBuffer.allocate(8).putLong(value).array();
-        return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 8-byte Long
+        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 8-byte Long
     }
 
     /**
@@ -214,7 +214,7 @@ public class XTablesClient {
      */
     public boolean putDouble(String key, Double value) {
         byte[] valueBytes = ByteBuffer.allocate(8).putDouble(value).array();
-        return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, valueBytes, XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE for 8-byte Double
+        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE for 8-byte Double
     }
 
     /**
@@ -230,7 +230,7 @@ public class XTablesClient {
      * @return True if the message was sent successfully; otherwise, false.
      */
     public boolean putBoolean(String key, boolean value) {
-        return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, value ? success : fail, XTableProto.XTableMessage.Type.BOOL); // Using DOUBLE for 8-byte Double
+        return sendPutMessage(key, value ? success : fail, XTableProto.XTableMessage.Type.BOOL); // Using DOUBLE for 8-byte Double
     }
 
     /**
@@ -244,7 +244,7 @@ public class XTablesClient {
      * @return True if the message was sent successfully; otherwise, false.
      */
     public <T> boolean putList(String key, List<T> value) {
-        return sendPushMessage(XTableProto.XTableMessage.Command.PUT, key, Utilities.toByteArray(value), XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE as the type for List serialization
+        return sendPutMessage(key, Utilities.toByteArray(value), XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE as the type for List serialization
     }
 
     /**
@@ -252,19 +252,40 @@ public class XTablesClient {
      * <p>
      * This helper method builds an XTableMessage and sends it using the PUSH socket. The message contains the specified key, command, value, and type.
      *
-     * @param command The command to be sent (e.g., PUT).
-     * @param key     The key associated with the value.
-     * @param value   The byte array representing the value to be sent.
-     * @param type    The type of the value being sent (e.g., STRING, INT64, etc.).
+     * @param key   The key associated with the value.
+     * @param value The byte array representing the value to be sent.
+     * @param type  The type of the value being sent (e.g., STRING, INT64, etc.).
      * @return True if the message was sent successfully; otherwise, false.
      */
-    private boolean sendPushMessage(XTableProto.XTableMessage.Command command, String key, byte[] value, XTableProto.XTableMessage.Type type) {
+    private boolean sendPutMessage(String key, byte[] value, XTableProto.XTableMessage.Type type) {
         try {
             return pushSocket.send(XTableProto.XTableMessage.newBuilder()
                     .setKey(key)
-                    .setCommand(command)
+                    .setCommand(XTableProto.XTableMessage.Command.PUT)
                     .setValue(ByteString.copyFrom(value))
                     .setType(type)
+                    .build()
+                    .toByteArray(), ZMQ.DONTWAIT);
+        } catch (Exception e) {
+            throw new XTablesException(e);
+        }
+    }
+
+    /**
+     * Publishes a message with a specified key and value to the push socket.
+     * The message is sent with the "PUBLISH" command.
+     *
+     * @param key   The key associated with the message being published.
+     * @param value The value (byte array) to be published with the key.
+     * @return true if the message was successfully sent, false otherwise.
+     * @throws XTablesException if there is an exception during the publish process.
+     */
+    public boolean publish(String key, byte[] value) {
+        try {
+            return pushSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setKey(key)
+                    .setCommand(XTableProto.XTableMessage.Command.PUBLISH)
+                    .setValue(ByteString.copyFrom(value))
                     .build()
                     .toByteArray(), ZMQ.DONTWAIT);
         } catch (Exception e) {
