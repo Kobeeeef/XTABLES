@@ -125,6 +125,9 @@ public class XTablesClient {
         this.subSocket = context.createSocket(SocketType.SUB);
         this.subSocket.setHWM(500);
         this.subSocket.connect("tcp://" + ip + ":" + subscribeSocketPort);
+        this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                .build().toByteArray());
         this.subscriptionConsumers = new HashMap<>();
         this.publishConsumers = new HashMap<>();
         this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
@@ -749,5 +752,17 @@ public class XTablesClient {
             }
         }
         return address;
+    }
+
+    public ZMQ.Socket getReqSocket() {
+        return reqSocket;
+    }
+
+    public ZMQ.Socket getPushSocket() {
+        return pushSocket;
+    }
+
+    public ZMQ.Socket getSubSocket() {
+        return subSocket;
     }
 }

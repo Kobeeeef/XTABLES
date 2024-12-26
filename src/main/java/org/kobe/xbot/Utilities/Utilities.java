@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -210,7 +211,12 @@ public class Utilities {
 
         return true;
     }
-
+    public static byte[] generateRandomBytes(int length) {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[length];
+        secureRandom.nextBytes(randomBytes);
+        return randomBytes;
+    }
     // Convert any List to byte array
     public static byte[] toByteArray(List<?> list) {
         if (list == null) {

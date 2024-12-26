@@ -81,6 +81,17 @@ public final class XTableProto {
      * @return The type.
      */
     XTableProto.XTableMessage.Type getType();
+
+    /**
+     * <code>optional bytes id = 5;</code>
+     * @return Whether the id field is set.
+     */
+    boolean hasId();
+    /**
+     * <code>optional bytes id = 5;</code>
+     * @return The id.
+     */
+    com.google.protobuf.ByteString getId();
   }
   /**
    * Protobuf type {@code XTableMessage}
@@ -108,6 +119,7 @@ public final class XTableProto {
       key_ = "";
       value_ = com.google.protobuf.ByteString.EMPTY;
       type_ = 0;
+      id_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -389,6 +401,10 @@ public final class XTableProto {
        * <code>REBOOT_SERVER = 17;</code>
        */
       REBOOT_SERVER(17),
+      /**
+       * <code>REGISTRY = 18;</code>
+       */
+      REGISTRY(18),
       UNRECOGNIZED(-1),
       ;
 
@@ -473,6 +489,10 @@ public final class XTableProto {
        * <code>REBOOT_SERVER = 17;</code>
        */
       public static final int REBOOT_SERVER_VALUE = 17;
+      /**
+       * <code>REGISTRY = 18;</code>
+       */
+      public static final int REGISTRY_VALUE = 18;
 
 
       public final int getNumber() {
@@ -517,6 +537,7 @@ public final class XTableProto {
           case 15: return UPDATE_EVENT;
           case 16: return INFORMATION;
           case 17: return REBOOT_SERVER;
+          case 18: return REGISTRY;
           default: return null;
         }
       }
@@ -1439,9 +1460,13 @@ public final class XTableProto {
          */
         PUBLISH(3),
         /**
-         * <code>LOG = 4;</code>
+         * <code>REGISTRY = 4;</code>
          */
-        LOG(4),
+        REGISTRY(4),
+        /**
+         * <code>LOG = 5;</code>
+         */
+        LOG(5),
         UNRECOGNIZED(-1),
         ;
 
@@ -1471,9 +1496,13 @@ public final class XTableProto {
          */
         public static final int PUBLISH_VALUE = 3;
         /**
-         * <code>LOG = 4;</code>
+         * <code>REGISTRY = 4;</code>
          */
-        public static final int LOG_VALUE = 4;
+        public static final int REGISTRY_VALUE = 4;
+        /**
+         * <code>LOG = 5;</code>
+         */
+        public static final int LOG_VALUE = 5;
 
 
         public final int getNumber() {
@@ -1504,7 +1533,8 @@ public final class XTableProto {
             case 1: return UPDATE;
             case 2: return DELETE;
             case 3: return PUBLISH;
-            case 4: return LOG;
+            case 4: return REGISTRY;
+            case 5: return LOG;
             default: return null;
           }
         }
@@ -2379,6 +2409,25 @@ public final class XTableProto {
       return result == null ? XTableProto.XTableMessage.Type.UNRECOGNIZED : result;
     }
 
+    public static final int ID_FIELD_NUMBER = 5;
+    private com.google.protobuf.ByteString id_ = com.google.protobuf.ByteString.EMPTY;
+    /**
+     * <code>optional bytes id = 5;</code>
+     * @return Whether the id field is set.
+     */
+    @java.lang.Override
+    public boolean hasId() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>optional bytes id = 5;</code>
+     * @return The id.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getId() {
+      return id_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2405,6 +2454,9 @@ public final class XTableProto {
       if (((bitField0_ & 0x00000004) != 0)) {
         output.writeEnum(4, type_);
       }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        output.writeBytes(5, id_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -2428,6 +2480,10 @@ public final class XTableProto {
       if (((bitField0_ & 0x00000004) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(4, type_);
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, id_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -2459,6 +2515,11 @@ public final class XTableProto {
       if (hasType()) {
         if (type_ != other.type_) return false;
       }
+      if (hasId() != other.hasId()) return false;
+      if (hasId()) {
+        if (!getId()
+            .equals(other.getId())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -2483,6 +2544,10 @@ public final class XTableProto {
       if (hasType()) {
         hash = (37 * hash) + TYPE_FIELD_NUMBER;
         hash = (53 * hash) + type_;
+      }
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -2619,6 +2684,7 @@ public final class XTableProto {
         key_ = "";
         value_ = com.google.protobuf.ByteString.EMPTY;
         type_ = 0;
+        id_ = com.google.protobuf.ByteString.EMPTY;
         return this;
       }
 
@@ -2668,6 +2734,10 @@ public final class XTableProto {
           result.type_ = type_;
           to_bitField0_ |= 0x00000004;
         }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.id_ = id_;
+          to_bitField0_ |= 0x00000008;
+        }
         result.bitField0_ |= to_bitField0_;
       }
 
@@ -2696,6 +2766,9 @@ public final class XTableProto {
         }
         if (other.hasType()) {
           setType(other.getType());
+        }
+        if (other.hasId()) {
+          setId(other.getId());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -2743,6 +2816,11 @@ public final class XTableProto {
                 bitField0_ |= 0x00000008;
                 break;
               } // case 32
+              case 42: {
+                id_ = input.readBytes();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -2992,6 +3070,46 @@ public final class XTableProto {
         return this;
       }
 
+      private com.google.protobuf.ByteString id_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes id = 5;</code>
+       * @return Whether the id field is set.
+       */
+      @java.lang.Override
+      public boolean hasId() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <code>optional bytes id = 5;</code>
+       * @return The id.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString getId() {
+        return id_;
+      }
+      /**
+       * <code>optional bytes id = 5;</code>
+       * @param value The id to set.
+       * @return This builder for chaining.
+       */
+      public Builder setId(com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        id_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes id = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearId() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        id_ = getDefaultInstance().getId();
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:XTableMessage)
     }
 
@@ -3067,31 +3185,32 @@ public final class XTableProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021XTableProto.proto\"\271\007\n\rXTableMessage\022\'\n" +
+      "\n\021XTableProto.proto\"\355\007\n\rXTableMessage\022\'\n" +
       "\007command\030\001 \001(\0162\026.XTableMessage.Command\022\020" +
       "\n\003key\030\002 \001(\tH\000\210\001\001\022\022\n\005value\030\003 \001(\014H\001\210\001\001\022&\n\004" +
-      "type\030\004 \001(\0162\023.XTableMessage.TypeH\002\210\001\001\032\217\001\n" +
-      "\tXTableLog\022-\n\005level\030\001 \001(\0162\036.XTableMessag" +
-      "e.XTableLog.Level\022\017\n\007message\030\002 \001(\t\"B\n\005Le" +
-      "vel\022\013\n\007UNKNOWN\020\000\022\010\n\004INFO\020\001\022\013\n\007WARNING\020\002\022" +
-      "\n\n\006SEVERE\020\003\022\t\n\005FATAL\020\004\032\314\001\n\014XTableUpdate\022" +
-      "\013\n\003key\030\001 \001(\t\0226\n\010category\030\002 \001(\0162$.XTableM" +
-      "essage.XTableUpdate.Category\022\r\n\005value\030\003 " +
-      "\001(\014\022!\n\004type\030\004 \001(\0162\023.XTableMessage.Type\"E" +
-      "\n\010Category\022\013\n\007UNKNOWN\020\000\022\n\n\006UPDATE\020\001\022\n\n\006D" +
-      "ELETE\020\002\022\013\n\007PUBLISH\020\003\022\007\n\003LOG\020\004\"y\n\004Type\022\013\n" +
-      "\007UNKNOWN\020\000\022\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005IN" +
-      "T64\020\005\022\010\n\004BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007" +
-      "MESSAGE\020\t\022\t\n\005ARRAY\020\n\022\n\n\006OBJECT\020\013\"\271\002\n\007Com" +
-      "mand\022\023\n\017UNKNOWN_COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GE" +
-      "T\020\002\022\024\n\020SUBSCRIBE_UPDATE\020\003\022\016\n\nGET_TABLES\020" +
-      "\004\022\016\n\nRUN_SCRIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DEL" +
-      "ETE\020\007\022\013\n\007PUBLISH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t" +
-      "\022\026\n\022UNSUBSCRIBE_DELETE\020\n\022\026\n\022UNSUBSCRIBE_" +
-      "UPDATE\020\013\022\010\n\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014" +
-      "DELETE_EVENT\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFO" +
-      "RMATION\020\020\022\021\n\rREBOOT_SERVER\020\021B\006\n\004_keyB\010\n\006" +
-      "_valueB\007\n\005_typeb\006proto3"
+      "type\030\004 \001(\0162\023.XTableMessage.TypeH\002\210\001\001\022\017\n\002" +
+      "id\030\005 \001(\014H\003\210\001\001\032\217\001\n\tXTableLog\022-\n\005level\030\001 \001" +
+      "(\0162\036.XTableMessage.XTableLog.Level\022\017\n\007me" +
+      "ssage\030\002 \001(\t\"B\n\005Level\022\013\n\007UNKNOWN\020\000\022\010\n\004INF" +
+      "O\020\001\022\013\n\007WARNING\020\002\022\n\n\006SEVERE\020\003\022\t\n\005FATAL\020\004\032" +
+      "\332\001\n\014XTableUpdate\022\013\n\003key\030\001 \001(\t\0226\n\010categor" +
+      "y\030\002 \001(\0162$.XTableMessage.XTableUpdate.Cat" +
+      "egory\022\r\n\005value\030\003 \001(\014\022!\n\004type\030\004 \001(\0162\023.XTa" +
+      "bleMessage.Type\"S\n\010Category\022\013\n\007UNKNOWN\020\000" +
+      "\022\n\n\006UPDATE\020\001\022\n\n\006DELETE\020\002\022\013\n\007PUBLISH\020\003\022\014\n" +
+      "\010REGISTRY\020\004\022\007\n\003LOG\020\005\"y\n\004Type\022\013\n\007UNKNOWN\020" +
+      "\000\022\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT64\020\005\022\010\n\004" +
+      "BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007MESSAGE\020\t" +
+      "\022\t\n\005ARRAY\020\n\022\n\n\006OBJECT\020\013\"\307\002\n\007Command\022\023\n\017U" +
+      "NKNOWN_COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GET\020\002\022\024\n\020SU" +
+      "BSCRIBE_UPDATE\020\003\022\016\n\nGET_TABLES\020\004\022\016\n\nRUN_" +
+      "SCRIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE\020\007\022\013\n\007" +
+      "PUBLISH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n\022UNSUB" +
+      "SCRIBE_DELETE\020\n\022\026\n\022UNSUBSCRIBE_UPDATE\020\013\022" +
+      "\010\n\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DELETE_EV" +
+      "ENT\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFORMATION\020\020" +
+      "\022\021\n\rREBOOT_SERVER\020\021\022\014\n\010REGISTRY\020\022B\006\n\004_ke" +
+      "yB\010\n\006_valueB\007\n\005_typeB\005\n\003_idb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3102,7 +3221,7 @@ public final class XTableProto {
     internal_static_XTableMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_XTableMessage_descriptor,
-        new java.lang.String[] { "Command", "Key", "Value", "Type", });
+        new java.lang.String[] { "Command", "Key", "Value", "Type", "Id", });
     internal_static_XTableMessage_XTableLog_descriptor =
       internal_static_XTableMessage_descriptor.getNestedTypes().get(0);
     internal_static_XTableMessage_XTableLog_fieldAccessorTable = new

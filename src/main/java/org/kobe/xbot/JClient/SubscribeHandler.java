@@ -45,7 +45,11 @@ public class SubscribeHandler extends BaseHandler {
 
     /**
      * The main method for handling incoming messages.
-     * It continuously receives messages from the JeroMQ socket and processes them.
+     * <p>
+     * It continuously receives messages from the JeroMQ socket,
+     * processes them by parsing the message into a protocol buffer,
+     * and stores the updates in the buffer.
+     * It also increments the count of subscription messages received.
      */
     @Override
     public void run() {
@@ -65,12 +69,25 @@ public class SubscribeHandler extends BaseHandler {
         }
     }
 
+    /**
+     * ConsumerHandlingThread - A thread for handling subscription consumers for each received update.
+     * <p>
+     * This inner thread continuously reads the latest update from the buffer and invokes the consumers
+     * that are subscribed to the specific update category or key.
+     * It handles both general and registry updates.
+     */
     private class ConsumerHandlingThread extends Thread {
         public ConsumerHandlingThread() {
             setName("XTABLES-CONSUMER-HANDLER-DAEMON");
             setDaemon(true);
         }
 
+        /**
+         * The run method processes each update by invoking the appropriate consumers.
+         * <p>
+         * It checks if the update is of type UPDATE, PUBLISH, or REGISTRY. For UPDATE and PUBLISH, it invokes all consumers
+         * associated with the update key. For REGISTRY, it sends the registry command to the push socket.
+         */
         @Override
         public void run() {
             try {
@@ -89,6 +106,11 @@ public class SubscribeHandler extends BaseHandler {
                                 consumer.accept(update);
                             }
                         }
+                    } else if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {
+                        instance.getPushSocket().send(XTableProto.XTableMessage.newBuilder()
+                                .setId(update.getValue())
+                                .setCommand(XTableProto.XTableMessage.Command.REGISTRY)
+                                .build().toByteArray(), ZMQ.DONTWAIT);
                     }
                 }
             } catch (Exception e) {
@@ -99,6 +121,8 @@ public class SubscribeHandler extends BaseHandler {
 
     /**
      * Logs exceptions and handles cleanup when the thread is interrupted.
+     * <p>
+     * This method interrupts the consumer handling thread and calls the parent class's interrupt method to clean up.
      */
     @Override
     public void interrupt() {

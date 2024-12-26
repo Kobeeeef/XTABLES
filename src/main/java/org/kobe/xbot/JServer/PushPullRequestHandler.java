@@ -45,9 +45,8 @@ public class PushPullRequestHandler extends BaseHandler {
                 instance.messages.incrementAndGet();
                 try {
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
-                    if (message.hasKey() && message.hasValue()) {
-                        processMessage(message);
-                    }
+                    processMessage(message);
+
                 } catch (Exception e) {
                     handleException(e);
                 }
@@ -90,6 +89,13 @@ public class PushPullRequestHandler extends BaseHandler {
                             .build()
                     );
 
+                }
+            }
+            case REGISTRY -> {
+                if (message.hasId()) {
+                    if(message.getId().equals(instance.getClientRegistry().getSessionId())) {
+                        System.out.println("found!");
+                    }
                 }
             }
             default -> logger.warning("Unhandled pull command: " + command);

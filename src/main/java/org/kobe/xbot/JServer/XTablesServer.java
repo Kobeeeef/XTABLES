@@ -64,6 +64,7 @@ public class XTablesServer {
     private PushPullRequestHandler pushPullRequestHandler;
     private ReplyRequestHandler replyRequestHandler;
     public ZMQ.Socket pubSocket;
+    private ClientRegistry clientRegistry;
     private final int pullPort;
     private final int repPort;
     private final int pubPort;
@@ -110,7 +111,13 @@ public class XTablesServer {
         this.pushPullRequestHandler.start();
         this.replyRequestHandler = new ReplyRequestHandler(repSocket, this);
         this.replyRequestHandler.start();
-
+//        this.xTablesSocketMonitor = new XTablesSocketMonitor(context);
+//        this.xTablesSocketMonitor.addSocket("PULL", pullSocket)
+//                .addSocket("REPLY", repSocket)
+//                .addSocket("PUBLISH", pubSocket);
+//        this.xTablesSocketMonitor.start();
+        this.clientRegistry = new ClientRegistry(this);
+        this.clientRegistry.start();
         initializeMDNSWithRetries(10);
         status.set(XTableStatus.ONLINE);
         latch.countDown();
@@ -139,6 +146,9 @@ public class XTablesServer {
         }
         if (replyRequestHandler != null) {
             replyRequestHandler.interrupt();
+        }
+        if (clientRegistry != null) {
+            clientRegistry.interrupt();
         }
         table.delete("");
 
@@ -304,6 +314,9 @@ public class XTablesServer {
             if (replyRequestHandler != null) {
                 replyRequestHandler.interrupt();
             }
+            if (clientRegistry != null) {
+                clientRegistry.interrupt();
+            }
             logger.info("Shutting down the server process...");
             System.exit(0);
         } catch (Exception exception) {
@@ -311,6 +324,19 @@ public class XTablesServer {
             logger.fatal("Forcing shutdown due to an error...");
             System.exit(1);
         }
+    }
+
+    /**
+     * Returns the ClientRegistry instance associated with the XTables server.
+     * <p>
+     * This method provides access to the ClientRegistry, which manages the list of connected clients
+     * and periodically updates the server with new session IDs and client information.
+     * The ClientRegistry operates as a background thread that handles client management tasks.
+     *
+     * @return the ClientRegistry instance managing client connections and session updates
+     */
+    public ClientRegistry getClientRegistry() {
+        return clientRegistry;
     }
 
     /**
