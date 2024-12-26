@@ -26,13 +26,13 @@ public class ClientStatistics {
     private final String jvmName;
     private String version;
     private final String type;
+    private String UUID;
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     private static final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
     private static final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-
-    public ClientStatistics(String type) {
+    public ClientStatistics() {
         this.type = "JAVA";
         this.nanoTime = System.nanoTime();
         this.maxMemoryMB = osMXBean.getTotalPhysicalMemorySize() / (1024 * 1024);
@@ -70,6 +70,15 @@ public class ClientStatistics {
         } else {
             this.health = HealthStatus.CRITICAL.name();
         }
+    }
+
+    public ClientStatistics setUUID(String UUID) {
+        this.UUID = UUID;
+        return this;
+    }
+
+    public String getUUID() {
+        return UUID;
     }
 
     public enum HealthStatus {

@@ -1,7 +1,7 @@
 package org.kobe.xbot.JServer;
 
 import com.google.protobuf.ByteString;
-import org.kobe.xbot.Utilities.Entities.Client;
+import org.kobe.xbot.Utilities.ClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.Utilities;
@@ -25,11 +25,11 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ClientRegistry extends Thread {
     private final static XTablesLogger logger = XTablesLogger.getLogger();
-    private final long loopInterval = 3000;
-    private long lastLoopTime = 0;
+    private final static long loopInterval = 3000;
     private final XTablesServer instance;
     private final AtomicReference<ByteString> sessionId = new AtomicReference<>(null);
-    private final LinkedList<Client> clients;
+    private final LinkedList<ClientStatistics> clients;
+    private long lastLoopTime = 0;
 
     /**
      * Constructor to initialize the ClientRegistry with the XTablesServer instance.
@@ -53,15 +53,11 @@ public class ClientRegistry extends Thread {
     @Override
     public void run() {
         try {
+            executeTask();
             while (!Thread.currentThread().isInterrupted()) {
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastLoopTime >= loopInterval) {
-                    clients.clear();
-                    sessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
-                    instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
-                            .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
-                            .setValue(sessionId.get())
-                            .build());
+                    executeTask();
                     lastLoopTime = currentTime;
                 }
                 try {
@@ -74,6 +70,19 @@ public class ClientRegistry extends Thread {
         } catch (Exception e) {
             handleException(e);
         }
+    }
+
+    /**
+     * Executes the periodic task of clearing the client list, updating the session ID,
+     * and notifying the instance of the update.
+     */
+    private void executeTask() {
+        clients.clear();
+        sessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
+        instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                .setValue(sessionId.get())
+                .build());
     }
 
     /**
@@ -100,7 +109,7 @@ public class ClientRegistry extends Thread {
      *
      * @return the list of connected clients
      */
-    public LinkedList<Client> getClients() {
+    public LinkedList<ClientStatistics> getClients() {
         return clients;
     }
 

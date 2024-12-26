@@ -73,6 +73,17 @@ public class SubscribeHandler extends BaseHandler {
     }
 
     /**
+     * Logs exceptions and handles cleanup when the thread is interrupted.
+     * <p>
+     * This method interrupts the consumer handling thread and calls the parent class's interrupt method to clean up.
+     */
+    @Override
+    public void interrupt() {
+        this.consumerHandlingThread.interrupt();
+        super.interrupt();
+    }
+
+    /**
      * ConsumerHandlingThread - A thread for handling subscription consumers for each received update.
      * <p>
      * This inner thread continuously reads the latest update from the buffer and invokes the consumers
@@ -110,7 +121,7 @@ public class SubscribeHandler extends BaseHandler {
                             }
                         }
                     } else if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {
-                        byte[] info = Utilities.serializeObject(new ClientStatistics("JAVA"));
+                        byte[] info = Utilities.serializeObject(new ClientStatistics());
                         instance.getPushSocket().send(XTableProto.XTableMessage.newBuilder()
                                 .setId(update.getValue())
                                 .setValue(ByteString.copyFrom(info))
@@ -122,16 +133,5 @@ public class SubscribeHandler extends BaseHandler {
                 handleException(new XTablesException(e));
             }
         }
-    }
-
-    /**
-     * Logs exceptions and handles cleanup when the thread is interrupted.
-     * <p>
-     * This method interrupts the consumer handling thread and calls the parent class's interrupt method to clean up.
-     */
-    @Override
-    public void interrupt() {
-        this.consumerHandlingThread.interrupt();
-        super.interrupt();
     }
 }

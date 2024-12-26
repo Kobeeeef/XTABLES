@@ -33,7 +33,7 @@ public class Main {
                 if (pull < 0 || pull > 65535 || rep < 0 || rep > 65535 || pub < 0 || pub > 65535) {
                     logger.severe("Error: The specified port '" + args[0] + "' is outside the specified range of valid port values.");
                 } else {
-                    XTablesServer.initialize(pull, rep, pub);
+                    XTablesServer.initialize(XTABLES_SERVER_VERSION, pull, rep, pub);
                 }
             } catch (NumberFormatException e) {
                 logger.severe("Error: The specified port '" + args[0] + "' is not a valid integer.");
@@ -42,7 +42,7 @@ public class Main {
             }
         } else {
             logger.info("No port number provided. Default ports 1735 (pull), 1736 (reply), 1737 (publish) is being used.");
-            XTablesServer.initialize(1735, 1736, 1737);
+            XTablesServer.initialize(XTABLES_SERVER_VERSION, 1735, 1736, 1737);
         }
     }
 }

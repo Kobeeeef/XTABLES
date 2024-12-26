@@ -1,8 +1,12 @@
 package org.kobe.xbot.JServer;
 
 import com.google.protobuf.ByteString;
+import org.kobe.xbot.Utilities.ClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Utilities;
 import org.zeromq.ZMQ;
+
+import java.util.UUID;
 
 /**
  * PushPullRequestHandler - A handler for processing push-pull messages using JeroMQ.
@@ -42,11 +46,10 @@ public class PushPullRequestHandler extends BaseHandler {
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 byte[] bytes = socket.recv();
-                instance.messages.incrementAndGet();
+                instance.pullMessages.incrementAndGet();
                 try {
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
                     processMessage(message);
-
                 } catch (Exception e) {
                     handleException(e);
                 }
@@ -93,8 +96,14 @@ public class PushPullRequestHandler extends BaseHandler {
             }
             case REGISTRY -> {
                 if (message.hasId()) {
-                    if(message.getId().equals(instance.getClientRegistry().getSessionId())) {
-                        System.out.println(message);
+                    if (message.getId().equals(instance.getClientRegistry().getSessionId())) {
+                        if (message.hasValue()) {
+                            byte[] value = message.getValue().toByteArray();
+                            ClientStatistics statistics = Utilities.deserializeObject(value, ClientStatistics.class);
+                            statistics.setUUID(UUID.randomUUID().toString());
+                            instance.getClientRegistry().getClients()
+                                    .add(statistics);
+                        }
                     }
                 }
             }

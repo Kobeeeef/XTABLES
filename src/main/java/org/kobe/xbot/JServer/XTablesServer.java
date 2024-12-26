@@ -1,11 +1,15 @@
 package org.kobe.xbot.JServer;
 
+import com.google.gson.Gson;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
-import org.kobe.xbot.Utilities.Utilities;
-import org.kobe.xbot.Utilities.XTableStatus;
-import org.kobe.xbot.Utilities.XTablesData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.SocketType;
@@ -16,14 +20,18 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * XTablesServer - A server class for managing JeroMQ-based messaging and mDNS service registration.
@@ -39,6 +47,7 @@ import java.util.logging.Level;
  * in a multithreaded environment.
  */
 public class XTablesServer {
+    public static final XTablesData table = new XTablesData();
     // =============================================================
     // Static Variables
     // These variables belong to the class itself and are shared
@@ -50,25 +59,29 @@ public class XTablesServer {
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private static final CountDownLatch latch = new CountDownLatch(1);
-    public static final XTablesData table = new XTablesData();
     private static final Logger log = LoggerFactory.getLogger(XTablesServer.class);
+    private static final Gson gson = new Gson();
     private static Thread main;
     // =============================================================
     // Instance Variables
     // These variables are unique to each instance of the class.
     // =============================================================
-    public final AtomicInteger messages = new AtomicInteger(0);
+    public final AtomicInteger pullMessages = new AtomicInteger(0);
+    public final AtomicInteger replyMessages = new AtomicInteger(0);
+    public final AtomicInteger publishMessages = new AtomicInteger(0);
+    private final int pullPort;
+    private final int repPort;
+    private final int pubPort;
+    private final String version;
+    private final AtomicBoolean debug = new AtomicBoolean(false);
+    public ZMQ.Socket pubSocket;
     private ZContext context;
     private JmDNS jmdns;
     private ServiceInfo serviceInfo;
     private PushPullRequestHandler pushPullRequestHandler;
     private ReplyRequestHandler replyRequestHandler;
-    public ZMQ.Socket pubSocket;
     private ClientRegistry clientRegistry;
-    private final int pullPort;
-    private final int repPort;
-    private final int pubPort;
-    private final AtomicBoolean debug = new AtomicBoolean(false);
+    private int iterationSpeed;
 
     /**
      * Constructor for initializing the server with specified ports.
@@ -77,12 +90,68 @@ public class XTablesServer {
      * @param repServerPort  Port for the REP socket
      * @param pubServerPort  Port for the PUB socket
      */
-    private XTablesServer(int pullServerPort, int repServerPort, int pubServerPort) {
+    private XTablesServer(String version, int pullServerPort, int repServerPort, int pubServerPort) {
         this.pullPort = pullServerPort;
         this.repPort = repServerPort;
         this.pubPort = pubServerPort;
+        this.version = version;
         instance.set(this);
         start();
+    }
+
+    /**
+     * Initializes the XTablesServer instance and starts the main server thread.
+     * Ensures the server is properly cleaned up during JVM shutdown.
+     *
+     * @param pullSocketPort    Port for the PULL socket
+     * @param replySocketPort   Port for the REP socket
+     * @param publishSocketPort Port for the PUB socket
+     * @return The initialized server instance
+     */
+    public static XTablesServer initialize(String version, int pullSocketPort, int replySocketPort, int publishSocketPort) {
+        if (instance.get() != null) {
+            return instance.get();
+        }
+        status.set(XTableStatus.STARTING);
+        main = new Thread(() -> new XTablesServer(version, pullSocketPort, replySocketPort, publishSocketPort));
+        main.setName("XTABLES-SERVER");
+        main.setDaemon(false);
+        main.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Shutdown initiated. Cleaning up resources...");
+            if (instance.get() != null) {
+                logger.info("Stopping server instance...");
+                try {
+                    instance.get().cleanup();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                logger.info("Server shutdown completed successfully.");
+            } else {
+                logger.warning("No active server instance found during shutdown.");
+            }
+        }));
+
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            logger.severe("Main latch interrupted: " + e.getMessage());
+            System.exit(1);
+        }
+        instance.get().iterationSpeed = Utilities.measureWhileLoopIterationsPerSecond();
+        String formattedSpeed = NumberFormat.getInstance().format(instance.get().iterationSpeed);
+        logger.info("Server can process approximately " + formattedSpeed + " iterations per second.");
+        return instance.get();
+    }
+
+    /**
+     * Retrieves the current instance of the XTablesServer.
+     *
+     * @return The current server instance, or null if not initialized
+     */
+    public static XTablesServer getInstance() {
+        return instance.get();
     }
 
     /**
@@ -199,7 +268,6 @@ public class XTablesServer {
         logger.info("Server restarted successfully.");
     }
 
-
     /**
      * Initializes mDNS (Multicast DNS) service with a specified number of retry attempts.
      * This is used for service discovery, allowing other devices to locate the server.
@@ -243,48 +311,6 @@ public class XTablesServer {
                 }
             }
         }
-    }
-
-    /**
-     * Initializes the XTablesServer instance and starts the main server thread.
-     * Ensures the server is properly cleaned up during JVM shutdown.
-     *
-     * @param pullSocketPort    Port for the PULL socket
-     * @param replySocketPort   Port for the REP socket
-     * @param publishSocketPort Port for the PUB socket
-     * @return The initialized server instance
-     */
-    public static XTablesServer initialize(int pullSocketPort, int replySocketPort, int publishSocketPort) {
-        if (instance.get() != null) {
-            return instance.get();
-        }
-        status.set(XTableStatus.STARTING);
-        main = new Thread(() -> new XTablesServer(pullSocketPort, replySocketPort, publishSocketPort));
-        main.setName("XTABLES-SERVER");
-        main.setDaemon(false);
-        main.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Shutdown initiated. Cleaning up resources...");
-            if (instance.get() != null) {
-                logger.info("Stopping server instance...");
-                try {
-                    instance.get().cleanup();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                logger.info("Server shutdown completed successfully.");
-            } else {
-                logger.warning("No active server instance found during shutdown.");
-            }
-        }));
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            logger.severe("Main latch interrupted: " + e.getMessage());
-            System.exit(1);
-        }
-
-        return instance.get();
     }
 
     /**
@@ -340,21 +366,23 @@ public class XTablesServer {
     }
 
     /**
-     * Retrieves the current instance of the XTablesServer.
-     *
-     * @return The current server instance, or null if not initialized
-     */
-    public static XTablesServer getInstance() {
-        return instance.get();
-    }
-
-    /**
      * Notifies connected clients of updates.
      *
      * @param update The update message to send
      */
     public void notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate update) {
         pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT);
+    }
+
+    public int getIterationSpeed() {
+        return this.iterationSpeed;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+    public XTableStatus getStatus() {
+        return status.get();
     }
 
     /**
@@ -390,4 +418,99 @@ public class XTablesServer {
         });
     }
 
+    private void addServlets(ServletContextHandler servletContextHandler) {
+        // Add a servlet to handle GET requests
+
+        XTablesServer server = this;
+        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                SystemStatistics systemStatistics = new SystemStatistics(server);
+                systemStatistics.setClientDataList(clientRegistry.getClients().stream().map(m -> {
+                    ClientData data = new ClientData(m.getIp(),
+                            m.getHostname(),
+                            m.getUUID());
+                    data.setStats(gson.toJson(m));
+                    return data;
+                }).collect(Collectors.toList()));
+                try {
+                    systemStatistics.setHostname(InetAddress.getLocalHost().getHostName());
+                } catch (Exception ignored) {
+                }
+
+                resp.getWriter().println(gson.toJson(systemStatistics));
+            }
+        }), "/api/get");
+        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                String uuidParam = req.getParameter("uuid");
+
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                if (uuidParam == null || uuidParam.isEmpty()) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"No UUID found in parameter!\"}");
+                    return;
+                }
+                UUID uuid;
+
+                try {
+                    uuid = UUID.fromString(uuidParam);
+                } catch (IllegalArgumentException e) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Invalid UUID format!\"}");
+                    return;
+                }
+
+
+                Optional<ClientStatistics> clientHandler = instance.get().getClientRegistry().getClients().stream().filter(f -> f.getUUID().equals(uuid.toString())).findFirst();
+                if (clientHandler.isPresent()) {
+//                        ClientStatistics statistics = clientHandler.get().pingServerForInformationAndWait(3000);
+//                        if (statistics != null) {
+//                            resp.setStatus(HttpServletResponse.SC_OK);
+//                            resp.getWriter().println(String.format("{ \"status\": \"success\", \"message\": %1$s}", gson.toJson(statistics)));
+//                        } else {
+//                            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//                            resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"The client did not respond!\"}");
+//                        }
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
+                }
+
+
+            }
+        }), "/api/ping");
+        // Add a servlet to handle server reboot POST requests
+        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                try {
+                    restart();
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been rebooted!\"}");
+                } catch (Exception e) {
+                    resp.setStatus(HttpServletResponse.SC_CONFLICT);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Server cannot reboot while: " + status.get().name() + "\"}");
+                }
+
+            }
+        }), "/api/reboot");
+        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                String data = table.toJSON();
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().println(data);
+
+            }
+        }), "/api/data");
+    }
 }

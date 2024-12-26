@@ -5,6 +5,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
@@ -214,6 +215,35 @@ public class Utilities {
 
         return true;
     }
+
+    /**
+     * Measures how many times a simple while loop can execute in one second.
+     *
+     * @return the number of iterations the while loop can execute in one second
+     */
+    public static int measureWhileLoopIterationsPerSecond() {
+        long startTime = System.nanoTime();
+        long endTime = startTime + 1_000_000_000;
+        int iterations = 0;
+        XTablesData xTablesData = new XTablesData();
+        byte[] bytes = XTableProto.XTableMessage.newBuilder()
+                .setCommand(getRandomCommand())
+                .setValue(ByteString.copyFrom(new byte[] { 12, 12, 3}))
+                .build()
+                .toByteArray();
+        while (System.nanoTime() < endTime) {
+            iterations++;
+            try {
+                XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
+            } catch (InvalidProtocolBufferException e) {
+                throw new RuntimeException(e);
+            }
+            xTablesData.put(getRandomCommand().name(), new byte[] { 23, 21, 12}, XTableProto.XTableMessage.Type.UNKNOWN);
+        }
+
+        return iterations / 2;
+    }
+
     /**
      * Utility method to serialize an object into a byte array.
      * <p>
@@ -222,7 +252,7 @@ public class Utilities {
      * This method is suitable for objects that you need to store or transmit in a binary format.
      *
      * @param object the object to be serialized
-     * @param <T> the type of the object
+     * @param <T>    the type of the object
      * @return a byte array containing the serialized object
      */
     public static <T> byte[] serializeObject(T object) {
@@ -244,8 +274,8 @@ public class Utilities {
      * It creates a Kryo instance, reads the byte array, and returns the object of the desired type.
      *
      * @param byteArray the byte array containing the serialized object
-     * @param clazz the class type of the object to be deserialized
-     * @param <T> the type of the object
+     * @param clazz     the class type of the object to be deserialized
+     * @param <T>       the type of the object
      * @return the deserialized object of type T
      */
     public static <T> T deserializeObject(byte[] byteArray, Class<T> clazz) {
@@ -258,12 +288,14 @@ public class Utilities {
 
         return object;
     }
+
     public static byte[] generateRandomBytes(int length) {
         SecureRandom secureRandom = new SecureRandom();
         byte[] randomBytes = new byte[length];
         secureRandom.nextBytes(randomBytes);
         return randomBytes;
     }
+
     // Convert any List to byte array
     public static byte[] toByteArray(List<?> list) {
         if (list == null) {

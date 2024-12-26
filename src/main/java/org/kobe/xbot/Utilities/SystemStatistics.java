@@ -1,6 +1,7 @@
 package org.kobe.xbot.Utilities;
 
 import com.sun.management.OperatingSystemMXBean;
+import org.kobe.xbot.JServer.XTablesServer;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -10,8 +11,6 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class SystemStatistics {
     private final long freeMemoryMB;
@@ -25,8 +24,10 @@ public class SystemStatistics {
     private final double powerUsageWatts;
     private final int totalClients;
     private XTableStatus status;
-    private int totalMessages;
-    private String ip;
+    private int totalPullMessages;
+    private int totalReplyMessages;
+    private int totalPublishMessages;
+    private final String ip;
     private final String processId;
     private final String javaVersion;
     private final String javaVendor;
@@ -49,9 +50,9 @@ public class SystemStatistics {
 //    private static final AtomicLong lastUpdateTime = new AtomicLong();
 //    private static final AtomicReference<Double> lastPowerUsageWatts = new AtomicReference<>(0.0);
 
-    public SystemStatistics(int totalClients) {
+    public SystemStatistics(XTablesServer instance) {
         this.nanoTime = System.nanoTime();
-        this.totalClients = totalClients;
+        this.totalClients = instance.getClientRegistry().getClients().size();
         this.maxMemoryMB = osMXBean.getTotalPhysicalMemorySize() / (1024 * 1024);
         this.freeMemoryMB = osMXBean.getFreePhysicalMemorySize() / (1024 * 1024);
         this.usedMemoryMB = maxMemoryMB - freeMemoryMB;
@@ -75,7 +76,11 @@ public class SystemStatistics {
         } else {
             this.health = HealthStatus.CRITICAL.name();
         }
-
+        this.totalPullMessages = instance.pullMessages.get();
+        this.totalReplyMessages = instance.replyMessages.get();
+        this.totalPublishMessages = instance.publishMessages.get();
+        this.version = instance.getVersion();
+        this.status = instance.getStatus();
 
     }
 
@@ -102,12 +107,30 @@ public class SystemStatistics {
         return this;
     }
 
-    public int getTotalMessages() {
-        return totalMessages;
+    public int getTotalPublishMessages() {
+        return totalPublishMessages;
     }
 
-    public SystemStatistics setTotalMessages(int totalMessages) {
-        this.totalMessages = totalMessages;
+    public SystemStatistics setTotalPublishMessages(int totalPublishMessages) {
+        this.totalPublishMessages = totalPublishMessages;
+        return this;
+    }
+
+    public int getTotalReplyMessages() {
+        return totalReplyMessages;
+    }
+
+    public SystemStatistics setTotalReplyMessages(int totalReplyMessages) {
+        this.totalReplyMessages = totalReplyMessages;
+        return this;
+    }
+
+    public int getTotalPullMessages() {
+        return totalPullMessages;
+    }
+
+    public SystemStatistics setTotalPullMessages(int totalPullMessages) {
+        this.totalPullMessages = totalPullMessages;
         return this;
     }
 

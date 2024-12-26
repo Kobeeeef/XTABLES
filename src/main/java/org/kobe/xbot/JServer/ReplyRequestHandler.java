@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.kobe.xbot.JServer.Main.XTABLES_SERVER_VERSION;
-
 /**
  * ReplyRequestHandler - A handler for processing reply requests using JeroMQ.
  * <p>
@@ -33,12 +31,12 @@ import static org.kobe.xbot.JServer.Main.XTABLES_SERVER_VERSION;
  * in a multithreaded environment with JeroMQ.
  */
 public class ReplyRequestHandler extends BaseHandler {
+    private static final Gson gson = new Gson();
     private final XTablesServer instance;
     private final byte[] success = new byte[]{(byte) 0x01};
     private final byte[] fail = new byte[]{(byte) 0x00};
     private final ByteString successByte = ByteString.copyFrom(success);
     private final ByteString failByte = ByteString.copyFrom(fail);
-    private static final Gson gson = new Gson();
 
     /**
      * Constructor that initializes the handler with the provided socket and server instance.
@@ -60,7 +58,7 @@ public class ReplyRequestHandler extends BaseHandler {
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 byte[] bytes = socket.recv();
-                instance.messages.incrementAndGet();
+                instance.replyMessages.incrementAndGet();
                 try {
 
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
@@ -155,12 +153,11 @@ public class ReplyRequestHandler extends BaseHandler {
                             }
                         }
                         case INFORMATION -> {
-                            SystemStatistics systemStatistics = new SystemStatistics(0);
-                            systemStatistics.setTotalMessages(instance.messages.get());
-                            systemStatistics.setVersion(XTABLES_SERVER_VERSION);
+                            SystemStatistics systemStatistics = new SystemStatistics(instance);
+                            byte[] serialized = Utilities.serializeObject(systemStatistics);
                             socket.send(XTableProto.XTableMessage.newBuilder()
                                     .setCommand(command)
-                                    .setValue(ByteString.copyFrom(gson.toJson(systemStatistics).replace(" ", "").replace("\n", "").getBytes(StandardCharsets.UTF_8)))
+                                    .setValue(ByteString.copyFrom(serialized))
                                     .build().toByteArray(), ZMQ.DONTWAIT);
                         }
                         case PING -> socket.send(XTableProto.XTableMessage.newBuilder()

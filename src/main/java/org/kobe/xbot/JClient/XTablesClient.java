@@ -47,20 +47,20 @@ public class XTablesClient {
     private static final byte[] fail = new byte[]{(byte) 0x00};
     private static final ByteString successByte = ByteString.copyFrom(success);
     private static final ByteString failByte = ByteString.copyFrom(fail);
+    public final AtomicInteger subscribeMessagesCount = new AtomicInteger(0);
+    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> subscriptionConsumers;
+    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> publishConsumers;
+    private final ZContext context;
+    private final ZMQ.Socket subSocket;
+    private final ZMQ.Socket pushSocket;
+    private final ZMQ.Socket reqSocket;
+    private final SubscribeHandler subscribeHandler;
     // =============================================================
     // Instance Variables
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
             "XTABLES Jero Client v1.0.0 | Build Date: 12/24/2024";
-    private final ZContext context;
-    private final ZMQ.Socket subSocket;
-    private final ZMQ.Socket pushSocket;
-    private final ZMQ.Socket reqSocket;
-    private final SubscribeHandler subscribeHandler;
-    public final AtomicInteger subscribeMessagesCount = new AtomicInteger(0);
-    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> subscriptionConsumers;
-    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> publishConsumers;
 
     /**
      * Default constructor for XTablesClient.
