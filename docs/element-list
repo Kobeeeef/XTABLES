@@ -1,3 +1,5 @@
 org.kobe.xbot.JClient
 org.kobe.xbot.JServer
+org.kobe.xbot.Utilities
+org.kobe.xbot.Utilities.Entities
 org.kobe.xbot.Utilities.Exceptions

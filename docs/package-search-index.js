@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.kobe.xbot.JClient"},{"l":"org.kobe.xbot.JServer"},{"l":"org.kobe.xbot.Utilities.Exceptions"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.kobe.xbot.JClient"},{"l":"org.kobe.xbot.JServer"},{"l":"org.kobe.xbot.Utilities"},{"l":"org.kobe.xbot.Utilities.Entities"},{"l":"org.kobe.xbot.Utilities.Exceptions"}];updateSearchResults();
