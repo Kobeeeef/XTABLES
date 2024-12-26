@@ -24,9 +24,6 @@ public class ClientStatistics {
     private final String javaVersion;
     private final String javaVendor;
     private final String jvmName;
-    private String pythonVersion;
-    private String pythonVendor;
-    private String pythonCompiler;
     private String version;
     private final String type;
 

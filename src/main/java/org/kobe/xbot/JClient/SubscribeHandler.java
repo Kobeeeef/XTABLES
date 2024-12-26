@@ -1,8 +1,11 @@
 package org.kobe.xbot.JClient;
 
+import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.CircularBuffer;
+import org.kobe.xbot.Utilities.ClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
+import org.kobe.xbot.Utilities.Utilities;
 import org.zeromq.ZMQ;
 
 import java.util.List;
@@ -107,8 +110,10 @@ public class SubscribeHandler extends BaseHandler {
                             }
                         }
                     } else if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {
+                        byte[] info = Utilities.serializeObject(new ClientStatistics("JAVA"));
                         instance.getPushSocket().send(XTableProto.XTableMessage.newBuilder()
                                 .setId(update.getValue())
+                                .setValue(ByteString.copyFrom(info))
                                 .setCommand(XTableProto.XTableMessage.Command.REGISTRY)
                                 .build().toByteArray(), ZMQ.DONTWAIT);
                     }

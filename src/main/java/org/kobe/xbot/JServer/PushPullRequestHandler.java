@@ -94,7 +94,7 @@ public class PushPullRequestHandler extends BaseHandler {
             case REGISTRY -> {
                 if (message.hasId()) {
                     if(message.getId().equals(instance.getClientRegistry().getSessionId())) {
-                        System.out.println("found!");
+                        System.out.println(message);
                     }
                 }
             }

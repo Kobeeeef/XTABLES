@@ -65,4 +65,14 @@ message XTableMessage {
       LOG = 5;
     }
   }
+
+  message ClientInfo {
+    string ip_address = 1;
+    string hostname = 2;
+    string operating_system = 3;
+    int32 port = 4;
+    bool is_active = 5;
+    string version = 6;
+    string user_agent = 7;
+  }
 }
