@@ -374,13 +374,38 @@ public class XTablesServer {
         pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT);
     }
 
+    /**
+     * Retrieves the iteration speed.
+     * <p>
+     * This method returns the number of iterations per second that the server can process,
+     * representing its current processing capability.
+     *
+     * @return the iteration speed as an integer
+     */
     public int getIterationSpeed() {
         return this.iterationSpeed;
     }
 
+    /**
+     * Retrieves the version of the server.
+     * <p>
+     * This method provides the version string for the current instance, which can
+     * be useful for diagnostics or display purposes.
+     *
+     * @return the version as a string
+     */
     public String getVersion() {
         return this.version;
     }
+
+    /**
+     * Retrieves the current status of the server.
+     * <p>
+     * This method accesses the current status stored in an atomic reference,
+     * providing a thread-safe way to get the server's state.
+     *
+     * @return the current status as an {@link XTableStatus} object
+     */
     public XTableStatus getStatus() {
         return status.get();
     }
