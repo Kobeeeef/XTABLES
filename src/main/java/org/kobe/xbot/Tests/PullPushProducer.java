@@ -21,7 +21,7 @@ public class PullPushProducer {
                 i++;
                   client.putInteger("test", i);
                   System.out.println(i);
-                  Thread.sleep(100);
+                  Thread.sleep(1);
 
 
             }

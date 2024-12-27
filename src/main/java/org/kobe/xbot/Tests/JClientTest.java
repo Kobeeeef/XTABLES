@@ -2,15 +2,16 @@ package org.kobe.xbot.Tests;
 
 import org.kobe.xbot.JClient.XTablesClient;
 import org.kobe.xbot.Utilities.Entities.PingResponse;
+import org.kobe.xbot.Utilities.XTablesByteUtils;
 
 public class JClientTest {
     public static void main(String[] args) throws InterruptedException {
 
         XTablesClient client = new XTablesClient("localhost");
         client.subscribe("test", (xTableUpdate -> {
-            System.out.println(xTableUpdate.getValue());
+            System.out.println(XTablesByteUtils.toInt(xTableUpdate.getValue()));
             try {
-                Thread.sleep(1);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
