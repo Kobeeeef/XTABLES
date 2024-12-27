@@ -1,15 +1,12 @@
 package org.kobe.xbot.JServer;
 
 import com.google.gson.Gson;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.Utilities;
+import org.kobe.xbot.Utilities.XTableStatus;
+import org.kobe.xbot.Utilities.XTablesData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.SocketType;
@@ -23,15 +20,12 @@ import java.net.InetAddress;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 /**
  * XTablesServer - A server class for managing JeroMQ-based messaging and mDNS service registration.
@@ -81,6 +75,9 @@ public class XTablesServer {
     private PushPullRequestHandler pushPullRequestHandler;
     private ReplyRequestHandler replyRequestHandler;
     private ClientRegistry clientRegistry;
+    private WebInterface webInterface;
+    private XTablesSocketMonitor socketMonitor;
+    private XTablesMessageRate rate;
     private int iterationSpeed;
 
     /**
@@ -180,14 +177,34 @@ public class XTablesServer {
         this.pushPullRequestHandler.start();
         this.replyRequestHandler = new ReplyRequestHandler(repSocket, this);
         this.replyRequestHandler.start();
-//        this.xTablesSocketMonitor = new XTablesSocketMonitor(context);
-//        this.xTablesSocketMonitor.addSocket("PULL", pullSocket)
-//                .addSocket("REPLY", repSocket)
-//                .addSocket("PUBLISH", pubSocket);
-//        this.xTablesSocketMonitor.start();
+        this.rate = new XTablesMessageRate(pullMessages, replyMessages, publishMessages);
         this.clientRegistry = new ClientRegistry(this);
         this.clientRegistry.start();
+        this.socketMonitor = new XTablesSocketMonitor(context) {
+            @Override
+            protected void onClientConnected(String socketName, String clientAddress, int clientCount) {
+                if (socketMonitor != null && socketName.equals("PUBLISH")) {
+                    logger.info(String.format("New client connection detected on PUBLISH socket: address=%s, connected clients=%d.", clientAddress, clientCount));
+                    logger.info("Triggering client registry update due to new PUBLISH client connection.");
+                    clientRegistry.executeNow();
+                }
+            }
+
+            @Override
+            protected void onClientDisconnected(String socketName, String clientAddress, int clientCount) {
+                if (socketMonitor != null && socketName.equals("PUBLISH")) {
+                    logger.info(String.format("Client disconnected from PUBLISH socket: address=%s, total connected clients=%d.", clientAddress, clientCount));
+                    logger.info("Triggering client registry update due to PUBLISH client disconnection.");
+                    clientRegistry.executeNow();
+                }
+            }
+        };
+        this.socketMonitor.addSocket("PULL", pullSocket)
+                .addSocket("REPLY", repSocket)
+                .addSocket("PUBLISH", pubSocket);
+        this.socketMonitor.start();
         initializeMDNSWithRetries(10);
+        this.webInterface = WebInterface.initialize(this);
         status.set(XTableStatus.ONLINE);
         latch.countDown();
     }
@@ -219,7 +236,16 @@ public class XTablesServer {
         if (clientRegistry != null) {
             clientRegistry.interrupt();
         }
+        if(socketMonitor != null) {
+            socketMonitor.interrupt();
+        }
+        if(rate != null) {
+            rate.shutdown();
+        }
         table.delete("");
+        pullMessages.set(0);
+        replyMessages.set(0);
+        publishMessages.set(0);
 
     }
 
@@ -343,6 +369,12 @@ public class XTablesServer {
             if (clientRegistry != null) {
                 clientRegistry.interrupt();
             }
+            if(socketMonitor != null) {
+                socketMonitor.interrupt();
+            }
+            if(rate != null) {
+                rate.shutdown();
+            }
             logger.info("Shutting down the server process...");
             System.exit(0);
         } catch (Exception exception) {
@@ -350,6 +382,19 @@ public class XTablesServer {
             logger.fatal("Forcing shutdown due to an error...");
             System.exit(1);
         }
+    }
+
+    public XTablesMessageRate getRate() {
+        return rate;
+    }
+
+    /**
+     * Returns the current data table associated with this instance.
+     *
+     * @return an instance of {@link XTablesData} representing the current table data.
+     */
+    public XTablesData getTable() {
+        return table;
     }
 
     /**
@@ -371,7 +416,7 @@ public class XTablesServer {
      * @param update The update message to send
      */
     public void notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate update) {
-        pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT);
+        if(pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT)) publishMessages.incrementAndGet();
     }
 
     /**
@@ -441,101 +486,5 @@ public class XTablesServer {
                         .build());
             }
         });
-    }
-
-    private void addServlets(ServletContextHandler servletContextHandler) {
-        // Add a servlet to handle GET requests
-
-        XTablesServer server = this;
-        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
-            @Override
-            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-                resp.setContentType("application/json");
-                resp.setCharacterEncoding("UTF-8");
-                SystemStatistics systemStatistics = new SystemStatistics(server);
-                systemStatistics.setClientDataList(clientRegistry.getClients().stream().map(m -> {
-                    ClientData data = new ClientData(m.getIp(),
-                            m.getHostname(),
-                            m.getUUID());
-                    data.setStats(gson.toJson(m));
-                    return data;
-                }).collect(Collectors.toList()));
-                try {
-                    systemStatistics.setHostname(InetAddress.getLocalHost().getHostName());
-                } catch (Exception ignored) {
-                }
-
-                resp.getWriter().println(gson.toJson(systemStatistics));
-            }
-        }), "/api/get");
-        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
-            @Override
-            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-                String uuidParam = req.getParameter("uuid");
-
-                resp.setContentType("application/json");
-                resp.setCharacterEncoding("UTF-8");
-                if (uuidParam == null || uuidParam.isEmpty()) {
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"No UUID found in parameter!\"}");
-                    return;
-                }
-                UUID uuid;
-
-                try {
-                    uuid = UUID.fromString(uuidParam);
-                } catch (IllegalArgumentException e) {
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Invalid UUID format!\"}");
-                    return;
-                }
-
-
-                Optional<ClientStatistics> clientHandler = instance.get().getClientRegistry().getClients().stream().filter(f -> f.getUUID().equals(uuid.toString())).findFirst();
-                if (clientHandler.isPresent()) {
-//                        ClientStatistics statistics = clientHandler.get().pingServerForInformationAndWait(3000);
-//                        if (statistics != null) {
-//                            resp.setStatus(HttpServletResponse.SC_OK);
-//                            resp.getWriter().println(String.format("{ \"status\": \"success\", \"message\": %1$s}", gson.toJson(statistics)));
-//                        } else {
-//                            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//                            resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"The client did not respond!\"}");
-//                        }
-                } else {
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
-                }
-
-
-            }
-        }), "/api/ping");
-        // Add a servlet to handle server reboot POST requests
-        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
-            @Override
-            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-                resp.setContentType("application/json");
-                resp.setCharacterEncoding("UTF-8");
-                try {
-                    restart();
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been rebooted!\"}");
-                } catch (Exception e) {
-                    resp.setStatus(HttpServletResponse.SC_CONFLICT);
-                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Server cannot reboot while: " + status.get().name() + "\"}");
-                }
-
-            }
-        }), "/api/reboot");
-        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
-            @Override
-            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-                resp.setContentType("application/json");
-                resp.setCharacterEncoding("UTF-8");
-                String data = table.toJSON();
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.getWriter().println(data);
-
-            }
-        }), "/api/data");
     }
 }

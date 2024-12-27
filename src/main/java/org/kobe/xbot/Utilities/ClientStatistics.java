@@ -27,6 +27,8 @@ public class ClientStatistics {
     private String version;
     private final String type;
     private String UUID;
+    private int bufferSize;
+    private int maxBufferSize;
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -70,6 +72,24 @@ public class ClientStatistics {
         } else {
             this.health = HealthStatus.CRITICAL.name();
         }
+    }
+
+    public int getMaxBufferSize() {
+        return maxBufferSize;
+    }
+
+    public ClientStatistics setMaxBufferSize(int maxBufferSize) {
+        this.maxBufferSize = maxBufferSize;
+        return this;
+    }
+
+    public int getBufferSize() {
+        return bufferSize;
+    }
+
+    public ClientStatistics setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+        return this;
     }
 
     public ClientStatistics setUUID(String UUID) {

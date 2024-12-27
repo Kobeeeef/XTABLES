@@ -28,7 +28,7 @@ public class SubscribeHandler extends BaseHandler {
     private final XTablesClient instance;
     private final CircularBuffer<XTableProto.XTableMessage.XTableUpdate> buffer;
     private final Thread consumerHandlingThread;
-
+    private final static int BUFFER_SIZE = 250;
     /**
      * Constructor that initializes the handler with the provided socket and server instance.
      *
@@ -38,7 +38,7 @@ public class SubscribeHandler extends BaseHandler {
     public SubscribeHandler(ZMQ.Socket socket, XTablesClient instance) {
         super("XTABLES-SUBSCRIBE-HANDLER-DAEMON", true, socket);
         this.instance = instance;
-        this.buffer = new CircularBuffer<>(250, (latest, current) -> {
+        this.buffer = new CircularBuffer<>(BUFFER_SIZE, (latest, current) -> {
             return current.getKey().equals(latest.getKey());
         });
         this.consumerHandlingThread = new ConsumerHandlingThread();
@@ -62,7 +62,16 @@ public class SubscribeHandler extends BaseHandler {
                 instance.subscribeMessagesCount.incrementAndGet();
                 try {
                     XTableProto.XTableMessage.XTableUpdate message = XTableProto.XTableMessage.XTableUpdate.parseFrom(bytes);
-                    this.buffer.write(message);
+                 if (message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {
+                        byte[] info = Utilities.serializeObject(new ClientStatistics()
+                                .setBufferSize(buffer.size)
+                                .setMaxBufferSize(BUFFER_SIZE));
+                        instance.getPushSocket().send(XTableProto.XTableMessage.newBuilder()
+                                .setId(message.getValue())
+                                .setValue(ByteString.copyFrom(info))
+                                .setCommand(XTableProto.XTableMessage.Command.REGISTRY)
+                                .build().toByteArray(), ZMQ.DONTWAIT);
+                    } else this.buffer.write(message);
                 } catch (Exception e) {
                     handleException(e);
                 }
@@ -109,7 +118,7 @@ public class SubscribeHandler extends BaseHandler {
                     XTableProto.XTableMessage.XTableUpdate update = buffer.readLatestAndClearOnFunction();
                     if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.UPDATE) || update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.PUBLISH)) {
                         if (instance.subscriptionConsumers.containsKey(update.getKey())) {
-                            List<Consumer<XTableProto.XTableMessage.XTableUpdate>> consumers = instance.subscriptionConsumers.get(update.getKey());
+                            List<Consumer<XTableProto.XTableMessage.XTableUpdate>> consumers = instance.subscriptionConsumers.get(update.getKey());;
                             for (Consumer<XTableProto.XTableMessage.XTableUpdate> consumer : consumers) {
                                 consumer.accept(update);
                             }
@@ -120,13 +129,6 @@ public class SubscribeHandler extends BaseHandler {
                                 consumer.accept(update);
                             }
                         }
-                    } else if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {
-                        byte[] info = Utilities.serializeObject(new ClientStatistics());
-                        instance.getPushSocket().send(XTableProto.XTableMessage.newBuilder()
-                                .setId(update.getValue())
-                                .setValue(ByteString.copyFrom(info))
-                                .setCommand(XTableProto.XTableMessage.Command.REGISTRY)
-                                .build().toByteArray(), ZMQ.DONTWAIT);
                     }
                 }
             } catch (Exception e) {

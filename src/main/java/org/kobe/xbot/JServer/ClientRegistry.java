@@ -30,6 +30,7 @@ public class ClientRegistry extends Thread {
     private final AtomicReference<ByteString> sessionId = new AtomicReference<>(null);
     private final LinkedList<ClientStatistics> clients;
     private long lastLoopTime = 0;
+    private boolean skipped;
 
     /**
      * Constructor to initialize the ClientRegistry with the XTablesServer instance.
@@ -57,19 +58,45 @@ public class ClientRegistry extends Thread {
             while (!Thread.currentThread().isInterrupted()) {
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastLoopTime >= loopInterval) {
-                    executeTask();
-                    lastLoopTime = currentTime;
+                    if (!shouldStopClientRegistry(50)) {
+                        executeTask();
+                        lastLoopTime = currentTime;
+                        skipped = false;
+                    } else {
+                        skipped = true;
+                    }
                 }
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    handleException(e);
                     break;
                 }
             }
         } catch (Exception e) {
             handleException(e);
         }
+    }
+
+    /**
+     * Method to check if the client registry should stop based on current messages per second
+     * compared to the max iteration speed threshold percentage.
+     * This method checks the pull, reply, and publish messages separately, with the reply being twice as sensitive.
+     *
+     * @param thresholdPercentage the threshold percentage (0 to 100) to compare against
+     * @return true if any message type exceeds the threshold, otherwise false
+     */
+    public boolean shouldStopClientRegistry(int thresholdPercentage) {
+        // Get current messages per second and max iteration speed
+        double currentPullMessagesPerSecond = instance.getRate().getPullMessagesPerSecond();
+        double currentReplyMessagesPerSecond = instance.getRate().getReplyMessagesPerSecond() * 2;  // Multiply by 2 for two-way messaging
+        double currentPublishMessagesPerSecond = instance.getRate().getPublishMessagesPerSecond();
+        int maxIterationSpeed = instance.getIterationSpeed();
+        double thresholdValue = (thresholdPercentage / 100.0) * maxIterationSpeed;
+        return (currentPullMessagesPerSecond > thresholdValue) ||
+                (currentReplyMessagesPerSecond > thresholdValue) ||
+                (currentPublishMessagesPerSecond > thresholdValue);
     }
 
     /**
@@ -86,11 +113,21 @@ public class ClientRegistry extends Thread {
     }
 
     /**
+     * Forces the execution of the periodic task immediately, bypassing the scheduled loop.
+     * This method can be useful for manually triggering a client update outside the normal loop cycle.
+     */
+    public void executeNow() {
+        executeTask();
+        lastLoopTime = System.currentTimeMillis();
+    }
+
+    /**
      * Returns the number of milliseconds before the next loop will execute.
      *
      * @return milliseconds before the next loop
      */
     public long getMillisBeforeNextLoop() {
+        if (skipped) return -1;
         long currentTime = System.currentTimeMillis();
         return (currentTime - lastLoopTime >= loopInterval) ? 0 : loopInterval - (currentTime - lastLoopTime);
     }

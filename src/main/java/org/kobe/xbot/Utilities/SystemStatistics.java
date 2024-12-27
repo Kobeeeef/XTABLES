@@ -27,16 +27,20 @@ public class SystemStatistics {
     private int totalPullMessages;
     private int totalReplyMessages;
     private int totalPublishMessages;
+    private double pullPs;
+    private double replyPs;
+    private double publishPs;
+    private int maxIterationsPerSecond;
     private final String ip;
     private final String processId;
     private final String javaVersion;
     private final String javaVendor;
     private final String jvmName;
     private String hostname;
-    private int framesForwarded;
     private List<ClientData> clientDataList;
     private String version;
     private final String type = "JAVA";
+    private final long nextClientRegistryUpdate;
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -81,17 +85,26 @@ public class SystemStatistics {
         this.totalPublishMessages = instance.publishMessages.get();
         this.version = instance.getVersion();
         this.status = instance.getStatus();
+        this.nextClientRegistryUpdate = instance.getClientRegistry().getMillisBeforeNextLoop();
+        this.maxIterationsPerSecond = instance.getIterationSpeed();
+        this.publishPs = instance.getRate().getPublishMessagesPerSecond();
+        this.pullPs = instance.getRate().getPullMessagesPerSecond();
+        this.replyPs = instance.getRate().getReplyMessagesPerSecond();
+    }
 
+    public int getMaxIterationsPerSecond() {
+        return maxIterationsPerSecond;
+    }
+
+    public SystemStatistics setMaxIterationsPerSecond(int maxIterationsPerSecond) {
+        this.maxIterationsPerSecond = maxIterationsPerSecond;
+        return this;
     }
 
     public enum HealthStatus {
         GOOD, OKAY, STRESSED, OVERLOAD, CRITICAL, UNKNOWN
     }
 
-    public SystemStatistics setFramesForwarded(int framesForwarded) {
-        this.framesForwarded = framesForwarded;
-        return this;
-    }
 
     public SystemStatistics setHostname(String hostname) {
         this.hostname = hostname;

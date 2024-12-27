@@ -25,7 +25,6 @@ public class PullPushProducer {
 
                     // Read the image file into a byte array
                     i++;
-                    long id = ThreadLocalRandom.current().nextLong();
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.newBuilder()
                             .setCommand(XTableProto.XTableMessage.Command.PUT)
                             .setKey("imageKey")
@@ -34,12 +33,12 @@ public class PullPushProducer {
                             .build();
                     // Send the message to the socket
                     socket.send(message.toByteArray(), ZMQ.DONTWAIT);
-                    System.out.println(i);
+
 
 
             }
 
-        } catch (IOException  e) {
+        } catch (Exception  e) {
             throw new RuntimeException(e);
         }
     }

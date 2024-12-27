@@ -116,15 +116,6 @@ public class Utilities {
         return result;
     }
 
-    public static boolean isValidValue(String jsonString) {
-        try {
-            // Attempt to parse the JSON string
-            Json.read(jsonString);
-            return true; // If parsing succeeds, JSON is valid
-        } catch (Error | Exception e) {
-            return false; // If parsing fails, JSON is invalid
-        }
-    }
 
     @SafeVarargs
     public static <K, V> ConcurrentHashMap<K, V> combineConcurrentHashMaps(ConcurrentHashMap<K, V>... maps) {
@@ -241,7 +232,7 @@ public class Utilities {
             xTablesData.put(getRandomCommand().name(), new byte[] { 23, 21, 12}, XTableProto.XTableMessage.Type.UNKNOWN);
         }
 
-        return iterations / 2;
+        return iterations / 6;
     }
 
     /**
