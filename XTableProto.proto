@@ -23,7 +23,7 @@ message XTableMessage {
     UNKNOWN_COMMAND = 0;
     PUT = 1;
     GET = 2;
-    SUBSCRIBE_UPDATE = 3;
+    DEBUG = 3;
     GET_TABLES = 4;
     RUN_SCRIPT = 5;
     UPDATE_KEY = 6;

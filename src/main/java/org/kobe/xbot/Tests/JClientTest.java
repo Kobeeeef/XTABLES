@@ -1,7 +1,6 @@
 package org.kobe.xbot.Tests;
 
 import org.kobe.xbot.JClient.XTablesClient;
-import org.kobe.xbot.Utilities.Entities.PingResponse;
 import org.kobe.xbot.Utilities.XTablesByteUtils;
 
 public class JClientTest {
@@ -16,6 +15,17 @@ public class JClientTest {
                 throw new RuntimeException(e);
             }
         }));
+        client.subscribeToServerLogs((v) -> {
+            System.out.println(v.getMessage());
+            System.out.println(v.getLevel());
+        });
+        System.out.println(client.ping());
+        client.setServerDebug(true);
+        Thread.sleep(3000);
+        System.out.println(client.ping());
+        System.out.println(client.ping());
+        System.out.println(client.ping());
+        System.out.println(client.ping());
 
 //        while (true) {
 //            try {

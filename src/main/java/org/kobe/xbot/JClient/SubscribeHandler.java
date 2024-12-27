@@ -122,7 +122,7 @@ public class SubscribeHandler extends BaseHandler {
                     if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.UPDATE) || update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.PUBLISH)) {
                         if (instance.subscriptionConsumers.containsKey(update.getKey())) {
                             List<Consumer<XTableProto.XTableMessage.XTableUpdate>> consumers = instance.subscriptionConsumers.get(update.getKey());
-                            ;
+
                             for (Consumer<XTableProto.XTableMessage.XTableUpdate> consumer : consumers) {
                                 consumer.accept(update);
                             }
@@ -132,6 +132,10 @@ public class SubscribeHandler extends BaseHandler {
                             for (Consumer<XTableProto.XTableMessage.XTableUpdate> consumer : consumers) {
                                 consumer.accept(update);
                             }
+                        }
+                    } else if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.LOG)) {
+                        for (Consumer<XTableProto.XTableMessage.XTableLog> consumer : instance.logConsumers) {
+                            consumer.accept(XTableProto.XTableMessage.XTableLog.parseFrom(update.getValue()));
                         }
                     }
                 }

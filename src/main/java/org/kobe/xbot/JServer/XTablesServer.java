@@ -233,14 +233,14 @@ public class XTablesServer {
             logger.warning("""
                     Additional features are disabled. The XTablesServer will proceed with standard initialization.
                     The following components are excluded:
-                                      
+                                       \s
                     - XTablesMessageRate: Real-time messaging rate monitoring will not be initialized.
                     - ClientRegistry: The registry for tracking connected clients will not be enabled.
                     - XTablesSocketMonitor: Advanced socket monitoring and client management will not be available.
                     - WebInterface: The web-based dashboard for monitoring and managing server activities will not be initialized.
-                                      
-                    To enable these features, use the '--additional_features=true' option when starting the server.                
-                    """);
+                                       \s
+                    To enable these features, use the '--additional_features=true' option when starting the server.
+                   \s""");
         }
         logger.info(String.format("""
                 Debug Mode Status: %s
@@ -257,6 +257,7 @@ public class XTablesServer {
      * @throws IOException If an error occurs during cleanup
      */
     private void cleanup() throws IOException {
+        status.set(XTableStatus.OFFLINE);
         if (context != null) {
             logger.info("Destroying ZMQ context and releasing resources...");
             context.destroy();
@@ -387,12 +388,12 @@ public class XTablesServer {
      */
     public void shutdown() {
         try {
+            status.set(XTableStatus.OFFLINE);
             if (context != null) {
                 logger.info("Destroying ZMQ context and releasing resources...");
                 context.destroy();
                 logger.info("ZMQ context destroyed successfully.");
             }
-            status.set(XTableStatus.OFFLINE);
             if (jmdns != null && serviceInfo != null) {
                 logger.info("Attempting to unregister mDNS service: " + serviceInfo.getQualifiedName() + " on port " + SERVICE_PORT + "...");
                 jmdns.unregisterService(serviceInfo);
@@ -523,20 +524,22 @@ public class XTablesServer {
      *              When enabled, the system starts publishing logs to the clients for debugging purposes.
      */
     public void setDebug(boolean value) {
-        debug.set(value);
-        XTablesLogger.setHandler((level, s) -> {
-            if (debug.get() && pubSocket != null) {
-                notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
-                        .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
-                        .setValue(XTableProto.XTableMessage.XTableLog.newBuilder()
-                                .setLevel(level.equals(Level.INFO) ? XTableProto.XTableMessage.XTableLog.Level.INFO : level.equals(Level.WARNING) ? XTableProto.XTableMessage.XTableLog.Level.WARNING : level.equals(Level.SEVERE) ? XTableProto.XTableMessage.XTableLog.Level.SEVERE : level.equals(XTablesLogger.FATAL) ? XTableProto.XTableMessage.XTableLog.Level.FATAL : XTableProto.XTableMessage.XTableLog.Level.UNKNOWN)
-                                .setMessage(s)
-                                .build()
-                                .toByteString())
-                        .build());
-            }
-        });
-        logger.info("Debug mode is now " + (debug.get() ? "enabled. Logs will be published to connected clients."
-                : "disabled. Logs will not be sent to clients."));
+        if (debug.get() != value) {
+            debug.set(value);
+            XTablesLogger.setHandler((level, s) -> {
+                if (debug.get() && pubSocket != null && status.get().equals(XTableStatus.ONLINE)) {
+                    notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                            .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
+                            .setValue(XTableProto.XTableMessage.XTableLog.newBuilder()
+                                    .setLevel(level.equals(Level.INFO) ? XTableProto.XTableMessage.XTableLog.Level.INFO : level.equals(Level.WARNING) ? XTableProto.XTableMessage.XTableLog.Level.WARNING : level.equals(Level.SEVERE) ? XTableProto.XTableMessage.XTableLog.Level.SEVERE : level.equals(XTablesLogger.FATAL) ? XTableProto.XTableMessage.XTableLog.Level.FATAL : XTableProto.XTableMessage.XTableLog.Level.UNKNOWN)
+                                    .setMessage(s)
+                                    .build()
+                                    .toByteString())
+                            .build());
+                }
+            });
+            logger.info("Debug mode is now " + (debug.get() ? "enabled. Logs will be published to connected clients."
+                    : "disabled. Logs will not be sent to clients."));
+        }
     }
 }

@@ -160,6 +160,20 @@ public class ReplyRequestHandler extends BaseHandler {
                                     .setValue(ByteString.copyFrom(serialized))
                                     .build().toByteArray(), ZMQ.DONTWAIT);
                         }
+                        case DEBUG -> {
+                            if (message.hasValue()) {
+                                instance.setDebug(message.getValue().equals(successByte));
+                                socket.send(XTableProto.XTableMessage.newBuilder()
+                                        .setValue(successByte)
+                                        .build()
+                                        .toByteArray(), ZMQ.DONTWAIT);
+                            } else {
+                                socket.send(XTableProto.XTableMessage.newBuilder()
+                                        .setValue(failByte)
+                                        .build()
+                                        .toByteArray(), ZMQ.DONTWAIT);
+                            }
+                        }
                         case PING -> socket.send(XTableProto.XTableMessage.newBuilder()
                                 .setValue(successByte)
                                 .build()

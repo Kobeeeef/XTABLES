@@ -243,5 +243,45 @@ public class WebInterface {
 
             }
         }), "/api/data");
+        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                String uuidParam = req.getParameter("uuid");
+
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                if (uuidParam == null || uuidParam.isEmpty()) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"No UUID found in parameter!\"}");
+                    return;
+                }
+                UUID uuid;
+
+                try {
+                    uuid = UUID.fromString(uuidParam);
+                } catch (IllegalArgumentException e) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Invalid UUID format!\"}");
+                    return;
+                }
+
+
+                Optional<ClientStatistics> clientHandler = ((List<ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().filter(f -> f.getUUID().equals(uuid.toString())).findFirst();
+                if (clientHandler.isPresent()) {
+                    boolean success = server.getClientRegistry().getClients().remove(clientHandler.get());
+                    if (success) {
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                        resp.getWriter().println("{ \"status\": \"success\", \"message\": \"The client has been disconnected!\"}");
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
+                    }
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
+                }
+
+            }
+        }), "/api/disconnect");
     }
 }

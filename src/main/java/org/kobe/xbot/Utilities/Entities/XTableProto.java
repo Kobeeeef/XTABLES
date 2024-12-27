@@ -342,9 +342,9 @@ public final class XTableProto {
        */
       GET(2),
       /**
-       * <code>SUBSCRIBE_UPDATE = 3;</code>
+       * <code>DEBUG = 3;</code>
        */
-      SUBSCRIBE_UPDATE(3),
+      DEBUG(3),
       /**
        * <code>GET_TABLES = 4;</code>
        */
@@ -430,9 +430,9 @@ public final class XTableProto {
        */
       public static final int GET_VALUE = 2;
       /**
-       * <code>SUBSCRIBE_UPDATE = 3;</code>
+       * <code>DEBUG = 3;</code>
        */
-      public static final int SUBSCRIBE_UPDATE_VALUE = 3;
+      public static final int DEBUG_VALUE = 3;
       /**
        * <code>GET_TABLES = 4;</code>
        */
@@ -522,7 +522,7 @@ public final class XTableProto {
           case 0: return UNKNOWN_COMMAND;
           case 1: return PUT;
           case 2: return GET;
-          case 3: return SUBSCRIBE_UPDATE;
+          case 3: return DEBUG;
           case 4: return GET_TABLES;
           case 5: return RUN_SCRIPT;
           case 6: return UPDATE_KEY;
@@ -4446,7 +4446,7 @@ public final class XTableProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021XTableProto.proto\"\223\t\n\rXTableMessage\022\'\n" +
+      "\n\021XTableProto.proto\"\210\t\n\rXTableMessage\022\'\n" +
       "\007command\030\001 \001(\0162\026.XTableMessage.Command\022\020" +
       "\n\003key\030\002 \001(\tH\000\210\001\001\022\022\n\005value\030\003 \001(\014H\001\210\001\001\022&\n\004" +
       "type\030\004 \001(\0162\023.XTableMessage.TypeH\002\210\001\001\022\017\n\002" +
@@ -4466,17 +4466,16 @@ public final class XTableProto {
       "\030\006 \001(\t\022\022\n\nuser_agent\030\007 \001(\t\"y\n\004Type\022\013\n\007UN" +
       "KNOWN\020\000\022\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT64" +
       "\020\005\022\010\n\004BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007MES" +
-      "SAGE\020\t\022\t\n\005ARRAY\020\n\022\n\n\006OBJECT\020\013\"\307\002\n\007Comman" +
+      "SAGE\020\t\022\t\n\005ARRAY\020\n\022\n\n\006OBJECT\020\013\"\274\002\n\007Comman" +
       "d\022\023\n\017UNKNOWN_COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GET\020\002" +
-      "\022\024\n\020SUBSCRIBE_UPDATE\020\003\022\016\n\nGET_TABLES\020\004\022\016" +
-      "\n\nRUN_SCRIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE" +
-      "\020\007\022\013\n\007PUBLISH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n" +
-      "\022UNSUBSCRIBE_DELETE\020\n\022\026\n\022UNSUBSCRIBE_UPD" +
-      "ATE\020\013\022\010\n\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DEL" +
-      "ETE_EVENT\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFORMA" +
-      "TION\020\020\022\021\n\rREBOOT_SERVER\020\021\022\014\n\010REGISTRY\020\022B" +
-      "\006\n\004_keyB\010\n\006_valueB\007\n\005_typeB\005\n\003_idb\006proto" +
-      "3"
+      "\022\t\n\005DEBUG\020\003\022\016\n\nGET_TABLES\020\004\022\016\n\nRUN_SCRIP" +
+      "T\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE\020\007\022\013\n\007PUBLI" +
+      "SH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n\022UNSUBSCRIB" +
+      "E_DELETE\020\n\022\026\n\022UNSUBSCRIBE_UPDATE\020\013\022\010\n\004PI" +
+      "NG\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DELETE_EVENT\020\016" +
+      "\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFORMATION\020\020\022\021\n\rR" +
+      "EBOOT_SERVER\020\021\022\014\n\010REGISTRY\020\022B\006\n\004_keyB\010\n\006" +
+      "_valueB\007\n\005_typeB\005\n\003_idb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

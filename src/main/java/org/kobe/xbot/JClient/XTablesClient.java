@@ -8,9 +8,12 @@ import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.Utilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQException;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -48,9 +51,10 @@ public class XTablesClient {
     private static final byte[] fail = new byte[]{(byte) 0x00};
     private static final ByteString successByte = ByteString.copyFrom(success);
     private static final ByteString failByte = ByteString.copyFrom(fail);
+    private static final Logger log = LoggerFactory.getLogger(XTablesClient.class);
     public final AtomicInteger subscribeMessagesCount = new AtomicInteger(0);
     public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> subscriptionConsumers;
-    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> publishConsumers;
+    public final List<Consumer<XTableProto.XTableMessage.XTableLog>> logConsumers;
     private final ZContext context;
     private final ZMQ.Socket subSocket;
     private final ZMQ.Socket pushSocket;
@@ -133,7 +137,7 @@ public class XTablesClient {
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION)
                 .build().toByteArray());
         this.subscriptionConsumers = new HashMap<>();
-        this.publishConsumers = new HashMap<>();
+        this.logConsumers = new ArrayList<>();
         this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
         this.subscribeHandler.start();
 
@@ -457,8 +461,33 @@ public class XTablesClient {
                     .build()
                     .toByteArray());
             return XTableProto.XTableMessage.parseFrom(reqSocket.recv());
-        } catch (InvalidProtocolBufferException | NullPointerException e) {
+        } catch (InvalidProtocolBufferException | NullPointerException | ZMQException e) {
+            logger.warning(e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Sets the XTABLES debug mode to the specified value.
+     * <p>
+     * This method constructs and sends a message to toggle the server's debug mode.
+     * It verifies the server's response to ensure the operation was successful.
+     *
+     * @param value a boolean indicating whether to enable or disable debug mode
+     * @return true if the server acknowledged the operation successfully, false otherwise
+     */
+    public boolean setServerDebug(boolean value) {
+        try {
+            reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setValue(value ? successByte : failByte)
+                    .setCommand(XTableProto.XTableMessage.Command.DEBUG)
+                    .build()
+                    .toByteArray());
+            byte[] response = reqSocket.recv();
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            return message.hasValue() && message.getValue().equals(successByte);
+        } catch (InvalidProtocolBufferException | NullPointerException | ZMQException e) {
+            return false;
         }
     }
 
@@ -493,7 +522,8 @@ public class XTablesClient {
             if (!message.hasValue())
                 return false;
             return message.getValue().equals(successByte);
-        } catch (InvalidProtocolBufferException | NullPointerException e) {
+        } catch (InvalidProtocolBufferException | NullPointerException | ZMQException e) {
+            logger.warning(e.getMessage());
             return false;
         }
     }
@@ -606,9 +636,49 @@ public class XTablesClient {
             if (message.hasValue()) {
                 return new PingResponse(message.getValue().equals(successByte), diff);
             } else return new PingResponse(false, -1);
-        } catch (InvalidProtocolBufferException e) {
+        } catch (InvalidProtocolBufferException | ZMQException e) {
             return new PingResponse(false, -1);
         }
+    }
+
+    /**
+     * Subscribes a consumer-to-server log update.
+     * <p>
+     * This method registers a consumer to receive log updates from the server.
+     * It ensures the subscription to the appropriate log category via the subscription socket.
+     *
+     * @param consumer a Consumer function to handle incoming server log messages
+     * @return true if the subscription was successful, false otherwise
+     */
+    public boolean subscribeToServerLogs(Consumer<XTableProto.XTableMessage.XTableLog> consumer) {
+        boolean success = this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
+                .build()
+                .toByteArray());
+        if (success) {
+            return this.logConsumers.add(consumer);
+        }
+        return false;
+    }
+
+    /**
+     * Unsubscribes a consumer from server log updates.
+     * <p>
+     * This method removes a previously registered consumer from receiving server log updates.
+     * If no more consumers are registered, it unsubscribes from the log category on the subscription socket.
+     *
+     * @param consumer a Consumer function previously registered to handle server log messages
+     * @return true if the consumer was removed successfully, false otherwise
+     */
+    public boolean unsubscribeToServerLogs(Consumer<XTableProto.XTableMessage.XTableLog> consumer) {
+        boolean success = this.logConsumers.remove(consumer);
+        if (this.logConsumers.isEmpty()) {
+            return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                    .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
+                    .build()
+                    .toByteArray());
+        }
+        return success;
     }
 
     /**
