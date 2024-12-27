@@ -43,6 +43,7 @@ public class XTablesClient {
     // across all instances of the class.
     // =============================================================
     private static final XTablesLogger logger = XTablesLogger.getLogger();
+    public static final String UUID = java.util.UUID.randomUUID().toString();
     private static final byte[] success = new byte[]{(byte) 0x01};
     private static final byte[] fail = new byte[]{(byte) 0x00};
     private static final ByteString successByte = ByteString.copyFrom(success);
@@ -127,6 +128,9 @@ public class XTablesClient {
         this.subSocket.connect("tcp://" + ip + ":" + subscribeSocketPort);
         this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                .build().toByteArray());
+        this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION)
                 .build().toByteArray());
         this.subscriptionConsumers = new HashMap<>();
         this.publishConsumers = new HashMap<>();
@@ -281,7 +285,7 @@ public class XTablesClient {
      * @param key   The key associated with the message being published.
      * @param value The value (byte array) to be published with the key.
      * @return true if the message was successfully sent, false otherwise.
-     * @throws XTablesException if there is an exception during the publish process.
+     * @throws XTablesException if there is an exception during the publication process.
      */
     public boolean publish(String key, byte[] value) {
         try {

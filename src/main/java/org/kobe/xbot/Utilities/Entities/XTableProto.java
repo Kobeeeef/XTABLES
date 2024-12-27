@@ -1464,9 +1464,13 @@ public final class XTableProto {
          */
         REGISTRY(4),
         /**
-         * <code>LOG = 5;</code>
+         * <code>INFORMATION = 5;</code>
          */
-        LOG(5),
+        INFORMATION(5),
+        /**
+         * <code>LOG = 6;</code>
+         */
+        LOG(6),
         UNRECOGNIZED(-1),
         ;
 
@@ -1500,9 +1504,13 @@ public final class XTableProto {
          */
         public static final int REGISTRY_VALUE = 4;
         /**
-         * <code>LOG = 5;</code>
+         * <code>INFORMATION = 5;</code>
          */
-        public static final int LOG_VALUE = 5;
+        public static final int INFORMATION_VALUE = 5;
+        /**
+         * <code>LOG = 6;</code>
+         */
+        public static final int LOG_VALUE = 6;
 
 
         public final int getNumber() {
@@ -1534,7 +1542,8 @@ public final class XTableProto {
             case 2: return DELETE;
             case 3: return PUBLISH;
             case 4: return REGISTRY;
-            case 5: return LOG;
+            case 5: return INFORMATION;
+            case 6: return LOG;
             default: return null;
           }
         }
@@ -2294,6 +2303,1253 @@ public final class XTableProto {
 
       @java.lang.Override
       public XTableProto.XTableMessage.XTableUpdate getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
+    }
+
+    public interface ClientInfoOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:XTableMessage.ClientInfo)
+        com.google.protobuf.MessageOrBuilder {
+
+      /**
+       * <code>string ip_address = 1;</code>
+       * @return The ipAddress.
+       */
+      java.lang.String getIpAddress();
+      /**
+       * <code>string ip_address = 1;</code>
+       * @return The bytes for ipAddress.
+       */
+      com.google.protobuf.ByteString
+          getIpAddressBytes();
+
+      /**
+       * <code>string hostname = 2;</code>
+       * @return The hostname.
+       */
+      java.lang.String getHostname();
+      /**
+       * <code>string hostname = 2;</code>
+       * @return The bytes for hostname.
+       */
+      com.google.protobuf.ByteString
+          getHostnameBytes();
+
+      /**
+       * <code>string operating_system = 3;</code>
+       * @return The operatingSystem.
+       */
+      java.lang.String getOperatingSystem();
+      /**
+       * <code>string operating_system = 3;</code>
+       * @return The bytes for operatingSystem.
+       */
+      com.google.protobuf.ByteString
+          getOperatingSystemBytes();
+
+      /**
+       * <code>int32 port = 4;</code>
+       * @return The port.
+       */
+      int getPort();
+
+      /**
+       * <code>bool is_active = 5;</code>
+       * @return The isActive.
+       */
+      boolean getIsActive();
+
+      /**
+       * <code>string version = 6;</code>
+       * @return The version.
+       */
+      java.lang.String getVersion();
+      /**
+       * <code>string version = 6;</code>
+       * @return The bytes for version.
+       */
+      com.google.protobuf.ByteString
+          getVersionBytes();
+
+      /**
+       * <code>string user_agent = 7;</code>
+       * @return The userAgent.
+       */
+      java.lang.String getUserAgent();
+      /**
+       * <code>string user_agent = 7;</code>
+       * @return The bytes for userAgent.
+       */
+      com.google.protobuf.ByteString
+          getUserAgentBytes();
+    }
+    /**
+     * Protobuf type {@code XTableMessage.ClientInfo}
+     */
+    public static final class ClientInfo extends
+        com.google.protobuf.GeneratedMessage implements
+        // @@protoc_insertion_point(message_implements:XTableMessage.ClientInfo)
+        ClientInfoOrBuilder {
+    private static final long serialVersionUID = 0L;
+      static {
+        com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+          com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+          /* major= */ 4,
+          /* minor= */ 29,
+          /* patch= */ 2,
+          /* suffix= */ "",
+          ClientInfo.class.getName());
+      }
+      // Use ClientInfo.newBuilder() to construct.
+      private ClientInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+        super(builder);
+      }
+      private ClientInfo() {
+        ipAddress_ = "";
+        hostname_ = "";
+        operatingSystem_ = "";
+        version_ = "";
+        userAgent_ = "";
+      }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return XTableProto.internal_static_XTableMessage_ClientInfo_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return XTableProto.internal_static_XTableMessage_ClientInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                XTableProto.XTableMessage.ClientInfo.class, XTableProto.XTableMessage.ClientInfo.Builder.class);
+      }
+
+      public static final int IP_ADDRESS_FIELD_NUMBER = 1;
+      @SuppressWarnings("serial")
+      private volatile java.lang.Object ipAddress_ = "";
+      /**
+       * <code>string ip_address = 1;</code>
+       * @return The ipAddress.
+       */
+      @java.lang.Override
+      public java.lang.String getIpAddress() {
+        java.lang.Object ref = ipAddress_;
+        if (ref instanceof java.lang.String) {
+          return (java.lang.String) ref;
+        } else {
+          com.google.protobuf.ByteString bs = 
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          ipAddress_ = s;
+          return s;
+        }
+      }
+      /**
+       * <code>string ip_address = 1;</code>
+       * @return The bytes for ipAddress.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString
+          getIpAddressBytes() {
+        java.lang.Object ref = ipAddress_;
+        if (ref instanceof java.lang.String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          ipAddress_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+
+      public static final int HOSTNAME_FIELD_NUMBER = 2;
+      @SuppressWarnings("serial")
+      private volatile java.lang.Object hostname_ = "";
+      /**
+       * <code>string hostname = 2;</code>
+       * @return The hostname.
+       */
+      @java.lang.Override
+      public java.lang.String getHostname() {
+        java.lang.Object ref = hostname_;
+        if (ref instanceof java.lang.String) {
+          return (java.lang.String) ref;
+        } else {
+          com.google.protobuf.ByteString bs = 
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          hostname_ = s;
+          return s;
+        }
+      }
+      /**
+       * <code>string hostname = 2;</code>
+       * @return The bytes for hostname.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString
+          getHostnameBytes() {
+        java.lang.Object ref = hostname_;
+        if (ref instanceof java.lang.String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          hostname_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+
+      public static final int OPERATING_SYSTEM_FIELD_NUMBER = 3;
+      @SuppressWarnings("serial")
+      private volatile java.lang.Object operatingSystem_ = "";
+      /**
+       * <code>string operating_system = 3;</code>
+       * @return The operatingSystem.
+       */
+      @java.lang.Override
+      public java.lang.String getOperatingSystem() {
+        java.lang.Object ref = operatingSystem_;
+        if (ref instanceof java.lang.String) {
+          return (java.lang.String) ref;
+        } else {
+          com.google.protobuf.ByteString bs = 
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          operatingSystem_ = s;
+          return s;
+        }
+      }
+      /**
+       * <code>string operating_system = 3;</code>
+       * @return The bytes for operatingSystem.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString
+          getOperatingSystemBytes() {
+        java.lang.Object ref = operatingSystem_;
+        if (ref instanceof java.lang.String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          operatingSystem_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+
+      public static final int PORT_FIELD_NUMBER = 4;
+      private int port_ = 0;
+      /**
+       * <code>int32 port = 4;</code>
+       * @return The port.
+       */
+      @java.lang.Override
+      public int getPort() {
+        return port_;
+      }
+
+      public static final int IS_ACTIVE_FIELD_NUMBER = 5;
+      private boolean isActive_ = false;
+      /**
+       * <code>bool is_active = 5;</code>
+       * @return The isActive.
+       */
+      @java.lang.Override
+      public boolean getIsActive() {
+        return isActive_;
+      }
+
+      public static final int VERSION_FIELD_NUMBER = 6;
+      @SuppressWarnings("serial")
+      private volatile java.lang.Object version_ = "";
+      /**
+       * <code>string version = 6;</code>
+       * @return The version.
+       */
+      @java.lang.Override
+      public java.lang.String getVersion() {
+        java.lang.Object ref = version_;
+        if (ref instanceof java.lang.String) {
+          return (java.lang.String) ref;
+        } else {
+          com.google.protobuf.ByteString bs = 
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          version_ = s;
+          return s;
+        }
+      }
+      /**
+       * <code>string version = 6;</code>
+       * @return The bytes for version.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString
+          getVersionBytes() {
+        java.lang.Object ref = version_;
+        if (ref instanceof java.lang.String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          version_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+
+      public static final int USER_AGENT_FIELD_NUMBER = 7;
+      @SuppressWarnings("serial")
+      private volatile java.lang.Object userAgent_ = "";
+      /**
+       * <code>string user_agent = 7;</code>
+       * @return The userAgent.
+       */
+      @java.lang.Override
+      public java.lang.String getUserAgent() {
+        java.lang.Object ref = userAgent_;
+        if (ref instanceof java.lang.String) {
+          return (java.lang.String) ref;
+        } else {
+          com.google.protobuf.ByteString bs = 
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          userAgent_ = s;
+          return s;
+        }
+      }
+      /**
+       * <code>string user_agent = 7;</code>
+       * @return The bytes for userAgent.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString
+          getUserAgentBytes() {
+        java.lang.Object ref = userAgent_;
+        if (ref instanceof java.lang.String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          userAgent_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+
+      private byte memoizedIsInitialized = -1;
+      @java.lang.Override
+      public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized == 1) return true;
+        if (isInitialized == 0) return false;
+
+        memoizedIsInitialized = 1;
+        return true;
+      }
+
+      @java.lang.Override
+      public void writeTo(com.google.protobuf.CodedOutputStream output)
+                          throws java.io.IOException {
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(ipAddress_)) {
+          com.google.protobuf.GeneratedMessage.writeString(output, 1, ipAddress_);
+        }
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(hostname_)) {
+          com.google.protobuf.GeneratedMessage.writeString(output, 2, hostname_);
+        }
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(operatingSystem_)) {
+          com.google.protobuf.GeneratedMessage.writeString(output, 3, operatingSystem_);
+        }
+        if (port_ != 0) {
+          output.writeInt32(4, port_);
+        }
+        if (isActive_ != false) {
+          output.writeBool(5, isActive_);
+        }
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(version_)) {
+          com.google.protobuf.GeneratedMessage.writeString(output, 6, version_);
+        }
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(userAgent_)) {
+          com.google.protobuf.GeneratedMessage.writeString(output, 7, userAgent_);
+        }
+        getUnknownFields().writeTo(output);
+      }
+
+      @java.lang.Override
+      public int getSerializedSize() {
+        int size = memoizedSize;
+        if (size != -1) return size;
+
+        size = 0;
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(ipAddress_)) {
+          size += com.google.protobuf.GeneratedMessage.computeStringSize(1, ipAddress_);
+        }
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(hostname_)) {
+          size += com.google.protobuf.GeneratedMessage.computeStringSize(2, hostname_);
+        }
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(operatingSystem_)) {
+          size += com.google.protobuf.GeneratedMessage.computeStringSize(3, operatingSystem_);
+        }
+        if (port_ != 0) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeInt32Size(4, port_);
+        }
+        if (isActive_ != false) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBoolSize(5, isActive_);
+        }
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(version_)) {
+          size += com.google.protobuf.GeneratedMessage.computeStringSize(6, version_);
+        }
+        if (!com.google.protobuf.GeneratedMessage.isStringEmpty(userAgent_)) {
+          size += com.google.protobuf.GeneratedMessage.computeStringSize(7, userAgent_);
+        }
+        size += getUnknownFields().getSerializedSize();
+        memoizedSize = size;
+        return size;
+      }
+
+      @java.lang.Override
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof XTableProto.XTableMessage.ClientInfo)) {
+          return super.equals(obj);
+        }
+        XTableProto.XTableMessage.ClientInfo other = (XTableProto.XTableMessage.ClientInfo) obj;
+
+        if (!getIpAddress()
+            .equals(other.getIpAddress())) return false;
+        if (!getHostname()
+            .equals(other.getHostname())) return false;
+        if (!getOperatingSystem()
+            .equals(other.getOperatingSystem())) return false;
+        if (getPort()
+            != other.getPort()) return false;
+        if (getIsActive()
+            != other.getIsActive()) return false;
+        if (!getVersion()
+            .equals(other.getVersion())) return false;
+        if (!getUserAgent()
+            .equals(other.getUserAgent())) return false;
+        if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+        return true;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptor().hashCode();
+        hash = (37 * hash) + IP_ADDRESS_FIELD_NUMBER;
+        hash = (53 * hash) + getIpAddress().hashCode();
+        hash = (37 * hash) + HOSTNAME_FIELD_NUMBER;
+        hash = (53 * hash) + getHostname().hashCode();
+        hash = (37 * hash) + OPERATING_SYSTEM_FIELD_NUMBER;
+        hash = (53 * hash) + getOperatingSystem().hashCode();
+        hash = (37 * hash) + PORT_FIELD_NUMBER;
+        hash = (53 * hash) + getPort();
+        hash = (37 * hash) + IS_ACTIVE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getIsActive());
+        hash = (37 * hash) + VERSION_FIELD_NUMBER;
+        hash = (53 * hash) + getVersion().hashCode();
+        hash = (37 * hash) + USER_AGENT_FIELD_NUMBER;
+        hash = (53 * hash) + getUserAgent().hashCode();
+        hash = (29 * hash) + getUnknownFields().hashCode();
+        memoizedHashCode = hash;
+        return hash;
+      }
+
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(
+          java.nio.ByteBuffer data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(
+          java.nio.ByteBuffer data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(
+          com.google.protobuf.ByteString data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(
+          com.google.protobuf.ByteString data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(byte[] data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(
+          byte[] data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
+      }
+
+      public static XTableProto.XTableMessage.ClientInfo parseDelimitedFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
+      }
+
+      public static XTableProto.XTableMessage.ClientInfo parseDelimitedFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(
+          com.google.protobuf.CodedInputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
+      }
+      public static XTableProto.XTableMessage.ClientInfo parseFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
+      }
+
+      @java.lang.Override
+      public Builder newBuilderForType() { return newBuilder(); }
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
+      }
+      public static Builder newBuilder(XTableProto.XTableMessage.ClientInfo prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      @java.lang.Override
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
+
+      @java.lang.Override
+      protected Builder newBuilderForType(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+      }
+      /**
+       * Protobuf type {@code XTableMessage.ClientInfo}
+       */
+      public static final class Builder extends
+          com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+          // @@protoc_insertion_point(builder_implements:XTableMessage.ClientInfo)
+          XTableProto.XTableMessage.ClientInfoOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+          return XTableProto.internal_static_XTableMessage_ClientInfo_descriptor;
+        }
+
+        @java.lang.Override
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+          return XTableProto.internal_static_XTableMessage_ClientInfo_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                  XTableProto.XTableMessage.ClientInfo.class, XTableProto.XTableMessage.ClientInfo.Builder.class);
+        }
+
+        // Construct using XTableProto.XTableMessage.ClientInfo.newBuilder()
+        private Builder() {
+
+        }
+
+        private Builder(
+            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          super(parent);
+
+        }
+        @java.lang.Override
+        public Builder clear() {
+          super.clear();
+          bitField0_ = 0;
+          ipAddress_ = "";
+          hostname_ = "";
+          operatingSystem_ = "";
+          port_ = 0;
+          isActive_ = false;
+          version_ = "";
+          userAgent_ = "";
+          return this;
+        }
+
+        @java.lang.Override
+        public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+          return XTableProto.internal_static_XTableMessage_ClientInfo_descriptor;
+        }
+
+        @java.lang.Override
+        public XTableProto.XTableMessage.ClientInfo getDefaultInstanceForType() {
+          return XTableProto.XTableMessage.ClientInfo.getDefaultInstance();
+        }
+
+        @java.lang.Override
+        public XTableProto.XTableMessage.ClientInfo build() {
+          XTableProto.XTableMessage.ClientInfo result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(result);
+          }
+          return result;
+        }
+
+        @java.lang.Override
+        public XTableProto.XTableMessage.ClientInfo buildPartial() {
+          XTableProto.XTableMessage.ClientInfo result = new XTableProto.XTableMessage.ClientInfo(this);
+          if (bitField0_ != 0) { buildPartial0(result); }
+          onBuilt();
+          return result;
+        }
+
+        private void buildPartial0(XTableProto.XTableMessage.ClientInfo result) {
+          int from_bitField0_ = bitField0_;
+          if (((from_bitField0_ & 0x00000001) != 0)) {
+            result.ipAddress_ = ipAddress_;
+          }
+          if (((from_bitField0_ & 0x00000002) != 0)) {
+            result.hostname_ = hostname_;
+          }
+          if (((from_bitField0_ & 0x00000004) != 0)) {
+            result.operatingSystem_ = operatingSystem_;
+          }
+          if (((from_bitField0_ & 0x00000008) != 0)) {
+            result.port_ = port_;
+          }
+          if (((from_bitField0_ & 0x00000010) != 0)) {
+            result.isActive_ = isActive_;
+          }
+          if (((from_bitField0_ & 0x00000020) != 0)) {
+            result.version_ = version_;
+          }
+          if (((from_bitField0_ & 0x00000040) != 0)) {
+            result.userAgent_ = userAgent_;
+          }
+        }
+
+        @java.lang.Override
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+          if (other instanceof XTableProto.XTableMessage.ClientInfo) {
+            return mergeFrom((XTableProto.XTableMessage.ClientInfo)other);
+          } else {
+            super.mergeFrom(other);
+            return this;
+          }
+        }
+
+        public Builder mergeFrom(XTableProto.XTableMessage.ClientInfo other) {
+          if (other == XTableProto.XTableMessage.ClientInfo.getDefaultInstance()) return this;
+          if (!other.getIpAddress().isEmpty()) {
+            ipAddress_ = other.ipAddress_;
+            bitField0_ |= 0x00000001;
+            onChanged();
+          }
+          if (!other.getHostname().isEmpty()) {
+            hostname_ = other.hostname_;
+            bitField0_ |= 0x00000002;
+            onChanged();
+          }
+          if (!other.getOperatingSystem().isEmpty()) {
+            operatingSystem_ = other.operatingSystem_;
+            bitField0_ |= 0x00000004;
+            onChanged();
+          }
+          if (other.getPort() != 0) {
+            setPort(other.getPort());
+          }
+          if (other.getIsActive() != false) {
+            setIsActive(other.getIsActive());
+          }
+          if (!other.getVersion().isEmpty()) {
+            version_ = other.version_;
+            bitField0_ |= 0x00000020;
+            onChanged();
+          }
+          if (!other.getUserAgent().isEmpty()) {
+            userAgent_ = other.userAgent_;
+            bitField0_ |= 0x00000040;
+            onChanged();
+          }
+          this.mergeUnknownFields(other.getUnknownFields());
+          onChanged();
+          return this;
+        }
+
+        @java.lang.Override
+        public final boolean isInitialized() {
+          return true;
+        }
+
+        @java.lang.Override
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+          if (extensionRegistry == null) {
+            throw new java.lang.NullPointerException();
+          }
+          try {
+            boolean done = false;
+            while (!done) {
+              int tag = input.readTag();
+              switch (tag) {
+                case 0:
+                  done = true;
+                  break;
+                case 10: {
+                  ipAddress_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+                case 18: {
+                  hostname_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+                case 26: {
+                  operatingSystem_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000004;
+                  break;
+                } // case 26
+                case 32: {
+                  port_ = input.readInt32();
+                  bitField0_ |= 0x00000008;
+                  break;
+                } // case 32
+                case 40: {
+                  isActive_ = input.readBool();
+                  bitField0_ |= 0x00000010;
+                  break;
+                } // case 40
+                case 50: {
+                  version_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000020;
+                  break;
+                } // case 50
+                case 58: {
+                  userAgent_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000040;
+                  break;
+                } // case 58
+                default: {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+              } // switch (tag)
+            } // while (!done)
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            throw e.unwrapIOException();
+          } finally {
+            onChanged();
+          } // finally
+          return this;
+        }
+        private int bitField0_;
+
+        private java.lang.Object ipAddress_ = "";
+        /**
+         * <code>string ip_address = 1;</code>
+         * @return The ipAddress.
+         */
+        public java.lang.String getIpAddress() {
+          java.lang.Object ref = ipAddress_;
+          if (!(ref instanceof java.lang.String)) {
+            com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            ipAddress_ = s;
+            return s;
+          } else {
+            return (java.lang.String) ref;
+          }
+        }
+        /**
+         * <code>string ip_address = 1;</code>
+         * @return The bytes for ipAddress.
+         */
+        public com.google.protobuf.ByteString
+            getIpAddressBytes() {
+          java.lang.Object ref = ipAddress_;
+          if (ref instanceof String) {
+            com.google.protobuf.ByteString b = 
+                com.google.protobuf.ByteString.copyFromUtf8(
+                    (java.lang.String) ref);
+            ipAddress_ = b;
+            return b;
+          } else {
+            return (com.google.protobuf.ByteString) ref;
+          }
+        }
+        /**
+         * <code>string ip_address = 1;</code>
+         * @param value The ipAddress to set.
+         * @return This builder for chaining.
+         */
+        public Builder setIpAddress(
+            java.lang.String value) {
+          if (value == null) { throw new NullPointerException(); }
+          ipAddress_ = value;
+          bitField0_ |= 0x00000001;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string ip_address = 1;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearIpAddress() {
+          ipAddress_ = getDefaultInstance().getIpAddress();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string ip_address = 1;</code>
+         * @param value The bytes for ipAddress to set.
+         * @return This builder for chaining.
+         */
+        public Builder setIpAddressBytes(
+            com.google.protobuf.ByteString value) {
+          if (value == null) { throw new NullPointerException(); }
+          checkByteStringIsUtf8(value);
+          ipAddress_ = value;
+          bitField0_ |= 0x00000001;
+          onChanged();
+          return this;
+        }
+
+        private java.lang.Object hostname_ = "";
+        /**
+         * <code>string hostname = 2;</code>
+         * @return The hostname.
+         */
+        public java.lang.String getHostname() {
+          java.lang.Object ref = hostname_;
+          if (!(ref instanceof java.lang.String)) {
+            com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            hostname_ = s;
+            return s;
+          } else {
+            return (java.lang.String) ref;
+          }
+        }
+        /**
+         * <code>string hostname = 2;</code>
+         * @return The bytes for hostname.
+         */
+        public com.google.protobuf.ByteString
+            getHostnameBytes() {
+          java.lang.Object ref = hostname_;
+          if (ref instanceof String) {
+            com.google.protobuf.ByteString b = 
+                com.google.protobuf.ByteString.copyFromUtf8(
+                    (java.lang.String) ref);
+            hostname_ = b;
+            return b;
+          } else {
+            return (com.google.protobuf.ByteString) ref;
+          }
+        }
+        /**
+         * <code>string hostname = 2;</code>
+         * @param value The hostname to set.
+         * @return This builder for chaining.
+         */
+        public Builder setHostname(
+            java.lang.String value) {
+          if (value == null) { throw new NullPointerException(); }
+          hostname_ = value;
+          bitField0_ |= 0x00000002;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string hostname = 2;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearHostname() {
+          hostname_ = getDefaultInstance().getHostname();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string hostname = 2;</code>
+         * @param value The bytes for hostname to set.
+         * @return This builder for chaining.
+         */
+        public Builder setHostnameBytes(
+            com.google.protobuf.ByteString value) {
+          if (value == null) { throw new NullPointerException(); }
+          checkByteStringIsUtf8(value);
+          hostname_ = value;
+          bitField0_ |= 0x00000002;
+          onChanged();
+          return this;
+        }
+
+        private java.lang.Object operatingSystem_ = "";
+        /**
+         * <code>string operating_system = 3;</code>
+         * @return The operatingSystem.
+         */
+        public java.lang.String getOperatingSystem() {
+          java.lang.Object ref = operatingSystem_;
+          if (!(ref instanceof java.lang.String)) {
+            com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            operatingSystem_ = s;
+            return s;
+          } else {
+            return (java.lang.String) ref;
+          }
+        }
+        /**
+         * <code>string operating_system = 3;</code>
+         * @return The bytes for operatingSystem.
+         */
+        public com.google.protobuf.ByteString
+            getOperatingSystemBytes() {
+          java.lang.Object ref = operatingSystem_;
+          if (ref instanceof String) {
+            com.google.protobuf.ByteString b = 
+                com.google.protobuf.ByteString.copyFromUtf8(
+                    (java.lang.String) ref);
+            operatingSystem_ = b;
+            return b;
+          } else {
+            return (com.google.protobuf.ByteString) ref;
+          }
+        }
+        /**
+         * <code>string operating_system = 3;</code>
+         * @param value The operatingSystem to set.
+         * @return This builder for chaining.
+         */
+        public Builder setOperatingSystem(
+            java.lang.String value) {
+          if (value == null) { throw new NullPointerException(); }
+          operatingSystem_ = value;
+          bitField0_ |= 0x00000004;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string operating_system = 3;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearOperatingSystem() {
+          operatingSystem_ = getDefaultInstance().getOperatingSystem();
+          bitField0_ = (bitField0_ & ~0x00000004);
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string operating_system = 3;</code>
+         * @param value The bytes for operatingSystem to set.
+         * @return This builder for chaining.
+         */
+        public Builder setOperatingSystemBytes(
+            com.google.protobuf.ByteString value) {
+          if (value == null) { throw new NullPointerException(); }
+          checkByteStringIsUtf8(value);
+          operatingSystem_ = value;
+          bitField0_ |= 0x00000004;
+          onChanged();
+          return this;
+        }
+
+        private int port_ ;
+        /**
+         * <code>int32 port = 4;</code>
+         * @return The port.
+         */
+        @java.lang.Override
+        public int getPort() {
+          return port_;
+        }
+        /**
+         * <code>int32 port = 4;</code>
+         * @param value The port to set.
+         * @return This builder for chaining.
+         */
+        public Builder setPort(int value) {
+
+          port_ = value;
+          bitField0_ |= 0x00000008;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>int32 port = 4;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearPort() {
+          bitField0_ = (bitField0_ & ~0x00000008);
+          port_ = 0;
+          onChanged();
+          return this;
+        }
+
+        private boolean isActive_ ;
+        /**
+         * <code>bool is_active = 5;</code>
+         * @return The isActive.
+         */
+        @java.lang.Override
+        public boolean getIsActive() {
+          return isActive_;
+        }
+        /**
+         * <code>bool is_active = 5;</code>
+         * @param value The isActive to set.
+         * @return This builder for chaining.
+         */
+        public Builder setIsActive(boolean value) {
+
+          isActive_ = value;
+          bitField0_ |= 0x00000010;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>bool is_active = 5;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearIsActive() {
+          bitField0_ = (bitField0_ & ~0x00000010);
+          isActive_ = false;
+          onChanged();
+          return this;
+        }
+
+        private java.lang.Object version_ = "";
+        /**
+         * <code>string version = 6;</code>
+         * @return The version.
+         */
+        public java.lang.String getVersion() {
+          java.lang.Object ref = version_;
+          if (!(ref instanceof java.lang.String)) {
+            com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            version_ = s;
+            return s;
+          } else {
+            return (java.lang.String) ref;
+          }
+        }
+        /**
+         * <code>string version = 6;</code>
+         * @return The bytes for version.
+         */
+        public com.google.protobuf.ByteString
+            getVersionBytes() {
+          java.lang.Object ref = version_;
+          if (ref instanceof String) {
+            com.google.protobuf.ByteString b = 
+                com.google.protobuf.ByteString.copyFromUtf8(
+                    (java.lang.String) ref);
+            version_ = b;
+            return b;
+          } else {
+            return (com.google.protobuf.ByteString) ref;
+          }
+        }
+        /**
+         * <code>string version = 6;</code>
+         * @param value The version to set.
+         * @return This builder for chaining.
+         */
+        public Builder setVersion(
+            java.lang.String value) {
+          if (value == null) { throw new NullPointerException(); }
+          version_ = value;
+          bitField0_ |= 0x00000020;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string version = 6;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearVersion() {
+          version_ = getDefaultInstance().getVersion();
+          bitField0_ = (bitField0_ & ~0x00000020);
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string version = 6;</code>
+         * @param value The bytes for version to set.
+         * @return This builder for chaining.
+         */
+        public Builder setVersionBytes(
+            com.google.protobuf.ByteString value) {
+          if (value == null) { throw new NullPointerException(); }
+          checkByteStringIsUtf8(value);
+          version_ = value;
+          bitField0_ |= 0x00000020;
+          onChanged();
+          return this;
+        }
+
+        private java.lang.Object userAgent_ = "";
+        /**
+         * <code>string user_agent = 7;</code>
+         * @return The userAgent.
+         */
+        public java.lang.String getUserAgent() {
+          java.lang.Object ref = userAgent_;
+          if (!(ref instanceof java.lang.String)) {
+            com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
+            java.lang.String s = bs.toStringUtf8();
+            userAgent_ = s;
+            return s;
+          } else {
+            return (java.lang.String) ref;
+          }
+        }
+        /**
+         * <code>string user_agent = 7;</code>
+         * @return The bytes for userAgent.
+         */
+        public com.google.protobuf.ByteString
+            getUserAgentBytes() {
+          java.lang.Object ref = userAgent_;
+          if (ref instanceof String) {
+            com.google.protobuf.ByteString b = 
+                com.google.protobuf.ByteString.copyFromUtf8(
+                    (java.lang.String) ref);
+            userAgent_ = b;
+            return b;
+          } else {
+            return (com.google.protobuf.ByteString) ref;
+          }
+        }
+        /**
+         * <code>string user_agent = 7;</code>
+         * @param value The userAgent to set.
+         * @return This builder for chaining.
+         */
+        public Builder setUserAgent(
+            java.lang.String value) {
+          if (value == null) { throw new NullPointerException(); }
+          userAgent_ = value;
+          bitField0_ |= 0x00000040;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string user_agent = 7;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearUserAgent() {
+          userAgent_ = getDefaultInstance().getUserAgent();
+          bitField0_ = (bitField0_ & ~0x00000040);
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>string user_agent = 7;</code>
+         * @param value The bytes for userAgent to set.
+         * @return This builder for chaining.
+         */
+        public Builder setUserAgentBytes(
+            com.google.protobuf.ByteString value) {
+          if (value == null) { throw new NullPointerException(); }
+          checkByteStringIsUtf8(value);
+          userAgent_ = value;
+          bitField0_ |= 0x00000040;
+          onChanged();
+          return this;
+        }
+
+        // @@protoc_insertion_point(builder_scope:XTableMessage.ClientInfo)
+      }
+
+      // @@protoc_insertion_point(class_scope:XTableMessage.ClientInfo)
+      private static final XTableProto.XTableMessage.ClientInfo DEFAULT_INSTANCE;
+      static {
+        DEFAULT_INSTANCE = new XTableProto.XTableMessage.ClientInfo();
+      }
+
+      public static XTableProto.XTableMessage.ClientInfo getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      private static final com.google.protobuf.Parser<ClientInfo>
+          PARSER = new com.google.protobuf.AbstractParser<ClientInfo>() {
+        @java.lang.Override
+        public ClientInfo parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          Builder builder = newBuilder();
+          try {
+            builder.mergeFrom(input, extensionRegistry);
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            throw e.setUnfinishedMessage(builder.buildPartial());
+          } catch (com.google.protobuf.UninitializedMessageException e) {
+            throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+          } catch (java.io.IOException e) {
+            throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                .setUnfinishedMessage(builder.buildPartial());
+          }
+          return builder.buildPartial();
+        }
+      };
+
+      public static com.google.protobuf.Parser<ClientInfo> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<ClientInfo> getParserForType() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public XTableProto.XTableMessage.ClientInfo getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
 
@@ -3176,6 +4432,11 @@ public final class XTableProto {
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_XTableMessage_XTableUpdate_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_XTableMessage_ClientInfo_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_XTableMessage_ClientInfo_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -3185,7 +4446,7 @@ public final class XTableProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021XTableProto.proto\"\355\007\n\rXTableMessage\022\'\n" +
+      "\n\021XTableProto.proto\"\223\t\n\rXTableMessage\022\'\n" +
       "\007command\030\001 \001(\0162\026.XTableMessage.Command\022\020" +
       "\n\003key\030\002 \001(\tH\000\210\001\001\022\022\n\005value\030\003 \001(\014H\001\210\001\001\022&\n\004" +
       "type\030\004 \001(\0162\023.XTableMessage.TypeH\002\210\001\001\022\017\n\002" +
@@ -3193,24 +4454,29 @@ public final class XTableProto {
       "(\0162\036.XTableMessage.XTableLog.Level\022\017\n\007me" +
       "ssage\030\002 \001(\t\"B\n\005Level\022\013\n\007UNKNOWN\020\000\022\010\n\004INF" +
       "O\020\001\022\013\n\007WARNING\020\002\022\n\n\006SEVERE\020\003\022\t\n\005FATAL\020\004\032" +
-      "\332\001\n\014XTableUpdate\022\013\n\003key\030\001 \001(\t\0226\n\010categor" +
+      "\353\001\n\014XTableUpdate\022\013\n\003key\030\001 \001(\t\0226\n\010categor" +
       "y\030\002 \001(\0162$.XTableMessage.XTableUpdate.Cat" +
       "egory\022\r\n\005value\030\003 \001(\014\022!\n\004type\030\004 \001(\0162\023.XTa" +
-      "bleMessage.Type\"S\n\010Category\022\013\n\007UNKNOWN\020\000" +
+      "bleMessage.Type\"d\n\010Category\022\013\n\007UNKNOWN\020\000" +
       "\022\n\n\006UPDATE\020\001\022\n\n\006DELETE\020\002\022\013\n\007PUBLISH\020\003\022\014\n" +
-      "\010REGISTRY\020\004\022\007\n\003LOG\020\005\"y\n\004Type\022\013\n\007UNKNOWN\020" +
-      "\000\022\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT64\020\005\022\010\n\004" +
-      "BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007MESSAGE\020\t" +
-      "\022\t\n\005ARRAY\020\n\022\n\n\006OBJECT\020\013\"\307\002\n\007Command\022\023\n\017U" +
-      "NKNOWN_COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GET\020\002\022\024\n\020SU" +
-      "BSCRIBE_UPDATE\020\003\022\016\n\nGET_TABLES\020\004\022\016\n\nRUN_" +
-      "SCRIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE\020\007\022\013\n\007" +
-      "PUBLISH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n\022UNSUB" +
-      "SCRIBE_DELETE\020\n\022\026\n\022UNSUBSCRIBE_UPDATE\020\013\022" +
-      "\010\n\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DELETE_EV" +
-      "ENT\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFORMATION\020\020" +
-      "\022\021\n\rREBOOT_SERVER\020\021\022\014\n\010REGISTRY\020\022B\006\n\004_ke" +
-      "yB\010\n\006_valueB\007\n\005_typeB\005\n\003_idb\006proto3"
+      "\010REGISTRY\020\004\022\017\n\013INFORMATION\020\005\022\007\n\003LOG\020\006\032\222\001" +
+      "\n\nClientInfo\022\022\n\nip_address\030\001 \001(\t\022\020\n\010host" +
+      "name\030\002 \001(\t\022\030\n\020operating_system\030\003 \001(\t\022\014\n\004" +
+      "port\030\004 \001(\005\022\021\n\tis_active\030\005 \001(\010\022\017\n\007version" +
+      "\030\006 \001(\t\022\022\n\nuser_agent\030\007 \001(\t\"y\n\004Type\022\013\n\007UN" +
+      "KNOWN\020\000\022\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT64" +
+      "\020\005\022\010\n\004BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007MES" +
+      "SAGE\020\t\022\t\n\005ARRAY\020\n\022\n\n\006OBJECT\020\013\"\307\002\n\007Comman" +
+      "d\022\023\n\017UNKNOWN_COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GET\020\002" +
+      "\022\024\n\020SUBSCRIBE_UPDATE\020\003\022\016\n\nGET_TABLES\020\004\022\016" +
+      "\n\nRUN_SCRIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE" +
+      "\020\007\022\013\n\007PUBLISH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n" +
+      "\022UNSUBSCRIBE_DELETE\020\n\022\026\n\022UNSUBSCRIBE_UPD" +
+      "ATE\020\013\022\010\n\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DEL" +
+      "ETE_EVENT\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFORMA" +
+      "TION\020\020\022\021\n\rREBOOT_SERVER\020\021\022\014\n\010REGISTRY\020\022B" +
+      "\006\n\004_keyB\010\n\006_valueB\007\n\005_typeB\005\n\003_idb\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3234,6 +4500,12 @@ public final class XTableProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_XTableMessage_XTableUpdate_descriptor,
         new java.lang.String[] { "Key", "Category", "Value", "Type", });
+    internal_static_XTableMessage_ClientInfo_descriptor =
+      internal_static_XTableMessage_descriptor.getNestedTypes().get(2);
+    internal_static_XTableMessage_ClientInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_XTableMessage_ClientInfo_descriptor,
+        new java.lang.String[] { "IpAddress", "Hostname", "OperatingSystem", "Port", "IsActive", "Version", "UserAgent", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

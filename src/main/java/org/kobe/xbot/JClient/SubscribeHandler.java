@@ -29,6 +29,7 @@ public class SubscribeHandler extends BaseHandler {
     private final CircularBuffer<XTableProto.XTableMessage.XTableUpdate> buffer;
     private final Thread consumerHandlingThread;
     private final static int BUFFER_SIZE = 250;
+
     /**
      * Constructor that initializes the handler with the provided socket and server instance.
      *
@@ -62,14 +63,16 @@ public class SubscribeHandler extends BaseHandler {
                 instance.subscribeMessagesCount.incrementAndGet();
                 try {
                     XTableProto.XTableMessage.XTableUpdate message = XTableProto.XTableMessage.XTableUpdate.parseFrom(bytes);
-                 if (message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {
+                    if (message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION) || message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {
                         byte[] info = Utilities.serializeObject(new ClientStatistics()
                                 .setBufferSize(buffer.size)
+                                .setUUID(XTablesClient.UUID)
+                                .setVersion(instance.getVersion())
                                 .setMaxBufferSize(BUFFER_SIZE));
                         instance.getPushSocket().send(XTableProto.XTableMessage.newBuilder()
                                 .setId(message.getValue())
                                 .setValue(ByteString.copyFrom(info))
-                                .setCommand(XTableProto.XTableMessage.Command.REGISTRY)
+                                .setCommand(message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION) ? XTableProto.XTableMessage.Command.INFORMATION : XTableProto.XTableMessage.Command.REGISTRY)
                                 .build().toByteArray(), ZMQ.DONTWAIT);
                     } else this.buffer.write(message);
                 } catch (Exception e) {
@@ -118,7 +121,8 @@ public class SubscribeHandler extends BaseHandler {
                     XTableProto.XTableMessage.XTableUpdate update = buffer.readLatestAndClearOnFunction();
                     if (update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.UPDATE) || update.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.PUBLISH)) {
                         if (instance.subscriptionConsumers.containsKey(update.getKey())) {
-                            List<Consumer<XTableProto.XTableMessage.XTableUpdate>> consumers = instance.subscriptionConsumers.get(update.getKey());;
+                            List<Consumer<XTableProto.XTableMessage.XTableUpdate>> consumers = instance.subscriptionConsumers.get(update.getKey());
+                            ;
                             for (Consumer<XTableProto.XTableMessage.XTableUpdate> consumer : consumers) {
                                 consumer.accept(update);
                             }

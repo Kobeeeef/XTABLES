@@ -62,7 +62,8 @@ message XTableMessage {
       DELETE = 2;
       PUBLISH = 3;
       REGISTRY = 4;
-      LOG = 5;
+      INFORMATION = 5;
+      LOG = 6;
     }
   }
 

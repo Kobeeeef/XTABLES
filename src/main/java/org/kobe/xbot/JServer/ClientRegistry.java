@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ClientRegistry extends Thread {
     private final static XTablesLogger logger = XTablesLogger.getLogger();
-    private final static long loopInterval = 3000;
+    private final static long loopInterval = 500;
     private final XTablesServer instance;
     private final AtomicReference<ByteString> sessionId = new AtomicReference<>(null);
     private final LinkedList<ClientStatistics> clients;
@@ -46,7 +46,7 @@ public class ClientRegistry extends Thread {
 
     /**
      * The run method handles the periodic task of updating the client registry and session ID.
-     * It runs in a loop, checking every 3 seconds to clear the client list and generate a new session ID.
+     * It runs in a loop, checking every second to clear the client list and generate a new session ID.
      * Once the session ID is updated, it notifies the server of the update.
      * The loop runs until the thread is interrupted, and it sleeps for 100 milliseconds between iterations
      * to reduce CPU usage.
@@ -58,7 +58,7 @@ public class ClientRegistry extends Thread {
             while (!Thread.currentThread().isInterrupted()) {
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastLoopTime >= loopInterval) {
-                    if (!shouldStopClientRegistry(50)) {
+                    if (!shouldStopClientRegistry(5) && !clients.isEmpty()) {
                         executeTask();
                         lastLoopTime = currentTime;
                         skipped = false;
@@ -104,12 +104,13 @@ public class ClientRegistry extends Thread {
      * and notifying the instance of the update.
      */
     private void executeTask() {
-        clients.clear();
         sessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
         instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
-                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION)
                 .setValue(sessionId.get())
-                .build());
+                .build()
+                );
+        instance.publishMessages.incrementAndGet();
     }
 
     /**
@@ -127,6 +128,7 @@ public class ClientRegistry extends Thread {
      * @return milliseconds before the next loop
      */
     public long getMillisBeforeNextLoop() {
+        if(clients.isEmpty()) return -2;
         if (skipped) return -1;
         long currentTime = System.currentTimeMillis();
         return (currentTime - lastLoopTime >= loopInterval) ? 0 : loopInterval - (currentTime - lastLoopTime);

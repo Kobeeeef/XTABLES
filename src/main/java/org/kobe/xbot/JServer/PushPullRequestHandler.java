@@ -6,6 +6,7 @@ import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Utilities;
 import org.zeromq.ZMQ;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -96,13 +97,29 @@ public class PushPullRequestHandler extends BaseHandler {
             }
             case REGISTRY -> {
                 if (message.hasId()) {
+                    if (message.getId().equals(instance.getClientRegistrySessionId())) {
+                        if (message.hasValue()) {
+                            byte[] value = message.getValue().toByteArray();
+                            ClientStatistics statistics = Utilities.deserializeObject(value, ClientStatistics.class);
+                            instance.getClientRegistry().getClients()
+                                    .add(statistics);
+                        }
+                    }
+                }
+            }
+            case INFORMATION -> {
+                if (message.hasId()) {
                     if (message.getId().equals(instance.getClientRegistry().getSessionId())) {
                         if (message.hasValue()) {
                             byte[] value = message.getValue().toByteArray();
                             ClientStatistics statistics = Utilities.deserializeObject(value, ClientStatistics.class);
-                            statistics.setUUID(UUID.randomUUID().toString());
-                            instance.getClientRegistry().getClients()
-                                    .add(statistics);
+                            instance.getClientRegistry().getClients().replaceAll(client -> {
+                                if (client.getUUID().equals(statistics.getUUID())) {
+                                    return statistics;
+                                }
+                                return client;
+                            });
+
                         }
                     }
                 }

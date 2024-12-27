@@ -1,6 +1,7 @@
 package org.kobe.xbot.JServer;
 
 import com.google.gson.Gson;
+import com.google.protobuf.ByteString;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,14 +16,17 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.kobe.xbot.Utilities.ClientData;
 import org.kobe.xbot.Utilities.ClientStatistics;
+import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.SystemStatistics;
+import org.kobe.xbot.Utilities.Utilities;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -131,7 +135,7 @@ public class WebInterface {
                 resp.setContentType("application/json");
                 resp.setCharacterEncoding("UTF-8");
                 SystemStatistics systemStatistics = new SystemStatistics(server);
-                systemStatistics.setClientDataList(server.getClientRegistry().getClients().stream().map(m -> {
+                systemStatistics.setClientDataList(((List<ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().map(m -> {
                     ClientData data = new ClientData(m.getIp(),
                             m.getHostname(),
                             m.getUUID());
@@ -204,6 +208,30 @@ public class WebInterface {
 
             }
         }), "/api/reboot");
+        servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                try {
+                    if (!xTablesServer.getClientRegistry().shouldStopClientRegistry(5)) {
+                        xTablesServer.getClientRegistrySession().set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
+                        xTablesServer.getClientRegistry().getClients().clear();
+                        xTablesServer.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                                .setValue(xTablesServer.getClientRegistrySessionId())
+                                .build()
+                        );
+                    }
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been reloaded!\"}");
+                } catch (Exception e) {
+                    resp.setStatus(HttpServletResponse.SC_CONFLICT);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Server cannot reboot while: " + server.getStatus().name() + "\"}");
+                }
+
+            }
+        }), "/api/reloadRegistry");
         servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
             @Override
             protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

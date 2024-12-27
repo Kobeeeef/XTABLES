@@ -80,7 +80,6 @@ public class XTablesSocketMonitor extends Thread {
         }
         monitorSocketNames.clear();
         clientMap.clear();
-        System.out.println("XTablesSocketMonitor cleaned up.");
     }
 
     // Prints the connected client count for each socket

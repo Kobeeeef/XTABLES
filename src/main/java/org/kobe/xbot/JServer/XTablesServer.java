@@ -1,6 +1,7 @@
 package org.kobe.xbot.JServer;
 
 import com.google.gson.Gson;
+import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
@@ -79,7 +80,7 @@ public class XTablesServer {
     private XTablesSocketMonitor socketMonitor;
     private XTablesMessageRate rate;
     private int iterationSpeed;
-
+    private final AtomicReference<ByteString> clientRegistrySessionId = new AtomicReference<>();
     /**
      * Constructor for initializing the server with specified ports.
      *
@@ -180,13 +181,26 @@ public class XTablesServer {
         this.rate = new XTablesMessageRate(pullMessages, replyMessages, publishMessages);
         this.clientRegistry = new ClientRegistry(this);
         this.clientRegistry.start();
+
+
         this.socketMonitor = new XTablesSocketMonitor(context) {
             @Override
             protected void onClientConnected(String socketName, String clientAddress, int clientCount) {
                 if (socketMonitor != null && socketName.equals("PUBLISH")) {
                     logger.info(String.format("New client connection detected on PUBLISH socket: address=%s, connected clients=%d.", clientAddress, clientCount));
                     logger.info("Triggering client registry update due to new PUBLISH client connection.");
-                    clientRegistry.executeNow();
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignored) {
+
+                    }
+                    clientRegistrySessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
+                    clientRegistry.getClients().clear();
+                    notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                            .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                            .setValue(clientRegistrySessionId.get())
+                            .build()
+                    );
                 }
             }
 
@@ -195,7 +209,13 @@ public class XTablesServer {
                 if (socketMonitor != null && socketName.equals("PUBLISH")) {
                     logger.info(String.format("Client disconnected from PUBLISH socket: address=%s, total connected clients=%d.", clientAddress, clientCount));
                     logger.info("Triggering client registry update due to PUBLISH client disconnection.");
-                    clientRegistry.executeNow();
+                    clientRegistrySessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
+                    clientRegistry.getClients().clear();
+                    notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                            .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                            .setValue(clientRegistrySessionId.get())
+                            .build()
+                    );
                 }
             }
         };
@@ -236,10 +256,10 @@ public class XTablesServer {
         if (clientRegistry != null) {
             clientRegistry.interrupt();
         }
-        if(socketMonitor != null) {
+        if (socketMonitor != null) {
             socketMonitor.interrupt();
         }
-        if(rate != null) {
+        if (rate != null) {
             rate.shutdown();
         }
         table.delete("");
@@ -369,10 +389,10 @@ public class XTablesServer {
             if (clientRegistry != null) {
                 clientRegistry.interrupt();
             }
-            if(socketMonitor != null) {
+            if (socketMonitor != null) {
                 socketMonitor.interrupt();
             }
-            if(rate != null) {
+            if (rate != null) {
                 rate.shutdown();
             }
             logger.info("Shutting down the server process...");
@@ -410,13 +430,20 @@ public class XTablesServer {
         return clientRegistry;
     }
 
+    public ByteString getClientRegistrySessionId() {
+        return clientRegistrySessionId.get();
+    }
+    public AtomicReference<ByteString> getClientRegistrySession() {
+        return clientRegistrySessionId;
+    }
+
     /**
      * Notifies connected clients of updates.
      *
      * @param update The update message to send
      */
     public void notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate update) {
-        if(pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT)) publishMessages.incrementAndGet();
+      pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT);
     }
 
     /**
