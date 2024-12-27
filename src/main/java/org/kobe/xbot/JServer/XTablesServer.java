@@ -69,6 +69,7 @@ public class XTablesServer {
     private final int pubPort;
     private final String version;
     private final AtomicBoolean debug = new AtomicBoolean(false);
+    private final boolean additionalFeatures;
     public ZMQ.Socket pubSocket;
     private ZContext context;
     private JmDNS jmdns;
@@ -81,6 +82,7 @@ public class XTablesServer {
     private XTablesMessageRate rate;
     private int iterationSpeed;
     private final AtomicReference<ByteString> clientRegistrySessionId = new AtomicReference<>();
+
     /**
      * Constructor for initializing the server with specified ports.
      *
@@ -88,11 +90,12 @@ public class XTablesServer {
      * @param repServerPort  Port for the REP socket
      * @param pubServerPort  Port for the PUB socket
      */
-    private XTablesServer(String version, int pullServerPort, int repServerPort, int pubServerPort) {
+    private XTablesServer(String version, int pullServerPort, int repServerPort, int pubServerPort, boolean additionalFeatures) {
         this.pullPort = pullServerPort;
         this.repPort = repServerPort;
         this.pubPort = pubServerPort;
         this.version = version;
+        this.additionalFeatures = additionalFeatures;
         instance.set(this);
         start();
     }
@@ -106,12 +109,12 @@ public class XTablesServer {
      * @param publishSocketPort Port for the PUB socket
      * @return The initialized server instance
      */
-    public static XTablesServer initialize(String version, int pullSocketPort, int replySocketPort, int publishSocketPort) {
+    public static XTablesServer initialize(String version, int pullSocketPort, int replySocketPort, int publishSocketPort, boolean additionalFeatures) {
         if (instance.get() != null) {
             return instance.get();
         }
         status.set(XTableStatus.STARTING);
-        main = new Thread(() -> new XTablesServer(version, pullSocketPort, replySocketPort, publishSocketPort));
+        main = new Thread(() -> new XTablesServer(version, pullSocketPort, replySocketPort, publishSocketPort, additionalFeatures));
         main.setName("XTABLES-SERVER");
         main.setDaemon(false);
         main.start();
@@ -137,9 +140,11 @@ public class XTablesServer {
             logger.severe("Main latch interrupted: " + e.getMessage());
             System.exit(1);
         }
-        instance.get().iterationSpeed = Utilities.measureWhileLoopIterationsPerSecond();
-        String formattedSpeed = NumberFormat.getInstance().format(instance.get().iterationSpeed);
-        logger.info("Server can process approximately " + formattedSpeed + " iterations per second.");
+        if (additionalFeatures) {
+            instance.get().iterationSpeed = Utilities.measureWhileLoopIterationsPerSecond();
+            String formattedSpeed = NumberFormat.getInstance().format(instance.get().iterationSpeed);
+            logger.info("Server can process approximately " + formattedSpeed + " iterations per second.");
+        }
         return instance.get();
     }
 
@@ -178,53 +183,70 @@ public class XTablesServer {
         this.pushPullRequestHandler.start();
         this.replyRequestHandler = new ReplyRequestHandler(repSocket, this);
         this.replyRequestHandler.start();
-        this.rate = new XTablesMessageRate(pullMessages, replyMessages, publishMessages);
-        this.clientRegistry = new ClientRegistry(this);
-        this.clientRegistry.start();
-
-
-        this.socketMonitor = new XTablesSocketMonitor(context) {
-            @Override
-            protected void onClientConnected(String socketName, String clientAddress, int clientCount) {
-                if (socketMonitor != null && socketName.equals("PUBLISH")) {
-                    logger.info(String.format("New client connection detected on PUBLISH socket: address=%s, connected clients=%d.", clientAddress, clientCount));
-                    logger.info("Triggering client registry update due to new PUBLISH client connection.");
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ignored) {
-
-                    }
-                    clientRegistrySessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
-                    clientRegistry.getClients().clear();
-                    notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
-                            .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
-                            .setValue(clientRegistrySessionId.get())
-                            .build()
-                    );
-                }
-            }
-
-            @Override
-            protected void onClientDisconnected(String socketName, String clientAddress, int clientCount) {
-                if (socketMonitor != null && socketName.equals("PUBLISH")) {
-                    logger.info(String.format("Client disconnected from PUBLISH socket: address=%s, total connected clients=%d.", clientAddress, clientCount));
-                    logger.info("Triggering client registry update due to PUBLISH client disconnection.");
-                    clientRegistrySessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
-                    clientRegistry.getClients().clear();
-                    notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
-                            .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
-                            .setValue(clientRegistrySessionId.get())
-                            .build()
-                    );
-                }
-            }
-        };
-        this.socketMonitor.addSocket("PULL", pullSocket)
-                .addSocket("REPLY", repSocket)
-                .addSocket("PUBLISH", pubSocket);
-        this.socketMonitor.start();
         initializeMDNSWithRetries(10);
-        this.webInterface = WebInterface.initialize(this);
+        if (additionalFeatures) {
+            this.rate = new XTablesMessageRate(pullMessages, replyMessages, publishMessages);
+            this.clientRegistry = new ClientRegistry(this);
+            this.clientRegistry.start();
+            this.socketMonitor = new XTablesSocketMonitor(context) {
+                @Override
+                protected void onClientConnected(String socketName, String clientAddress, int clientCount) {
+                    if (socketMonitor != null && socketName.equals("PUBLISH")) {
+                        logger.info(String.format("New client connection detected on PUBLISH socket: address=%s, connected clients=%d.", clientAddress, clientCount));
+                        logger.info("Triggering client registry update due to new PUBLISH client connection.");
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException ignored) {
+
+                        }
+                        clientRegistrySessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
+                        clientRegistry.getClients().clear();
+                        notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                                .setValue(clientRegistrySessionId.get())
+                                .build()
+                        );
+                    }
+                }
+
+                @Override
+                protected void onClientDisconnected(String socketName, String clientAddress, int clientCount) {
+                    if (socketMonitor != null && socketName.equals("PUBLISH")) {
+                        logger.info(String.format("Client disconnected from PUBLISH socket: address=%s, total connected clients=%d.", clientAddress, clientCount));
+                        logger.info("Triggering client registry update due to PUBLISH client disconnection.");
+                        clientRegistrySessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
+                        clientRegistry.getClients().clear();
+                        notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                                .setValue(clientRegistrySessionId.get())
+                                .build()
+                        );
+                    }
+                }
+            };
+            this.socketMonitor.addSocket("PULL", pullSocket)
+                    .addSocket("REPLY", repSocket)
+                    .addSocket("PUBLISH", pubSocket);
+            this.socketMonitor.start();
+            this.webInterface = WebInterface.initialize(this);
+        } else {
+            logger.warning("""
+                    Additional features are disabled. The XTablesServer will proceed with standard initialization.
+                    The following components are excluded:
+                                      
+                    - XTablesMessageRate: Real-time messaging rate monitoring will not be initialized.
+                    - ClientRegistry: The registry for tracking connected clients will not be enabled.
+                    - XTablesSocketMonitor: Advanced socket monitoring and client management will not be available.
+                    - WebInterface: The web-based dashboard for monitoring and managing server activities will not be initialized.
+                                      
+                    To enable these features, use the '--additional_features=true' option when starting the server.                
+                    """);
+        }
+        logger.info(String.format("""
+                Debug Mode Status: %s
+                - When enabled, the system publishes detailed logs to connected clients to assist in debugging.
+                - This allows real-time insights into server operations and events.
+                """, debug.get() ? "Enabled" : "Disabled"));
         status.set(XTableStatus.ONLINE);
         latch.countDown();
     }
@@ -433,6 +455,7 @@ public class XTablesServer {
     public ByteString getClientRegistrySessionId() {
         return clientRegistrySessionId.get();
     }
+
     public AtomicReference<ByteString> getClientRegistrySession() {
         return clientRegistrySessionId;
     }
@@ -443,7 +466,7 @@ public class XTablesServer {
      * @param update The update message to send
      */
     public void notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate update) {
-      pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT);
+        pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT);
     }
 
     /**
@@ -513,5 +536,7 @@ public class XTablesServer {
                         .build());
             }
         });
+        logger.info("Debug mode is now " + (debug.get() ? "enabled. Logs will be published to connected clients."
+                : "disabled. Logs will not be sent to clients."));
     }
 }

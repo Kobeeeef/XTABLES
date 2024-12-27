@@ -17,32 +17,65 @@ import org.kobe.xbot.Utilities.Logger.XTablesLogger;
  * for messaging and service discovery using JeroMQ.
  */
 public class Main {
-
+    /**
+     * The version string for the XTablesServer.
+     * Includes the software name, version, build date, and Java version.
+     */
     public static final String XTABLES_SERVER_VERSION =
             "XTABLES Jero Server v1.0.0 | Build Date: 12/24/2024 | Java 17";
 
-
+    /**
+     * The logger instance for recording server events, warnings, and errors.
+     */
     private static final XTablesLogger logger = XTablesLogger.getLogger();
 
+    /**
+     * Main method - The entry point of the application.
+     * <p>
+     * Parses command-line arguments to configure server settings and initialize the XTablesServer.
+     * Accepts three optional arguments for PULL, REQ/REP, and PUB ports and an additional optional flag
+     * `--additional_features=true/false` to enable or disable additional server features.
+     * <p>
+     * If no ports are provided, the server defaults to using 1735 for PULL, 1736 for REQ/REP, and 1737 for PUB.
+     * The method validates all provided ports to ensure they are within the range of 0 to 65535.
+     * <p>
+     * Errors such as invalid port formats or ranges are logged using the `logger` instance.
+     *
+     * @param args Command-line arguments for server configuration.
+     */
     public static void main(String[] args) {
-        if (args.length == 3) {
-            try {
-                int pull = Integer.parseInt(args[0]);
-                int rep = Integer.parseInt(args[1]);
-                int pub = Integer.parseInt(args[2]);
-                if (pull < 0 || pull > 65535 || rep < 0 || rep > 65535 || pub < 0 || pub > 65535) {
-                    logger.severe("Error: The specified port '" + args[0] + "' is outside the specified range of valid port values.");
-                } else {
-                    XTablesServer.initialize(XTABLES_SERVER_VERSION, pull, rep, pub);
+        boolean additionalFeatures = false;
+        int pull = 1735;
+        int rep = 1736;
+        int pub = 1737;
+
+        try {
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].startsWith("--additional_features=")) {
+                    String[] split = args[i].split("=", 2);
+                    if (split.length == 2) {
+                        additionalFeatures = Boolean.parseBoolean(split[1]);
+                    } else {
+                        logger.severe("Invalid format for --additional_features. Expected format: --additional_features=true/false");
+                        return;
+                    }
+                } else if (i < 3) {
+                    switch (i) {
+                        case 0 -> pull = Integer.parseInt(args[i]);
+                        case 1 -> rep = Integer.parseInt(args[i]);
+                        case 2 -> pub = Integer.parseInt(args[i]);
+                    }
                 }
-            } catch (NumberFormatException e) {
-                logger.severe("Error: The specified port '" + args[0] + "' is not a valid integer.");
-                logger.severe("Error: The specified port '" + args[1] + "' is not a valid integer.");
-                logger.severe("Error: The specified port '" + args[2] + "' is not a valid integer.");
             }
-        } else {
-            logger.info("No port number provided. Default ports 1735 (pull), 1736 (reply), 1737 (publish) is being used.");
-            XTablesServer.initialize(XTABLES_SERVER_VERSION, 1735, 1736, 1737);
+            if (pull < 0 || pull > 65535 || rep < 0 || rep > 65535 || pub < 0 || pub > 65535) {
+                logger.severe("Error: One or more specified ports are outside the valid range (0-65535).");
+                return;
+            }
+            logger.info("Starting server with additional_features=" + additionalFeatures);
+            XTablesServer.initialize(XTABLES_SERVER_VERSION, pull, rep, pub, additionalFeatures);
+
+        } catch (NumberFormatException e) {
+            logger.severe("Error: One or more specified ports are not valid integers.");
         }
     }
 }
