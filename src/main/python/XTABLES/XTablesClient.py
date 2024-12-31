@@ -193,6 +193,7 @@ class XTablesServerNotFound(Exception):
 # Sample usage
 if __name__ == "__main__":
     client = XTablesClient("localhost")
+    client.execute_put_boolean("name", True)
     print(client.execute_get_boolean("name"))
     print(client.execute_get_integer("age"))
     print(client.execute_get_array("numbers"))
