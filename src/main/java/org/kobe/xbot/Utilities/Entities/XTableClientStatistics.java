@@ -263,28 +263,28 @@ public final class XTableClientStatistics {
         getProcessIdBytes();
 
     /**
-     * <code>string java_version = 11;</code>
-     * @return The javaVersion.
+     * <code>string lang_version = 11;</code>
+     * @return The langVersion.
      */
-    java.lang.String getJavaVersion();
+    java.lang.String getLangVersion();
     /**
-     * <code>string java_version = 11;</code>
-     * @return The bytes for javaVersion.
+     * <code>string lang_version = 11;</code>
+     * @return The bytes for langVersion.
      */
     com.google.protobuf.ByteString
-        getJavaVersionBytes();
+        getLangVersionBytes();
 
     /**
-     * <code>string java_vendor = 12;</code>
-     * @return The javaVendor.
+     * <code>string lang_vendor = 12;</code>
+     * @return The langVendor.
      */
-    java.lang.String getJavaVendor();
+    java.lang.String getLangVendor();
     /**
-     * <code>string java_vendor = 12;</code>
-     * @return The bytes for javaVendor.
+     * <code>string lang_vendor = 12;</code>
+     * @return The bytes for langVendor.
      */
     com.google.protobuf.ByteString
-        getJavaVendorBytes();
+        getLangVendorBytes();
 
     /**
      * <code>string jvm_name = 13;</code>
@@ -423,8 +423,8 @@ public final class XTableClientStatistics {
       ip_ = "";
       hostname_ = "";
       processId_ = "";
-      javaVersion_ = "";
-      javaVendor_ = "";
+      langVersion_ = "";
+      langVendor_ = "";
       jvmName_ = "";
       health_ = 0;
       version_ = "";
@@ -640,78 +640,78 @@ public final class XTableClientStatistics {
       }
     }
 
-    public static final int JAVA_VERSION_FIELD_NUMBER = 11;
+    public static final int LANG_VERSION_FIELD_NUMBER = 11;
     @SuppressWarnings("serial")
-    private volatile java.lang.Object javaVersion_ = "";
+    private volatile java.lang.Object langVersion_ = "";
     /**
-     * <code>string java_version = 11;</code>
-     * @return The javaVersion.
+     * <code>string lang_version = 11;</code>
+     * @return The langVersion.
      */
     @java.lang.Override
-    public java.lang.String getJavaVersion() {
-      java.lang.Object ref = javaVersion_;
+    public java.lang.String getLangVersion() {
+      java.lang.Object ref = langVersion_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        javaVersion_ = s;
+        langVersion_ = s;
         return s;
       }
     }
     /**
-     * <code>string java_version = 11;</code>
-     * @return The bytes for javaVersion.
+     * <code>string lang_version = 11;</code>
+     * @return The bytes for langVersion.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getJavaVersionBytes() {
-      java.lang.Object ref = javaVersion_;
+        getLangVersionBytes() {
+      java.lang.Object ref = langVersion_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        javaVersion_ = b;
+        langVersion_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    public static final int JAVA_VENDOR_FIELD_NUMBER = 12;
+    public static final int LANG_VENDOR_FIELD_NUMBER = 12;
     @SuppressWarnings("serial")
-    private volatile java.lang.Object javaVendor_ = "";
+    private volatile java.lang.Object langVendor_ = "";
     /**
-     * <code>string java_vendor = 12;</code>
-     * @return The javaVendor.
+     * <code>string lang_vendor = 12;</code>
+     * @return The langVendor.
      */
     @java.lang.Override
-    public java.lang.String getJavaVendor() {
-      java.lang.Object ref = javaVendor_;
+    public java.lang.String getLangVendor() {
+      java.lang.Object ref = langVendor_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        javaVendor_ = s;
+        langVendor_ = s;
         return s;
       }
     }
     /**
-     * <code>string java_vendor = 12;</code>
-     * @return The bytes for javaVendor.
+     * <code>string lang_vendor = 12;</code>
+     * @return The bytes for langVendor.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getJavaVendorBytes() {
-      java.lang.Object ref = javaVendor_;
+        getLangVendorBytes() {
+      java.lang.Object ref = langVendor_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        javaVendor_ = b;
+        langVendor_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1010,11 +1010,11 @@ public final class XTableClientStatistics {
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(processId_)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 10, processId_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(javaVersion_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 11, javaVersion_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(langVersion_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 11, langVersion_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(javaVendor_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 12, javaVendor_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(langVendor_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 12, langVendor_);
       }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(jvmName_)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 13, jvmName_);
@@ -1083,11 +1083,11 @@ public final class XTableClientStatistics {
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(processId_)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(10, processId_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(javaVersion_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(11, javaVersion_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(langVersion_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(11, langVersion_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(javaVendor_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(12, javaVendor_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(langVendor_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(12, langVendor_);
       }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(jvmName_)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(13, jvmName_);
@@ -1149,10 +1149,10 @@ public final class XTableClientStatistics {
           .equals(other.getHostname())) return false;
       if (!getProcessId()
           .equals(other.getProcessId())) return false;
-      if (!getJavaVersion()
-          .equals(other.getJavaVersion())) return false;
-      if (!getJavaVendor()
-          .equals(other.getJavaVendor())) return false;
+      if (!getLangVersion()
+          .equals(other.getLangVersion())) return false;
+      if (!getLangVendor()
+          .equals(other.getLangVendor())) return false;
       if (!getJvmName()
           .equals(other.getJvmName())) return false;
       if (health_ != other.health_) return false;
@@ -1218,10 +1218,10 @@ public final class XTableClientStatistics {
       hash = (53 * hash) + getHostname().hashCode();
       hash = (37 * hash) + PROCESS_ID_FIELD_NUMBER;
       hash = (53 * hash) + getProcessId().hashCode();
-      hash = (37 * hash) + JAVA_VERSION_FIELD_NUMBER;
-      hash = (53 * hash) + getJavaVersion().hashCode();
-      hash = (37 * hash) + JAVA_VENDOR_FIELD_NUMBER;
-      hash = (53 * hash) + getJavaVendor().hashCode();
+      hash = (37 * hash) + LANG_VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getLangVersion().hashCode();
+      hash = (37 * hash) + LANG_VENDOR_FIELD_NUMBER;
+      hash = (53 * hash) + getLangVendor().hashCode();
       hash = (37 * hash) + JVM_NAME_FIELD_NUMBER;
       hash = (53 * hash) + getJvmName().hashCode();
       hash = (37 * hash) + HEALTH_FIELD_NUMBER;
@@ -1391,8 +1391,8 @@ public final class XTableClientStatistics {
         ip_ = "";
         hostname_ = "";
         processId_ = "";
-        javaVersion_ = "";
-        javaVendor_ = "";
+        langVersion_ = "";
+        langVendor_ = "";
         jvmName_ = "";
         health_ = 0;
         version_ = "";
@@ -1464,10 +1464,10 @@ public final class XTableClientStatistics {
           result.processId_ = processId_;
         }
         if (((from_bitField0_ & 0x00000400) != 0)) {
-          result.javaVersion_ = javaVersion_;
+          result.langVersion_ = langVersion_;
         }
         if (((from_bitField0_ & 0x00000800) != 0)) {
-          result.javaVendor_ = javaVendor_;
+          result.langVendor_ = langVendor_;
         }
         if (((from_bitField0_ & 0x00001000) != 0)) {
           result.jvmName_ = jvmName_;
@@ -1547,13 +1547,13 @@ public final class XTableClientStatistics {
           bitField0_ |= 0x00000200;
           onChanged();
         }
-        if (!other.getJavaVersion().isEmpty()) {
-          javaVersion_ = other.javaVersion_;
+        if (!other.getLangVersion().isEmpty()) {
+          langVersion_ = other.langVersion_;
           bitField0_ |= 0x00000400;
           onChanged();
         }
-        if (!other.getJavaVendor().isEmpty()) {
-          javaVendor_ = other.javaVendor_;
+        if (!other.getLangVendor().isEmpty()) {
+          langVendor_ = other.langVendor_;
           bitField0_ |= 0x00000800;
           onChanged();
         }
@@ -1663,12 +1663,12 @@ public final class XTableClientStatistics {
                 break;
               } // case 82
               case 90: {
-                javaVersion_ = input.readStringRequireUtf8();
+                langVersion_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000400;
                 break;
               } // case 90
               case 98: {
-                javaVendor_ = input.readStringRequireUtf8();
+                langVendor_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000800;
                 break;
               } // case 98
@@ -2164,145 +2164,145 @@ public final class XTableClientStatistics {
         return this;
       }
 
-      private java.lang.Object javaVersion_ = "";
+      private java.lang.Object langVersion_ = "";
       /**
-       * <code>string java_version = 11;</code>
-       * @return The javaVersion.
+       * <code>string lang_version = 11;</code>
+       * @return The langVersion.
        */
-      public java.lang.String getJavaVersion() {
-        java.lang.Object ref = javaVersion_;
+      public java.lang.String getLangVersion() {
+        java.lang.Object ref = langVersion_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          javaVersion_ = s;
+          langVersion_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string java_version = 11;</code>
-       * @return The bytes for javaVersion.
+       * <code>string lang_version = 11;</code>
+       * @return The bytes for langVersion.
        */
       public com.google.protobuf.ByteString
-          getJavaVersionBytes() {
-        java.lang.Object ref = javaVersion_;
+          getLangVersionBytes() {
+        java.lang.Object ref = langVersion_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          javaVersion_ = b;
+          langVersion_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string java_version = 11;</code>
-       * @param value The javaVersion to set.
+       * <code>string lang_version = 11;</code>
+       * @param value The langVersion to set.
        * @return This builder for chaining.
        */
-      public Builder setJavaVersion(
+      public Builder setLangVersion(
           java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
-        javaVersion_ = value;
+        langVersion_ = value;
         bitField0_ |= 0x00000400;
         onChanged();
         return this;
       }
       /**
-       * <code>string java_version = 11;</code>
+       * <code>string lang_version = 11;</code>
        * @return This builder for chaining.
        */
-      public Builder clearJavaVersion() {
-        javaVersion_ = getDefaultInstance().getJavaVersion();
+      public Builder clearLangVersion() {
+        langVersion_ = getDefaultInstance().getLangVersion();
         bitField0_ = (bitField0_ & ~0x00000400);
         onChanged();
         return this;
       }
       /**
-       * <code>string java_version = 11;</code>
-       * @param value The bytes for javaVersion to set.
+       * <code>string lang_version = 11;</code>
+       * @param value The bytes for langVersion to set.
        * @return This builder for chaining.
        */
-      public Builder setJavaVersionBytes(
+      public Builder setLangVersionBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
-        javaVersion_ = value;
+        langVersion_ = value;
         bitField0_ |= 0x00000400;
         onChanged();
         return this;
       }
 
-      private java.lang.Object javaVendor_ = "";
+      private java.lang.Object langVendor_ = "";
       /**
-       * <code>string java_vendor = 12;</code>
-       * @return The javaVendor.
+       * <code>string lang_vendor = 12;</code>
+       * @return The langVendor.
        */
-      public java.lang.String getJavaVendor() {
-        java.lang.Object ref = javaVendor_;
+      public java.lang.String getLangVendor() {
+        java.lang.Object ref = langVendor_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          javaVendor_ = s;
+          langVendor_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string java_vendor = 12;</code>
-       * @return The bytes for javaVendor.
+       * <code>string lang_vendor = 12;</code>
+       * @return The bytes for langVendor.
        */
       public com.google.protobuf.ByteString
-          getJavaVendorBytes() {
-        java.lang.Object ref = javaVendor_;
+          getLangVendorBytes() {
+        java.lang.Object ref = langVendor_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          javaVendor_ = b;
+          langVendor_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string java_vendor = 12;</code>
-       * @param value The javaVendor to set.
+       * <code>string lang_vendor = 12;</code>
+       * @param value The langVendor to set.
        * @return This builder for chaining.
        */
-      public Builder setJavaVendor(
+      public Builder setLangVendor(
           java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
-        javaVendor_ = value;
+        langVendor_ = value;
         bitField0_ |= 0x00000800;
         onChanged();
         return this;
       }
       /**
-       * <code>string java_vendor = 12;</code>
+       * <code>string lang_vendor = 12;</code>
        * @return This builder for chaining.
        */
-      public Builder clearJavaVendor() {
-        javaVendor_ = getDefaultInstance().getJavaVendor();
+      public Builder clearLangVendor() {
+        langVendor_ = getDefaultInstance().getLangVendor();
         bitField0_ = (bitField0_ & ~0x00000800);
         onChanged();
         return this;
       }
       /**
-       * <code>string java_vendor = 12;</code>
-       * @param value The bytes for javaVendor to set.
+       * <code>string lang_vendor = 12;</code>
+       * @param value The bytes for langVendor to set.
        * @return This builder for chaining.
        */
-      public Builder setJavaVendorBytes(
+      public Builder setLangVendorBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
-        javaVendor_ = value;
+        langVendor_ = value;
         bitField0_ |= 0x00000800;
         onChanged();
         return this;
@@ -2846,7 +2846,7 @@ public final class XTableClientStatistics {
       "d_percentage\030\005 \001(\001\022\034\n\024available_processo" +
       "rs\030\006 \001(\005\022\025\n\rtotal_threads\030\007 \001(\003\022\n\n\002ip\030\010 " +
       "\001(\t\022\020\n\010hostname\030\t \001(\t\022\022\n\nprocess_id\030\n \001(" +
-      "\t\022\024\n\014java_version\030\013 \001(\t\022\023\n\013java_vendor\030\014" +
+      "\t\022\024\n\014lang_version\030\013 \001(\t\022\023\n\013lang_vendor\030\014" +
       " \001(\t\022\020\n\010jvm_name\030\r \001(\t\022\035\n\006health\030\016 \001(\0162\r" +
       ".HealthStatus\022\024\n\007version\030\017 \001(\tH\000\210\001\001\022\021\n\004t" +
       "ype\030\020 \001(\tH\001\210\001\001\022\021\n\004uuid\030\021 \001(\tH\002\210\001\001\022\030\n\013buf" +
@@ -2866,7 +2866,7 @@ public final class XTableClientStatistics {
     internal_static_ClientStatistics_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_ClientStatistics_descriptor,
-        new java.lang.String[] { "NanoTime", "MaxMemoryMb", "FreeMemoryMb", "UsedMemoryMb", "ProcessCpuLoadPercentage", "AvailableProcessors", "TotalThreads", "Ip", "Hostname", "ProcessId", "JavaVersion", "JavaVendor", "JvmName", "Health", "Version", "Type", "Uuid", "BufferSize", "MaxBufferSize", });
+        new java.lang.String[] { "NanoTime", "MaxMemoryMb", "FreeMemoryMb", "UsedMemoryMb", "ProcessCpuLoadPercentage", "AvailableProcessors", "TotalThreads", "Ip", "Hostname", "ProcessId", "LangVersion", "LangVendor", "JvmName", "Health", "Version", "Type", "Uuid", "BufferSize", "MaxBufferSize", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

@@ -5,6 +5,7 @@ import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.TableFormatter;
 import org.kobe.xbot.Utilities.Utilities;
 import org.kobe.xbot.Utilities.XTableStatus;
 import org.kobe.xbot.Utilities.XTablesData;
@@ -22,6 +23,8 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,6 +85,7 @@ public class XTablesServer {
     private XTablesMessageRate rate;
     private int iterationSpeed;
     private final AtomicReference<ByteString> clientRegistrySessionId = new AtomicReference<>();
+    private final ScheduledExecutorService scheduler;
 
     /**
      * Constructor for initializing the server with specified ports.
@@ -97,6 +101,19 @@ public class XTablesServer {
         this.version = version;
         this.additionalFeatures = additionalFeatures;
         instance.set(this);
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
+        this.scheduler.scheduleAtFixedRate(() -> {
+            String[] headers = {"Type", "Amount"};
+            String[][] data = {
+                    {"PULL", NumberFormat.getInstance().format(pullMessages.get())},
+                    {"PUBLISH", NumberFormat.getInstance().format(publishMessages.get())},
+                    {"REPLY", NumberFormat.getInstance().format(replyMessages.get())}
+            };
+            logger.info("Total message count in the last minute:\n" +TableFormatter.makeTable(headers, data));
+            pullMessages.set(0);
+            replyMessages.set(0);
+            publishMessages.set(0);
+        }, 60, 60, TimeUnit.SECONDS);
         start();
     }
 
@@ -231,16 +248,16 @@ public class XTablesServer {
             this.webInterface = WebInterface.initialize(this);
         } else {
             logger.warning("""
-                    Additional features are disabled. The XTablesServer will proceed with standard initialization.
-                    The following components are excluded:
-                                       \s
-                    - XTablesMessageRate: Real-time messaging rate monitoring will not be initialized.
-                    - ClientRegistry: The registry for tracking connected clients will not be enabled.
-                    - XTablesSocketMonitor: Advanced socket monitoring and client management will not be available.
-                    - WebInterface: The web-based dashboard for monitoring and managing server activities will not be initialized.
-                                       \s
-                    To enable these features, use the '--additional_features=true' option when starting the server.
-                   \s""");
+                     Additional features are disabled. The XTablesServer will proceed with standard initialization.
+                     The following components are excluded:
+                                        \s
+                     - XTablesMessageRate: Real-time messaging rate monitoring will not be initialized.
+                     - ClientRegistry: The registry for tracking connected clients will not be enabled.
+                     - XTablesSocketMonitor: Advanced socket monitoring and client management will not be available.
+                     - WebInterface: The web-based dashboard for monitoring and managing server activities will not be initialized.
+                                        \s
+                     To enable these features, use the '--additional_features=true' option when starting the server.
+                    \s""");
         }
         logger.info(String.format("""
                 Debug Mode Status: %s

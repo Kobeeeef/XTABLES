@@ -50,7 +50,6 @@
       </plugins>
     </build>
     <dependencies>
-
         <dependency>
             <groupId>org.zeromq</groupId>
             <artifactId>jeromq</artifactId>
@@ -66,7 +65,7 @@
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
         </dependency>
-        <dependency>
+            <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
             <version>11.0.21</version>

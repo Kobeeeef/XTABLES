@@ -121,7 +121,7 @@ public class PushPullRequestHandler extends BaseHandler {
                             try {
                                 XTableClientStatistics.ClientStatistics clientStatistics = XTableClientStatistics.ClientStatistics.parseFrom(value);
                                 instance.getClientRegistry().getClients().replaceAll(client -> {
-                                    if (client.getUuid().equals(client.getUuid())) {
+                                    if (client.getUuid().equals(clientStatistics.getUuid())) {
                                         return clientStatistics;
                                     }
                                     return client;

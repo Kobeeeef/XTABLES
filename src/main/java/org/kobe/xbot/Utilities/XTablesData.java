@@ -210,7 +210,8 @@ public class XTablesData {
         }
     }
     public String toJSON() {
-        return gson.toJson(this.data);
+        if(this.data == null) return null;
+        return gson.toJson(new HashMap<>(this.data));
     }
     public Map<String, XTablesData> getTablesMap() {
         return data;
@@ -265,7 +266,8 @@ public class XTablesData {
                     case INT64 -> new JsonPrimitive(bytesToLong(node.value));
                     case BOOL -> new JsonPrimitive(node.value[0] == 0x01);
                     case DOUBLE -> new JsonPrimitive(bytesToDouble(node.value));
-                    case BYTES -> {
+
+                    case BYTES, UNKNOWN -> {
                         JsonArray byteArray = new JsonArray();
                         for (byte b : node.value) {
                             byteArray.add(b);

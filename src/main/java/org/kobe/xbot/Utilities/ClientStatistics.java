@@ -22,8 +22,8 @@ public class ClientStatistics {
     private String ip;
     private String hostname;
     private String processId;
-    private String javaVersion;
-    private String javaVendor;
+    private String langVersion;
+    private String langVendor;
     private String jvmName;
     private String version;
     private String type;
@@ -58,8 +58,8 @@ public class ClientStatistics {
 
         // Process and Java environment information
         this.processId = runtimeMXBean.getName().split("@")[0];
-        this.javaVersion = System.getProperty("java.version");
-        this.javaVendor = System.getProperty("java.vendor");
+        this.langVersion = System.getProperty("java.version");
+        this.langVendor = System.getProperty("java.vendor");
         this.jvmName = System.getProperty("java.vm.name");
 
         if (usedMemoryMB <= maxMemoryMB * 0.5 && processCpuLoadPercentage < 50) {
@@ -88,8 +88,8 @@ public class ClientStatistics {
                 .setUuid(this.UUID)
                 .setHostname(this.hostname)
                 .setProcessId(this.processId)
-                .setJavaVersion(this.javaVersion)
-                .setJavaVendor(this.javaVendor)
+                .setLangVersion(this.langVersion)
+                .setLangVendor(this.langVendor)
                 .setJvmName(this.jvmName)
                 .setHealth(XTableClientStatistics.HealthStatus.valueOf(this.health));
 
@@ -118,9 +118,9 @@ public class ClientStatistics {
         stats.totalThreads = protobuf.getTotalThreads();
         stats.ip = protobuf.getIp();
         stats.hostname = protobuf.getHostname();
-        stats.processId = String.valueOf(protobuf.getProcessId());
-        stats.javaVersion = protobuf.getJavaVersion();
-        stats.javaVendor = protobuf.getJavaVendor();
+        stats.processId = protobuf.getProcessId();
+        stats.langVersion = protobuf.getLangVersion();
+        stats.langVendor = protobuf.getLangVendor();
         stats.jvmName = protobuf.getJvmName();
         stats.health = protobuf.getHealth().name();
 
@@ -173,8 +173,8 @@ public class ClientStatistics {
     public long getTotalThreads() { return totalThreads; }
     public String getHealth() { return health; }
     public String getProcessId() { return processId; }
-    public String getJavaVersion() { return javaVersion; }
-    public String getJavaVendor() { return javaVendor; }
+    public String getLangVersion() { return langVersion; }
+    public String getLangVendor() { return langVendor; }
     public String getJvmName() { return jvmName; }
 
     public String getUUID() {

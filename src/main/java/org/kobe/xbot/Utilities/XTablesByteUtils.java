@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * XTablesByteUtils - A utility class for converting between byte arrays, ByteString, and various data types.
@@ -176,5 +177,79 @@ public class XTablesByteUtils {
             throw new IllegalArgumentException("Invalid ByteString for boolean conversion.");
         }
         return byteString.byteAt(0) == (byte) 0x01;
+    }
+
+
+    /**
+     * Converts an integer into a byte array.
+     * <p>
+     * This method converts the provided integer into a 4-byte array.
+     *
+     * @param i The integer to convert.
+     * @return The byte array representing the integer.
+     */
+    public static byte[] fromInteger(int i) {
+        return ByteBuffer.allocate(4).putInt(i).array();
+    }
+
+    /**
+     * Converts a long into a byte array.
+     * <p>
+     * This method converts the provided long into an 8-byte array.
+     *
+     * @param i The long to convert.
+     * @return The byte array representing the long.
+     */
+    public static byte[] fromLong(long i) {
+        return ByteBuffer.allocate(8).putLong(i).array();
+    }
+
+    /**
+     * Converts a double into a byte array.
+     * <p>
+     * This method converts the provided double into an 8-byte array.
+     *
+     * @param i The double to convert.
+     * @return The byte array representing the double.
+     */
+    public static byte[] fromDouble(double i) {
+        return ByteBuffer.allocate(8).putDouble(i).array();
+    }
+
+    /**
+     * Converts a boolean into a byte array.
+     * <p>
+     * This method converts the provided boolean into a byte array.
+     * True is represented by 0x01, and false by 0x00.
+     *
+     * @param i The boolean to convert.
+     * @return The byte array representing the boolean.
+     */
+    public static byte[] fromBoolean(boolean i) {
+        return i ? new byte[]{(byte) 0x01} : new byte[]{(byte) 0x00};
+    }
+
+    /**
+     * Converts a list of objects into a byte array.
+     * <p>
+     * This method converts the provided list of objects into a byte array using the `Utilities.toByteArray()` method.
+     *
+     * @param i The list of objects to convert.
+     * @return The byte array representing the list of objects.
+     */
+    public static <T> byte[] fromList(List<T> i) {
+        return Utilities.toByteArray(i);
+    }
+
+    /**
+     * Converts a string into a byte array.
+     * <p>
+     * This method converts the provided string into a byte array using UTF-8 encoding.
+     *
+     * @param i The string to convert.
+     * @return The byte array representing the string.
+     */
+    public static byte[] fromString(String i) {
+        return i.getBytes(StandardCharsets.UTF_8);
     }
 }
