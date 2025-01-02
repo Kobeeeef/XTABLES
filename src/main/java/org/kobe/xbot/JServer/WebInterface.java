@@ -267,7 +267,7 @@ public class WebInterface {
                 }
 
 
-                Optional<ClientStatistics> clientHandler = ((List<ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().filter(f -> f.getUUID().equals(uuid.toString())).findFirst();
+                Optional<XTableClientStatistics.ClientStatistics> clientHandler = ((List<XTableClientStatistics.ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().filter(f -> f.getUuid().equals(uuid.toString())).findFirst();
                 if (clientHandler.isPresent()) {
                     boolean success = server.getClientRegistry().getClients().remove(clientHandler.get());
                     if (success) {

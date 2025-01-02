@@ -33,8 +33,8 @@ public class SystemStatistics {
     private int maxIterationsPerSecond;
     private final String ip;
     private final String processId;
-    private final String javaVersion;
-    private final String javaVendor;
+    private final String langVersion;
+    private final String langVendor;
     private final String jvmName;
     private String hostname;
     private List<ClientData> clientDataList;
@@ -65,8 +65,8 @@ public class SystemStatistics {
         this.powerUsageWatts = 0;
         this.totalThreads = threadMXBean.getThreadCount();
         this.processId = runtimeMXBean.getName().split("@")[0];
-        this.javaVersion = System.getProperty("java.version");
-        this.javaVendor = System.getProperty("java.vendor");
+        this.langVersion = System.getProperty("java.version");
+        this.langVendor = System.getProperty("java.vendor");
         this.jvmName = System.getProperty("java.vm.name");
         this.ip = Utilities.getLocalIPAddress();
         if (usedMemoryMB <= maxMemoryMB * 0.5 && processCpuLoadPercentage < 50) {
