@@ -28,9 +28,9 @@ class ClientStatistics:
         self.ip = self.get_local_ip_address()
         self.hostname = self.get_hostname()
         self.process_id = os.getpid()
-        self.java_version = platform.java_ver()[0] or "N/A"
-        self.java_vendor = platform.system()  # Best equivalent for vendor
-        self.jvm_name = platform.python_implementation()  # JVM equivalent in Python
+        self.python_version = platform.python_version()
+        self.python_vendor = platform.python_compiler()
+        self.jvm_name = platform.python_implementation()
         self.health = self.calculate_health()
 
         # Optional fields
@@ -95,8 +95,8 @@ class ClientStatistics:
         stats.ip = self.ip
         stats.hostname = self.hostname
         stats.process_id = str(self.process_id)
-        stats.java_version = self.java_version
-        stats.java_vendor = self.java_vendor
+        stats.lang_version = self.python_version
+        stats.lang_vendor = self.python_vendor
         stats.jvm_name = self.jvm_name
         stats.health = cspf.HealthStatus.Value(self.health.name)
 
@@ -123,8 +123,8 @@ class ClientStatistics:
         stats.ip = stats_pb.ip
         stats.hostname = stats_pb.hostname
         stats.process_id = stats_pb.process_id
-        stats.java_version = stats_pb.java_version
-        stats.java_vendor = stats_pb.java_vendor
+        stats.python_version = stats_pb.lang_version
+        stats.python_vendor = stats_pb.lang_vendor
         stats.jvm_name = stats_pb.jvm_name
         stats.health = HealthStatus(stats_pb.health)
 

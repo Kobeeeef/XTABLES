@@ -1,11 +1,15 @@
 import socket
 import time
+import traceback
 import zmq
 import struct
 import XTableProto_pb2 as XTableProto
 from SubscribeHandler import SubscribeHandler
 from typing import Callable, Dict, List
 import uuid
+from PingResponse import PingResponse
+from XTablesByteUtils import XTablesByteUtils
+
 
 class XTablesClient:
     # ================================================================
@@ -16,9 +20,11 @@ class XTablesClient:
     # ================================================================
     # Instance Variables
     # ================================================================
-    XTABLES_CLIENT_VERSION = "XTABLES Python Client v1.0.0 | Build Date: 12/24/2024"
+    XTABLES_CLIENT_VERSION = "XTABLES JPython Client v1.0.0 | Build Date: 1/2/2025"
 
-    def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737):
+    def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737, buffer_size=500):
+        self.debug = True
+        self.BUFFER_SIZE = buffer_size
         self.context = zmq.Context()
         self.push_socket = self.context.socket(zmq.PUSH)
         self.push_socket.set_hwm(500)
@@ -30,10 +36,14 @@ class XTablesClient:
         self.subscribe_messages_count = 0
         self.subscription_consumers = {}
         self.uuid = str(uuid.uuid4())
-        if ip is None:
-            ip = self.resolve_host_by_name()
+        self.ip = ip
+        self.push_port = push_port
+        self.req_port = req_port
+        self.sub_port = sub_port
+        if self.ip is None:
+            self.ip = self.resolve_host_by_name()
 
-        if ip is None:
+        if self.ip is None:
             raise XTablesServerNotFound("Could not resolve XTABLES hostname server.")
 
         print(f"\nConnecting to XTABLES Server...\n"
@@ -47,14 +57,63 @@ class XTablesClient:
         self.push_socket.connect(f"tcp://{ip}:{push_port}")
         self.req_socket.connect(f"tcp://{ip}:{req_port}")
         self.sub_socket.connect(f"tcp://{ip}:{sub_port}")
-
+        message = XTableProto.XTableMessage.XTableUpdate()
+        message.category = XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY
+        bytes_registry = message.SerializeToString()
+        self.sub_socket.setsockopt(zmq.SUBSCRIBE, bytes_registry)
+        message.category = XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION
+        bytes_information = message.SerializeToString()
+        self.sub_socket.setsockopt(zmq.SUBSCRIBE, bytes_information)
         self.subscribe_handler = SubscribeHandler(self.sub_socket, self)
         self.subscribe_handler.start()
+
+    def connect(self):
+        """
+        Attempts to reconnect the sockets to the server.
+        """
+        try:
+            # Ensure sockets are closed before reconnecting
+            self.push_socket.close()
+            self.req_socket.close()
+            self.sub_socket.close()
+
+            # Create new sockets and reconnect
+            self.push_socket = self.context.socket(zmq.PUSH)
+            self.req_socket = self.context.socket(zmq.REQ)
+            self.sub_socket = self.context.socket(zmq.SUB)
+
+            self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
+            self.push_socket.set_hwm(500)
+            self.sub_socket.set_hwm(500)
+            self.req_socket.set_hwm(500)
+            self.push_socket.connect(f"tcp://{self.ip}:{self.push_port}")
+            self.req_socket.connect(f"tcp://{self.ip}:{self.req_port}")
+            self.sub_socket.connect(f"tcp://{self.ip}:{self.sub_port}")
+
+            # Re-initialize subscription
+            message = XTableProto.XTableMessage.XTableUpdate()
+            message.category = XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY
+            bytes_registry = message.SerializeToString()
+            self.sub_socket.setsockopt(zmq.SUBSCRIBE, bytes_registry)
+            message.category = XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION
+            bytes_information = message.SerializeToString()
+            self.sub_socket.setsockopt(zmq.SUBSCRIBE, bytes_information)
+            if self.subscribe_handler:
+                self.subscribe_handler.interrupt()
+            self.subscribe_handler = SubscribeHandler(self.sub_socket, self)
+            self.subscribe_handler.start()
+            print("Reconnected to XTABLES Server.")
+        except zmq.ZMQError as e:
+            print(f"Error reconnecting: {e}")
+            if self.debug:
+                traceback.print_exc()
 
     def resolve_host_by_name(self):
         try:
             return socket.gethostbyname('XTABLES.local')
         except socket.gaierror:
+            if self.debug:
+                traceback.print_exc()
             return None
 
     def send_push_message(self, command, key, value, msg_type):
@@ -67,6 +126,8 @@ class XTablesClient:
             self.push_socket.send(message.SerializeToString())
             return True
         except zmq.ZMQError:
+            if self.debug:
+                traceback.print_exc()
             print(f"Error sending message: {e}")
             return False
 
@@ -88,6 +149,8 @@ class XTablesClient:
             self.subscription_consumers[key].append(consumer)
             return True
         except zmq.ZMQError as e:
+            if self.debug:
+                traceback.print_exc()
             print(f"Error subscribing to key {key}: {e}")
             return False
 
@@ -105,6 +168,8 @@ class XTablesClient:
             self.subscription_consumers[""].append(consumer)
             return True
         except zmq.ZMQError as e:
+            if self.debug:
+                traceback.print_exc()
             print(f"Error subscribing to all keys: {e}")
             return False
 
@@ -132,6 +197,8 @@ class XTablesClient:
                     return True
             return False
         except zmq.ZMQError as e:
+            if self.debug:
+                traceback.print_exc()
             print(f"Error unsubscribing to key {key}: {e}")
             return False
 
@@ -155,6 +222,8 @@ class XTablesClient:
                     return True
             return False
         except zmq.ZMQError as e:
+            if self.debug:
+                traceback.print_exc()
             print(f"Error subscribing to all keys: {e}")
             return False
 
@@ -289,8 +358,36 @@ class XTablesClient:
             return response_message
 
         except Exception as e:
+            if self.debug:
+                traceback.print_exc()
             print(f"Error occurred: {e}")
             return None
+
+    def ping(self):
+        try:
+            start_time = time.perf_counter_ns()
+            message = XTableProto.XTableMessage()
+            message.command = XTableProto.XTableMessage.Command.PING
+            self.req_socket.send(message.SerializeToString())
+
+            response_bytes = self.req_socket.recv()
+            round_trip_time = time.perf_counter_ns() - start_time
+
+            if not response_bytes:
+                return PingResponse(False, -1)
+
+            response_message = XTableProto.XTableMessage.FromString(response_bytes)
+
+            if response_message.HasField("value"):
+                success = response_message.value == self.SUCCESS_BYTE
+                return PingResponse(success, round_trip_time)
+            else:
+                return PingResponse(False, -1)
+
+        except Exception:
+            if self.debug:
+                traceback.print_exc()
+            return PingResponse(False, -1)
 
     # ====================
     # Version and Properties Methods
@@ -307,16 +404,16 @@ class XTablesServerNotFound(Exception):
 
 
 def consumer(test):
-    print("UPDATE: " + test.key + " " + str(test.value) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
-    time.sleep(0.1)
+    print("UPDATE: " + test.key + " " + str(
+        XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 
 
 # Sample usage
 if __name__ == "__main__":
     client = XTablesClient("localhost")
     client.subscribe_all(consumer)
-    while True:
-        time.sleep(10)
+    time.sleep(100000)
+
     # print(client.getUnknownBytes("name"))
     # print(client.getString("age"))
     # print(client.getArray("numbers"))

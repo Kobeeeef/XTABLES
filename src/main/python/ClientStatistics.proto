@@ -21,8 +21,8 @@ message ClientStatistics {
     string ip = 8;
     string hostname = 9;
     string process_id = 10;
-    string java_version = 11;
-    string java_vendor = 12;
+    string lang_version = 11;
+    string lang_vendor = 12;
     string jvm_name = 13;
     HealthStatus health = 14;
 

@@ -9,16 +9,17 @@ from CircularBuffer import CircularBuffer
 import Utilities
 import traceback
 
+
 class SubscribeHandler(BaseHandler):
     """
     A handler for processing incoming subscription messages using ZeroMQ.
     """
 
-    BUFFER_SIZE = 250
 
     def __init__(self, socket: zmq.Socket, instance: Any):
         super().__init__("XTABLES-SUBSCRIBE-HANDLER-DAEMON", True, socket)
         self._stop = False
+        self.BUFFER_SIZE = instance.BUFFER_SIZE
         self.instance = instance
         self.buffer = CircularBuffer(self.BUFFER_SIZE, lambda latest, current: latest.key == current.key)
         self.consumer_handling_thread = self.ConsumerHandlingThread(self)
@@ -55,13 +56,16 @@ class SubscribeHandler(BaseHandler):
                         self.buffer.write(message)
 
                 except DecodeError as e:
-                    traceback.print_exc()
+                    if self.instance.debug:
+                        traceback.print_exc()
                     self.logger.warning(f"Failed to decode message: {e}")
                 except Exception as e:
-                    traceback.print_exc()
+                    if self.instance.debug:
+                        traceback.print_exc()
                     self.handle_exception(e)
         except Exception as e:
-            traceback.print_exc()
+            if self.instance.debug:
+                traceback.print_exc()
             self.handle_exception(e)
 
     def interrupt(self):
@@ -69,7 +73,6 @@ class SubscribeHandler(BaseHandler):
         Handles cleanup and interrupts the consumer handling thread.
         """
         self._stop = True
-        self.consumer_handling_thread.interrupt()
         super().interrupt()
 
     class ConsumerHandlingThread(threading.Thread):
@@ -97,10 +100,12 @@ class SubscribeHandler(BaseHandler):
                             self._process_log_consumers(update)
 
                     except Exception as e:
-                        traceback.print_exc()
+                        if self.parent_handler.instance.debug:
+                            traceback.print_exc()
                         self.parent_handler.handle_exception(e)
             except Exception as e:
-                traceback.print_exc()
+                if self.parent_handler.instance.debug:
+                    traceback.print_exc()
                 self.parent_handler.handle_exception(e)
 
         def _process_consumers(self, update):
