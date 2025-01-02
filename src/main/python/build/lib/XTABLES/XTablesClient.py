@@ -1,408 +1,199 @@
-from enum import Enum
-from io import BytesIO
-from zeroconf import Zeroconf, ServiceBrowser, ServiceListener
-import logging
-import socket
-import threading
-import time
-import json
-
-from . import SocketClient as sc
-from . import Utilities
-
-
-class Status(Enum):
-    FAIL = "FAIL"
-    OK = "OK"
-
-
-class XTablesClient:
-    """*********************************CLIENT*********************************"""
-
-    def __init__(self, server_ip=None, server_port=1735, name=None):
-        logging.basicConfig(level=logging.INFO)
-        self.server_ip = server_ip
-        self.server_port = server_port
-        self.name = name
-        self.shutdown_event = threading.Event()
-        self.service_found = threading.Event()
-        self.logger = logging.getLogger(__name__)
-        self.socket_client = None
-        if self.server_ip and self.server_port:
-            self._initialize_client(server_ip=self.server_ip, server_port=self.server_port)
-        elif self.server_port:
-            try:
-                self.logger.info("Attempting to resolve IP address using OS resolver.")
-                self.server_ip = socket.gethostbyname("XTABLES.local")
-            except Exception:
-                self.logger.fatal("Failed to resolve XTABLES server. Falling back to mDNS.")
-                self.zeroconf = Zeroconf()
-                self.listener = self.XTablesServiceListener(self)
-                self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
-                self.discover_service()
-            self._initialize_client(server_ip=self.server_ip, server_port=self.server_port)
-        else:
-            self.zeroconf = Zeroconf()
-            self.listener = self.XTablesServiceListener(self)
-            self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
-            self.discover_service()
-
-    def discover_service(self):
-        while not self.shutdown_event.is_set():
-            try:
-                if self.name is None:
-                    self.logger.info("Listening for first instance of XTABLES service on port 5353...")
-                else:
-                    self.logger.info(f"Listening for '{self.name}' XTABLES services on port 5353...")
-                service_found = self.service_found.wait(timeout=2)
-
-                if service_found:
-                    self.logger.info("Service found, proceeding to close mDNS services...")
-                    self.zeroconf.close()
-                    self.logger.info("mDNS service closed.")
-                    self._initialize_client(self.server_ip, self.server_port)
-                    break
-                else:
-                    self.logger.info("Service not found, retrying discovery...")
-                    self.zeroconf = Zeroconf()
-                    self.browser = ServiceBrowser(self.zeroconf, "_xtables._tcp.local.", self.listener)
-            except Exception as e:
-                self.logger.error(f"Error during service discovery: {e}. Retrying...")
-                time.sleep(1)
-
-    class XTablesServiceListener(ServiceListener):
-        def __init__(self, client):
-            self.client = client
-            self.logger = logging.getLogger(__name__)
-            self.service_resolved = False
-
-        def add_service(self, zeroconf, service_type, name):
-            if not self.service_resolved:
-                info = zeroconf.get_service_info(service_type, name)
-                if info:
-                    self.resolve_service(info)
-
-        def remove_service(self, zc: "Zeroconf", type_: str, name: str) -> None:
-            pass
-
-        def resolve_service(self, info):
-            if not self.service_resolved:
-                service_address = socket.inet_ntoa(info.addresses[0])
-
-                port_str = info.properties.get(b'port')
-                if port_str:
-                    try:
-                        port = int(port_str.decode('utf-8'))
-
-                    except ValueError:
-                        port = None
-                else:
-                    port = None
-                if self.client.name and self.client.name.lower() == "localhost":
-                    try:
-                        service_address = socket.gethostbyname(socket.gethostname())
-                    except Exception as e:
-                        self.logger.fatal(f"Could not find localhost address: {e}")
-
-                if (port is not None) and service_address and (
-                        self.client.name in [None, "localhost", info.name, service_address]):
-                    self.logger.info(f"Service resolved: {info.name} at {service_address}:{port}")
-                    self.client.server_ip = service_address
-                    self.client.server_port = port
-                    self.client.service_found.set()
-                    self.service_resolved = True
-
-    def _initialize_client(self, server_ip, server_port):
-        self.socket_client = sc.SocketClient(server_ip, server_port)
-        self.socket_client.connect()
-
-    def shutdown(self):
-        self.shutdown_event.set()
-        self.socket_client.shutdown()
-
-    """*********************************CLIENT*********************************"""
-
-    """--------------------------------METHODS--------------------------------"""
-
-    def subscribe_to_all(self, consumer):
-        return self.socket_client.subscribeForAllUpdates(consumer)
-
-    def subscribe_to_key(self, key, consumer):
-        return self.socket_client.subscribeForUpdates(key, consumer)
-
-    def getTables(self, key=None, TIMEOUT=3000):
-        """
-        Retrieves the list of tables using the generalized send_request_and_retrieve method.
-
-        :param key: The optional key for the specific table.
-        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
-        :return: The list of tables if successful, or an empty list if the request fails or times out.
-        """
-        value = self.socket_client.send_request_and_retrieve("GET_TABLES", key, TIMEOUT)
-        if value:
-            try:
-                # Attempt to parse the response value as a JSON array
-                array_value = json.loads(value)
-                if isinstance(array_value, list):
-                    return array_value
-                else:
-                    self.logger.error(f"The GET_TABLES request returned an invalid data structure!")
-                    return []
-            except (ValueError, json.JSONDecodeError) as e:
-                self.logger.error(f"Failed to parse the GET_TABLES response: {e}")
-                return []
-        return []
-
-    def getString(self, key, TIMEOUT=3000):
-        """
-        Retrieves a string value for the given key using the generalized method.
-
-        :param key: The key to retrieve.
-        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
-        :return: The string value if successful, or None if the request times out or fails.
-        """
-        value = self.socket_client.send_request_and_retrieve("GET", key, TIMEOUT)
-        if value == "null":
-            return None
-        if value:
-            return Utilities.parse_string(value)
-        return None
-
-    def getClass(self, key, class_type, TIMEOUT=3000):
-        """
-        Retrieves a class object from the server for the given key by first fetching it as a JSON string
-        and then converting it to an instance of the specified class type.
-
-        :param key: The key for which to get the class object.
-        :param class_type: The class type to deserialize the JSON string into.
-        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
-        :return: An instance of the class if successful, or None if the key is not found or an error occurs.
-        """
-        # Use the existing getString method to fetch the value as a string
-        json_string = self.getString(key, TIMEOUT)
-
-        if json_string is not None:
-            try:
-                json_dict = json.loads(json_string.replace('\\"', '"'))
-                return class_type(**json_dict)
-            except (ValueError, TypeError) as e:
-                self.logger.error(f"Error parsing value for key '{key}' into class {class_type.__name__}: {e}")
-                return None
-        else:
-            return None
-
-    def getArray(self, key, TIMEOUT=3000):
-        """
-        Retrieves an array (list) value from the server for the given key by fetching it as a string
-        and then converting it to a Python list.
-
-        :param key: The key for which to get the array value.
-        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
-        :return: The array as a Python list if successful, or None if the key is not found or the conversion fails.
-        """
-        # Use the existing getString method to fetch the value as a string
-        string_value = self.getString(key, TIMEOUT)
-
-        if string_value is not None:
-            try:
-                # Attempt to convert the string value to a list using json.loads
-                array_value = json.loads(string_value)
-
-                if isinstance(array_value, list):
-                    return array_value
-                else:
-                    self.logger.error(f"Value for key '{key}' is not a valid array: {string_value}")
-                    return None
-            except (ValueError, json.JSONDecodeError) as e:
-                self.logger.error(f"Failed to parse array for key '{key}': {e}")
-                return None
-        else:
-            return None
-
-    def getFloat(self, key, TIMEOUT=3000):
-        """
-        Retrieves a float value from the server for the given key by fetching it as a string
-        and then converting it to a float.
-
-        :param key: The key for which to get the float value.
-        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
-        :return: The float value if successful, or None if the key is not found or the conversion fails.
-        """
-        # Use the existing getString method to fetch the value as a string
-        string_value = self.getString(key, TIMEOUT)
-
-        if string_value is not None:
-            try:
-                # Attempt to convert the string value to a float
-                return float(string_value)
-            except ValueError:
-                self.logger.error(f"Value for key '{key}' is not a valid float: {string_value}")
-                return None
-        else:
-            return None
-
-    def getBoolean(self, key, TIMEOUT=3000):
-        """
-        Retrieves a boolean value from the server for the given key by first fetching it as a string
-        and then converting it to a boolean.
-
-        :param key: The key for which to get the boolean value.
-        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
-        :return: The boolean value if successful, or None if the key is not found or the conversion fails.
-        """
-        string_value = self.getString(key, TIMEOUT)
-
-        if string_value is not None:
-            string_value = string_value.strip().lower()
-            if string_value in ['true', '1']:
-                return True
-            elif string_value in ['false', '0']:
-                return False
-            else:
-                self.logger.error(f"Value for key '{key}' is not a valid boolean: {string_value}")
-                return None
-        else:
-            return None
-
-    def getValue(self, key, TIMEOUT=3000):
-        """
-        Retrieves a value from the server for the given key and returns it in its appropriate Python type.
-        The method automatically handles arrays (lists), dictionaries, booleans, integers, floats, and strings.
-
-        :param TIMEOUT: The amount of time to wait before returning None
-        :param key: The key for which to get the value. param TIMEOUT: Timeout in milliseconds to wait for the
-        response (default is 3000). :return: The value in its appropriate Python type if successful, or None if the
-        key is not found or the conversion fails.
-        """
-        # Use the existing getString method to fetch the value as a string
-        string_value = self.getString(key, TIMEOUT)
-
-        if string_value is not None:
-            try:
-                # Try to load the value as a JSON object first (for lists, dicts, etc.)
-                value = json.loads(string_value)
-
-                # Return the value directly if it is a known Python type (list, dict, etc.)
-                if isinstance(value, (list, dict, int, float, bool, tuple)):
-                    return value
-                else:
-                    self.logger.error(f"Value for key '{key}' is of an unsupported type: {type(value).__name__}")
-                    return None
-            except (ValueError, json.JSONDecodeError):
-                # If JSON loading fails, it's likely a simple string
-                return string_value
-        else:
-            return None
-
-    def getInteger(self, key, TIMEOUT=3000):
-        """
-        Retrieves an integer value from the server for the given key by first fetching it as a string
-        and then converting it to an integer.
-
-        :param key: The key for which to get the integer value.
-        :param TIMEOUT: Timeout in milliseconds to wait for the response (default is 3000).
-        :return: The integer value if successful, or None if the key is not found or the conversion fails.
-        """
-        # Use the existing getString method to fetch the value as a string
-        string_value = self.getString(key, TIMEOUT)
-
-        if string_value is not None:
-            try:
-                # Attempt to convert the string value to an integer
-                return int(string_value)
-            except ValueError:
-                self.logger.error(f"Value for key '{key}' is not a valid integer: {string_value}")
-                return None
-        else:
-            return None
-
-    def executePutBoolean(self, key, value):
-        if isinstance(value, bool) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.socket_client.send_message(f"IGNORED:PUT {key} {str(value).lower()}")
-
-    def executePutString(self, key, value):
-        if isinstance(value, str) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.socket_client.send_message(f'IGNORED:PUT {key} "{value}"')
-
-    def executePutInteger(self, key, value):
-        if isinstance(value, int) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.socket_client.send_message(f"IGNORED:PUT {key} {value}")
-
-    def deleteTable(self, key=None):
-        try:
-            if key is not None and isinstance(key, str):
-                Utilities.validate_key(key, True)
-                response = self.socket_client.send_request_and_retrieve("DELETE", key)
-                return Status[response.upper()] if response else Status.FAIL
-            else:
-                response = self.socket_client.send_request_and_retrieve("DELETE")
-                return Status[response.upper()] if response else Status.FAIL
-        except (KeyError, Exception):
-            return Status.FAIL
-
-    def rebootServer(self):
-        try:
-
-            response = self.socket_client.send_request_and_retrieve("REBOOT_SERVER")
-            return Status[response.upper()] if response else Status.FAIL
-        except (KeyError, Exception):
-            return Status.FAIL
-
-    def updateKey(self, oldKey, newKey):
-        try:
-            if isinstance(oldKey, str) and isinstance(newKey, str):
-                Utilities.validate_key(oldKey, True)
-                Utilities.validate_key(newKey, True)
-                response = self.socket_client.send_request_and_retrieve("UPDATE_KEY", f"{oldKey} {newKey}")
-                return Status[response.upper()] if response else Status.FAIL
-        except (KeyError, Exception):
-            return Status.FAIL
-
-    def executePutFloat(self, key, value):
-        if isinstance(value, float) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-            self.socket_client.send_message(f"IGNORED:PUT {key} {value}")
-        else:
-            raise TypeError("Key must be a string and value must be a float")
-
-    def executePutBytes(self, key, value):
-        if isinstance(value, bytes) and isinstance(key, str):
-            Utilities.validate_key(key, True)
-
-            # Encode byte array to Base64 string
-            base64_value = base64.b64encode(value).decode('utf-8')
-
-            # Send the Base64 string to the server
-            self.socket_client.send_message(f"IGNORED:PUT {key} {base64_value}")
-        else:
-            self.logger.error("Key must be a string and value must be a byte array (bytes).")
-
-    def executePutArrayOrTuple(self, key, value):
-        if isinstance(key, str) and isinstance(value, (list, tuple)):
-            Utilities.validate_key(key, True)
-            # Only convert to a list if it's a tuple, otherwise keep it as is
-            formatted_values = str(value if isinstance(value, list) else list(value))
-            self.socket_client.send_message(f"IGNORED:PUT {key} {formatted_values}")
-        else:
-            raise TypeError("Key must be a string and value must be a list or tuple")
-
-    def executePutClass(self, key, obj):
-        """
-        Serializes the given class object into a JSON string and sends it to the server.
-
-        :param key: The key under which the class data will be stored.
-        :param obj: The class object to be serialized and sent.
-        """
-        if isinstance(key, str) and obj is not None:
-            # Convert the class object to a JSON string
-            json_string = json.dumps(obj, default=lambda o: o.__dict__)
-
-            Utilities.validate_key(key, True)
-            self.socket_client.send_message(f'IGNORED:PUT {key} {json_string}')
-        else:
-            self.logger.error("Invalid key or object provided.")
-
-    """--------------------------------METHODS--------------------------------"""
+# import socket
+# import time
+# import zmq
+# import struct
+# import XTableProto_pb2 as XTableProto
+#
+#
+# class XTablesClient:
+#     # ================================================================
+#     # Static Variables
+#     # ================================================================
+#     SUCCESS_BYTE = bytes([0x01])
+#     FAIL_BYTE = bytes([0x00])
+#     # ================================================================
+#     # Instance Variables
+#     # ================================================================
+#     XTABLES_CLIENT_VERSION = "XTABLES Python Client v1.0.0 | Build Date: 12/24/2024"
+#
+#     def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737):
+#         self.context = zmq.Context()
+#         self.push_socket = self.context.socket(zmq.PUSH)
+#         self.push_socket.set_hwm(500)
+#         self.req_socket = self.context.socket(zmq.REQ)
+#         self.req_socket.set_hwm(500)
+#         self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
+#         self.sub_socket = self.context.socket(zmq.SUB)
+#         self.sub_socket.set_hwm(500)
+#
+#         if ip is None:
+#             ip = self.resolve_host_by_name()
+#
+#         if ip is None:
+#             raise XTablesServerNotFound("Could not resolve XTABLES hostname server.")
+#
+#         print(f"\nConnecting to XTABLES Server...\n"
+#               f"------------------------------------------------------------\n"
+#               f"Server IP: {ip}\n"
+#               f"Push Socket Port: {push_port}\n"
+#               f"Request Socket Port: {req_port}\n"
+#               f"Subscribe Socket Port: {sub_port}\n"
+#               f"------------------------------------------------------------")
+#
+#         self.push_socket.connect(f"tcp://{ip}:{push_port}")
+#         self.req_socket.connect(f"tcp://{ip}:{req_port}")
+#         self.sub_socket.connect(f"tcp://{ip}:{sub_port}")
+#
+#     def resolve_host_by_name(self):
+#         try:
+#             return socket.gethostbyname('XTABLES.local')
+#         except socket.gaierror:
+#             return None
+#
+#     def send_push_message(self, command, key, value, msg_type):
+#         message = XTableProto.XTableMessage()
+#         message.key = key
+#         message.command = command
+#         message.value = value
+#         message.type = msg_type
+#         try:
+#             self.push_socket.send(message.SerializeToString())
+#             return True
+#         except zmq.ZMQError:
+#             print(f"Error sending message: {e}")
+#             return False
+#
+#     # ====================
+#     # PUT Methods
+#     # ====================
+#     def execute_put_bytes(self, key, value):
+#         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value,
+#                                       XTableProto.XTableMessage.Type.UNKNOWN)
+#
+#     def execute_put_string(self, key, value):
+#         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value.encode('utf-8'),
+#                                       XTableProto.XTableMessage.Type.STRING)
+#
+#     def execute_put_integer(self, key, value):
+#         value_bytes = struct.pack('!i', value)
+#         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value_bytes,
+#                                       XTableProto.XTableMessage.Type.INT64)
+#
+#     def execute_put_long(self, key, value):
+#         value_bytes = struct.pack('!q', value)
+#         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value_bytes,
+#                                       XTableProto.XTableMessage.Type.INT64)
+#
+#     def execute_put_double(self, key, value):
+#         value_bytes = struct.pack('!d', value)
+#         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value_bytes,
+#                                       XTableProto.XTableMessage.Type.DOUBLE)
+#
+#     def execute_put_boolean(self, key, value):
+#         value_bytes = self.SUCCESS_BYTE if value else self.FAIL_BYTE
+#         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value_bytes,
+#                                       XTableProto.XTableMessage.Type.BOOL)
+#
+#     def execute_put_array(self, key, values):
+#         """
+#         Handles putting arrays to the server.
+#         Assumes `values` is an array of values that can be serialized into a byte array.
+#         """
+#         serialized_array = [struct.pack('!i', value) for value in values]  # Example with integers
+#         array_value = b''.join(serialized_array)
+#         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, array_value,
+#                                       XTableProto.XTableMessage.Type.ARRAY)
+#
+#     # ====================
+#     # GET Methods
+#     # ====================
+#
+#     def execute_get_string(self, key):
+#         message = self.get_xtable_message(key)
+#         print(message)
+#         if message is not None and message.type == XTableProto.XTableMessage.Type.STRING:
+#             return message.value.decode('utf-8')
+#         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
+#             return None
+#         else:
+#             raise ValueError(f"Expected STRING type, but got: {message.type}")
+#
+#     def execute_get_integer(self, key):
+#         message = self.get_xtable_message(key)
+#         if message is not None and message.type == XTableProto.XTableMessage.Type.INT64:
+#             return struct.unpack('!i', message.value)[0]
+#         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
+#             return None
+#         else:
+#             raise ValueError(f"Expected INT type, but got: {message.type}")
+#
+#     def execute_get_boolean(self, key):
+#         message = self.get_xtable_message(key)
+#         if message is not None and message.type == XTableProto.XTableMessage.Type.BOOL:
+#             return message.value == self.SUCCESS_BYTE
+#         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
+#             return None
+#         else:
+#             raise ValueError(f"Expected BOOL type, but got: {message.type}")
+#
+#     def execute_get_long(self, key):
+#         message = self.get_xtable_message(key)
+#         if message is not None and message.type == XTableProto.XTableMessage.Type.INT64:
+#             return struct.unpack('!q', message.value)[0]
+#         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
+#             return None
+#         else:
+#             raise ValueError(f"Expected LONG type, but got: {message.type}")
+#
+#     def execute_get_double(self, key):
+#         message = self.get_xtable_message(key)
+#         if message is not None and message.type == XTableProto.XTableMessage.Type.DOUBLE:
+#             return struct.unpack('!d', message.value)[0]
+#         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
+#             return None
+#         else:
+#             raise ValueError(f"Expected DOUBLE type, but got: {message.type}")
+#
+#     def execute_get_array(self, key):
+#         message = self.get_xtable_message(key)
+#         if message is not None and message.type == XTableProto.XTableMessage.Type.ARRAY:
+#             return message.value
+#         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
+#             return None
+#         else:
+#             raise ValueError(f"Expected ARRAY type, but got: {message.type}")
+#
+#     def get_xtable_message(self, key):
+#         try:
+#             message = XTableProto.XTableMessage()
+#             message.key = key
+#             message.command = XTableProto.XTableMessage.Command.GET
+#             self.req_socket.send(message.SerializeToString())
+#             response_bytes = self.req_socket.recv()
+#             response_message = XTableProto.XTableMessage.FromString(response_bytes)
+#
+#             return response_message
+#
+#         except Exception as e:
+#             print(f"Error occurred: {e}")
+#             return None
+#
+#     # ====================
+#     # Version and Properties Methods
+#     # ====================
+#     def get_client_version(self):
+#         return self.XTABLES_CLIENT_VERSION
+#
+#
+#
+# class XTablesServerNotFound(Exception):
+#     pass
+#
+#
+# # Sample usage
+# if __name__ == "__main__":
+#     client = XTablesClient("localhost")
+#     client.execute_put_boolean("name", True)
+#     print(client.execute_get_boolean("name"))
+#     print(client.execute_get_integer("age"))
+#     print(client.execute_get_array("numbers"))

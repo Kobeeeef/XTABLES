@@ -188,13 +188,13 @@ public class XTablesServer {
         this.context = new ZContext();
         pubSocket = context.createSocket(SocketType.PUB);
         pubSocket.setHWM(500);
-        pubSocket.bind("tcp://localhost:" + pubPort);
+        pubSocket.bind("tcp://*:" + pubPort);
         ZMQ.Socket pullSocket = context.createSocket(SocketType.PULL);
         pullSocket.setHWM(500);
-        pullSocket.bind("tcp://localhost:" + pullPort);
+        pullSocket.bind("tcp://*:" + pullPort);
         ZMQ.Socket repSocket = context.createSocket(SocketType.REP);
         repSocket.setHWM(500);
-        repSocket.bind("tcp://localhost:" + repPort);
+        repSocket.bind("tcp://*:" + repPort);
 
         this.pushPullRequestHandler = new PushPullRequestHandler(pullSocket, this);
         this.pushPullRequestHandler.start();
