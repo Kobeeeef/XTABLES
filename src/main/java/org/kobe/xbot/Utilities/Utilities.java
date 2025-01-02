@@ -1,18 +1,12 @@
 package org.kobe.xbot.Utilities;
 
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -219,7 +213,7 @@ public class Utilities {
         XTablesData xTablesData = new XTablesData();
         byte[] bytes = XTableProto.XTableMessage.newBuilder()
                 .setCommand(getRandomCommand())
-                .setValue(ByteString.copyFrom(new byte[] { 12, 12, 3}))
+                .setValue(ByteString.copyFrom(new byte[]{12, 12, 3}))
                 .build()
                 .toByteArray();
         while (System.nanoTime() < endTime) {
@@ -229,56 +223,15 @@ public class Utilities {
             } catch (InvalidProtocolBufferException e) {
                 throw new RuntimeException(e);
             }
-            xTablesData.put(getRandomCommand().name(), new byte[] { 23, 21, 12}, XTableProto.XTableMessage.Type.UNKNOWN);
+            xTablesData.put(getRandomCommand().name(), new byte[]{23, 21, 12}, XTableProto.XTableMessage.Type.UNKNOWN);
         }
 
         return iterations / 6;
     }
 
-    /**
-     * Utility method to serialize an object into a byte array.
-     * <p>
-     * This method uses Kryo to serialize the given object into a byte array. It creates a Kryo instance,
-     * registers the object's class, and writes the object to a byte array output stream.
-     * This method is suitable for objects that you need to store or transmit in a binary format.
-     *
-     * @param object the object to be serialized
-     * @param <T>    the type of the object
-     * @return a byte array containing the serialized object
-     */
-    public static <T> byte[] serializeObject(T object) {
-        Kryo kryo = new Kryo();
-        kryo.register(object.getClass()); // Register the class for performance (optional)
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        Output output = new Output(byteArrayOutputStream);
-        kryo.writeObject(output, object);
-        output.close();
 
-        return byteArrayOutputStream.toByteArray();
-    }
 
-    /**
-     * Utility method to deserialize a byte array back into an object of the specified class.
-     * <p>
-     * This method uses Kryo to deserialize the given byte array back into an object of the specified class.
-     * It creates a Kryo instance, reads the byte array, and returns the object of the desired type.
-     *
-     * @param byteArray the byte array containing the serialized object
-     * @param clazz     the class type of the object to be deserialized
-     * @param <T>       the type of the object
-     * @return the deserialized object of type T
-     */
-    public static <T> T deserializeObject(byte[] byteArray, Class<T> clazz) {
-        Kryo kryo = new Kryo();
-        kryo.register(clazz); // Register the class for performance (optional)
-
-        Input input = new Input(byteArray);
-        T object = kryo.readObject(input, clazz);
-        input.close();
-
-        return object;
-    }
 
     public static byte[] generateRandomBytes(int length) {
         SecureRandom secureRandom = new SecureRandom();

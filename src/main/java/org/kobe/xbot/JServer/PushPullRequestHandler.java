@@ -2,6 +2,7 @@ package org.kobe.xbot.JServer;
 
 import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.ClientStatistics;
+import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Utilities;
 import org.zeromq.ZMQ;
@@ -52,6 +53,7 @@ public class PushPullRequestHandler extends BaseHandler {
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
                     processMessage(message);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     handleException(e);
                 }
             }
@@ -100,9 +102,13 @@ public class PushPullRequestHandler extends BaseHandler {
                     if (message.getId().equals(instance.getClientRegistrySessionId())) {
                         if (message.hasValue()) {
                             byte[] value = message.getValue().toByteArray();
-                            ClientStatistics statistics = Utilities.deserializeObject(value, ClientStatistics.class);
-                            instance.getClientRegistry().getClients()
-                                    .add(statistics);
+                            try {
+                                XTableClientStatistics.ClientStatistics clientStatistics = XTableClientStatistics.ClientStatistics.parseFrom(value);
+                                instance.getClientRegistry().getClients()
+                                        .add(clientStatistics);
+                            } catch (Exception e) {
+                                logger.warning("Failed to parse client statistics: " + e.getMessage());
+                            }
                         }
                     }
                 }
@@ -112,13 +118,17 @@ public class PushPullRequestHandler extends BaseHandler {
                     if (message.getId().equals(instance.getClientRegistry().getSessionId())) {
                         if (message.hasValue()) {
                             byte[] value = message.getValue().toByteArray();
-                            ClientStatistics statistics = Utilities.deserializeObject(value, ClientStatistics.class);
-                            instance.getClientRegistry().getClients().replaceAll(client -> {
-                                if (client.getUUID().equals(statistics.getUUID())) {
-                                    return statistics;
-                                }
-                                return client;
-                            });
+                            try {
+                                XTableClientStatistics.ClientStatistics clientStatistics = XTableClientStatistics.ClientStatistics.parseFrom(value);
+                                instance.getClientRegistry().getClients().replaceAll(client -> {
+                                    if (client.getUuid().equals(client.getUuid())) {
+                                        return clientStatistics;
+                                    }
+                                    return client;
+                                });
+                            } catch (Exception e) {
+                                logger.warning("Failed to parse client statistics: " + e.getMessage());
+                            }
 
                         }
                     }
