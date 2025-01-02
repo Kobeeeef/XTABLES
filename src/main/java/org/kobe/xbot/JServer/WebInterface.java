@@ -16,6 +16,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.kobe.xbot.Utilities.ClientData;
 import org.kobe.xbot.Utilities.ClientStatistics;
+import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.SystemStatistics;
@@ -135,11 +136,11 @@ public class WebInterface {
                 resp.setContentType("application/json");
                 resp.setCharacterEncoding("UTF-8");
                 SystemStatistics systemStatistics = new SystemStatistics(server);
-                systemStatistics.setClientDataList(((List<ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().map(m -> {
+                systemStatistics.setClientDataList(((List<XTableClientStatistics.ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().map(m -> {
                     ClientData data = new ClientData(m.getIp(),
                             m.getHostname(),
-                            m.getUUID());
-                    data.setStats(gson.toJson(m));
+                            m.getUuid());
+                    data.setStats(gson.toJson(ClientStatistics.fromProtobuf(m)));
                     return data;
                 }).collect(Collectors.toList()));
                 try {
@@ -173,7 +174,7 @@ public class WebInterface {
                 }
 
 
-                Optional<ClientStatistics> clientHandler = server.getClientRegistry().getClients().stream().filter(f -> f.getUUID().equals(uuid.toString())).findFirst();
+                Optional<XTableClientStatistics.ClientStatistics> clientHandler = server.getClientRegistry().getClients().stream().filter(f -> f.getUuid().equals(uuid.toString())).findFirst();
                 if (clientHandler.isPresent()) {
 //                        ClientStatistics statistics = clientHandler.get().pingServerForInformationAndWait(3000);
 //                        if (statistics != null) {

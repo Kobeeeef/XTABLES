@@ -3,6 +3,7 @@ package org.kobe.xbot.JClient;
 import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.CircularBuffer;
 import org.kobe.xbot.Utilities.ClientStatistics;
+import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Utilities;
@@ -64,11 +65,14 @@ public class SubscribeHandler extends BaseHandler {
                 try {
                     XTableProto.XTableMessage.XTableUpdate message = XTableProto.XTableMessage.XTableUpdate.parseFrom(bytes);
                     if (message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION) || message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {
-                        byte[] info = Utilities.serializeObject(new ClientStatistics()
+                        byte[] info = new ClientStatistics()
                                 .setBufferSize(buffer.size)
                                 .setUUID(XTablesClient.UUID)
                                 .setVersion(instance.getVersion())
-                                .setMaxBufferSize(BUFFER_SIZE));
+                                .setMaxBufferSize(BUFFER_SIZE)
+                                        .toProtobuf()
+                                                .toByteArray();
+
                         instance.getPushSocket().send(XTableProto.XTableMessage.newBuilder()
                                 .setId(message.getValue())
                                 .setValue(ByteString.copyFrom(info))

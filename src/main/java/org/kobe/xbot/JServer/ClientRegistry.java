@@ -2,6 +2,7 @@ package org.kobe.xbot.JServer;
 
 import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.ClientStatistics;
+import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.Utilities;
@@ -28,7 +29,7 @@ public class ClientRegistry extends Thread {
     private final static long loopInterval = 500;
     private final XTablesServer instance;
     private final AtomicReference<ByteString> sessionId = new AtomicReference<>(null);
-    private final LinkedList<ClientStatistics> clients;
+    private final LinkedList<XTableClientStatistics.ClientStatistics> clients;
     private long lastLoopTime = 0;
     private boolean skipped;
 
@@ -148,7 +149,7 @@ public class ClientRegistry extends Thread {
      *
      * @return the list of connected clients
      */
-    public LinkedList<ClientStatistics> getClients() {
+    public LinkedList<XTableClientStatistics.ClientStatistics> getClients() {
         return clients;
     }
 

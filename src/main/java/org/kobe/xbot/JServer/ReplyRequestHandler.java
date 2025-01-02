@@ -153,12 +153,12 @@ public class ReplyRequestHandler extends BaseHandler {
                             }
                         }
                         case INFORMATION -> {
-                            SystemStatistics systemStatistics = new SystemStatistics(instance);
-                            byte[] serialized = Utilities.serializeObject(systemStatistics);
-                            socket.send(XTableProto.XTableMessage.newBuilder()
-                                    .setCommand(command)
-                                    .setValue(ByteString.copyFrom(serialized))
-                                    .build().toByteArray(), ZMQ.DONTWAIT);
+//                            SystemStatistics systemStatistics = new SystemStatistics(instance);
+//                            byte[] serialized = Utilities.serializeObject(systemStatistics);
+//                            socket.send(XTableProto.XTableMessage.newBuilder()
+//                                    .setCommand(command)
+//                                    .setValue(ByteString.copyFrom(serialized))
+//                                    .build().toByteArray(), ZMQ.DONTWAIT);
                         }
                         case DEBUG -> {
                             if (message.hasValue()) {
