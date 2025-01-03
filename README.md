@@ -71,3 +71,30 @@ To resolve this issue, you must set the JVM option to prefer the IPv4 stack. Add
 This setting forces the JVM to use the IPv4 stack, which should resolve the socket exception issue. Make sure to include this option in your command line or IDE configuration when running the application.
 
 
+Here’s a simple `.md` documentation for both workflows without the YAML code:
+
+---
+
+## GitHub Actions Workflows
+
+### 1. Create ZIP on Push
+
+This workflow automates the creation of a ZIP file containing specific Java files from the repository whenever there is a push to the `master` branch. The workflow includes the following steps:
+- It checks out the repository code.
+- Installs the necessary `zip` utility.
+- Creates a ZIP file of the `JClient` and `Utilities` Java files.
+- Commits and pushes the ZIP file to a separate branch, `zip-files`.
+
+### 2. Upload Python Package
+
+This workflow automates the process of building and uploading a Python package to PyPI when a push occurs to the `master` branch. The workflow involves:
+- Checking out the repository code.
+- Setting up the appropriate Python version.
+- Installing required dependencies (`setuptools`, `wheel`, `twine`).
+- Cleaning up any previous build files.
+- Building a source distribution and wheel package from the Python package.
+- Uploading the package to PyPI using `twine`.
+
+---
+
+These workflows help automate repetitive tasks in your development process, such as creating ZIP archives for Java files and pushing Python packages to PyPI, ensuring smooth deployment and integration.
