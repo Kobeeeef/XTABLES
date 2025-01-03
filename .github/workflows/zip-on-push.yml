@@ -19,10 +19,15 @@ jobs:
     - name: Create ZIP of JClient and Utilities
       run: |
         mkdir -p output
-        zip -r output/directories.zip src/main/java/org/kobe/xbot/JClient src/main/java/org/kobe/xbot/Utilities
+        zip -r output/jclient.zip src/main/java/org/kobe/xbot/JClient src/main/java/org/kobe/xbot/Utilities
 
-    - name: Upload ZIP file as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: JCLIENT-zip
-        path: output/jclient.zip
+    - name: Commit and Push ZIP to Repository
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git checkout -b zip-files || git checkout zip-files
+        mkdir -p zips
+        cp output/jclient.zip zips/
+        git add zips/jclient.zip
+        git commit -m "Add JClient ZIP on push"
+        git push origin zip-files
