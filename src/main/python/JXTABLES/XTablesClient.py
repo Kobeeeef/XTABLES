@@ -21,7 +21,6 @@ except ImportError:
     from XTablesByteUtils import XTablesByteUtils
 
 
-
 class XTablesClient:
     # ================================================================
     # Static Variables
@@ -34,11 +33,10 @@ class XTablesClient:
     XTABLES_CLIENT_VERSION = "XTABLES JPython Client v1.0.0 | Build Date: 1/2/2025"
 
     def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737, buffer_size=500):
-        self.debug = True
+        self.debug = False
         self.BUFFER_SIZE = buffer_size
         self.context = zmq.Context()
         self.push_socket = self.context.socket(zmq.PUSH)
-        self.push_socket.set_hwm(500)
         self.req_socket = self.context.socket(zmq.REQ)
         self.req_socket.set_hwm(500)
         self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
@@ -101,7 +99,6 @@ class XTablesClient:
             self.sub_socket = self.context.socket(zmq.SUB)
 
             self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
-            self.push_socket.set_hwm(500)
             self.sub_socket.set_hwm(500)
             self.req_socket.set_hwm(500)
             self.push_socket.connect(f"tcp://{self.ip}:{self.push_port}")
@@ -132,7 +129,7 @@ class XTablesClient:
         except socket.gaierror:
             if self.debug:
                 traceback.print_exc()
-            return None
+            return self.resolve_host_by_name()
 
     def send_push_message(self, command, key, value, msg_type):
         message = XTableProto.XTableMessage()
@@ -143,10 +140,22 @@ class XTablesClient:
         try:
             self.push_socket.send(message.SerializeToString(), zmq.constants.DONTWAIT)
             return True
-        except zmq.ZMQError:
+        except zmq.ZMQError and zmq.error.Again:
             if self.debug:
                 traceback.print_exc()
-            print(f"Error sending message: {e}")
+            return False
+
+    def publish(self, key, value):
+        message = XTableProto.XTableMessage()
+        message.key = key
+        message.command = XTableProto.XTableMessage.Command.PUBLISH
+        message.value = value
+        try:
+            self.push_socket.send(message.SerializeToString(), zmq.constants.DONTWAIT)
+            return True
+        except zmq.ZMQError and zmq.error.Again:
+            if self.debug:
+                traceback.print_exc()
             return False
 
     def subscribe(self, key: str, consumer: Callable):
@@ -369,7 +378,7 @@ class XTablesClient:
             message = XTableProto.XTableMessage()
             message.key = key
             message.command = XTableProto.XTableMessage.Command.GET
-            self.req_socket.send(message.SerializeToString())
+            self.req_socket.send(message.SerializeToString(), zmq.constants.DONTWAIT)
             response_bytes = self.req_socket.recv()
             response_message = XTableProto.XTableMessage.FromString(response_bytes)
 
@@ -378,7 +387,6 @@ class XTablesClient:
         except Exception as e:
             if self.debug:
                 traceback.print_exc()
-            print(f"Error occurred: {e}")
             return None
 
     def ping(self):
@@ -420,24 +428,26 @@ class XTablesClient:
     def add_client_version_property(self, value):
         self.XTABLES_CLIENT_VERSION = self.XTABLES_CLIENT_VERSION + " | " + value
 
+    def set_client_debug(self, value):
+        self.debug = value
+
 
 class XTablesServerNotFound(Exception):
     pass
 
 
-def consumer(test):
-    print("UPDATE: " + test.key + " " + str(
-        XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
-
-
-if __name__ == "__main__":
-    client = XTablesClient("localhost")
-    # client.subscribe_all(consumer)
-    # time.sleep(100000)
-    while True:
-        print(client.ping())
-        time.sleep(1)
-
-    # print(client.getUnknownBytes("name"))
-    # print(client.getString("age"))
-    # print(client.getArray("numbers"))
+# def consumer(test):
+#     print("UPDATE: " + test.key + " " + str(
+#         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
+#
+#
+# if __name__ == "__main__":
+#     client = XTablesClient("localhost")
+#     # client.subscribe_all(consumer)
+#     # time.sleep(100000)
+#     while True:
+#         client.publish("test", b"test")
+#
+#     # print(client.getUnknownBytes("name"))
+#     # print(client.getString("age"))
+#     # print(client.getArray("numbers"))
