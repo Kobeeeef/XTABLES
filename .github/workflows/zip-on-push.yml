@@ -1,0 +1,28 @@
+name: Create ZIP on Push
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  zip_directories:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install zip utility
+      run: sudo apt-get install -y zip
+
+    - name: Create ZIP of JClient and Utilities
+      run: |
+        mkdir -p output
+        zip -r output/directories.zip src/main/java/org/kobe/xbot/JClient src/main/java/org/kobe/xbot/Utilities
+
+    - name: Upload ZIP file as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: JCLIENT-zip
+        path: output/jclient.zip
