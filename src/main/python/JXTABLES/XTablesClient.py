@@ -76,6 +76,13 @@ class XTablesClient:
         self.subscribe_handler = SubscribeHandler(self.sub_socket, self)
         self.subscribe_handler.start()
 
+    def shutdown(self):
+        if self.subscribe_handler:
+            self.subscribe_handler.interrupt()
+        self.push_socket.close()
+        self.req_socket.close()
+        self.sub_socket.close()
+
     def _reconnect_req(self):
         self.req_socket.close()
         self.req_socket = self.context.socket(zmq.REQ)
@@ -438,7 +445,6 @@ class XTablesClient:
 
 class XTablesServerNotFound(Exception):
     pass
-
 
 # def consumer(test):
 #     print("UPDATE: " + test.key + " " + str(
