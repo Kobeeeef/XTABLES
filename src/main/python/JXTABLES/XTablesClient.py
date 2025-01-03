@@ -383,8 +383,12 @@ class XTablesClient:
             response_message = XTableProto.XTableMessage.FromString(response_bytes)
 
             return response_message
-
-        except Exception as e:
+        except zmq.error.ZMQError:
+            if self.debug:
+                traceback.print_exc()
+            print("Exception on REQ socket. Reconnecting to clear states.")
+            self._reconnect_req()
+        except Exception:
             if self.debug:
                 traceback.print_exc()
             return None
@@ -412,7 +416,7 @@ class XTablesClient:
         except zmq.error.ZMQError:
             if self.debug:
                 traceback.print_exc()
-            print("ZMQ Exception on REQ socket. Reconnecting to clear states.")
+            print("Exception on REQ socket. Reconnecting to clear states.")
             self._reconnect_req()
         except Exception:
             if self.debug:
@@ -441,13 +445,14 @@ class XTablesServerNotFound(Exception):
 #         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 #
 #
-# if __name__ == "__main__":
-#     client = XTablesClient("localhost")
-#     # client.subscribe_all(consumer)
-#     # time.sleep(100000)
-#     while True:
-#         client.publish("test", b"test")
-#
-#     # print(client.getUnknownBytes("name"))
-#     # print(client.getString("age"))
-#     # print(client.getArray("numbers"))
+if __name__ == "__main__":
+    client = XTablesClient("localhost")
+    # client.subscribe_all(consumer)
+    # time.sleep(100000)
+    client.putBytes("test", b'ok')
+    while True:
+        print(client.getBytes("test"))
+
+    # print(client.getUnknownBytes("name"))
+    # print(client.getString("age"))
+    # print(client.getArray("numbers"))
