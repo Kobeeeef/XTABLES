@@ -26,12 +26,13 @@ public class PullPushProducer {
 
             byte[] imageBytes = Files.readAllBytes(Paths.get("ping_page.png"));
             int i = 0;
+        i++;
+        byte[] valueBytes = ByteBuffer.allocate(4).putInt(i).array();
             while (!Thread.currentThread().isInterrupted()) {
-                i++;
-                byte[] valueBytes = ByteBuffer.allocate(4).putInt(i).array();
-                  client.publish(UUID.randomUUID().toString(), valueBytes);
-                  System.out.println(i);
-                    Thread.sleep(1);
+
+                  client.publish("a", valueBytes);
+
+
 
             }
 
