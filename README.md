@@ -23,7 +23,7 @@ For more detailed documentation on XTABLES:
 ![image](https://github.com/user-attachments/assets/e7fa937a-262c-4db3-9df0-ada2719fd4c2)
 
 # Main Page
-![image](https://github.com/user-attachments/assets/33d42b9e-db13-4fb2-b3c0-1d1d532e8b03)
+![image](https://github.com/user-attachments/assets/7861da8f-72ed-4654-b3c1-e05d8cf48f5d)
 
 ## Comparison with FRC Network Tables
 
