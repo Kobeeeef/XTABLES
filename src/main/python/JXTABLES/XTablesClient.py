@@ -442,17 +442,17 @@ class XTablesServerNotFound(Exception):
 
 # def consumer(test):
 #     print("UPDATE: " + test.key + " " + str(
-#         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
+#         XTablesByteUtils.to_string(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 #
 #
 # if __name__ == "__main__":
 #     client = XTablesClient("localhost")
-#     # client.subscribe_all(consumer)
-#     # time.sleep(100000)
+#     client.subscribe_all(consumer)
+#     time.sleep(100000)
 #     client.putBytes("test", b'ok')
 #     while True:
 #         print(client.getBytes("test"))
-
-    # print(client.getUnknownBytes("name"))
-    # print(client.getString("age"))
-    # print(client.getArray("numbers"))
+#
+#     # print(client.getUnknownBytes("name"))
+#     # print(client.getString("age"))
+#     # print(client.getArray("numbers"))
