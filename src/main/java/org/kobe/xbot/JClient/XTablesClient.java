@@ -856,15 +856,34 @@ public class XTablesClient {
         return foundIp;
     }
 
+    /**
+     * Retrieves the REQ (Request) socket.
+     * The REQ socket is typically used for sending requests in a request-reply pattern.
+     *
+     * @return The ZMQ.Socket instance representing the REQ socket.
+     */
     public ZMQ.Socket getReqSocket() {
         return reqSocket;
     }
 
+    /**
+     * Retrieves the PUSH socket.
+     * The PUSH socket is used for sending messages in a one-way pattern, usually to a PULL socket.
+     *
+     * @return The ZMQ.Socket instance representing the PUSH socket.
+     */
     public ZMQ.Socket getPushSocket() {
         return pushSocket;
     }
 
+    /**
+     * Retrieves the SUB (Subscriber) socket.
+     * The SUB socket is used to subscribe to messages from a PUB (Publisher) socket.
+     *
+     * @return The ZMQ.Socket instance representing the SUB socket.
+     */
     public ZMQ.Socket getSubSocket() {
         return subSocket;
     }
+
 }
