@@ -4,18 +4,26 @@ import zmq
 import traceback
 from google.protobuf.message import DecodeError
 
+try:
+    # Package-level imports
+    from .BaseHandler import BaseHandler
+    from .ClientStatistics import ClientStatistics
+    from .CircularBuffer import CircularBuffer
+    from . import Utilities
+    from . import XTableProto_pb2 as XTableProto
+except ImportError:
+    # Standalone script imports
+    from BaseHandler import BaseHandler
+    from ClientStatistics import ClientStatistics
+    from CircularBuffer import CircularBuffer
+    import Utilities
+    import XTableProto_pb2 as XTableProto
 
-from .BaseHandler import BaseHandler
-from .ClientStatistics import ClientStatistics
-from .CircularBuffer import CircularBuffer
-from . import Utilities
-from . import XTableProto_pb2 as XTableProto
 
 class SubscribeHandler(BaseHandler):
     """
     A handler for processing incoming subscription messages using ZeroMQ.
     """
-
 
     def __init__(self, socket: zmq.Socket, instance: Any):
         super().__init__("XTABLES-SUBSCRIBE-HANDLER-DAEMON", True, socket)

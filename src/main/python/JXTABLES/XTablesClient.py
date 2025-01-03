@@ -3,14 +3,23 @@ import time
 import traceback
 import zmq
 import struct
+import zmq.constants
 from typing import Callable, Dict, List
 import uuid
 
+try:
+    # Package-level imports
+    from . import XTableProto_pb2 as XTableProto
+    from .SubscribeHandler import SubscribeHandler
+    from .PingResponse import PingResponse
+    from .XTablesByteUtils import XTablesByteUtils
+except ImportError:
+    # Standalone script imports
+    import XTableProto_pb2 as XTableProto
+    from SubscribeHandler import SubscribeHandler
+    from PingResponse import PingResponse
+    from XTablesByteUtils import XTablesByteUtils
 
-from . import XTableProto_pb2 as XTableProto
-from .SubscribeHandler import SubscribeHandler
-from .PingResponse import PingResponse
-from .XTablesByteUtils import XTablesByteUtils
 
 
 class XTablesClient:
@@ -69,6 +78,13 @@ class XTablesClient:
         self.subscribe_handler = SubscribeHandler(self.sub_socket, self)
         self.subscribe_handler.start()
 
+    def _reconnect_req(self):
+        self.req_socket.close()
+        self.req_socket = self.context.socket(zmq.REQ)
+        self.req_socket.set_hwm(500)
+        self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
+        self.req_socket.connect(f"tcp://{self.ip}:{self.req_port}")
+
     def connect(self):
         """
         Attempts to reconnect the sockets to the server.
@@ -125,7 +141,7 @@ class XTablesClient:
         message.value = value
         message.type = msg_type
         try:
-            self.push_socket.send(message.SerializeToString())
+            self.push_socket.send(message.SerializeToString(), zmq.constants.DONTWAIT)
             return True
         except zmq.ZMQError:
             if self.debug:
@@ -370,7 +386,7 @@ class XTablesClient:
             start_time = time.perf_counter_ns()
             message = XTableProto.XTableMessage()
             message.command = XTableProto.XTableMessage.Command.PING
-            self.req_socket.send(message.SerializeToString())
+            self.req_socket.send(message.SerializeToString(), zmq.constants.DONTWAIT)
 
             response_bytes = self.req_socket.recv()
             round_trip_time = time.perf_counter_ns() - start_time
@@ -385,7 +401,11 @@ class XTablesClient:
                 return PingResponse(success, round_trip_time)
             else:
                 return PingResponse(False, -1)
-
+        except zmq.error.ZMQError:
+            if self.debug:
+                traceback.print_exc()
+            print("ZMQ Exception on REQ socket. Reconnecting to clear states.")
+            self._reconnect_req()
         except Exception:
             if self.debug:
                 traceback.print_exc()
@@ -405,17 +425,19 @@ class XTablesServerNotFound(Exception):
     pass
 
 
-# def consumer(test):
-#     print("UPDATE: " + test.key + " " + str(
-#         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
-#
-#
-# # Sample usage
-# if __name__ == "__main__":
-#     client = XTablesClient("localhost")
-#     client.subscribe_all(consumer)
-#     time.sleep(100000)
-#
-#     # print(client.getUnknownBytes("name"))
-#     # print(client.getString("age"))
-#     # print(client.getArray("numbers"))
+def consumer(test):
+    print("UPDATE: " + test.key + " " + str(
+        XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
+
+
+if __name__ == "__main__":
+    client = XTablesClient("localhost")
+    # client.subscribe_all(consumer)
+    # time.sleep(100000)
+    while True:
+        print(client.ping())
+        time.sleep(1)
+
+    # print(client.getUnknownBytes("name"))
+    # print(client.getString("age"))
+    # print(client.getArray("numbers"))

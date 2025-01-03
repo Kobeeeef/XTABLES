@@ -6,7 +6,12 @@ import time
 from enum import Enum
 
 
-from . import ClientStatistics_pb2 as cspf
+try:
+    # Package-level import
+    from . import ClientStatistics_pb2 as cspf
+except ImportError:
+    # Standalone script import
+    import ClientStatistics_pb2 as cspf
 
 
 class HealthStatus(Enum):
