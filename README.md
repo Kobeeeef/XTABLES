@@ -13,6 +13,9 @@ You can access the Javadocs for XTABLES at the following link:
 
 [XTABLES Javadocs](https://kobeeeef.github.io/XTABLES/index.html)
 
+For more detailed documentation on XTABLES:
+
+[Vision Documentation](https://team488.gitbook.io/xtables/java-client-setup)
 
 ## New Dashboard
 
