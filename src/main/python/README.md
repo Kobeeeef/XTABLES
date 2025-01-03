@@ -1,82 +1,69 @@
-
 # XTablesClient
 
-`XTablesClient` is a Python client library for connecting to an XTABLES server, supporting both direct socket and ZeroMQ-based communication. This client provides methods for data operations on network tables and offers convenient functionality for interacting with robotic applications or distributed systems.
+**XTablesClient** is a Python client library designed to interact with the XTables server, allowing you to send and receive messages, subscribe to updates, and manage communication through ZeroMQ (ZMQ) sockets. The client supports publishing, subscribing, and retrieving various data types (strings, integers, booleans, arrays, and more) to/from the server.
 
 ## Features
-- **Flexible Initialization**: Connects to a server directly or discovers it via mDNS.
-- **Data Operations**: Supports multiple data types (`Boolean`, `String`, `Integer`, `Float`, `Array`, `Class`, `Bytes`) for seamless data transmission.
-- **ZeroMQ Support**: Configurable ZeroMQ PUSH/PULL and PUB/SUB communication for real-time message streaming.
-- **Robust Connection Management**: Includes automatic reconnection and resubscription after disconnection.
-- **Subscription**: Allows for subscriptions to data updates for specific keys, invoking consumer functions on updates.
+
+- **Socket Communication**: Uses ZeroMQ for push, request, and subscription communication with the XTables server.
+- **Subscription Management**: Allows subscribing to specific keys or to all updates.
+- **Multiple Data Types**: Supports sending and receiving a variety of data types, including strings, integers, booleans, arrays, and raw bytes.
+- **mDNS Support**: Automatically resolves the server's IP address using Zeroconf if the hostname is not provided.
 
 ## Installation
 
-Install `xtables-client` from PyPI:
+To install `XTablesClient`, simply use `pip`:
+
 ```bash
-pip install xtables-client
+pip install XTablesClient
 ```
 
 ## Usage
 
-### Import and Initialization
+### Basic Example
+
 ```python
-from xtables_client import XTablesClient
+from XTablesClient import XTablesClient
 
 # Initialize the client
-client = XTablesClient(server_ip="192.168.1.10", server_port=1735, useZeroMQ=True)
+client = XTablesClient()
+
+# Publish a string message
+client.publish("some_key", b"Hello, XTables!")
+
+# Subscribe to a key and handle incoming messages
+def message_handler(message):
+    print(f"Received message for key: {message.key} with value: {message.value}")
+
+client.subscribe("some_key", message_handler)
+
+# Retrieve data
+data = client.getString("some_key")
+print(data)
 ```
 
-### Data Operations
+### Available Methods
 
-1. **Setting Values**
-   - **Boolean**: `client.executePutBoolean("key", True)`
-   - **String**: `client.executePutString("key", "value")`
-   - **Integer**: `client.executePutInteger("key", 42)`
-   - **Float**: `client.executePutFloat("key", 3.14)`
+#### Publishing Data
+- `publish(key: str, value: str)`: Publish a string value to the server.
+- `putString(key: str, value: str)`: Put a string value in the XTable.
+- `putInteger(key: str, value: int)`: Put an integer value.
+- `putBoolean(key: str, value: bool)`: Put a boolean value.
 
-2. **Retrieving Values**
-   - **Get Integer**: `value = client.getInteger("key")`
-   - **Get String**: `value = client.getString("key")`
-   - **Get Float**: `value = client.getFloat("key")`
+#### Subscribing to Updates
+- `subscribe(key: str, consumer: Callable)`: Subscribe to updates for a specific key.
+- `subscribe_all(consumer: Callable)`: Subscribe to updates for all keys.
 
-3. **Subscriptions**
-   - Subscribe to updates for a key and handle updates with a custom function:
-     ```python
-     def my_consumer(key, value):
-         print(f"Update for {key}: {value}")
+#### Retrieving Data
+- `getString(key: str)`: Get a string value from the server.
+- `getInteger(key: str)`: Get an integer value.
+- `getBoolean(key: str)`: Get a boolean value.
+- `getArray(key: str)`: Get an array of values.
 
-     client.subscribeForUpdates("key", my_consumer)
-     ```
+## Documentation
 
-4. **ZeroMQ Operations**
-   - **Push Data**: `client.push_frame("identifier", "message")`
-   - **Receive Next**: `key, value = client.recv_next()`
-
-### Connection Management
-- **Reconnect**: Automatic reconnection and re-subscription to previously subscribed keys.
-- **Shutdown**: Gracefully shuts down the client connection.
-  ```python
-  client.shutdown()
-  ```
-
-## Example
-
-```python
-from xtables_client import XTablesClient
-
-client = XTablesClient(useZeroMQ=True, server_port=1735)
-client.subscribe("image")
-
-while True:
-    key, value = client.recv_next()
-    if key is not None:
-        print(f"Received data for {key}: {value}")
-```
+- **XTablesClient** is built with simplicity in mind and uses ZeroMQ for efficient communication with the XTables server. It can be easily extended or modified for custom use cases.
+- The package uses **Zeroconf** to automatically discover the server in your network if the IP is not provided.
 
 ## License
-This project is licensed under the MIT License.
 
-```
-
-This README provides a clear overview of the client’s capabilities, installation instructions, and usage examples to facilitate integration with any XTABLES server.
+`XTablesClient` is licensed under the MIT License. See the LICENSE file for more details.
