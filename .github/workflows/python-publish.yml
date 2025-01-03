@@ -1,8 +1,11 @@
 name: Upload Python Package
 
+# Trigger on every push to the repository (you can specify branches if needed)
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - master  # Change 'main' to your default branch name if different
+    # Optionally add tags or specific files you want to trigger on
 
 permissions:
   contents: read
@@ -17,6 +20,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+
+      - name: Extract version from setup.py
+        id: version
+        run: |
+          VERSION=$(python -c "from setuptools import setup; print(setup().get_version())")
+          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version set to: $VERSION"
 
       - name: Build release distributions
         run: |
@@ -53,3 +63,4 @@ jobs:
           packages-dir: dist/
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          VERSION: ${{ env.PACKAGE_VERSION }}
