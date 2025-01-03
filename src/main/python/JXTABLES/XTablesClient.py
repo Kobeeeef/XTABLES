@@ -6,6 +6,8 @@ import struct
 import zmq.constants
 from typing import Callable, Dict, List
 import uuid
+import logging
+from zeroconf import Zeroconf
 
 try:
     # Package-level imports
@@ -13,9 +15,11 @@ try:
     from .SubscribeHandler import SubscribeHandler
     from .PingResponse import PingResponse
     from .XTablesByteUtils import XTablesByteUtils
+    from . import TempConnectionManager
 except ImportError:
     # Standalone script imports
     import XTableProto_pb2 as XTableProto
+    from TempConnectionManager import TempConnectionManager as tcm
     from SubscribeHandler import SubscribeHandler
     from PingResponse import PingResponse
     from XTablesByteUtils import XTablesByteUtils
@@ -33,7 +37,7 @@ class XTablesClient:
     XTABLES_CLIENT_VERSION = "XTABLES JPython Client v1.0.0 | Build Date: 1/2/2025"
 
     def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737, buffer_size=500):
-        self.debug = False
+        self.debug = True
         self.BUFFER_SIZE = buffer_size
         self.context = zmq.Context()
         self.push_socket = self.context.socket(zmq.PUSH)
@@ -46,6 +50,7 @@ class XTablesClient:
         self.subscription_consumers = {}
         self.uuid = str(uuid.uuid4())
         self.ip = ip
+        self.logger = logging.getLogger(__name__)
         self.push_port = push_port
         self.req_port = req_port
         self.sub_port = sub_port
@@ -131,12 +136,57 @@ class XTablesClient:
                 traceback.print_exc()
 
     def resolve_host_by_name(self):
+        temp_ip = tcm.get()
+        if temp_ip:
+            self.logger.info(f"Retrieved cached server IP: {temp_ip}")
+            return temp_ip
+
+        address = None
+        zeroconf = Zeroconf()
         try:
-            return socket.gethostbyname('XTABLES.local')
-        except socket.gaierror:
-            if self.debug:
-                traceback.print_exc()
-            return self.resolve_host_by_name()
+            while not address:
+                try:
+                    if self.debug:
+                        self.logger.info("Attempting to resolve host 'XTABLES.local'...")
+                    address = socket.gethostbyname("XTABLES.local")
+                    if self.debug:
+                        self.logger.info(f"Host resolution successful: IP address found at {address}")
+                        self.logger.info("Proceeding with socket client initialization.")
+                except socket.gaierror:
+                    if self.debug:
+                        traceback.print_exc()
+                        self.logger.error("Failed to resolve 'XTABLES.local'. Host not found. Now attempting "
+                                          "zeroconf...")
+                    try:
+                        info = zeroconf.get_service_info("_xtables._tcp.local.", "XTablesService._xtables._tcp.local.")
+                        if info:
+                            addresses = info.parsed_addresses()
+                            if addresses:
+                                address = addresses[0]
+                                if self.debug:
+                                    self.logger.info(f"Zeroconf resolution successful: IP address found at {address}")
+                            else:
+                                if self.debug:
+                                    self.logger.error("No valid IP address found from Zeroconf.")
+                        else:
+                            if self.debug:
+                                self.logger.error("Failed to resolve 'XTablesService' using Zeroconf. Retrying in 1 "
+                                             "second...")
+                    except Exception as e:
+                        if self.debug:
+                            traceback.print_exc()
+                            self.logger.error(f"Error resolving service: {e}")
+
+                    time.sleep(1)
+
+        finally:
+            zeroconf.close()
+
+        if address:
+            tcm.set(address)
+            return address
+
+        return None
 
     def send_push_message(self, command, key, value, msg_type):
         message = XTableProto.XTableMessage()
@@ -452,8 +502,9 @@ class XTablesServerNotFound(Exception):
 #
 #
 # if __name__ == "__main__":
-#     client = XTablesClient("localhost")
-#     client.subscribe_all(consumer)
+#     client = XTablesClient()
+#
+#     #client.subscribe_all(consumer)
 #     time.sleep(100000)
 #     client.putBytes("test", b'ok')
 #     while True:
