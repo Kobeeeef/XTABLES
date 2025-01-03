@@ -7,6 +7,7 @@ import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.TempConnectionManager;
 import org.kobe.xbot.Utilities.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,9 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceInfo;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -105,11 +109,10 @@ public class XTablesClient {
      */
     public XTablesClient(String ip, int pushSocketPort, int requestSocketPort, int subscribeSocketPort) {
         if (ip == null) {
-            InetAddress inetAddress = resolveHostByName();
-            if (inetAddress == null) {
+            ip = resolveHostByName();
+            if (ip == null) {
                 throw new XTablesServerNotFound("Could not resolve XTABLES hostname server.");
             }
-            ip = inetAddress.getHostAddress();
         }
         logger.info("\n" +
                 "Connecting to XTABLES Server...\n" +
@@ -805,27 +808,52 @@ public class XTablesClient {
      *
      * @return The resolved InetAddress of the XTABLES server, or null if failed to resolve.
      */
-    private InetAddress resolveHostByName() {
+    private String resolveHostByName() {
+        String tempIp = TempConnectionManager.get();
+        if (tempIp != null) {
+            logger.info("Retrieved cached server IP: " + tempIp);
+            return tempIp;
+        }
         InetAddress address = null;
-        while (address == null) {
-            try {
-                logger.info("Attempting to resolve host 'XTABLES.local'...");
-                address = Inet4Address.getByName("XTABLES.local");
-                logger.info("Host resolution successful: IP address found at " + address.getHostAddress());
-                logger.info("Proceeding with socket client initialization.");
-            } catch (UnknownHostException e) {
-                logger.severe("Failed to resolve 'XTABLES.local'. Host not found. Retrying in 1 second...");
-                logger.severe("Exception details: " + e);
+        try (JmDNS jmdns = JmDNS.create()) {
+            while (address == null) {
                 try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    logger.warning("Retry wait interrupted. Exiting...");
-                    return null;
+                    logger.info("Attempting to resolve host 'XTABLES.local'...");
+                    address = Inet4Address.getByName("XTABLES.local");
+                    logger.info("Host resolution successful: IP address found at " + address.getHostAddress());
+                    logger.info("Proceeding with socket client initialization.");
+                } catch (UnknownHostException e) {
+                    logger.severe("Failed to resolve 'XTABLES.local'. Host not found. Now attempting jmDNS...");
+                    logger.severe("Exception details: " + e);
+                    ServiceInfo serviceInfo = jmdns.getServiceInfo("_xtables._tcp.local.", "XTablesService", false, 3000);
+                    if (serviceInfo != null) {
+                        Optional<Inet4Address> inet4Address = Arrays.stream(serviceInfo.getInet4Addresses())
+                                .filter(Objects::nonNull)
+                                .findFirst();
+                        if (inet4Address.isPresent()) {
+                            address = inet4Address.get();
+                        } else {
+                            logger.severe("Failed to retrieve IPv4 address from XTablesService.");
+                        }
+                    } else {
+                        logger.severe("Failed to resolve 'XTablesService' using jmDNS. Retrying in 1 second...");
+                    }
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        logger.warning("Retry wait interrupted. Exiting...");
+                        return null;
+                    }
                 }
             }
+        } catch (IOException e) {
+            return resolveHostByName();
         }
-        return address;
+        String foundIp = address.getHostAddress();
+        TempConnectionManager.set(foundIp);
+        return foundIp;
     }
 
     public ZMQ.Socket getReqSocket() {

@@ -6,7 +6,7 @@ import org.kobe.xbot.Utilities.XTablesByteUtils;
 public class JClientTest {
     public static void main(String[] args) throws InterruptedException {
 
-        XTablesClient client = new XTablesClient("localhost");
+        XTablesClient client = new XTablesClient();
         client.subscribe("test", (xTableUpdate -> {
             System.out.println(XTablesByteUtils.toInt(xTableUpdate.getValue()));
             try {
