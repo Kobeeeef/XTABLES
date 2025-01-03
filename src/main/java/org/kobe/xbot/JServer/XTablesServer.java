@@ -375,6 +375,7 @@ public class XTablesServer {
                 jmdns = JmDNS.create(addr, "XTABLES");
                 Map<String, String> props = new HashMap<>();
                 props.put("pullSocketPort", String.valueOf(pullPort));
+                props.put("pubSocketPort", String.valueOf(pubPort));
                 props.put("replySocketPort", String.valueOf(repPort));
                 serviceInfo = ServiceInfo.create("_xtables._tcp.local.", SERVICE_NAME, SERVICE_PORT, 0, 0, props);
                 jmdns.registerService(serviceInfo);
