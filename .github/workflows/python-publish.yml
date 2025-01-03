@@ -21,6 +21,11 @@ jobs:
         with:
           python-version: "3.x"
 
+      # Install setuptools before running the version extraction command
+      - name: Install setuptools
+        run: |
+          python -m pip install setuptools
+
       - name: Extract version from setup.py
         id: version
         run: |
