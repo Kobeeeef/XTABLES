@@ -25,9 +25,18 @@ jobs:
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
-        git checkout -b zip-files || git checkout zip-files
+        
+        # Fetch the latest changes from the remote and integrate them
+        git fetch origin zip-files
+        
+        # Checkout the branch, create if it doesn't exist
+        git checkout -B zip-files origin/zip-files
+        
+        # Ensure the directory structure exists and copy the zip file
         mkdir -p zips
         cp output/jclient.zip zips/
+        
+        # Stage, commit, and push changes
         git add zips/jclient.zip
         git commit -m "Add JClient ZIP on push"
         git push origin zip-files
