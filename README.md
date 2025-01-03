@@ -23,7 +23,7 @@ For more detailed documentation on XTABLES:
 ![image](https://github.com/user-attachments/assets/e7fa937a-262c-4db3-9df0-ada2719fd4c2)
 
 # Main Page
-![image](https://github.com/user-attachments/assets/33d42b9e-db13-4fb2-b3c0-1d1d532e8b03)
+![image](https://github.com/user-attachments/assets/7861da8f-72ed-4654-b3c1-e05d8cf48f5d)
 
 ## Comparison with FRC Network Tables
 
@@ -31,11 +31,11 @@ For more detailed documentation on XTABLES:
 
 - **Message Rate**:
   - **FRC Network Tables**: Approximately 10 to 20 thousand messages per second.
-  - **XTablesClient**: Capable of sending around ~400,000 updates per second, which translates to 25 million messages per minute with 0% loss.
+  - **XTablesClient**: Capable of sending around ~1,500,000 updates per second, which translates to 90 million messages per minute with 0% loss.
 
 - **Latency**:
   - **FRC Network Tables**: Typically higher latency due to lower message rates and less optimized data handling.
-  - **XTablesClient**: Average round-trip latency of 0.6ms in a local wireless network, ensuring almost zero latency for real-time applications.
+  - **XTablesClient**: Average round-trip latency of 0.13ms in a local wireless network, ensuring almost zero latency for real-time applications.
 
 - **Efficiency**:
   - **FRC Network Tables**: Basic data management and limited functionalities.
