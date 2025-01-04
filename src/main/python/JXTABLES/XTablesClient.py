@@ -15,7 +15,7 @@ try:
     from .SubscribeHandler import SubscribeHandler
     from .PingResponse import PingResponse
     from .XTablesByteUtils import XTablesByteUtils
-    from . import TempConnectionManager
+    from . import TempConnectionManager as tcm
 except ImportError:
     # Standalone script imports
     import XTableProto_pb2 as XTableProto
