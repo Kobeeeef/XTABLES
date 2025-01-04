@@ -130,7 +130,7 @@ public class XTablesClient {
                 "Request Socket Port: " + requestSocketPort + "\n" +
                 "Subscribe Socket Port: " + subscribeSocketPort + "\n" +
                 "------------------------------------------------------------");
-        this.context = new ZContext();
+        this.context = new ZContext(2);
         this.pushSocket = context.createSocket(SocketType.PUSH);
         this.pushSocket.setHWM(500);
         this.pushSocket.connect("tcp://" + this.ip + ":" + pushSocketPort);

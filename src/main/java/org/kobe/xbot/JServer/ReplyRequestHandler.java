@@ -130,10 +130,10 @@ public class ReplyRequestHandler extends BaseHandler {
                                         .toByteArray(), ZMQ.DONTWAIT);
 
                                 if (response) {
-                                    instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                    instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                                             .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.DELETE)
                                             .setKey(key)
-                                            .build()
+                                            .build().toByteArray()
                                     );
                                 }
                             } else {
@@ -146,9 +146,9 @@ public class ReplyRequestHandler extends BaseHandler {
                                         .toByteArray(), ZMQ.DONTWAIT);
 
                                 if (response) {
-                                    instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                    instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                                             .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.DELETE)
-                                            .build()
+                                            .build().toByteArray()
                                     );
                                 }
                             }

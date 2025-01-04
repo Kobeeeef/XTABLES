@@ -21,6 +21,7 @@ import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.SystemStatistics;
 import org.kobe.xbot.Utilities.Utilities;
+import org.zeromq.ZMQ;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -218,10 +219,10 @@ public class WebInterface {
                     if (!xTablesServer.getClientRegistry().shouldStopClientRegistry(5)) {
                         xTablesServer.getClientRegistrySession().set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
                         xTablesServer.getClientRegistry().getClients().clear();
-                        xTablesServer.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                        xTablesServer.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
                                 .setValue(xTablesServer.getClientRegistrySessionId())
-                                .build()
+                                .build().toByteArray()
                         );
                     }
                     resp.setStatus(HttpServletResponse.SC_OK);

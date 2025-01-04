@@ -6,6 +6,7 @@ import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.Utilities;
+import org.zeromq.ZMQ;
 
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -106,10 +107,10 @@ public class ClientRegistry extends Thread {
      */
     private void executeTask() {
         sessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
-        instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION)
                 .setValue(sessionId.get())
-                .build()
+                .build().toByteArray()
                 );
         instance.publishMessages.incrementAndGet();
     }

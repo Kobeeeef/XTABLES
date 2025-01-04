@@ -73,8 +73,8 @@ public class XTablesServer {
     private final String version;
     private final AtomicBoolean debug = new AtomicBoolean(false);
     private final boolean additionalFeatures;
-    public ZMQ.Socket pubSocket;
-    private ZContext context;
+    private ZMQ.Socket pubSocket;
+    public ZContext context;
     private JmDNS jmdns;
     private ServiceInfo serviceInfo;
     private PushPullRequestHandler pushPullRequestHandler;
@@ -86,7 +86,7 @@ public class XTablesServer {
     private int iterationSpeed;
     private final AtomicReference<ByteString> clientRegistrySessionId = new AtomicReference<>();
     private final ScheduledExecutorService scheduler;
-
+    public XTablesMessageQueue publishQueue;
     /**
      * Constructor for initializing the server with specified ports.
      *
@@ -109,7 +109,7 @@ public class XTablesServer {
                     {"PUBLISH", NumberFormat.getInstance().format(publishMessages.get())},
                     {"REPLY", NumberFormat.getInstance().format(replyMessages.get())}
             };
-            logger.info("Total message count in the last minute:\n" +TableFormatter.makeTable(headers, data));
+            logger.info("Total message count in the last minute:\n" + TableFormatter.makeTable(headers, data));
             pullMessages.set(0);
             replyMessages.set(0);
             publishMessages.set(0);
@@ -185,17 +185,18 @@ public class XTablesServer {
             System.exit(1);
         }
         Utilities.warmupProtobuf();
-        this.context = new ZContext();
-        pubSocket = context.createSocket(SocketType.PUB);
-        pubSocket.setHWM(500);
-        pubSocket.bind("tcp://*:" + pubPort);
+        this.context = new ZContext(3);
+        this.pubSocket = context.createSocket(SocketType.PUB);
+        this.pubSocket.setHWM(500);
+        this.pubSocket.bind("tcp://*:" + pubPort);
         ZMQ.Socket pullSocket = context.createSocket(SocketType.PULL);
         pullSocket.setHWM(500);
         pullSocket.bind("tcp://*:" + pullPort);
         ZMQ.Socket repSocket = context.createSocket(SocketType.REP);
         repSocket.setHWM(500);
         repSocket.bind("tcp://*:" + repPort);
-
+        this.publishQueue = new XTablesMessageQueue(this.pubSocket);
+        this.publishQueue.start();
         this.pushPullRequestHandler = new PushPullRequestHandler(pullSocket, this);
         this.pushPullRequestHandler.start();
         this.replyRequestHandler = new ReplyRequestHandler(repSocket, this);
@@ -218,11 +219,10 @@ public class XTablesServer {
                         }
                         clientRegistrySessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
                         clientRegistry.getClients().clear();
-                        notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                        publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
                                 .setValue(clientRegistrySessionId.get())
-                                .build()
-                        );
+                                .build().toByteArray());
                     }
                 }
 
@@ -233,10 +233,10 @@ public class XTablesServer {
                         logger.info("Triggering client registry update due to PUBLISH client disconnection.");
                         clientRegistrySessionId.set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
                         clientRegistry.getClients().clear();
-                        notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                        publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
                                 .setValue(clientRegistrySessionId.get())
-                                .build()
+                                .build().toByteArray()
                         );
                     }
                 }
@@ -248,15 +248,15 @@ public class XTablesServer {
             this.webInterface = WebInterface.initialize(this);
         } else {
             logger.warning("""
-                     Additional features are disabled. The XTablesServer will proceed with standard initialization.
-                     The following components are excluded:
+                    Additional features are disabled. The XTablesServer will proceed with standard initialization.
+                    The following components are excluded:
                                         \s
-                     - XTablesMessageRate: Real-time messaging rate monitoring will not be initialized.
-                     - ClientRegistry: The registry for tracking connected clients will not be enabled.
-                     - XTablesSocketMonitor: Advanced socket monitoring and client management will not be available.
-                     - WebInterface: The web-based dashboard for monitoring and managing server activities will not be initialized.
+                    - XTablesMessageRate: Real-time messaging rate monitoring will not be initialized.
+                    - ClientRegistry: The registry for tracking connected clients will not be enabled.
+                    - XTablesSocketMonitor: Advanced socket monitoring and client management will not be available.
+                    - WebInterface: The web-based dashboard for monitoring and managing server activities will not be initialized.
                                         \s
-                     To enable these features, use the '--additional_features=true' option when starting the server.
+                    To enable these features, use the '--additional_features=true' option when starting the server.
                     \s""");
         }
         logger.info(String.format("""
@@ -298,6 +298,9 @@ public class XTablesServer {
         }
         if (socketMonitor != null) {
             socketMonitor.interrupt();
+        }
+        if (publishQueue != null) {
+            publishQueue.interrupt();
         }
         if (rate != null) {
             rate.shutdown();
@@ -433,6 +436,9 @@ public class XTablesServer {
             if (socketMonitor != null) {
                 socketMonitor.interrupt();
             }
+            if (publishQueue != null) {
+                publishQueue.interrupt();
+            }
             if (rate != null) {
                 rate.shutdown();
             }
@@ -479,14 +485,7 @@ public class XTablesServer {
         return clientRegistrySessionId;
     }
 
-    /**
-     * Notifies connected clients of updates.
-     *
-     * @param update The update message to send
-     */
-    public void notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate update) {
-        pubSocket.send(update.toByteArray(), ZMQ.DONTWAIT);
-    }
+
 
     /**
      * Retrieves the iteration speed.
@@ -546,14 +545,14 @@ public class XTablesServer {
             debug.set(value);
             XTablesLogger.setHandler((level, s) -> {
                 if (debug.get() && pubSocket != null && status.get().equals(XTableStatus.ONLINE)) {
-                    notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                    publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                             .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
                             .setValue(XTableProto.XTableMessage.XTableLog.newBuilder()
                                     .setLevel(level.equals(Level.INFO) ? XTableProto.XTableMessage.XTableLog.Level.INFO : level.equals(Level.WARNING) ? XTableProto.XTableMessage.XTableLog.Level.WARNING : level.equals(Level.SEVERE) ? XTableProto.XTableMessage.XTableLog.Level.SEVERE : level.equals(XTablesLogger.FATAL) ? XTableProto.XTableMessage.XTableLog.Level.FATAL : XTableProto.XTableMessage.XTableLog.Level.UNKNOWN)
                                     .setMessage(s)
                                     .build()
                                     .toByteString())
-                            .build());
+                            .build().toByteArray());
                 }
             });
             logger.info("Debug mode is now " + (debug.get() ? "enabled. Logs will be published to connected clients."

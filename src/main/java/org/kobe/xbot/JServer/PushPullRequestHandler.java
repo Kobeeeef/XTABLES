@@ -75,12 +75,12 @@ public class PushPullRequestHandler extends BaseHandler {
                     String key = message.getKey();
                     byte[] value = message.getValue().toByteArray();
                     if (XTablesServer.table.put(key, value, message.getType())) {
-                        instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                        instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                                 .setType(message.getType())
                                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.UPDATE)
                                 .setKey(key)
                                 .setValue(ByteString.copyFrom(value))
-                                .build()
+                                .build().toByteArray()
                         );
                     }
                 }
@@ -88,12 +88,12 @@ public class PushPullRequestHandler extends BaseHandler {
             case PUBLISH -> {
                 if (message.hasKey() && message.hasValue()) {
                     instance.publishMessages.incrementAndGet();
-                    instance.notifyUpdateClients(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                    instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                             .setKey(message.getKey())
                             .setType(message.getType())
                             .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.PUBLISH)
                             .setValue(ByteString.copyFrom(message.getValue().toByteArray()))
-                            .build()
+                            .build().toByteArray()
                     );
 
                 }
