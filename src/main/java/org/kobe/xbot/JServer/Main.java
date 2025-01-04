@@ -51,7 +51,7 @@ public class Main {
 
         try {
             for (int i = 0; i < args.length; i++) {
-                if (args[i].startsWith("--additional_features=")) {
+                if (args[i].startsWith("--additional_features=") || args[i].startsWith("--additional-features=")) {
                     String[] split = args[i].split("=", 2);
                     if (split.length == 2) {
                         additionalFeatures = Boolean.parseBoolean(split[1]);
