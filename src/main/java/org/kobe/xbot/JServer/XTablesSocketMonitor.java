@@ -3,10 +3,7 @@ package org.kobe.xbot.JServer;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class XTablesSocketMonitor extends Thread {
     private final ZContext context;
@@ -73,7 +70,7 @@ public class XTablesSocketMonitor extends Thread {
     }
 
     private void cleanup() {
-        for (ZMQ.Socket monitorSocket : monitorSocketNames.keySet()) {
+        for (ZMQ.Socket monitorSocket : new HashSet<>(monitorSocketNames.keySet())) {
             monitorSocket.close();
         }
         monitorSocketNames.clear();
