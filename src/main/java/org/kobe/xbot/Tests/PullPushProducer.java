@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PullPushProducer {
     public static void main(String[] args) throws IOException, InterruptedException {
-        XTablesClient client = new XTablesClient("localhost");
+        XTablesClient client = new XTablesClient();
         System.out.println(Arrays.toString(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setKey("test")
                 .build()
@@ -31,7 +31,7 @@ public class PullPushProducer {
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(i).array();
             while (!Thread.currentThread().isInterrupted()) {
 
-                client.publish("h", new byte[]{});
+                client.publish("h", imageBytes);
 
 
 

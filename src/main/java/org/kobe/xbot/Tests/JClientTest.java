@@ -27,16 +27,16 @@ public class JClientTest {
         System.out.println(client.ping());
         System.out.println(client.ping());
 
-//        while (true) {
-//            try {
-//                client.getBoolean("awd");
-//
-//            } catch (Exception ignored) {
-//            }
-//
-//        }
+        while (true) {
+            try {
+                client.getBoolean("awd");
+                Thread.sleep(300);
+            } catch (Exception ignored) {
+            }
 
-        Thread.sleep(300000000);
+        }
+
+//        Thread.sleep(300000000);
     }
 }
 

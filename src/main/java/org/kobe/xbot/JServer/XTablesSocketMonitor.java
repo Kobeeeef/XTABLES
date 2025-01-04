@@ -32,40 +32,38 @@ public class XTablesSocketMonitor extends Thread {
 
     @Override
     public void run() {
-        while (running) {
-            for (Map.Entry<ZMQ.Socket, String> entry : monitorSocketNames.entrySet()) {
-                ZMQ.Socket monitorSocket = entry.getKey();
-                String socketName = entry.getValue();
+        try {
+            while (running) {
+                for (Map.Entry<ZMQ.Socket, String> entry : monitorSocketNames.entrySet()) {
+                    ZMQ.Socket monitorSocket = entry.getKey();
+                    String socketName = entry.getValue();
+                    ZMQ.Event event = ZMQ.Event.recv(monitorSocket);
 
-                ZMQ.Event event = ZMQ.Event.recv(monitorSocket, ZMQ.DONTWAIT);
-                if (event != null) {
-                    String clientAddress = event.getAddress();
+                    if (event != null) {
+                        String clientAddress = event.getAddress();
 
-                    if (clientAddress == null) continue;
+                        if (clientAddress == null) continue;
 
-                    switch (event.getEvent()) {
-                        case ZMQ.EVENT_ACCEPTED -> {
-                            clientMap.get(socketName).add(clientAddress);
-                            onClientConnected(socketName, clientAddress, clientMap.get(socketName).size());
-                        }
-                        case ZMQ.EVENT_DISCONNECTED -> {
-                            clientMap.get(socketName).remove(clientAddress);
-                            onClientDisconnected(socketName, clientAddress, clientMap.get(socketName).size());
+                        switch (event.getEvent()) {
+                            case ZMQ.EVENT_ACCEPTED -> {
+                                clientMap.get(socketName).add(clientAddress);
+                                onClientConnected(socketName, clientAddress, clientMap.get(socketName).size());
+                            }
+                            case ZMQ.EVENT_DISCONNECTED -> {
+                                clientMap.get(socketName).remove(clientAddress);
+                                onClientDisconnected(socketName, clientAddress, clientMap.get(socketName).size());
+                            }
                         }
                     }
                 }
             }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+        } catch (Exception e) {
+            System.err.println("Error in ZeroMQ event loop: " + e.getMessage());
+        } finally {
+            cleanup();
         }
-
-        cleanup();
     }
+
 
     @Override
     public void interrupt() {

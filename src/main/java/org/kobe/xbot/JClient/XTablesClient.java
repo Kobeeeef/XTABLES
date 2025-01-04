@@ -73,7 +73,7 @@ public class XTablesClient {
     private String XTABLES_CLIENT_VERSION =
             "XTABLES Jero Client v2.0.0 | Build Date: 1/3/2025";
     private String ip;
-    private int requestSocketPort;
+    private final int requestSocketPort;
 
     /**
      * Default constructor for XTablesClient.
@@ -117,11 +117,13 @@ public class XTablesClient {
             if (this.ip == null) {
                 throw new XTablesServerNotFound("Could not resolve XTABLES hostname server.");
             }
+        } else {
+            this.ip = ip;
         }
-        this.ip = ip;
+
         this.requestSocketPort = requestSocketPort;
-        logger.info("\n" +
-                "Connecting to XTABLES Server...\n" +
+        logger.info(
+                "Connecting to XTABLES Server:\n" +
                 "------------------------------------------------------------\n" +
                 "Server IP: " + this.ip + "\n" +
                 "Push Socket Port: " + pushSocketPort + "\n" +
