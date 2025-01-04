@@ -1,6 +1,10 @@
 package org.kobe.xbot.Utilities;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.protobuf.ByteString;
+import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +23,10 @@ import java.util.List;
  * This class is a part of the XTABLES project and provides essential utility functions for byte conversion in data processing.
  */
 public class XTablesByteUtils {
+    private static final Gson gson = new GsonBuilder()
+            .disableHtmlEscaping()
+            .setLenient()
+            .create();
     /**
      * Converts a byte array into an integer.
      * <p>
@@ -252,4 +260,38 @@ public class XTablesByteUtils {
     public static byte[] fromString(String i) {
         return i.getBytes(StandardCharsets.UTF_8);
     }
+
+    /**
+     * Converts an object into a byte array.
+     * <p>
+     * This method serializes the provided object into a JSON string using Gson,
+     * then converts the JSON string into a byte array using UTF-8 encoding.
+     *
+     * @param v The object to convert.
+     * @return A byte array representing the object in JSON format.
+     */
+    public static byte[] fromObject(Object v) {
+        return fromString(gson.toJson(v));
+    }
+
+    /**
+     * Converts a byte array back into an object of the specified class type.
+     * <p>
+     * This method deserializes the byte array into a JSON string, then uses Gson
+     * to convert the JSON string into an object of the specified type.
+     *
+     * @param v     The byte array to convert.
+     * @param clazz The class type of the object to return.
+     * @param <T>   The type of the object.
+     * @return The deserialized object of type T.
+     * @throws XTablesException If there is an error during deserialization.
+     */
+    public static <T> T toObject(byte[] v, Class<T> clazz) {
+        try {
+            return gson.fromJson(toString(v), clazz);
+        } catch (JsonSyntaxException e) {
+            throw new XTablesException(e);
+        }
+    }
+
 }

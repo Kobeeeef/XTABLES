@@ -3,17 +3,18 @@ package org.kobe.xbot.JServer;
 
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
-import org.kobe.xbot.Utilities.DataCompression;
+import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
-import org.kobe.xbot.Utilities.SystemStatistics;
-import org.kobe.xbot.Utilities.Utilities;
 import org.zeromq.ZMQ;
 
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * ReplyRequestHandler - A handler for processing reply requests using JeroMQ.
@@ -153,12 +154,23 @@ public class ReplyRequestHandler extends BaseHandler {
                             }
                         }
                         case INFORMATION -> {
-//                            SystemStatistics systemStatistics = new SystemStatistics(instance);
-//                            byte[] serialized = Utilities.serializeObject(systemStatistics);
-//                            socket.send(XTableProto.XTableMessage.newBuilder()
-//                                    .setCommand(command)
-//                                    .setValue(ByteString.copyFrom(serialized))
-//                                    .build().toByteArray(), ZMQ.DONTWAIT);
+                            SystemStatistics systemStatistics = new SystemStatistics(instance);
+                            systemStatistics.setClientDataList(((List<XTableClientStatistics.ClientStatistics>) instance.getClientRegistry().getClients().clone()).stream().map(m -> {
+                                ClientData data = new ClientData(m.getIp(),
+                                        m.getHostname(),
+                                        m.getUuid());
+                                data.setStats(gson.toJson(ClientStatistics.fromProtobuf(m)));
+                                return data;
+                            }).collect(Collectors.toList()));
+                            try {
+                                systemStatistics.setHostname(InetAddress.getLocalHost().getHostName());
+                            } catch (Exception ignored) {
+                            }
+                            byte[] serialized = XTablesByteUtils.fromObject(systemStatistics);
+                            socket.send(XTableProto.XTableMessage.newBuilder()
+                                    .setCommand(command)
+                                    .setValue(ByteString.copyFrom(serialized))
+                                    .build().toByteArray(), ZMQ.DONTWAIT);
                         }
                         case DEBUG -> {
                             if (message.hasValue()) {

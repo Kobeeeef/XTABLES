@@ -3,6 +3,7 @@ package org.kobe.xbot.Tests;
 import com.google.protobuf.ByteString;
 import org.kobe.xbot.JClient.XTablesClient;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.SystemStatistics;
 import org.kobe.xbot.Utilities.XTablesByteUtils;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -24,13 +25,13 @@ public class PullPushProducer {
                 .build()
                 .toByteArray()));
 
-            byte[] imageBytes = Files.readAllBytes(Paths.get("ping_page.png"));
+            byte[] imageBytes = Files.readAllBytes(Paths.get("D:\\stuff\\IdeaProjects\\XTABLES\\src\\main\\resources\\static\\logo.png"));
             int i = 0;
         i++;
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(i).array();
             while (!Thread.currentThread().isInterrupted()) {
 
-                  client.publish("a", valueBytes);
+                client.publish("h", new byte[]{});
 
 
 

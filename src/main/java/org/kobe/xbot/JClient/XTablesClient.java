@@ -7,8 +7,10 @@ import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.SystemStatistics;
 import org.kobe.xbot.Utilities.TempConnectionManager;
 import org.kobe.xbot.Utilities.Utilities;
+import org.kobe.xbot.Utilities.XTablesByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.SocketType;
@@ -62,7 +64,7 @@ public class XTablesClient {
     private final ZContext context;
     private final ZMQ.Socket subSocket;
     private final ZMQ.Socket pushSocket;
-    private final ZMQ.Socket reqSocket;
+    private ZMQ.Socket reqSocket;
     private final SubscribeHandler subscribeHandler;
     // =============================================================
     // Instance Variables
@@ -70,6 +72,8 @@ public class XTablesClient {
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
             "XTABLES Jero Client v1.0.0 | Build Date: 1/2/2025";
+    private String ip;
+    private int requestSocketPort;
 
     /**
      * Default constructor for XTablesClient.
@@ -109,15 +113,17 @@ public class XTablesClient {
      */
     public XTablesClient(String ip, int pushSocketPort, int requestSocketPort, int subscribeSocketPort) {
         if (ip == null) {
-            ip = resolveHostByName();
-            if (ip == null) {
+            this.ip = resolveHostByName();
+            if (this.ip == null) {
                 throw new XTablesServerNotFound("Could not resolve XTABLES hostname server.");
             }
         }
+        this.ip = ip;
+        this.requestSocketPort = requestSocketPort;
         logger.info("\n" +
                 "Connecting to XTABLES Server...\n" +
                 "------------------------------------------------------------\n" +
-                "Server IP: " + ip + "\n" +
+                "Server IP: " + this.ip + "\n" +
                 "Push Socket Port: " + pushSocketPort + "\n" +
                 "Request Socket Port: " + requestSocketPort + "\n" +
                 "Subscribe Socket Port: " + subscribeSocketPort + "\n" +
@@ -125,14 +131,14 @@ public class XTablesClient {
         this.context = new ZContext();
         this.pushSocket = context.createSocket(SocketType.PUSH);
         this.pushSocket.setHWM(500);
-        this.pushSocket.connect("tcp://" + ip + ":" + pushSocketPort);
+        this.pushSocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
         this.reqSocket = context.createSocket(SocketType.REQ);
         this.reqSocket.setHWM(500);
-        this.reqSocket.connect("tcp://" + ip + ":" + requestSocketPort);
+        this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
         this.reqSocket.setReceiveTimeOut(3000);
         this.subSocket = context.createSocket(SocketType.SUB);
         this.subSocket.setHWM(500);
-        this.subSocket.connect("tcp://" + ip + ":" + subscribeSocketPort);
+        this.subSocket.connect("tcp://" + this.ip + ":" + subscribeSocketPort);
         this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
                 .build().toByteArray());
@@ -145,7 +151,13 @@ public class XTablesClient {
         this.subscribeHandler.start();
 
     }
-
+    private void reconnectRequestSocket() {
+        this.reqSocket.close();
+        this.reqSocket = context.createSocket(SocketType.REQ);
+        this.reqSocket.setHWM(500);
+        this.reqSocket.setReceiveTimeOut(3000);
+        this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
+    }
     /**
      * Sends a PUT request with a byte array value to the server.
      * <p>
@@ -464,8 +476,12 @@ public class XTablesClient {
                     .build()
                     .toByteArray());
             return XTableProto.XTableMessage.parseFrom(reqSocket.recv());
-        } catch (InvalidProtocolBufferException | NullPointerException | ZMQException e) {
+        } catch (InvalidProtocolBufferException | NullPointerException e) {
             logger.warning(e.getMessage());
+            return null;
+        } catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
             return null;
         }
     }
@@ -489,8 +505,35 @@ public class XTablesClient {
             byte[] response = reqSocket.recv();
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             return message.hasValue() && message.getValue().equals(successByte);
-        } catch (InvalidProtocolBufferException | NullPointerException | ZMQException e) {
+        } catch (InvalidProtocolBufferException | NullPointerException e) {
             return false;
+        }catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
+            return false;
+        }
+    }
+
+    public SystemStatistics getServerStatistics() {
+        try {
+            reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setCommand(XTableProto.XTableMessage.Command.INFORMATION)
+                    .build()
+                    .toByteArray());
+            byte[] response = reqSocket.recv();
+            if (response == null) return null;
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            if (message.hasValue()) {
+                return XTablesByteUtils.toObject(message.getValue().toByteArray(), SystemStatistics.class);
+            } else {
+                return null;
+            }
+        } catch (InvalidProtocolBufferException | NullPointerException | XTablesException e) {
+            return null;
+        } catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
+            return null;
         }
     }
 
@@ -525,8 +568,12 @@ public class XTablesClient {
             if (!message.hasValue())
                 return false;
             return message.getValue().equals(successByte);
-        } catch (InvalidProtocolBufferException | NullPointerException | ZMQException e) {
+        } catch (InvalidProtocolBufferException | NullPointerException e) {
             logger.warning(e.getMessage());
+            return false;
+        }catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
             return false;
         }
     }
@@ -575,6 +622,10 @@ public class XTablesClient {
             return Utilities.fromByteArray(message.getValue().toByteArray(), String.class);
         } catch (InvalidProtocolBufferException | NullPointerException e) {
             return Collections.EMPTY_LIST;
+        }catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
+            return Collections.EMPTY_LIST;
         }
     }
 
@@ -614,6 +665,10 @@ public class XTablesClient {
             else return false;
         } catch (InvalidProtocolBufferException e) {
             return false;
+        }catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
+            return false;
         }
     }
 
@@ -639,7 +694,11 @@ public class XTablesClient {
             if (message.hasValue()) {
                 return new PingResponse(message.getValue().equals(successByte), diff);
             } else return new PingResponse(false, -1);
-        } catch (InvalidProtocolBufferException | ZMQException e) {
+        } catch (InvalidProtocolBufferException e) {
+            return new PingResponse(false, -1);
+        }catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
             return new PingResponse(false, -1);
         }
     }
