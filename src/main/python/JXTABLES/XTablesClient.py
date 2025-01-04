@@ -34,7 +34,7 @@ class XTablesClient:
     # ================================================================
     # Instance Variables
     # ================================================================
-    XTABLES_CLIENT_VERSION = "XTABLES JPython Client v1.0.0 | Build Date: 1/2/2025"
+    XTABLES_CLIENT_VERSION = "XTABLES JPython Client v5.0.9 | Build Date: 1/3/2025"
 
     def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737, buffer_size=500):
         self.debug = True
