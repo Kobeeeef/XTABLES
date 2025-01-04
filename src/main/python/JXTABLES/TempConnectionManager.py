@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 
 class TempConnectionManager:
@@ -28,13 +29,17 @@ class TempConnectionManager:
 
         @return: the stored IP address, or None if the file does not exist or cannot be read.
         """
-        temp_file = os.path.join(os.getenv("TEMP"), "PYTHON-XTABLES-TEMP-CONNECTION.tmp")
-        if os.path.exists(temp_file):
-            try:
-                with open(temp_file, 'r') as file:
-                    return file.read().strip()
-            except IOError as e:
-                print(f"Error reading the file: {e}")
+        try:
+            temp_dir = tempfile.gettempdir()
+            temp_file = os.path.join(temp_dir, "PYTHON-XTABLES-TEMP-CONNECTION.tmp")
+            if os.path.exists(temp_file):
+                try:
+                    with open(temp_file, 'r') as file:
+                        return file.read().strip()
+                except IOError as e:
+                    print(f"Error reading the file: {e}")
+        except Exception as e:
+            print(f"Error getting temp IP: {e}")
         return None
 
     @staticmethod
@@ -45,15 +50,23 @@ class TempConnectionManager:
         This method removes the temporary file where the IP address is stored. If the file
         does not exist, nothing happens.
         """
-        temp_file = os.path.join(os.getenv("TEMP"), "PYTHON-XTABLES-TEMP-CONNECTION.tmp")
-        if os.path.exists(temp_file):
-            try:
-                os.remove(temp_file)
-                print("Temporary connection file deleted.")
-            except IOError as e:
-                print(f"Error deleting the file: {e}")
-        else:
-            print("No temporary connection file found to delete.")
+        try:
+            temp_dir = tempfile.gettempdir()
+            temp_file = os.path.join(temp_dir, "PYTHON-XTABLES-TEMP-CONNECTION.tmp")
+            if os.path.exists(temp_file):
+                try:
+                    os.remove(temp_file)
+                    print("Temporary connection file deleted.")
+                    return True
+                except IOError as e:
+                    print(f"Error deleting the file: {e}")
+                    return False
+            else:
+                print("No temporary connection file found to delete.")
+                return False
+        except Exception as e:
+            print(f"Error invalidating temp IP: {e}")
+            return False
 
     @staticmethod
     def set(ip_address):
@@ -66,8 +79,15 @@ class TempConnectionManager:
         @param ip_address: the IP address to store in the temporary file.
         """
         try:
-            temp_file = os.path.join(os.getenv("TEMP"), "PYTHON-XTABLES-TEMP-CONNECTION.tmp")
-            with open(temp_file, 'w') as file:
-                file.write(ip_address)
-        except IOError as e:
-            print(f"Error writing to the file: {e}")
+            temp_dir = tempfile.gettempdir()
+            temp_file = os.path.join(temp_dir, "PYTHON-XTABLES-TEMP-CONNECTION.tmp")
+            try:
+                with open(temp_file, 'w') as file:
+                    file.write(ip_address)
+                return True
+            except IOError as e:
+                print(f"Error writing to the file: {e}")
+                return False
+        except Exception as e:
+            print(f"Error setting temp IP: {e}")
+            return False
