@@ -71,7 +71,7 @@ public class XTablesClient {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v1.0.0 | Build Date: 1/2/2025";
+            "XTABLES Jero Client v2.0.0 | Build Date: 1/3/2025";
     private String ip;
     private int requestSocketPort;
 
