@@ -37,7 +37,7 @@ class XTablesClient:
     XTABLES_CLIENT_VERSION = "XTABLES JPython Client v5.0.9 | Build Date: 1/3/2025"
 
     def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737, buffer_size=500):
-        self.debug = True
+        self.debug = False
         self.BUFFER_SIZE = buffer_size
         self.context = zmq.Context()
         self.push_socket = self.context.socket(zmq.PUSH)
