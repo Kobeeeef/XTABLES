@@ -29,8 +29,14 @@ public class XTablesLogger extends Logger {
     }
 
     public static XTablesLogger getLogger() {
+        return getLogger(loggerName);
+    }
+    public static XTablesLogger getLogger(Class<?> clazz) {
+        return getLogger(clazz.getName());
+    }
+    public static XTablesLogger getLogger(String className) {
         if (instance == null) {
-            XTablesLogger logger = new XTablesLogger(loggerName, null);
+            XTablesLogger logger = new XTablesLogger(className, null);
             logger.setLevel(defaultLevel);
             ConsoleHandler consoleHandler = new ConsoleHandler();
             consoleHandler.setFormatter(new XTablesFormatter());

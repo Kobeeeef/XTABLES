@@ -16,9 +16,10 @@ public class PullPushProducer {
         int i = 0;
 
         while (!Thread.currentThread().isInterrupted()) {
-
-            client.putBytes("h", ByteBuffer.allocate(4).putInt(i).array());
-
+            i++;
+            client.publish("h", ByteBuffer.allocate(4).putInt(i).array());
+            System.out.println(i);
+            Thread.sleep(1);
         }
 
 

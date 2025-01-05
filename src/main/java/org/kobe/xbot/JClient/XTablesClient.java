@@ -133,13 +133,19 @@ public class XTablesClient {
         this.context = new ZContext(2);
         this.pushSocket = context.createSocket(SocketType.PUSH);
         this.pushSocket.setHWM(500);
+        this.pushSocket.setReconnectIVL(1000);
+        this.pushSocket.setReconnectIVLMax(1000);
         this.pushSocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
         this.reqSocket = context.createSocket(SocketType.REQ);
         this.reqSocket.setHWM(500);
+        this.reqSocket.setReconnectIVL(1000);
+        this.reqSocket.setReconnectIVLMax(1000);
         this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
         this.reqSocket.setReceiveTimeOut(3000);
         this.subSocket = context.createSocket(SocketType.SUB);
         this.subSocket.setHWM(500);
+        this.subSocket.setReconnectIVL(1000);
+        this.subSocket.setReconnectIVLMax(1000);
         this.subSocket.connect("tcp://" + this.ip + ":" + subscribeSocketPort);
         this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)

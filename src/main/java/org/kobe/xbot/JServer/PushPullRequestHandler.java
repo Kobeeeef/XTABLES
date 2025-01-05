@@ -53,7 +53,6 @@ public class PushPullRequestHandler extends BaseHandler {
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
                     processMessage(message);
                 } catch (Exception e) {
-                    e.printStackTrace();
                     handleException(e);
                 }
             }
@@ -87,7 +86,6 @@ public class PushPullRequestHandler extends BaseHandler {
             }
             case PUBLISH -> {
                 if (message.hasKey() && message.hasValue()) {
-                    instance.publishMessages.incrementAndGet();
                     instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                             .setKey(message.getKey())
                             .setType(message.getType())

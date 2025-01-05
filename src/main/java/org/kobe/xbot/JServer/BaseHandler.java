@@ -13,7 +13,7 @@ import org.zeromq.ZMQ;
  * Version: 1.0
  */
 public abstract class BaseHandler extends Thread {
-    protected static final XTablesLogger logger = XTablesLogger.getLogger();
+    protected static final XTablesLogger logger = XTablesLogger.getLogger(BaseHandler.class);
     protected final ZMQ.Socket socket;
 
     /**

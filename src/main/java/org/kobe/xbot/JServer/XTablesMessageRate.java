@@ -43,12 +43,6 @@ public class XTablesMessageRate {
 
             // Update the last time to current time for the next iteration
             lastTime = currentTime;
-            if (System.currentTimeMillis() % 60000 < 100) { // Every 60 seconds, check and reset
-                pullMessages.set(0);
-                replyMessages.set(0);
-                publishMessages.set(0);
-            }
-
         }, 0, 500, TimeUnit.MILLISECONDS);
     }
 

@@ -1,11 +1,13 @@
 package org.kobe.xbot.JServer;
 
+import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import java.util.*;
 
 public class XTablesSocketMonitor extends Thread {
+    private static final XTablesLogger logger = XTablesLogger.getLogger();
     private final ZContext context;
     private final Map<ZMQ.Socket, String> monitorSocketNames = new HashMap<>();
     private final Map<String, List<String>> clientMap = new HashMap<>();
@@ -18,7 +20,16 @@ public class XTablesSocketMonitor extends Thread {
 
     public XTablesSocketMonitor addSocket(String socketName, ZMQ.Socket socket) {
         String monitorAddress = "inproc://monitor-" + socket.hashCode();
-        socket.monitor(monitorAddress, ZMQ.EVENT_ACCEPTED | ZMQ.EVENT_DISCONNECTED);
+        socket.monitor(monitorAddress,
+                ZMQ.EVENT_ACCEPTED |
+                        ZMQ.EVENT_BIND_FAILED |
+                        ZMQ.EVENT_CLOSED |
+                        ZMQ.EVENT_CONNECTED |
+                        ZMQ.EVENT_CONNECT_DELAYED |
+                        ZMQ.EVENT_CONNECT_RETRIED |
+                        ZMQ.EVENT_DISCONNECTED |
+                        ZMQ.EVENT_LISTENING |
+                        ZMQ.EVENT_MONITOR_STOPPED);
         ZMQ.Socket monitorSocket = context.createSocket(ZMQ.PAIR);
         monitorSocket.connect(monitorAddress);
 
@@ -37,20 +48,7 @@ public class XTablesSocketMonitor extends Thread {
                     ZMQ.Event event = ZMQ.Event.recv(monitorSocket);
 
                     if (event != null) {
-                        String clientAddress = event.getAddress();
-
-                        if (clientAddress == null) continue;
-
-                        switch (event.getEvent()) {
-                            case ZMQ.EVENT_ACCEPTED -> {
-                                clientMap.get(socketName).add(clientAddress);
-                                onClientConnected(socketName, clientAddress, clientMap.get(socketName).size());
-                            }
-                            case ZMQ.EVENT_DISCONNECTED -> {
-                                clientMap.get(socketName).remove(clientAddress);
-                                onClientDisconnected(socketName, clientAddress, clientMap.get(socketName).size());
-                            }
-                        }
+                        handleEvent(socketName, event);
                     }
                 }
             }
@@ -61,6 +59,24 @@ public class XTablesSocketMonitor extends Thread {
         }
     }
 
+    private void handleEvent(String socketName, ZMQ.Event event) {
+        String clientAddress = event.getAddress();
+
+        if (clientAddress == null && event.getEvent() != ZMQ.EVENT_MONITOR_STOPPED) return;
+
+        switch (event.getEvent()) {
+            case ZMQ.EVENT_ACCEPTED -> onClientConnected(socketName, clientAddress, clientMap.get(socketName).size());
+            case ZMQ.EVENT_DISCONNECTED -> onClientDisconnected(socketName, clientAddress, clientMap.get(socketName).size());
+            case ZMQ.EVENT_CONNECTED -> logger.info("Socket connected: " + socketName + " to " + clientAddress);
+            case ZMQ.EVENT_CONNECT_DELAYED -> logger.warning("Connection delayed: " + socketName + " to " + clientAddress);
+            case ZMQ.EVENT_CONNECT_RETRIED -> logger.info("Connection retried: " + socketName + " to " + clientAddress);
+            case ZMQ.EVENT_BIND_FAILED -> logger.severe("Bind failed on socket: " + socketName);
+            case ZMQ.EVENT_CLOSED -> logger.info("Socket closed: " + socketName);
+            case ZMQ.EVENT_LISTENING -> logger.info("Socket is listening: " + socketName);
+            case ZMQ.EVENT_MONITOR_STOPPED -> logger.warning("Monitor stopped for socket: " + socketName);
+            default -> logger.fatal("Unhandled event: " + event.getEvent() + " on socket: " + socketName);
+        }
+    }
 
     @Override
     public void interrupt() {

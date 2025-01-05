@@ -56,6 +56,7 @@ public abstract class BaseHandler extends Thread {
      * Logs exceptions that occur during thread execution.
      */
     protected void handleException(Exception exception) {
+        exception.printStackTrace();
         logger.severe("Exception in thread " + getName() + ": " + exception.getMessage());
     }
 }

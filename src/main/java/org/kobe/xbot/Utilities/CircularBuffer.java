@@ -22,6 +22,15 @@ public class CircularBuffer<T> {
         this.buffer = new Object[capacity];
         this.shouldRemove = shouldRemove;
     }
+    public CircularBuffer(int capacity) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Buffer size must be greater than 0");
+        }
+        this.capacity = capacity;
+        this.buffer = new Object[capacity];
+        this.shouldRemove = null;
+    }
+
 
     // Write data to the buffer
     public void write(T data) {
@@ -32,7 +41,7 @@ public class CircularBuffer<T> {
             if (size < capacity) {
                 size++;
             }
-            notEmpty.signalAll(); // Notify any waiting readers
+            notEmpty.signalAll();
         } finally {
             lock.unlock();
         }
@@ -67,7 +76,7 @@ public class CircularBuffer<T> {
             // Read the data in FIFO order
             int readIndex = (writeIndex - size + capacity) % capacity;
             T data = (T) buffer[readIndex];
-            buffer[readIndex] = null; // Clear the read slot
+            buffer[readIndex] = null;
             size--;
             return data;
         } finally {
