@@ -124,12 +124,12 @@ public class XTablesClient {
         this.requestSocketPort = requestSocketPort;
         logger.info(
                 "Connecting to XTABLES Server:\n" +
-                "------------------------------------------------------------\n" +
-                "Server IP: " + this.ip + "\n" +
-                "Push Socket Port: " + pushSocketPort + "\n" +
-                "Request Socket Port: " + requestSocketPort + "\n" +
-                "Subscribe Socket Port: " + subscribeSocketPort + "\n" +
-                "------------------------------------------------------------");
+                        "------------------------------------------------------------\n" +
+                        "Server IP: " + this.ip + "\n" +
+                        "Push Socket Port: " + pushSocketPort + "\n" +
+                        "Request Socket Port: " + requestSocketPort + "\n" +
+                        "Subscribe Socket Port: " + subscribeSocketPort + "\n" +
+                        "------------------------------------------------------------");
         this.context = new ZContext(2);
         this.pushSocket = context.createSocket(SocketType.PUSH);
         this.pushSocket.setHWM(500);
@@ -159,6 +159,7 @@ public class XTablesClient {
         this.subscribeHandler.start();
 
     }
+
     private void reconnectRequestSocket() {
         this.reqSocket.close();
         this.reqSocket = context.createSocket(SocketType.REQ);
@@ -166,6 +167,7 @@ public class XTablesClient {
         this.reqSocket.setReceiveTimeOut(3000);
         this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
     }
+
     /**
      * Sends a PUT request with a byte array value to the server.
      * <p>
@@ -177,7 +179,7 @@ public class XTablesClient {
      * @return True if the message was sent successfully; otherwise, false.
      */
     public boolean putBytes(String key, byte[] value) {
-        return sendPutMessage(key, value, XTableProto.XTableMessage.Type.UNKNOWN);
+        return sendPutMessage(key, value, XTableProto.XTableMessage.Type.BYTES);
     }
 
     /**
@@ -193,6 +195,20 @@ public class XTablesClient {
      */
     public boolean putBytes(String key, byte[] value, XTableProto.XTableMessage.Type type) {
         return sendPutMessage(key, value, type);
+    }
+
+    /**
+     * Sends a PUT request with a byte array value to the server with an UNKNOWN message type.
+     * <p>
+     * This method is a convenience method that uses the UNKNOWN type for sending byte array data.
+     * </p>
+     *
+     * @param key   The key associated with the value. This is the identifier for the data.
+     * @param value The byte array value to be sent. Contains the data to be sent to the server.
+     * @return True if the message was sent successfully; otherwise, false.
+     */
+    public boolean putUnknownBytes(String key, byte[] value) {
+        return sendPutMessage(key, value, XTableProto.XTableMessage.Type.UNKNOWN);
     }
 
     /**
@@ -515,7 +531,7 @@ public class XTablesClient {
             return message.hasValue() && message.getValue().equals(successByte);
         } catch (InvalidProtocolBufferException | NullPointerException e) {
             return false;
-        }catch (ZMQException e) {
+        } catch (ZMQException e) {
             logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
             reconnectRequestSocket();
             return false;
@@ -579,7 +595,7 @@ public class XTablesClient {
         } catch (InvalidProtocolBufferException | NullPointerException e) {
             logger.warning(e.getMessage());
             return false;
-        }catch (ZMQException e) {
+        } catch (ZMQException e) {
             logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
             reconnectRequestSocket();
             return false;
@@ -630,7 +646,7 @@ public class XTablesClient {
             return Utilities.fromByteArray(message.getValue().toByteArray(), String.class);
         } catch (InvalidProtocolBufferException | NullPointerException e) {
             return Collections.EMPTY_LIST;
-        }catch (ZMQException e) {
+        } catch (ZMQException e) {
             logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
             reconnectRequestSocket();
             return Collections.EMPTY_LIST;
@@ -673,7 +689,7 @@ public class XTablesClient {
             else return false;
         } catch (InvalidProtocolBufferException e) {
             return false;
-        }catch (ZMQException e) {
+        } catch (ZMQException e) {
             logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
             reconnectRequestSocket();
             return false;
@@ -704,7 +720,7 @@ public class XTablesClient {
             } else return new PingResponse(false, -1);
         } catch (InvalidProtocolBufferException e) {
             return new PingResponse(false, -1);
-        }catch (ZMQException e) {
+        } catch (ZMQException e) {
             logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
             reconnectRequestSocket();
             return new PingResponse(false, -1);

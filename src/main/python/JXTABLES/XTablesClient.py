@@ -41,10 +41,14 @@ class XTablesClient:
         self.BUFFER_SIZE = buffer_size
         self.context = zmq.Context()
         self.push_socket = self.context.socket(zmq.PUSH)
+        self.push_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
+        self.push_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 1000)
         self.req_socket = self.context.socket(zmq.REQ)
         self.req_socket.set_hwm(500)
         self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
         self.sub_socket = self.context.socket(zmq.SUB)
+        self.sub_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
+        self.sub_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 1000)
         self.sub_socket.set_hwm(500)
         self.subscribe_messages_count = 0
         self.subscription_consumers = {}
@@ -92,6 +96,10 @@ class XTablesClient:
         self.req_socket.close()
         self.req_socket = self.context.socket(zmq.REQ)
         self.req_socket.set_hwm(500)
+        self.req_socket.setsockopt(zmq.REQ_RELAXED, 1)
+        self.req_socket.setsockopt(zmq.TCP_KEEPALIVE, 1)
+        self.req_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
+        self.req_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 1000)
         self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
         self.req_socket.connect(f"tcp://{self.ip}:{self.req_port}")
 
@@ -171,7 +179,7 @@ class XTablesClient:
                         else:
                             if self.debug:
                                 self.logger.error("Failed to resolve 'XTablesService' using Zeroconf. Retrying in 1 "
-                                             "second...")
+                                                  "second...")
                     except Exception as e:
                         if self.debug:
                             traceback.print_exc()
@@ -501,15 +509,15 @@ class XTablesServerNotFound(Exception):
 #         XTablesByteUtils.to_string(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 #
 #
-# if __name__ == "__main__":
-#     client = XTablesClient()
-#
-#     #client.subscribe_all(consumer)
-#     time.sleep(100000)
-#     client.putBytes("test", b'ok')
-#     while True:
-#         print(client.getBytes("test"))
-#
-#     # print(client.getUnknownBytes("name"))
-#     # print(client.getString("age"))
-#     # print(client.getArray("numbers"))
+if __name__ == "__main__":
+    client = XTablesClient()
+
+    #client.subscribe_all(consumer)
+
+    client.putBytes("test", b'ok')
+    while True:
+        print(client.getBytes("test"))
+
+    # print(client.getUnknownBytes("name"))
+    # print(client.getString("age"))
+    # print(client.getArray("numbers"))

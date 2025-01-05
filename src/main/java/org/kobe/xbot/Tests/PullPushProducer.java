@@ -4,6 +4,7 @@ import org.kobe.xbot.JClient.XTablesClient;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -17,9 +18,9 @@ public class PullPushProducer {
 
         while (!Thread.currentThread().isInterrupted()) {
             i++;
-            client.publish("h", ByteBuffer.allocate(4).putInt(i).array());
+            client.putBytes("test", "lmaao".getBytes(StandardCharsets.UTF_8));
             System.out.println(i);
-            Thread.sleep(1);
+            Thread.sleep(100000);
         }
 
 
