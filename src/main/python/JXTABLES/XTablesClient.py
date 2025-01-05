@@ -509,15 +509,15 @@ class XTablesServerNotFound(Exception):
 #         XTablesByteUtils.to_string(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 #
 #
-if __name__ == "__main__":
-    client = XTablesClient()
-
-    #client.subscribe_all(consumer)
-
-    client.putBytes("test", b'ok')
-    while True:
-        print(client.getBytes("test"))
-
-    # print(client.getUnknownBytes("name"))
-    # print(client.getString("age"))
-    # print(client.getArray("numbers"))
+# if __name__ == "__main__":
+#     client = XTablesClient()
+#
+#     #client.subscribe_all(consumer)
+#
+#     client.putBytes("test", b'ok')
+#     while True:
+#         print(client.getBytes("test"))
+#
+#     # print(client.getUnknownBytes("name"))
+#     # print(client.getString("age"))
+#     # print(client.getArray("numbers"))
