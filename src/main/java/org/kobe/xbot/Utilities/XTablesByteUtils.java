@@ -1,9 +1,8 @@
 package org.kobe.xbot.Utilities;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.google.protobuf.ByteString;
+import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 
 import java.nio.ByteBuffer;
@@ -273,7 +272,99 @@ public class XTablesByteUtils {
     public static byte[] fromObject(Object v) {
         return fromString(gson.toJson(v));
     }
+    /**
+     * Converts a byte array into an object of the specified type.
+     *
+     * @param bytes The byte array to convert.
+     * @param type  The target type.
+     * @param <T>   The type of the object.
+     * @return The converted object of type T.
+     * @throws XTablesException If the type is unknown or the conversion fails.
+     */
+    public static <T> T autoFromBytes(byte[] bytes, XTableProto.XTableMessage.Type type) throws XTablesException {
+        try {
+            // Handle ENUM if specific conversion logic is needed
+            return switch (type) {
+                case STRING -> (T) toString(bytes);
+                case DOUBLE -> (T) Double.valueOf(toDouble(bytes));
+                case INT64 -> (T) Long.valueOf(toLong(bytes));
+                case BOOL -> (T) Boolean.valueOf(toBoolean(bytes));
+                case BYTES -> (T) bytes;
+                case ENUM -> throw new XTablesException("ENUM type is not yet supported.");
+                case MESSAGE -> (T) toObject(bytes, Object.class);
+                case ARRAY -> (T) Utilities.fromByteArray(bytes, Object.class);
+                case OBJECT -> (T) toObject(bytes, Object.class);
+                default -> throw new XTablesException("Unknown type: " + type);
+            };
+        } catch (Exception e) {
+            throw new XTablesException("Failed to convert bytes to " + type, e);
+        }
+    }
+    /**
+     * Converts a JSON string to a byte array based on the detected type.
+     *
+     * @param json The JSON string to convert.
+     * @return A byte array representing the converted JSON value.
+     * @throws XTablesException If the JSON string cannot be converted.
+     */
+    public static byte[] autoStringJsonToBytes(String json) throws XTablesException {
+        try {
+            if (json == null || json.equals("null")) {
+                return XTablesByteUtils.fromString("null");
+            }
+            // Parse the JSON string into a JsonElement
+            JsonElement element = gson.fromJson(json, JsonElement.class);
 
+            // Check the type of the JSON element and convert accordingly
+            if (element.isJsonPrimitive()) {
+                JsonPrimitive primitive = element.getAsJsonPrimitive();
+                if (primitive.isString()) {
+                    return XTablesByteUtils.fromString(primitive.getAsString());
+                } else if (primitive.isBoolean()) {
+                    return XTablesByteUtils.fromBoolean(primitive.getAsBoolean());
+                } else if (primitive.isNumber()) {
+                    if (primitive.getAsLong() <= Integer.MAX_VALUE) {
+                        return XTablesByteUtils.fromInteger(primitive.getAsInt());
+                    } else {
+                        return XTablesByteUtils.fromLong(primitive.getAsLong());
+                    }
+                } else {
+                    return XTablesByteUtils.fromString("UNKNOWN");
+                }
+            } else if (element.isJsonArray()) {
+                JsonArray jsonArray = element.getAsJsonArray();
+                return XTablesByteUtils.fromList(gson.fromJson(jsonArray, List.class));
+            } else if (element.isJsonObject()) {
+                JsonObject jsonObject = element.getAsJsonObject();
+                return XTablesByteUtils.fromObject(gson.fromJson(jsonObject, Object.class));
+            } else {
+                // For unknown types, return the UNKNOWN type
+                JsonObject jsonObject = element.getAsJsonObject();
+                return XTablesByteUtils.fromObject(gson.fromJson(jsonObject, Object.class));
+            }
+        } catch (Exception e) {
+            throw new XTablesException("Failed to convert JSON string to bytes", e);
+        }
+    }
+    /**
+     * Converts a byte array into a JSON string based on the specified type.
+     *
+     * @param bytes The byte array to convert.
+     * @param type  The type of the byte array content.
+     * @return A JSON string representing the byte array's content in the specified type.
+     * @throws XTablesException If there is an error during conversion.
+     */
+    public static String autoFromBytesToJsonString(byte[] bytes, XTableProto.XTableMessage.Type type) throws XTablesException {
+        try {
+            // Convert the byte array to the appropriate object based on the type
+            Object convertedValue = autoFromBytes(bytes, type);
+
+            // Serialize the converted value into a JSON string
+            return gson.toJson(convertedValue);
+        } catch (Exception e) {
+            throw new XTablesException("Failed to convert bytes to JSON for type " + type, e);
+        }
+    }
     /**
      * Converts a byte array back into an object of the specified class type.
      * <p>

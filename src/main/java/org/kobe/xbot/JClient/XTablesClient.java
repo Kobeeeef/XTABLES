@@ -2,15 +2,12 @@ package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.PingResponse;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
-import org.kobe.xbot.Utilities.SystemStatistics;
-import org.kobe.xbot.Utilities.TempConnectionManager;
-import org.kobe.xbot.Utilities.Utilities;
-import org.kobe.xbot.Utilities.XTablesByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.SocketType;
@@ -463,6 +460,24 @@ public class XTablesClient {
             throw new IllegalArgumentException("Expected DOUBLE type, but got: " + message.getType());
         }
     }
+    public byte[] getBytes(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.BYTES)) {
+            return message.getValue().toByteArray();
+        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
+            return null;
+        } else {
+            throw new IllegalArgumentException("Expected DOUBLE type, but got: " + message.getType());
+        }
+    }
+    public byte[] getUnknownBytes(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message != null) {
+            return message.getValue().toByteArray();
+        } else {
+            throw new IllegalArgumentException("Expected DOUBLE type, but got: " + message.getType());
+        }
+    }
 
     /**
      * Executes a GET request to retrieve a List of values associated with the specified key.
@@ -701,6 +716,44 @@ public class XTablesClient {
             logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
             reconnectRequestSocket();
             return false;
+        }
+    }
+
+    /**
+     * Retrieves the raw JSON data from the server.
+     * <p>
+     * This method sends a GET_RAW_JSON request to the server, waits for the response,
+     * and then processes the received message.
+     * If the message contains a valid value,
+     * it decompresses and decodes the Base64-encoded data into a readable JSON string.
+     * In case of an error or an invalid response, it returns null.
+     * <p>
+     * This method handles potential exceptions, including protocol buffer parsing issues
+     * and ZeroMQ communication errors, automatically reconnecting the request socket when necessary.
+     *
+     * @return A string containing the raw JSON data, or null if the request fails or the response is invalid
+     */
+    public String getRawJson() {
+        try {
+            reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setCommand(XTableProto.XTableMessage.Command.GET_RAW_JSON)
+                    .build()
+                    .toByteArray());
+            byte[] response = reqSocket.recv();
+            if (response == null) return null;
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            if (message.hasValue()) {
+                byte[] compressed = message.getValue().toByteArray();
+                byte[] decompressed = DataCompression.decompress(compressed);
+                if(decompressed == null) return null;
+                return new String(decompressed);
+            } else return null;
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        } catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
+            return null;
         }
     }
 

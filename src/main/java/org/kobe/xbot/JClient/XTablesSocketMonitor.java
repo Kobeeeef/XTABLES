@@ -138,6 +138,44 @@ public class XTablesSocketMonitor extends Thread {
     public SocketStatus getStatus(String socketName) {
         return socketStatuses.getOrDefault(socketName, SocketStatus.UNKNOWN);
     }
+    public String getSimplifiedMessage() {
+        // Count the occurrences of each status
+        int connectedCount = 0;
+        int delayedCount = 0;
+        int offCount = 0;
+        int unknownCount = 0;
+
+        for (SocketStatus status : socketStatuses.values()) {
+            switch (status) {
+                case CONNECTED -> connectedCount++;
+                case CONNECT_DELAYED -> delayedCount++;
+                case DISCONNECTED -> offCount++;
+                default -> unknownCount++;
+            }
+        }
+
+        // Build the simplified message string
+        StringBuilder simplifiedMessage = new StringBuilder();
+        if (connectedCount > 0) {
+            simplifiedMessage.append(connectedCount).append("C");
+        }
+        if (delayedCount > 0) {
+            simplifiedMessage.append(delayedCount).append("D");
+        }
+        if (offCount > 0) {
+            simplifiedMessage.append(offCount).append("O");
+        }
+        if (unknownCount > 0) {
+            simplifiedMessage.append(unknownCount).append("U");
+        }
+
+        // Return the simplified message as a string
+        return simplifiedMessage.toString();
+    }
+
+    public boolean isConnected(String socketName) {
+        return getStatus(socketName).equals(SocketStatus.CONNECTED);
+    }
 
     /**
      * The main event loop for monitoring socket events.

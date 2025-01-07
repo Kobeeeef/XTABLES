@@ -84,7 +84,7 @@ public class ReplyRequestHandler extends BaseHandler {
                         }
                         case GET_RAW_JSON -> socket.send(XTableProto.XTableMessage.newBuilder()
                                 .setCommand(command)
-                                .setValue(ByteString.copyFrom(DataCompression.compressAndConvertBase64(XTablesServer.table.toJSON()).getBytes(StandardCharsets.UTF_8)))
+                                .setValue(ByteString.copyFrom(DataCompression.compressString(XTablesServer.table.toJSON())))
                                 .build().toByteArray(), ZMQ.DONTWAIT);
                         case REBOOT_SERVER -> {
                             socket.send(XTableProto.XTableMessage.newBuilder()

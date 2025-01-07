@@ -213,6 +213,11 @@ public class XTablesData {
         if(this.data == null) return null;
         return gson.toJson(new HashMap<>(this.data));
     }
+
+    public XTableProto.XTableMessage.Type getType() {
+        return type;
+    }
+
     public Map<String, XTablesData> getTablesMap() {
         return data;
     }
