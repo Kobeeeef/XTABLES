@@ -75,6 +75,7 @@ public class XTablesClient {
 
     private final String ip;
     private final int requestSocketPort;
+    private XTablesSocketMonitor socketMonitor;
 
     /**
      * Default constructor for XTablesClient.
@@ -132,21 +133,26 @@ public class XTablesClient {
                         "Subscribe Socket Port: " + subscribeSocketPort + "\n" +
                         "------------------------------------------------------------");
         this.context = new ZContext(2);
+        this.socketMonitor = new XTablesSocketMonitor(context);
+        this.socketMonitor.start();
         this.pushSocket = context.createSocket(SocketType.PUSH);
         this.pushSocket.setHWM(500);
         this.pushSocket.setReconnectIVL(1000);
         this.pushSocket.setReconnectIVLMax(1000);
+        this.socketMonitor.addSocket("PUSH", this.pushSocket);
         this.pushSocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
         this.reqSocket = context.createSocket(SocketType.REQ);
         this.reqSocket.setHWM(500);
         this.reqSocket.setReconnectIVL(1000);
         this.reqSocket.setReconnectIVLMax(1000);
+        this.socketMonitor.addSocket("REQUEST", this.reqSocket);
         this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
         this.reqSocket.setReceiveTimeOut(3000);
         this.subSocket = context.createSocket(SocketType.SUB);
         this.subSocket.setHWM(500);
         this.subSocket.setReconnectIVL(1000);
         this.subSocket.setReconnectIVLMax(1000);
+        this.socketMonitor.addSocket("SUBSCRIBE", this.subSocket);
         this.subSocket.connect("tcp://" + this.ip + ":" + subscribeSocketPort);
         this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
@@ -158,12 +164,13 @@ public class XTablesClient {
         this.logConsumers = new ArrayList<>();
         this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
         this.subscribeHandler.start();
-
     }
 
     private void reconnectRequestSocket() {
+        this.socketMonitor.removeSocket("REQUEST");
         this.reqSocket.close();
         this.reqSocket = context.createSocket(SocketType.REQ);
+        this.socketMonitor.addSocket("REQUEST", this.reqSocket);
         this.reqSocket.setHWM(500);
         this.reqSocket.setReceiveTimeOut(3000);
         this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
@@ -958,6 +965,18 @@ public class XTablesClient {
      */
     public ZMQ.Socket getPushSocket() {
         return pushSocket;
+    }
+
+    /**
+     * Retrieves the socket monitor.
+     * The socket monitor is responsible for monitoring the state of the sockets,
+     * handling events such as connections, disconnections, and errors.
+     * It provides real-time updates about the status of each monitored socket.
+     *
+     * @return The XTablesSocketMonitor instance responsible for monitoring socket events.
+     */
+    public XTablesSocketMonitor getSocketMonitor() {
+        return socketMonitor;
     }
 
     /**

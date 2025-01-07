@@ -3,6 +3,7 @@ package org.kobe.xbot.JServer;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Poller;
 
 import java.util.*;
 
@@ -11,10 +12,12 @@ public class XTablesSocketMonitor extends Thread {
     private final ZContext context;
     private final Map<ZMQ.Socket, String> monitorSocketNames = new HashMap<>();
     private final Map<String, List<String>> clientMap = new HashMap<>();
+    private final Poller poller;
     private volatile boolean running = true;
 
     public XTablesSocketMonitor(ZContext context) {
         this.context = context;
+        this.poller = context.createPoller(0); // Create a poller with no initial sockets
         setDaemon(true);
     }
 
@@ -35,6 +38,7 @@ public class XTablesSocketMonitor extends Thread {
 
         monitorSocketNames.put(monitorSocket, socketName);
         clientMap.put(socketName, new ArrayList<>());
+        poller.register(monitorSocket, Poller.POLLIN); // Register monitor socket to poll for events
         return this;
     }
 
@@ -42,13 +46,17 @@ public class XTablesSocketMonitor extends Thread {
     public void run() {
         try {
             while (running) {
-                for (Map.Entry<ZMQ.Socket, String> entry : monitorSocketNames.entrySet()) {
-                    ZMQ.Socket monitorSocket = entry.getKey();
-                    String socketName = entry.getValue();
-                    ZMQ.Event event = ZMQ.Event.recv(monitorSocket);
+                int events = poller.poll(1000); // Poll with timeout to avoid blocking indefinitely
+                if (events > 0) {
+                    for (int i = 0; i < poller.getSize(); i++) {
+                        if (poller.pollin(i)) {
+                            ZMQ.Socket monitorSocket = poller.getSocket(i);
+                            ZMQ.Event event = ZMQ.Event.recv(monitorSocket);
 
-                    if (event != null) {
-                        handleEvent(socketName, event);
+                            if (event != null) {
+                                handleEvent(monitorSocketNames.get(monitorSocket), event);
+                            }
+                        }
                     }
                 }
             }
