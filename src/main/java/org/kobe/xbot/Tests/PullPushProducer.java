@@ -17,10 +17,9 @@ public class PullPushProducer {
         int i = 0;
 
         while (!Thread.currentThread().isInterrupted()) {
-            i++;
-            client.putUnknownBytes("test", "".getBytes(StandardCharsets.UTF_8));
-            System.out.println(i);
-            Thread.sleep(100000);
+
+            client.publish("test", imageBytes);
+
         }
 
 

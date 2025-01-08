@@ -143,12 +143,14 @@ public class XTablesSocketMonitor extends Thread {
         int connectedCount = 0;
         int delayedCount = 0;
         int offCount = 0;
+        int retriedCount = 0;
         int unknownCount = 0;
 
         for (SocketStatus status : socketStatuses.values()) {
             switch (status) {
                 case CONNECTED -> connectedCount++;
                 case CONNECT_DELAYED -> delayedCount++;
+                case CONNECT_RETRIED -> retriedCount++;
                 case DISCONNECTED -> offCount++;
                 default -> unknownCount++;
             }
@@ -167,6 +169,9 @@ public class XTablesSocketMonitor extends Thread {
         }
         if (unknownCount > 0) {
             simplifiedMessage.append(unknownCount).append("U");
+        }
+        if (retriedCount > 0) {
+            simplifiedMessage.append(retriedCount).append("R");
         }
 
         // Return the simplified message as a string
