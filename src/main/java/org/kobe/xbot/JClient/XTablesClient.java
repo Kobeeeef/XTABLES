@@ -460,6 +460,7 @@ public class XTablesClient {
             throw new IllegalArgumentException("Expected DOUBLE type, but got: " + message.getType());
         }
     }
+
     public byte[] getBytes(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.BYTES)) {
@@ -470,6 +471,7 @@ public class XTablesClient {
             throw new IllegalArgumentException("Expected DOUBLE type, but got: " + message.getType());
         }
     }
+
     public byte[] getUnknownBytes(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null) {
@@ -745,7 +747,7 @@ public class XTablesClient {
             if (message.hasValue()) {
                 byte[] compressed = message.getValue().toByteArray();
                 byte[] decompressed = DataCompression.decompress(compressed);
-                if(decompressed == null) return null;
+                if (decompressed == null) return null;
                 return new String(decompressed);
             } else return null;
         } catch (InvalidProtocolBufferException e) {
@@ -959,14 +961,15 @@ public class XTablesClient {
             return tempIp;
         }
         InetAddress address = null;
-        try (JmDNS jmdns = JmDNS.create()) {
-            while (address == null) {
-                try {
-                    logger.info("Attempting to resolve host 'XTABLES.local'...");
-                    address = Inet4Address.getByName("XTABLES.local");
-                    logger.info("Host resolution successful: IP address found at " + address.getHostAddress());
-                    logger.info("Proceeding with socket client initialization.");
-                } catch (UnknownHostException e) {
+
+        while (address == null) {
+            try {
+                logger.info("Attempting to resolve host 'XTABLES.local'...");
+                address = Inet4Address.getByName("XTABLES.local");
+                logger.info("Host resolution successful: IP address found at " + address.getHostAddress());
+                logger.info("Proceeding with socket client initialization.");
+            } catch (UnknownHostException e) {
+                try (JmDNS jmdns = JmDNS.create()) {
                     logger.severe("Failed to resolve 'XTABLES.local'. Host not found. Now attempting jmDNS...");
                     logger.severe("Exception details: " + e);
                     ServiceInfo serviceInfo = jmdns.getServiceInfo("_xtables._tcp.local.", "XTablesService", false, 3000);
@@ -984,16 +987,21 @@ public class XTablesClient {
                     }
 
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(3000);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         logger.warning("Retry wait interrupted. Exiting...");
                         return null;
                     }
+                } catch (IOException ei) {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException ex) {
+                    }
+                    logger.severe("Exception on resolving XTABLES server: " + ei.getMessage());
+                    return resolveHostByName();
                 }
             }
-        } catch (IOException e) {
-            return resolveHostByName();
         }
         String foundIp = address.getHostAddress();
         TempConnectionManager.set(foundIp);
