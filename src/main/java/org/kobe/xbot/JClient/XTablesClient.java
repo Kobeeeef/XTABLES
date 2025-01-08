@@ -55,14 +55,6 @@ public class XTablesClient {
     private static final ByteString successByte = ByteString.copyFrom(success);
     private static final ByteString failByte = ByteString.copyFrom(fail);
     private static final Logger log = LoggerFactory.getLogger(XTablesClient.class);
-    public final AtomicInteger subscribeMessagesCount = new AtomicInteger(0);
-    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> subscriptionConsumers;
-    public final List<Consumer<XTableProto.XTableMessage.XTableLog>> logConsumers;
-    private final ZContext context;
-    private final ZMQ.Socket subSocket;
-    private final ZMQ.Socket pushSocket;
-    private ZMQ.Socket reqSocket;
-    private final SubscribeHandler subscribeHandler;
     // =============================================================
     // Instance Variables
     // These variables are unique to each instance of the class.
@@ -72,8 +64,16 @@ public class XTablesClient {
 
     private final String ip;
     private final int requestSocketPort;
-    private XTablesSocketMonitor socketMonitor;
-
+    private final XTablesSocketMonitor socketMonitor;
+    public final AtomicInteger subscribeMessagesCount = new AtomicInteger(0);
+    public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> subscriptionConsumers;
+    public final List<Consumer<XTableProto.XTableMessage.XTableLog>> logConsumers;
+    private final ZContext context;
+    private final ZMQ.Socket subSocket;
+    private final ZMQ.Socket pushSocket;
+    private final ZMQ.Socket clientRegistrySocket;
+    private ZMQ.Socket reqSocket;
+    private final SubscribeHandler subscribeHandler;
     /**
      * Default constructor for XTablesClient.
      * Initializes the client without specifying an IP address.
@@ -129,7 +129,7 @@ public class XTablesClient {
                         "Request Socket Port: " + requestSocketPort + "\n" +
                         "Subscribe Socket Port: " + subscribeSocketPort + "\n" +
                         "------------------------------------------------------------");
-        this.context = new ZContext(2);
+        this.context = new ZContext(3);
         this.socketMonitor = new XTablesSocketMonitor(context);
         this.socketMonitor.start();
         this.pushSocket = context.createSocket(SocketType.PUSH);
@@ -138,6 +138,12 @@ public class XTablesClient {
         this.pushSocket.setReconnectIVLMax(1000);
         this.socketMonitor.addSocket("PUSH", this.pushSocket);
         this.pushSocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
+        this.clientRegistrySocket = context.createSocket(SocketType.PUSH);
+        this.clientRegistrySocket.setHWM(500);
+        this.clientRegistrySocket.setReconnectIVL(1000);
+        this.clientRegistrySocket.setReconnectIVLMax(1000);
+        this.socketMonitor.addSocket("REGISTRY", this.clientRegistrySocket);
+        this.clientRegistrySocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
         this.reqSocket = context.createSocket(SocketType.REQ);
         this.reqSocket.setHWM(500);
         this.reqSocket.setReconnectIVL(1000);
@@ -1026,6 +1032,16 @@ public class XTablesClient {
      */
     public ZMQ.Socket getPushSocket() {
         return pushSocket;
+    }
+
+    /**
+     * Retrieves the PUSH socket for registry.
+     * The PUSH socket is used for sending messages in a one-way pattern, usually to a PULL socket.
+     *
+     * @return The ZMQ.Socket instance representing the PUSH socket.
+     */
+    public ZMQ.Socket getRegsitrySocket() {
+        return clientRegistrySocket;
     }
 
     /**

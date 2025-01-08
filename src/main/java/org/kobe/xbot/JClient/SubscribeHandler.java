@@ -73,7 +73,7 @@ public class SubscribeHandler extends BaseHandler {
                                         .toProtobuf()
                                                 .toByteArray();
 
-                        instance.getPushSocket().send(XTableProto.XTableMessage.newBuilder()
+                        instance.getRegsitrySocket().send(XTableProto.XTableMessage.newBuilder()
                                 .setId(message.getValue())
                                 .setValue(ByteString.copyFrom(info))
                                 .setCommand(message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION) ? XTableProto.XTableMessage.Command.INFORMATION : XTableProto.XTableMessage.Command.REGISTRY)
