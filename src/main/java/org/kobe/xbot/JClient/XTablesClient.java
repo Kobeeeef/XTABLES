@@ -474,7 +474,7 @@ public class XTablesClient {
         } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
-            throw new IllegalArgumentException("Expected DOUBLE type, but got: " + message.getType());
+            throw new IllegalArgumentException("Expected BYTES type, but got: " + message.getType());
         }
     }
 
@@ -483,7 +483,7 @@ public class XTablesClient {
         if (message != null) {
             return message.getValue().toByteArray();
         } else {
-            throw new IllegalArgumentException("Expected DOUBLE type, but got: " + message.getType());
+            throw new IllegalArgumentException("There was no message received back from the XTABLES server.");
         }
     }
 

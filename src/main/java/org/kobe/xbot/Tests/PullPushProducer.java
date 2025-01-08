@@ -18,7 +18,7 @@ public class PullPushProducer {
 
         while (!Thread.currentThread().isInterrupted()) {
 
-            client.publish("test", imageBytes);
+            client.putUnknownBytes("b", new byte[]{});
 
         }
 
