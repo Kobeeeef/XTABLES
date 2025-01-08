@@ -42,28 +42,3 @@ jobs:
       - name: Upload package to PyPI
         run: |
           twine upload src/main/python/dist/* -u __token__ -p "${{ secrets.PYPI_API_TOKEN }}"
-
-  pypi-publish:
-    runs-on: ubuntu-latest
-    needs:
-      - release-build
-    permissions:
-      id-token: write
-
-    environment:
-      name: pypi
-      url: https://pypi.org/project/XTablesClient/
-
-    steps:
-      - name: Retrieve release distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: release-dists
-          path: dist/
-
-      - name: Publish release distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist/
-        env:
-          PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
