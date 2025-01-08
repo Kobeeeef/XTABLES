@@ -40,7 +40,7 @@ class XTablesClient:
     def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737, buffer_size=500):
         self.debug = False
         self.BUFFER_SIZE = buffer_size
-        self.context = zmq.Context()
+        self.context = zmq.Context(3)
         self.push_socket = self.context.socket(zmq.PUSH)
         self.push_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
         self.push_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 1000)
@@ -98,9 +98,12 @@ class XTablesClient:
     def shutdown(self):
         if self.subscribe_handler:
             self.subscribe_handler.interrupt()
+        if self.socketMonitor:
+            self.socketMonitor.interrupt()
         self.push_socket.close()
         self.req_socket.close()
         self.sub_socket.close()
+        self.context.term()
 
     def _reconnect_req(self):
         self.socketMonitor.remove_socket_by_name("REQUEST")
@@ -527,6 +530,7 @@ class XTablesServerNotFound(Exception):
 #     #client.subscribe_all(consumer)
 #
 #     client.putBytes("test", b'ok')
+#     client.shutdown()
 #     time.sleep(100000)
 #
 #     # print(client.getUnknownBytes("name"))

@@ -122,7 +122,6 @@ class XTablesSocketMonitor(threading.Thread):
 
     def interrupt(self):
         self.running = False
-        super().interrupt()
         self.cleanup()
 
     def cleanup(self):
