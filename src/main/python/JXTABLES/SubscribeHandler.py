@@ -60,7 +60,7 @@ class SubscribeHandler(BaseHandler):
                             if message.category == XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION
                             else XTableProto.XTableMessage.Command.REGISTRY,
                         )
-                        self.instance.push_socket.send(response.SerializeToString(), zmq.DONTWAIT)
+                        self.instance.registry_socket.send(response.SerializeToString(), zmq.DONTWAIT)
                     else:
                         self.buffer.write(message)
 

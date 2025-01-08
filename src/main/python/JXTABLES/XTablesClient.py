@@ -16,6 +16,7 @@ try:
     from .PingResponse import PingResponse
     from .XTablesByteUtils import XTablesByteUtils
     from . import TempConnectionManager as tcm
+    from .XTablesSocketMonitor import XTablesSocketMonitor
 except ImportError:
     # Standalone script imports
     import XTableProto_pb2 as XTableProto
@@ -23,7 +24,7 @@ except ImportError:
     from SubscribeHandler import SubscribeHandler
     from PingResponse import PingResponse
     from XTablesByteUtils import XTablesByteUtils
-
+    from XTablesSocketMonitor import XTablesSocketMonitor
 
 class XTablesClient:
     # ================================================================
@@ -43,6 +44,9 @@ class XTablesClient:
         self.push_socket = self.context.socket(zmq.PUSH)
         self.push_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
         self.push_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 1000)
+        self.registry_socket = self.context.socket(zmq.PUSH)
+        self.registry_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
+        self.registry_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 1000)
         self.req_socket = self.context.socket(zmq.REQ)
         self.req_socket.set_hwm(500)
         self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
@@ -71,8 +75,14 @@ class XTablesClient:
               f"Request Socket Port: {self.req_port}\n"
               f"Subscribe Socket Port: {self.sub_port}\n"
               f"------------------------------------------------------------")
-
+        self.socketMonitor = XTablesSocketMonitor(self, self.context)
+        self.socketMonitor.add_socket("PUSH", self.push_socket)
+        self.socketMonitor.add_socket("SUBSCRIBE", self.sub_socket)
+        self.socketMonitor.add_socket("REQUEST", self.req_socket)
+        self.socketMonitor.add_socket("REGISTRY", self.registry_socket)
+        self.socketMonitor.start()
         self.push_socket.connect(f"tcp://{self.ip}:{self.push_port}")
+        self.registry_socket.connect(f"tcp://{self.ip}:{self.push_port}")
         self.req_socket.connect(f"tcp://{self.ip}:{self.req_port}")
         self.sub_socket.connect(f"tcp://{self.ip}:{self.sub_port}")
         message = XTableProto.XTableMessage.XTableUpdate()
@@ -93,6 +103,7 @@ class XTablesClient:
         self.sub_socket.close()
 
     def _reconnect_req(self):
+        self.socketMonitor.remove_socket_by_name("REQUEST")
         self.req_socket.close()
         self.req_socket = self.context.socket(zmq.REQ)
         self.req_socket.set_hwm(500)
@@ -101,6 +112,7 @@ class XTablesClient:
         self.req_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
         self.req_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 1000)
         self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
+        self.socketMonitor.add_socket("REQUEST", self.req_socket)
         self.req_socket.connect(f"tcp://{self.ip}:{self.req_port}")
 
     def connect(self):
@@ -515,8 +527,7 @@ class XTablesServerNotFound(Exception):
 #     #client.subscribe_all(consumer)
 #
 #     client.putBytes("test", b'ok')
-#     while True:
-#         print(client.getBytes("test"))
+#     time.sleep(100000)
 #
 #     # print(client.getUnknownBytes("name"))
 #     # print(client.getString("age"))
