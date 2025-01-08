@@ -26,6 +26,7 @@ except ImportError:
     from XTablesByteUtils import XTablesByteUtils
     from XTablesSocketMonitor import XTablesSocketMonitor
 
+
 class XTablesClient:
     # ================================================================
     # Static Variables
@@ -503,6 +504,33 @@ class XTablesClient:
                 traceback.print_exc()
             return PingResponse(False, -1)
 
+    def set_server_debug(self, value):
+        try:
+            message = XTableProto.XTableMessage()
+            message.command = XTableProto.XTableMessage.Command.DEBUG
+            message.value = self.SUCCESS_BYTE if value else self.FAIL_BYTE
+            self.req_socket.send(message.SerializeToString(), zmq.constants.DONTWAIT)
+
+            response_bytes = self.req_socket.recv()
+            if not response_bytes:
+                return False
+
+            response_message = XTableProto.XTableMessage.FromString(response_bytes)
+
+            if response_message.HasField("value"):
+                return response_message.value == self.SUCCESS_BYTE
+            else:
+                return False
+        except zmq.error.ZMQError:
+            if self.debug:
+                traceback.print_exc()
+            print("Exception on REQ socket. Reconnecting to clear states.")
+            self._reconnect_req()
+        except Exception:
+            if self.debug:
+                traceback.print_exc()
+            return False
+
     # ====================
     # Version and Properties Methods
     # ====================
@@ -519,6 +547,7 @@ class XTablesClient:
 class XTablesServerNotFound(Exception):
     pass
 
+
 # def consumer(test):
 #     print("UPDATE: " + test.key + " " + str(
 #         XTablesByteUtils.to_string(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
@@ -527,10 +556,12 @@ class XTablesServerNotFound(Exception):
 # if __name__ == "__main__":
 #     client = XTablesClient()
 #
-#     #client.subscribe_all(consumer)
+#     # client.subscribe_all(consumer)
+#     with open('D:\\stuff\\IdeaProjects\\XTABLES\\src\\main\\resources\\static\\logo.png', 'rb') as file:
+#         image_bytes = file.read()
+#     while True:
+#         print(client.set_server_debug(False))
 #
-#     client.putBytes("test", b'ok')
-#     client.shutdown()
 #     time.sleep(100000)
 #
 #     # print(client.getUnknownBytes("name"))
