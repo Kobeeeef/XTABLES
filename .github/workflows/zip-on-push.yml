@@ -19,7 +19,7 @@ jobs:
     - name: Create ZIP of JClient and Utilities
       run: |
         mkdir -p output
-        zip -r output/jclient.zip src/main/java/org/kobe/xbot/JClient src/main/java/org/kobe/xbot/Utilities
+        zip -r output/jclient.zip src/main/java/org/kobe/xbot/JClient src/main/java/org/kobe/xbot/JServer src/main/java/org/kobe/xbot/Utilities
 
     - name: Commit and Push ZIP to Repository
       run: |
