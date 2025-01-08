@@ -305,7 +305,7 @@ public class XTablesClient {
      * @return True if the message was sent successfully; otherwise, false.
      */
     public <T> boolean putList(String key, List<T> value) {
-        return sendPutMessage(key, Utilities.toByteArray(value), XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE as the type for List serialization
+        return sendPutMessage(key, Utilities.toByteArray(value), XTableProto.XTableMessage.Type.ARRAY); // Using DOUBLE as the type for List serialization
     }
 
     /**
