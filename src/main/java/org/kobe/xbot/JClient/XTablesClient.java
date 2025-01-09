@@ -65,7 +65,6 @@ public class XTablesClient {
     private final String ip;
     private final int requestSocketPort;
     private final XTablesSocketMonitor socketMonitor;
-    public final AtomicInteger subscribeMessagesCount = new AtomicInteger(0);
     public final Map<String, List<Consumer<XTableProto.XTableMessage.XTableUpdate>>> subscriptionConsumers;
     public final List<Consumer<XTableProto.XTableMessage.XTableLog>> logConsumers;
     private final ZContext context;

@@ -1,27 +1,28 @@
 package org.kobe.xbot.Tests;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.kobe.xbot.JClient.XTablesClient;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.XTablesByteUtils;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
+import java.util.Arrays;
+
 public class PullPushConsumer {
 
-    public static void main(String[] args) {
-        try (ZContext context = new ZContext()) {
-            ZMQ.Socket socket = context.createSocket(SocketType.SUB);
-            socket.setHWM(500);
-            socket.connect("tcp://localhost:1737");
-            System.out.println("Consumer connected. Receiving messages...");
-            socket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder().setKey("imageKey").build().toByteArray());
-            while (!Thread.currentThread().isInterrupted()) {
-                byte[] msg = socket.recv();
-                XTableProto.XTableMessage.XTableUpdate update = XTableProto.XTableMessage.XTableUpdate.parseFrom(msg);
-                System.out.println(update);
+    public static void main(String[] args) throws InterruptedException {
+        XTablesClient client = new XTablesClient();
+        client.subscribe("test.ok.lol", (a) -> {
+            System.out.println(Arrays.toString(XTablesByteUtils.fromByteArray(a.getValue().toByteArray())));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
-        }
+        });
+        Thread.sleep(99999999);
+        Thread.sleep(99999999);
     }
 }

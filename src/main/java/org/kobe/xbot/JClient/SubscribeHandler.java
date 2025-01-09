@@ -61,7 +61,6 @@ public class SubscribeHandler extends BaseHandler {
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 byte[] bytes = socket.recv();
-                instance.subscribeMessagesCount.incrementAndGet();
                 try {
                     XTableProto.XTableMessage.XTableUpdate message = XTableProto.XTableMessage.XTableUpdate.parseFrom(bytes);
                     if (message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION) || message.getCategory().equals(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)) {

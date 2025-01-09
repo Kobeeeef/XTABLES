@@ -46,13 +46,12 @@ public class XTablesSocketMonitor extends Thread {
     public void run() {
         try {
             while (running) {
-                int events = poller.poll(1000); // Poll with timeout to avoid blocking indefinitely
+                int events = poller.poll(1000);
                 if (events > 0) {
                     for (int i = 0; i < poller.getSize(); i++) {
                         if (poller.pollin(i)) {
                             ZMQ.Socket monitorSocket = poller.getSocket(i);
                             ZMQ.Event event = ZMQ.Event.recv(monitorSocket);
-
                             if (event != null) {
                                 handleEvent(monitorSocketNames.get(monitorSocket), event);
                             }
@@ -69,14 +68,15 @@ public class XTablesSocketMonitor extends Thread {
 
     private void handleEvent(String socketName, ZMQ.Event event) {
         String clientAddress = event.getAddress();
-
         if (clientAddress == null && event.getEvent() != ZMQ.EVENT_MONITOR_STOPPED) return;
 
         switch (event.getEvent()) {
             case ZMQ.EVENT_ACCEPTED -> onClientConnected(socketName, clientAddress, clientMap.get(socketName).size());
-            case ZMQ.EVENT_DISCONNECTED -> onClientDisconnected(socketName, clientAddress, clientMap.get(socketName).size());
+            case ZMQ.EVENT_DISCONNECTED ->
+                    onClientDisconnected(socketName, clientAddress, clientMap.get(socketName).size());
             case ZMQ.EVENT_CONNECTED -> logger.info("Socket connected: " + socketName + " to " + clientAddress);
-            case ZMQ.EVENT_CONNECT_DELAYED -> logger.warning("Connection delayed: " + socketName + " to " + clientAddress);
+            case ZMQ.EVENT_CONNECT_DELAYED ->
+                    logger.warning("Connection delayed: " + socketName + " to " + clientAddress);
             case ZMQ.EVENT_CONNECT_RETRIED -> logger.info("Connection retried: " + socketName + " to " + clientAddress);
             case ZMQ.EVENT_BIND_FAILED -> logger.severe("Bind failed on socket: " + socketName);
             case ZMQ.EVENT_CLOSED -> logger.info("Socket closed: " + socketName);
