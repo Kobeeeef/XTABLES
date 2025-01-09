@@ -100,16 +100,17 @@ public class ReplyRequestHandler extends BaseHandler {
                             if (message.hasKey()) {
                                 tables = XTablesServer.table.getTables(message.getKey());
 
-                                byte[] resp = Utilities.toByteArray((List<?>) tables);
-                                if (tables != null && !tables.isEmpty() && resp != null) {
-                                    builder.setValue(ByteString.copyFrom(resp));
+
+                                if (tables != null && !tables.isEmpty()) {
+                                    byte[] resp = XTablesByteUtils.toByteArray(tables.toArray(new String[0]));
+                                   if(resp != null) builder.setValue(ByteString.copyFrom(resp));
                                 }
                             } else {
                                 tables = XTablesServer.table.getTables("");
                                 if (tables != null && !tables.isEmpty()) {
                                     List<String> tablesList = new ArrayList<>(tables);
 
-                                    byte[] resp = Utilities.toByteArray(tablesList);
+                                    byte[] resp = XTablesByteUtils.toByteArray(tablesList.toArray());
                                     if (resp != null) {
                                         builder.setValue(ByteString.copyFrom(resp));
                                     }

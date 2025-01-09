@@ -74,6 +74,7 @@ public class XTablesClient {
     private final ZMQ.Socket clientRegistrySocket;
     private ZMQ.Socket reqSocket;
     private final SubscribeHandler subscribeHandler;
+
     /**
      * Default constructor for XTablesClient.
      * Initializes the client without specifying an IP address.
@@ -304,8 +305,8 @@ public class XTablesClient {
      * @param <T>   The type of the elements in the list.
      * @return True if the message was sent successfully; otherwise, false.
      */
-    public <T> boolean putList(String key, List<T> value) {
-        return sendPutMessage(key, Utilities.toByteArray(value), XTableProto.XTableMessage.Type.ARRAY); // Using DOUBLE as the type for List serialization
+    public <T> boolean putList(String key, T[] value) {
+        return sendPutMessage(key, XTablesByteUtils.toByteArray(value), XTableProto.XTableMessage.Type.ARRAY); // Using DOUBLE as the type for List serialization
     }
 
     /**
@@ -496,16 +497,25 @@ public class XTablesClient {
      * indicating the wrong type.
      *
      * @param key  The key associated with the List value.
-     * @param type The class of the elements in the list.
-     * @param <T>  The type of the elements in the list.
      * @return A List of values associated with the given key.
      * @throws IllegalArgumentException If the returned message type is not ARRAY.
      */
-    public <T> List<T> getList(String key, Class<T> type) {
+    public Object[] getList(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.ARRAY)) {
             byte[] valueBytes = message.getValue().toByteArray();
-            return Utilities.fromByteArray(valueBytes, type);
+            return XTablesByteUtils.fromByteArray(valueBytes);
+        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
+            return null;
+        } else {
+            throw new IllegalArgumentException("Expected ARRAY type, but got: " + message.getType());
+        }
+    }
+    public <T> T[] getList(String key, Class<T> type) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.ARRAY)) {
+            byte[] valueBytes = message.getValue().toByteArray();
+            return XTablesByteUtils.fromByteArray(valueBytes, type);
         } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
@@ -674,7 +684,9 @@ public class XTablesClient {
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             if (!message.hasValue())
                 return Collections.EMPTY_LIST;
-            return Utilities.fromByteArray(message.getValue().toByteArray(), String.class);
+            Object[] respV = XTablesByteUtils.fromByteArray(message.getValue().toByteArray(), String.class);
+            if(respV == null) return Collections.EMPTY_LIST;
+            return List.of((String[]) respV);
         } catch (InvalidProtocolBufferException | NullPointerException e) {
             return Collections.EMPTY_LIST;
         } catch (ZMQException e) {

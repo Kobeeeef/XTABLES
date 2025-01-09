@@ -17,6 +17,7 @@ try:
     from .XTablesByteUtils import XTablesByteUtils
     from . import TempConnectionManager as tcm
     from .XTablesSocketMonitor import XTablesSocketMonitor
+    from . import XTableArrayList_pb2 as XTableArrayProto
 except ImportError:
     # Standalone script imports
     import XTableProto_pb2 as XTableProto
@@ -25,6 +26,7 @@ except ImportError:
     from PingResponse import PingResponse
     from XTablesByteUtils import XTablesByteUtils
     from XTablesSocketMonitor import XTablesSocketMonitor
+    import XTableArrayList_pb2 as XTableArrayProto
 
 
 class XTablesClient:
@@ -375,9 +377,7 @@ class XTablesClient:
         Handles putting arrays to the server.
         Assumes `values` is an array of values that can be serialized into a byte array.
         """
-        serialized_array = [struct.pack('!i', value) for value in values]  # Example with integers
-        array_value = b''.join(serialized_array)
-        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, array_value,
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, XTablesByteUtils.to_byte_array(values),
                                       XTableProto.XTableMessage.Type.ARRAY)
 
     # ====================
@@ -432,7 +432,7 @@ class XTablesClient:
     def getArray(self, key):
         message = self._get_xtable_message(key)
         if message is not None and message.type == XTableProto.XTableMessage.Type.ARRAY:
-            return message.value
+            return XTablesByteUtils.from_byte_array(message.value)
         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
             return None
         else:
@@ -469,6 +469,7 @@ class XTablesClient:
                 traceback.print_exc()
             print("Exception on REQ socket. Reconnecting to clear states.")
             self._reconnect_req()
+            return None
         except Exception:
             if self.debug:
                 traceback.print_exc()
@@ -499,6 +500,7 @@ class XTablesClient:
                 traceback.print_exc()
             print("Exception on REQ socket. Reconnecting to clear states.")
             self._reconnect_req()
+            return PingResponse(False, -1)
         except Exception:
             if self.debug:
                 traceback.print_exc()
@@ -526,10 +528,40 @@ class XTablesClient:
                 traceback.print_exc()
             print("Exception on REQ socket. Reconnecting to clear states.")
             self._reconnect_req()
+            return False
         except Exception:
             if self.debug:
                 traceback.print_exc()
             return False
+
+    def getTables(self, key=None):
+        try:
+            message = XTableProto.XTableMessage()
+            message.command = XTableProto.XTableMessage.Command.GET_TABLES
+            if key is not None:
+                message.key = key
+            self.req_socket.send(message.SerializeToString(), zmq.constants.DONTWAIT)
+
+            response_bytes = self.req_socket.recv()
+            if not response_bytes:
+                return False
+
+            response_message = XTableProto.XTableMessage.FromString(response_bytes)
+
+            if response_message.HasField("value"):
+                return XTablesByteUtils.from_byte_array(response_message.value)
+            else:
+                return []
+        except zmq.error.ZMQError:
+            if self.debug:
+                traceback.print_exc()
+            print("Exception on REQ socket. Reconnecting to clear states.")
+            self._reconnect_req()
+            return []
+        except Exception:
+            if self.debug:
+                traceback.print_exc()
+            return []
 
     # ====================
     # Version and Properties Methods
@@ -547,20 +579,19 @@ class XTablesClient:
 class XTablesServerNotFound(Exception):
     pass
 
-
 # def consumer(test):
 #     print("UPDATE: " + test.key + " " + str(
 #         XTablesByteUtils.to_string(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 #
 #
 # if __name__ == "__main__":
-#     client = XTablesClient()
-#
+#     client = XTablesClient("localhost")
+#     client.set_client_debug(True)
 #     # client.subscribe_all(consumer)
 #     with open('D:\\stuff\\IdeaProjects\\XTABLES\\src\\main\\resources\\static\\logo.png', 'rb') as file:
 #         image_bytes = file.read()
-#     while True:
-#         print(client.set_server_debug(False))
+#     print(client.putArray("test.ok", ["okao"]))
+#     print(client.getArray("test.ok"))
 #
 #     time.sleep(100000)
 #

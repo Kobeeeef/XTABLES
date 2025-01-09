@@ -1,4 +1,11 @@
 import struct
+import traceback
+try:
+    # Package-level imports
+    from . import XTableArrayList_pb2 as XTableArrayProto
+except ImportError:
+    # Standalone script imports
+    import XTableArrayList_pb2 as XTableArrayProto
 
 
 class XTablesByteUtils:
@@ -102,14 +109,60 @@ class XTablesByteUtils:
         return bytes([0x01 if i else 0x00])
 
     @staticmethod
-    def from_list(i):
-        """
-        Converts a list to a byte array.
-        :param i: The list to convert.
-        :return: The byte array representation of the list.
-        """
-        # Assuming `i` is a list of basic types
-        return bytes(str(i), 'utf-8')
+    def to_byte_array(array):
+        if not array:
+            return b''
+
+        array_builder = XTableArrayProto.Array()
+
+        for obj in array:
+            value_builder = XTableArrayProto.Array.Value()
+
+            if isinstance(obj, str):
+                value_builder.string_value = obj
+            elif isinstance(obj, int):
+                value_builder.int_value = obj
+            elif isinstance(obj, float):
+                value_builder.float_value = obj
+            elif isinstance(obj, bool):
+                value_builder.bool_value = obj
+            elif isinstance(obj, bytes):
+                value_builder.bytes_value = obj
+            else:
+                raise ValueError(f"Unsupported object type: {type(obj)}")
+
+            array_builder.values.append(value_builder)
+
+        return array_builder.SerializeToString()
+
+    @staticmethod
+    def from_byte_array(byte_array):
+        if not byte_array:
+            return []
+
+        try:
+            array_message = XTableArrayProto.Array()
+            array_message.ParseFromString(byte_array)
+
+            result = []
+            for value in array_message.values:
+                if value.HasField('string_value'):
+                    result.append(value.string_value)
+                elif value.HasField('int_value'):
+                    result.append(value.int_value)
+                elif value.HasField('float_value'):
+                    result.append(value.float_value)
+                elif value.HasField('bool_value'):
+                    result.append(value.bool_value)
+                elif value.HasField('bytes_value'):
+                    result.append(value.bytes_value)
+                else:
+                    raise ValueError("Unsupported value type found in the byte array.")
+
+            return result
+        except Exception:
+            traceback.print_exc()
+            return None
 
     @staticmethod
     def from_string(i):

@@ -2,9 +2,11 @@ package org.kobe.xbot.Utilities;
 
 import com.google.gson.*;
 import com.google.protobuf.ByteString;
+import org.kobe.xbot.Utilities.Entities.XTableArrayList;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -244,8 +246,8 @@ public class XTablesByteUtils {
      * @param i The list of objects to convert.
      * @return The byte array representing the list of objects.
      */
-    public static <T> byte[] fromList(List<T> i) {
-        return Utilities.toByteArray(i);
+    public static <T> byte[] fromList(T[] i) {
+        return toByteArray(i);
     }
 
     /**
@@ -272,6 +274,124 @@ public class XTablesByteUtils {
     public static byte[] fromObject(Object v) {
         return fromString(gson.toJson(v));
     }
+    public static byte[] toByteArray(Object[] array) {
+        if (array == null || array.length == 0) {
+            return new byte[0];
+        }
+
+        XTableArrayList.Array.Builder arrayBuilder = XTableArrayList.Array.newBuilder();
+
+        for (Object obj : array) {
+            XTableArrayList.Array.Value.Builder valueBuilder = XTableArrayList.Array.Value.newBuilder();
+
+            if (obj instanceof String) {
+                valueBuilder.setStringValue((String) obj);
+            } else if (obj instanceof Integer) {
+                valueBuilder.setIntValue((Integer) obj);
+            } else if (obj instanceof Float) {
+                valueBuilder.setFloatValue((Float) obj);
+            } else if (obj instanceof Double) {
+                valueBuilder.setDoubleValue((Double) obj);
+            } else if (obj instanceof Boolean) {
+                valueBuilder.setBoolValue((Boolean) obj);
+            } else if (obj instanceof Long) {
+                valueBuilder.setInt64Value((Long) obj);
+            } else if (obj instanceof byte[]) {
+                valueBuilder.setBytesValue(ByteString.copyFrom((byte[]) obj));
+            } else {
+                // Handle unsupported object types
+                throw new IllegalArgumentException("Unsupported object type: " + obj.getClass());
+            }
+
+            arrayBuilder.addValues(valueBuilder.build());
+        }
+
+        XTableArrayList.Array arrayMessage = arrayBuilder.build();
+
+        // Convert the Array message to a byte array
+        return arrayMessage.toByteArray();
+    }
+    public static <T> T[] fromByteArray(byte[] byteArray, Class<T> type) {
+        if (byteArray == null || byteArray.length == 0) {
+            return (T[]) Array.newInstance(type, 0); // Return an empty array of the specified type
+        }
+
+        try {
+            // Parse the byte array into an Array message
+            XTableArrayList.Array arrayMessage = XTableArrayList.Array.parseFrom(byteArray);
+            T[] result = (T[]) Array.newInstance(type, arrayMessage.getValuesCount());
+
+            // Iterate over each value in the Array message and convert it to the appropriate type
+            for (int i = 0; i < arrayMessage.getValuesCount(); i++) {
+                XTableArrayList.Array.Value value = arrayMessage.getValues(i);
+                if (value.hasStringValue() && type.equals(String.class)) {
+                    result[i] = (T) value.getStringValue();
+                } else if (value.hasIntValue() && type.equals(Integer.class)) {
+                    result[i] = (T) Integer.valueOf(value.getIntValue());
+                } else if (value.hasFloatValue() && type.equals(Float.class)) {
+                    result[i] = (T) Float.valueOf(value.getFloatValue());
+                } else if (value.hasDoubleValue() && type.equals(Double.class)) {
+                    result[i] = (T) Double.valueOf(value.getDoubleValue());
+                } else if (value.hasBoolValue() && type.equals(Boolean.class)) {
+                    result[i] = (T) Boolean.valueOf(value.getBoolValue());
+                } else if (value.hasInt64Value() && type.equals(Long.class)) {
+                    result[i] = (T) Long.valueOf(value.getInt64Value());
+                } else if (value.hasBytesValue() && type.equals(byte[].class)) {
+                    result[i] = (T) value.getBytesValue().toByteArray();
+                } else {
+                    // Handle unsupported value type or mismatched type (shouldn't happen with your schema)
+                    throw new IllegalArgumentException("Unsupported or mismatched type for value: " + value.getClass().getName());
+                }
+            }
+
+            return result;
+        } catch (Exception e) {
+            // Handle deserialization errors
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Object[] fromByteArray(byte[] byteArray) {
+        if (byteArray == null || byteArray.length == 0) {
+            return new Object[0];
+        }
+
+        try {
+            // Parse the byte array into an Array message
+            XTableArrayList.Array arrayMessage = XTableArrayList.Array.parseFrom(byteArray);
+            Object[] result = new Object[arrayMessage.getValuesCount()];
+
+            // Iterate over each value in the Array message and convert it to the appropriate type
+            for (int i = 0; i < arrayMessage.getValuesCount(); i++) {
+                XTableArrayList.Array.Value value = arrayMessage.getValues(i);
+                if (value.hasStringValue()) {
+                    result[i] = value.getStringValue();
+                } else if (value.hasIntValue()) {
+                    result[i] = value.getIntValue();
+                } else if (value.hasFloatValue()) {
+                    result[i] = value.getFloatValue();
+                } else if (value.hasDoubleValue()) {
+                    result[i] = value.getDoubleValue();
+                } else if (value.hasBoolValue()) {
+                    result[i] = value.getBoolValue();
+                } else if (value.hasInt64Value()) {
+                    result[i] = value.getInt64Value();
+                } else if (value.hasBytesValue()) {
+                    result[i] = value.getBytesValue().toByteArray();
+                } else {
+                    // Handle unsupported value type (shouldn't happen with your schema)
+                    throw new IllegalArgumentException("Unsupported value type found in the byte array.");
+                }
+            }
+
+            return result;
+        } catch (Exception e) {
+            // Handle deserialization errors
+            e.printStackTrace();
+            return null;
+        }
+    }
     /**
      * Converts a byte array into an object of the specified type.
      *
@@ -292,7 +412,7 @@ public class XTablesByteUtils {
                 case BYTES -> (T) bytes;
                 case ENUM -> throw new XTablesException("ENUM type is not yet supported.");
                 case MESSAGE -> (T) toObject(bytes, Object.class);
-                case ARRAY -> (T) Utilities.fromByteArray(bytes, Object.class);
+                case ARRAY -> (T) fromByteArray(bytes);
                 case OBJECT -> (T) toObject(bytes, Object.class);
                 default -> throw new XTablesException("Unknown type: " + type);
             };
@@ -333,7 +453,7 @@ public class XTablesByteUtils {
                 }
             } else if (element.isJsonArray()) {
                 JsonArray jsonArray = element.getAsJsonArray();
-                return XTablesByteUtils.fromList(gson.fromJson(jsonArray, List.class));
+                return XTablesByteUtils.fromList(gson.fromJson(jsonArray, List.class).toArray());
             } else if (element.isJsonObject()) {
                 JsonObject jsonObject = element.getAsJsonObject();
                 return XTablesByteUtils.fromObject(gson.fromJson(jsonObject, Object.class));
