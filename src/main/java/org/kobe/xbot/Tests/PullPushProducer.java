@@ -11,7 +11,7 @@ import java.util.List;
 
 public class PullPushProducer {
     public static void main(String[] args) throws IOException, InterruptedException {
-        XTablesClient client = new XTablesClient("localhost");
+        XTablesClient client = new XTablesClient();
         Thread.sleep(1000);
 
         // byte[] imageBytes = Files.readAllBytes(Paths.get("D:\\stuff\\IdeaProjects\\XTABLES\\src\\main\\resources\\static\\logo.png"));

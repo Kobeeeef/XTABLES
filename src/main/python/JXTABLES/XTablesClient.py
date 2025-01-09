@@ -585,7 +585,7 @@ class XTablesServerNotFound(Exception):
 #
 #
 # if __name__ == "__main__":
-#     client = XTablesClient("localhost")
+#     client = XTablesClient()
 #     client.set_client_debug(True)
 #     # client.subscribe_all(consumer)
 #     with open('D:\\stuff\\IdeaProjects\\XTABLES\\src\\main\\resources\\static\\logo.png', 'rb') as file:
