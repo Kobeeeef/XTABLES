@@ -10,7 +10,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages Releases</name>
-            <url>https://maven.pkg.github.com/rokadias/XTABLES</url>
+            <url>https://maven.pkg.github.com/Kobeeeef/XTABLES</url>
         </repository>
     </distributionManagement>
     <properties>
