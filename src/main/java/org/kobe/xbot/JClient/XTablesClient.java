@@ -2,12 +2,16 @@ package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.DataCompression;
 import org.kobe.xbot.Utilities.Entities.PingResponse;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.SystemStatistics;
+import org.kobe.xbot.Utilities.TempConnectionManager;
+import org.kobe.xbot.Utilities.XTablesByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.SocketType;
@@ -24,7 +28,6 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -60,7 +63,7 @@ public class XTablesClient {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v2.0.0 | Build Date: 1/6/2025";
+            "XTABLES Jero Client v4.6.0 | Build Date: 1/10/2025";
 
     private final String ip;
     private final int requestSocketPort;
@@ -234,6 +237,22 @@ public class XTablesClient {
      */
     public boolean putString(String key, String value) {
         return sendPutMessage(key, value.getBytes(StandardCharsets.UTF_8), XTableProto.XTableMessage.Type.STRING);
+    }
+
+    /**
+     * Sends a PUT request with a list of coordinates to the server.
+     * <p>
+     * This method takes a list of `Coordinate` objects, builds a `CoordinateList` message from the list,
+     * and sends it to the server as a byte array with the BYTES type.
+     *
+     * @param key   The key associated with the list of coordinates.
+     * @param value The list of `Coordinate` objects to be sent.
+     * @return True if the message was sent successfully; otherwise, false.
+     */
+    public boolean putCoordinates(String key, List<XTableValues.Coordinate> value) {
+        XTableValues.CoordinateList list = XTableValues.CoordinateList.newBuilder()
+                .addAllCoordinates(value).build();
+        return sendPutMessage(key, list.toByteArray(), XTableProto.XTableMessage.Type.BYTES);
     }
 
     /**
@@ -496,7 +515,7 @@ public class XTablesClient {
      * using the `Utilities.fromByteArray()` method. Otherwise, it throws an IllegalArgumentException
      * indicating the wrong type.
      *
-     * @param key  The key associated with the List value.
+     * @param key The key associated with the List value.
      * @return A List of values associated with the given key.
      * @throws IllegalArgumentException If the returned message type is not ARRAY.
      */
@@ -511,6 +530,22 @@ public class XTablesClient {
             throw new IllegalArgumentException("Expected ARRAY type, but got: " + message.getType());
         }
     }
+
+    /**
+     * Executes a GET request to retrieve a List of values for a given key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is ARRAY.
+     * If so, it converts the byte array value to a List of the specified type
+     * using the `XTablesByteUtils.fromByteArray()` method.
+     * Otherwise, it throws an IllegalArgumentException
+     * indicating the wrong type.
+     *
+     * @param key  The key associated with the List value.
+     * @param type The class type of the list values.
+     * @return A List of values associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not ARRAY.
+     */
     public <T> T[] getList(String key, Class<T> type) {
         XTableProto.XTableMessage message = getXTableMessage(key);
         if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.ARRAY)) {
@@ -522,6 +557,36 @@ public class XTablesClient {
             throw new IllegalArgumentException("Expected ARRAY type, but got: " + message.getType());
         }
     }
+
+    /**
+     * Executes a GET request to retrieve a list of coordinates associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is BYTES.
+     * If so, it parses the byte array to extract a list of coordinates and returns it.
+     * Otherwise, it throws an IllegalArgumentException indicating the wrong type or if parsing fails.
+     *
+     * @param key The key associated with the list of coordinates.
+     * @return A List of `Coordinate` objects associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not BYTES or if parsing fails.
+     */
+    public List<XTableValues.Coordinate> getCoordinates(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+
+        if (message.getType() == XTableProto.XTableMessage.Type.BYTES) {
+            try {
+                return XTableValues.CoordinateList.parseFrom(message.getValue().toByteArray()).getCoordinatesList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+
+        throw new IllegalArgumentException("Expected BYTES type, but got: " + message.getType());
+    }
+
 
     /**
      * Sends a GET request to the server for the specified key and returns the parsed message.
@@ -685,7 +750,7 @@ public class XTablesClient {
             if (!message.hasValue())
                 return Collections.EMPTY_LIST;
             Object[] respV = XTablesByteUtils.fromByteArray(message.getValue().toByteArray(), String.class);
-            if(respV == null) return Collections.EMPTY_LIST;
+            if (respV == null) return Collections.EMPTY_LIST;
             return List.of((String[]) respV);
         } catch (InvalidProtocolBufferException | NullPointerException e) {
             return Collections.EMPTY_LIST;
