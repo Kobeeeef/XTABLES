@@ -575,7 +575,9 @@ public class XTablesClient {
         if (message == null) {
             throw new IllegalArgumentException("No message received from the XTABLES server.");
         }
-
+        if (!message.hasValue()) {
+            return null;
+        }
         if (message.getType() == XTableProto.XTableMessage.Type.BYTES) {
             try {
                 return XTableValues.CoordinateList.parseFrom(message.getValue().toByteArray()).getCoordinatesList();
@@ -583,6 +585,7 @@ public class XTablesClient {
                 throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
             }
         }
+
 
         throw new IllegalArgumentException("Expected BYTES type, but got: " + message.getType());
     }
