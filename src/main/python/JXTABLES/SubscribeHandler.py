@@ -42,7 +42,6 @@ class SubscribeHandler(BaseHandler):
             while not self._stop:
                 try:
                     bytes_message = self.socket.recv()
-                    self.instance.subscribe_messages_count += 1
                     message = XTableProto.XTableMessage.XTableUpdate.FromString(bytes_message)
 
                     if message.category in {XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION,
@@ -64,10 +63,9 @@ class SubscribeHandler(BaseHandler):
                     else:
                         self.buffer.write(message)
 
-                except DecodeError as e:
+                except DecodeError:
                     if self.instance.debug:
                         traceback.print_exc()
-                    self.logger.warning(f"Failed to decode message: {e}")
                 except Exception as e:
                     if self.instance.debug:
                         traceback.print_exc()
