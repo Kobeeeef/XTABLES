@@ -1,0 +1,11 @@
+syntax = "proto3";
+package org.kobe.xbot.Utilities.Entities;
+
+message Coordinate {
+    double x = 1;
+    double y = 2;
+}
+
+message CoordinateList {
+    repeated Coordinate coordinates = 1;
+}

@@ -12,6 +12,7 @@ from zeroconf import Zeroconf
 try:
     # Package-level imports
     from . import XTableProto_pb2 as XTableProto
+    from . import XTableValues_pb2 as XTableValues
     from .SubscribeHandler import SubscribeHandler
     from .PingResponse import PingResponse
     from .XTablesByteUtils import XTablesByteUtils
@@ -21,6 +22,7 @@ try:
 except ImportError:
     # Standalone script imports
     import XTableProto_pb2 as XTableProto
+    import XTableValues_pb2 as XTableValues
     from TempConnectionManager import TempConnectionManager as tcm
     from SubscribeHandler import SubscribeHandler
     from PingResponse import PingResponse
@@ -365,6 +367,11 @@ class XTablesClient:
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value_bytes,
                                       XTableProto.XTableMessage.Type.INT64)
 
+    def putCoordinates(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      XTableValues.CoordinateList(coordinates=value).SerializeToString(),
+                                      XTableProto.XTableMessage.Type.BYTES)
+
     def putDouble(self, key, value):
         value_bytes = struct.pack('!d', value)
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value_bytes,
@@ -380,7 +387,8 @@ class XTablesClient:
         Handles putting arrays to the server.
         Assumes `values` is an array of values that can be serialized into a byte array.
         """
-        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, XTablesByteUtils.to_byte_array(values),
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      XTablesByteUtils.to_byte_array(values),
                                       XTableProto.XTableMessage.Type.ARRAY)
 
     # ====================
@@ -395,6 +403,21 @@ class XTablesClient:
             return None
         else:
             raise ValueError(f"Expected STRING type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getCoordinates(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.BYTES:
+            try:
+                return XTableValues.CoordinateList.FromString(message.value).coordinates
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+
+        raise ValueError(f"Expected BYTES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getInteger(self, key):
         message = self._get_xtable_message(key)
@@ -582,6 +605,7 @@ class XTablesClient:
 class XTablesServerNotFound(Exception):
     pass
 
+
 def consumer(test):
     print("UPDATE: " + test.key + " " + str(
         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
@@ -590,8 +614,10 @@ def consumer(test):
 if __name__ == "__main__":
     client = XTablesClient()
     client.subscribe_all(consumer)
+    coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
 
-
+    client.putCoordinates("test", coordinates)
+    print(client.getCoordinates("test")[0])
     time.sleep(100000)
 
     # print(client.getUnknownBytes("name"))
