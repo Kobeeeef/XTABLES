@@ -40,6 +40,22 @@ public class TempConnectionManager {
     }
 
     /**
+     * Invalidates the temporary connection file.
+     * <p>
+     * This method deletes the temporary file that stores the IP address, ensuring
+     * that the connection information is no longer available. If the file does not
+     * exist, the method does nothing.
+     */
+    public static void invalidate() {
+        File tempFile = new File(System.getProperty("java.io.tmpdir"), "JAVA-XTABLES-TEMP-CONNECTION.tmp");
+        if (tempFile.exists()) {
+            if (!tempFile.delete()) {
+                System.err.println("Failed to delete the temporary connection file.");
+            }
+        }
+    }
+
+    /**
      * Sets the provided IP address in the temporary connection file.
      * <p>
      * If the temporary file does not exist, it is created.
