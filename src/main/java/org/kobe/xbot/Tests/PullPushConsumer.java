@@ -15,9 +15,9 @@ public class PullPushConsumer {
     public static void main(String[] args) throws InterruptedException {
         XTablesClient client = new XTablesClient();
         client.subscribe("test.ok.lol", (a) -> {
-            System.out.println(Arrays.toString(XTablesByteUtils.fromByteArray(a.getValue().toByteArray())));
+            System.out.println(XTablesByteUtils.toInt(a.getValue().toByteArray()))  ;
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

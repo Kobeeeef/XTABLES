@@ -128,6 +128,7 @@ public class XTablesClient {
                         "Push Socket Port: " + pushSocketPort + "\n" +
                         "Request Socket Port: " + requestSocketPort + "\n" +
                         "Subscribe Socket Port: " + subscribeSocketPort + "\n" +
+                        "Web Interface: " + "http://" + this.ip + ":4880/" + "\n" +
                         "------------------------------------------------------------");
         this.context = new ZContext(3);
         this.socketMonitor = new XTablesSocketMonitor(context);
@@ -140,8 +141,8 @@ public class XTablesClient {
         this.pushSocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
         this.clientRegistrySocket = context.createSocket(SocketType.PUSH);
         this.clientRegistrySocket.setHWM(500);
-        this.clientRegistrySocket.setReconnectIVL(1000);
-        this.clientRegistrySocket.setReconnectIVLMax(1000);
+        this.clientRegistrySocket.setReconnectIVL(2000);
+        this.clientRegistrySocket.setReconnectIVLMax(6000);
         this.socketMonitor.addSocket("REGISTRY", this.clientRegistrySocket);
         this.clientRegistrySocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
         this.reqSocket = context.createSocket(SocketType.REQ);

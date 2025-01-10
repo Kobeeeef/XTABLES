@@ -29,7 +29,7 @@ public class SubscribeHandler extends BaseHandler {
     private final XTablesClient instance;
     private final CircularBuffer<XTableProto.XTableMessage.XTableUpdate> buffer;
     private final Thread consumerHandlingThread;
-    private final static int BUFFER_SIZE = 250;
+    private final static int BUFFER_SIZE = 500;
 
     /**
      * Constructor that initializes the handler with the provided socket and server instance.
