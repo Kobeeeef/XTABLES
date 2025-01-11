@@ -1,6 +1,5 @@
 package org.kobe.xbot.Utilities.Logger;
 
-import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,7 +10,6 @@ import java.util.logging.Logger;
 
 public class XTablesLogger extends Logger {
     private static final String loggerName = "XTablesLogger";
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(XTablesLogger.class);
     private static Level defaultLevel = Level.ALL;
     private static XTablesLogger instance = null;
     private static final String RESET = "\u001B[0m";

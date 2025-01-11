@@ -9,8 +9,6 @@ import org.kobe.xbot.Utilities.TableFormatter;
 import org.kobe.xbot.Utilities.Utilities;
 import org.kobe.xbot.Utilities.XTableStatus;
 import org.kobe.xbot.Utilities.XTablesData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -57,7 +55,6 @@ public class XTablesServer {
     private static final AtomicReference<XTableStatus> status = new AtomicReference<>(XTableStatus.OFFLINE);
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private static final CountDownLatch latch = new CountDownLatch(1);
-    private static final Logger log = LoggerFactory.getLogger(XTablesServer.class);
     private static final Gson gson = new Gson();
     private static Thread main;
     // =============================================================

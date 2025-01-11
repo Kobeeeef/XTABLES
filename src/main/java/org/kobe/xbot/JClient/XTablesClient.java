@@ -12,8 +12,6 @@ import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.SystemStatistics;
 import org.kobe.xbot.Utilities.TempConnectionManager;
 import org.kobe.xbot.Utilities.XTablesByteUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -57,7 +55,6 @@ public class XTablesClient {
     private static final byte[] fail = new byte[]{(byte) 0x00};
     private static final ByteString successByte = ByteString.copyFrom(success);
     private static final ByteString failByte = ByteString.copyFrom(fail);
-    private static final Logger log = LoggerFactory.getLogger(XTablesClient.class);
     // =============================================================
     // Instance Variables
     // These variables are unique to each instance of the class.
