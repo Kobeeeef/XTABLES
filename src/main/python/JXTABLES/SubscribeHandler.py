@@ -46,20 +46,21 @@ class SubscribeHandler(BaseHandler):
 
                     if message.category in {XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION,
                                             XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY}:
-                        stats = ClientStatistics()
-                        stats.set_buffer_size(self.buffer.size)
-                        stats.set_uuid(self.instance.uuid)
-                        stats.set_version(self.instance.get_version())
-                        stats.set_max_buffer_size(self.BUFFER_SIZE)
-                        info_bytes = stats.to_protobuf()
-                        response = XTableProto.XTableMessage(
-                            id=message.value,
-                            value=info_bytes.SerializeToString(),
-                            command=XTableProto.XTableMessage.Command.INFORMATION
-                            if message.category == XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION
-                            else XTableProto.XTableMessage.Command.REGISTRY,
-                        )
-                        self.instance.registry_socket.send(response.SerializeToString(), zmq.DONTWAIT)
+                        if not self.instance.ghost:
+                            stats = ClientStatistics()
+                            stats.set_buffer_size(self.buffer.size)
+                            stats.set_uuid(self.instance.uuid)
+                            stats.set_version(self.instance.get_version())
+                            stats.set_max_buffer_size(self.BUFFER_SIZE)
+                            info_bytes = stats.to_protobuf()
+                            response = XTableProto.XTableMessage(
+                                id=message.value,
+                                value=info_bytes.SerializeToString(),
+                                command=XTableProto.XTableMessage.Command.INFORMATION
+                                if message.category == XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION
+                                else XTableProto.XTableMessage.Command.REGISTRY,
+                            )
+                            self.instance.registry_socket.send(response.SerializeToString(), zmq.DONTWAIT)
                     else:
                         self.buffer.write(message)
 

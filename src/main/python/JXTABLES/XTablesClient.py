@@ -42,16 +42,19 @@ class XTablesClient:
     # ================================================================
     XTABLES_CLIENT_VERSION = "XTABLES JPython Client v5.0.9 | Build Date: 1/3/2025"
 
-    def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737, buffer_size=500, debug_mode=False):
+    def __init__(self, ip=None, push_port=1735, req_port=1736, sub_port=1737, buffer_size=500, debug_mode=False,
+                 ghost=False):
         self.debug = debug_mode
         self.BUFFER_SIZE = buffer_size
         self.context = zmq.Context(3)
         self.push_socket = self.context.socket(zmq.PUSH)
         self.push_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
         self.push_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 1000)
-        self.registry_socket = self.context.socket(zmq.PUSH)
-        self.registry_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
-        self.registry_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 5000)
+        self.ghost = ghost
+        if not ghost:
+            self.registry_socket = self.context.socket(zmq.PUSH)
+            self.registry_socket.setsockopt(zmq.RECONNECT_IVL, 1000)
+            self.registry_socket.setsockopt(zmq.RECONNECT_IVL_MAX, 5000)
         self.req_socket = self.context.socket(zmq.REQ)
         self.req_socket.set_hwm(500)
         self.req_socket.setsockopt(zmq.RCVTIMEO, 3000)
@@ -81,15 +84,18 @@ class XTablesClient:
               f"Subscribe Socket Port: {self.sub_port}\n"
               f"Web Interface: http://{self.ip}:4880/\n"
               f"Debug Mode: {'Enabled' if self.debug else 'Disabled'}\n"
+              f"Ghost: {'Enabled' if ghost else 'Disabled'}\n"
               f"------------------------------------------------------------")
         self.socketMonitor = XTablesSocketMonitor(self, self.context)
         self.socketMonitor.add_socket("PUSH", self.push_socket)
         self.socketMonitor.add_socket("SUBSCRIBE", self.sub_socket)
         self.socketMonitor.add_socket("REQUEST", self.req_socket)
-        self.socketMonitor.add_socket("REGISTRY", self.registry_socket)
+        if not ghost:
+            self.socketMonitor.add_socket("REGISTRY", self.registry_socket)
         self.socketMonitor.start()
         self.push_socket.connect(f"tcp://{self.ip}:{self.push_port}")
-        self.registry_socket.connect(f"tcp://{self.ip}:{self.push_port}")
+        if not ghost:
+            self.registry_socket.connect(f"tcp://{self.ip}:{self.push_port}")
         self.req_socket.connect(f"tcp://{self.ip}:{self.req_port}")
         self.sub_socket.connect(f"tcp://{self.ip}:{self.sub_port}")
         message = XTableProto.XTableMessage.XTableUpdate()
@@ -605,19 +611,19 @@ class XTablesClient:
 class XTablesServerNotFound(Exception):
     pass
 
-#
-# def consumer(test):
-#     print("UPDATE: " + test.key + " " + str(
-#         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
+
+# # def consumer(test):
+# #     print("UPDATE: " + test.key + " " + str(
+# #         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 #
 #
 # if __name__ == "__main__":
-#     client = XTablesClient()
-#     client.subscribe_all(consumer)
+#     client = XTablesClient(ghost=False)
+#     #client.subscribe_all(consumer)
 #     coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
-#
-#     client.putCoordinates("test", coordinates)
-#     print(client.getCoordinates("test")[0])
+#     while True:
+#         client.putCoordinates("test", coordinates)
+#         print(client.getCoordinates("test")[0])
 #     time.sleep(100000)
 #
 #     # print(client.getUnknownBytes("name"))
