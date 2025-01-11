@@ -80,7 +80,7 @@ class XTablesClient:
               f"Request Socket Port: {self.req_port}\n"
               f"Subscribe Socket Port: {self.sub_port}\n"
               f"Web Interface: http://{self.ip}:4880/\n"
-              f"Debug Mode: {"Enabled" if self.debug else "Disabled"}\n"
+              f"Debug Mode: {'Enabled' if self.debug else 'Disabled'}\n"
               f"------------------------------------------------------------")
         self.socketMonitor = XTablesSocketMonitor(self, self.context)
         self.socketMonitor.add_socket("PUSH", self.push_socket)
@@ -605,21 +605,21 @@ class XTablesClient:
 class XTablesServerNotFound(Exception):
     pass
 
-
-def consumer(test):
-    print("UPDATE: " + test.key + " " + str(
-        XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
-
-
-if __name__ == "__main__":
-    client = XTablesClient()
-    client.subscribe_all(consumer)
-    coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
-
-    client.putCoordinates("test", coordinates)
-    print(client.getCoordinates("test")[0])
-    time.sleep(100000)
-
-    # print(client.getUnknownBytes("name"))
-    # print(client.getString("age"))
-    # print(client.getArray("numbers"))
+#
+# def consumer(test):
+#     print("UPDATE: " + test.key + " " + str(
+#         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
+#
+#
+# if __name__ == "__main__":
+#     client = XTablesClient()
+#     client.subscribe_all(consumer)
+#     coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
+#
+#     client.putCoordinates("test", coordinates)
+#     print(client.getCoordinates("test")[0])
+#     time.sleep(100000)
+#
+#     # print(client.getUnknownBytes("name"))
+#     # print(client.getString("age"))
+#     # print(client.getArray("numbers"))
