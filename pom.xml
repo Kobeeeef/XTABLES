@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kobe.xbot</groupId>
     <artifactId>xtables</artifactId>
-    <version>4.6.2</version>
+    <version>4.6.3</version>
     <distributionManagement>
         <repository>
             <id>github</id>
@@ -84,11 +84,6 @@
             <groupId>org.jmdns</groupId>
             <artifactId>jmdns</artifactId>
             <version>3.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.5.16</version>
         </dependency>
     </dependencies>
 </project>

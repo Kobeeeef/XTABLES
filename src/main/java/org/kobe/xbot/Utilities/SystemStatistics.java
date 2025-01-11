@@ -40,7 +40,7 @@ public class SystemStatistics {
     private List<ClientData> clientDataList;
     private String version;
     private final String type = "JAVA";
-    private final long nextClientRegistryUpdate;
+    private long nextClientRegistryUpdate;
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -54,7 +54,11 @@ public class SystemStatistics {
 
     public SystemStatistics(XTablesServer instance) {
         this.nanoTime = System.nanoTime();
-        this.totalClients = instance.getClientRegistry().getClients().size();
+        if(instance.getClientRegistry() != null) {
+            this.totalClients = instance.getClientRegistry().getClients().size();
+        } else {
+            this.totalClients = -1;
+        }
         this.maxMemoryMB = osMXBean.getTotalPhysicalMemorySize() / (1024 * 1024);
         this.freeMemoryMB = osMXBean.getFreePhysicalMemorySize() / (1024 * 1024);
         this.usedMemoryMB = maxMemoryMB - freeMemoryMB;
@@ -83,11 +87,17 @@ public class SystemStatistics {
         this.totalPublishMessages = instance.publishMessages.get();
         this.version = instance.getVersion();
         this.status = instance.getStatus();
-        this.nextClientRegistryUpdate = instance.getClientRegistry().getMillisBeforeNextLoop();
+        if (instance.getClientRegistry() != null) {
+            this.nextClientRegistryUpdate = instance.getClientRegistry().getMillisBeforeNextLoop();
+        } else {
+            this.nextClientRegistryUpdate = -1;
+        }
         this.maxIterationsPerSecond = instance.getIterationSpeed();
-        this.publishPs = instance.getRate().getPublishMessagesPerSecond();
-        this.pullPs = instance.getRate().getPullMessagesPerSecond();
-        this.replyPs = instance.getRate().getReplyMessagesPerSecond();
+        if(instance.getRate() != null) {
+            this.publishPs = instance.getRate().getPublishMessagesPerSecond();
+            this.pullPs = instance.getRate().getPullMessagesPerSecond();
+            this.replyPs = instance.getRate().getReplyMessagesPerSecond();
+        }
     }
 
     public int getMaxIterationsPerSecond() {

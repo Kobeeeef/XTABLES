@@ -476,6 +476,8 @@ public class XTablesByteUtils {
      */
     public static String autoFromBytesToJsonString(byte[] bytes, XTableProto.XTableMessage.Type type) throws XTablesException {
         try {
+            if(bytes == null || type == null)
+                return null;
             // Convert the byte array to the appropriate object based on the type
             Object convertedValue = autoFromBytes(bytes, type);
 

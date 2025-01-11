@@ -1,14 +1,9 @@
 package org.kobe.xbot.JServer;
 
 import com.google.protobuf.ByteString;
-import org.kobe.xbot.Utilities.ClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
-import org.kobe.xbot.Utilities.Utilities;
 import org.zeromq.ZMQ;
-
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * PushPullRequestHandler - A handler for processing push-pull messages using JeroMQ.
@@ -103,8 +98,9 @@ public class PushPullRequestHandler extends BaseHandler {
                             byte[] value = message.getValue().toByteArray();
                             try {
                                 XTableClientStatistics.ClientStatistics clientStatistics = XTableClientStatistics.ClientStatistics.parseFrom(value);
-                                instance.getClientRegistry().getClients()
-                                        .add(clientStatistics);
+                                if (instance.getClientRegistry() != null)
+                                    instance.getClientRegistry().getClients()
+                                            .add(clientStatistics);
                             } catch (Exception e) {
                                 logger.warning("Failed to parse client statistics: " + e.getMessage());
                             }
@@ -113,7 +109,7 @@ public class PushPullRequestHandler extends BaseHandler {
                 }
             }
             case INFORMATION -> {
-                if (message.hasId()) {
+                if (message.hasId() && instance.getClientRegistry() != null) {
                     if (message.getId().equals(instance.getClientRegistry().getSessionId())) {
                         if (message.hasValue()) {
                             byte[] value = message.getValue().toByteArray();

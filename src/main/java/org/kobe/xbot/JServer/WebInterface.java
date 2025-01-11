@@ -21,7 +21,6 @@ import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.kobe.xbot.Utilities.SystemStatistics;
 import org.kobe.xbot.Utilities.Utilities;
-import org.zeromq.ZMQ;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -137,13 +136,15 @@ public class WebInterface {
                 resp.setContentType("application/json");
                 resp.setCharacterEncoding("UTF-8");
                 SystemStatistics systemStatistics = new SystemStatistics(server);
-                systemStatistics.setClientDataList(((List<XTableClientStatistics.ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().map(m -> {
-                    ClientData data = new ClientData(m.getIp(),
-                            m.getHostname(),
-                            m.getUuid());
-                    data.setStats(gson.toJson(ClientStatistics.fromProtobuf(m)));
-                    return data;
-                }).collect(Collectors.toList()));
+                if (server.getClientRegistry() != null) {
+                    systemStatistics.setClientDataList(((List<XTableClientStatistics.ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().map(m -> {
+                        ClientData data = new ClientData(m.getIp(),
+                                m.getHostname(),
+                                m.getUuid());
+                        data.setStats(gson.toJson(ClientStatistics.fromProtobuf(m)));
+                        return data;
+                    }).collect(Collectors.toList()));
+                }
                 try {
                     systemStatistics.setHostname(InetAddress.getLocalHost().getHostName());
                 } catch (Exception ignored) {
@@ -216,20 +217,25 @@ public class WebInterface {
                 resp.setContentType("application/json");
                 resp.setCharacterEncoding("UTF-8");
                 try {
-                    if (!xTablesServer.getClientRegistry().shouldStopClientRegistry(5)) {
-                        xTablesServer.getClientRegistrySession().set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
-                        xTablesServer.getClientRegistry().getClients().clear();
-                        xTablesServer.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
-                                .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
-                                .setValue(xTablesServer.getClientRegistrySessionId())
-                                .build().toByteArray()
-                        );
+                    if (xTablesServer.getClientRegistry() != null) {
+                        if (!xTablesServer.getClientRegistry().shouldStopClientRegistry(5)) {
+                            xTablesServer.getClientRegistrySession().set(ByteString.copyFrom(Utilities.generateRandomBytes(10)));
+                            xTablesServer.getClientRegistry().getClients().clear();
+                            xTablesServer.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                                    .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
+                                    .setValue(xTablesServer.getClientRegistrySessionId())
+                                    .build().toByteArray()
+                            );
+                        }
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                        resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been reloaded!\"}");
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_CONFLICT);
+                        resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"No Client Registry\"}");
                     }
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.getWriter().println("{ \"status\": \"success\", \"message\": \"Server has been reloaded!\"}");
                 } catch (Exception e) {
                     resp.setStatus(HttpServletResponse.SC_CONFLICT);
-                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Server cannot reboot while: " + server.getStatus().name() + "\"}");
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"Server cannot reload while: " + server.getStatus().name() + "\"}");
                 }
 
             }
@@ -267,22 +273,25 @@ public class WebInterface {
                     return;
                 }
 
-
-                Optional<XTableClientStatistics.ClientStatistics> clientHandler = ((List<XTableClientStatistics.ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().filter(f -> f.getUuid().equals(uuid.toString())).findFirst();
-                if (clientHandler.isPresent()) {
-                    boolean success = server.getClientRegistry().getClients().remove(clientHandler.get());
-                    if (success) {
-                        resp.setStatus(HttpServletResponse.SC_OK);
-                        resp.getWriter().println("{ \"status\": \"success\", \"message\": \"The client has been disconnected!\"}");
+                if (xTablesServer.getClientRegistry() != null) {
+                    Optional<XTableClientStatistics.ClientStatistics> clientHandler = ((List<XTableClientStatistics.ClientStatistics>) server.getClientRegistry().getClients().clone()).stream().filter(f -> f.getUuid().equals(uuid.toString())).findFirst();
+                    if (clientHandler.isPresent()) {
+                        boolean success = server.getClientRegistry().getClients().remove(clientHandler.get());
+                        if (success) {
+                            resp.setStatus(HttpServletResponse.SC_OK);
+                            resp.getWriter().println("{ \"status\": \"success\", \"message\": \"The client has been disconnected!\"}");
+                        } else {
+                            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
+                        }
                     } else {
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
                     }
                 } else {
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"This client does not exist!\"}");
+                    resp.setStatus(HttpServletResponse.SC_CONFLICT);
+                    resp.getWriter().println("{ \"status\": \"failed\", \"message\": \"There is no client registry.\"}");
                 }
-
             }
         }), "/api/disconnect");
     }

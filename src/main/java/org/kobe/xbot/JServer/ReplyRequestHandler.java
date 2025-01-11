@@ -9,7 +9,6 @@ import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.zeromq.ZMQ;
 
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +102,7 @@ public class ReplyRequestHandler extends BaseHandler {
 
                                 if (tables != null && !tables.isEmpty()) {
                                     byte[] resp = XTablesByteUtils.toByteArray(tables.toArray(new String[0]));
-                                   if(resp != null) builder.setValue(ByteString.copyFrom(resp));
+                                    if (resp != null) builder.setValue(ByteString.copyFrom(resp));
                                 }
                             } else {
                                 tables = XTablesServer.table.getTables("");
@@ -156,13 +155,15 @@ public class ReplyRequestHandler extends BaseHandler {
                         }
                         case INFORMATION -> {
                             SystemStatistics systemStatistics = new SystemStatistics(instance);
-                            systemStatistics.setClientDataList(((List<XTableClientStatistics.ClientStatistics>) instance.getClientRegistry().getClients().clone()).stream().map(m -> {
-                                ClientData data = new ClientData(m.getIp(),
-                                        m.getHostname(),
-                                        m.getUuid());
-                                data.setStats(gson.toJson(ClientStatistics.fromProtobuf(m)));
-                                return data;
-                            }).collect(Collectors.toList()));
+                            if (instance.getClientRegistry() != null) {
+                                systemStatistics.setClientDataList(((List<XTableClientStatistics.ClientStatistics>) instance.getClientRegistry().getClients().clone()).stream().map(m -> {
+                                    ClientData data = new ClientData(m.getIp(),
+                                            m.getHostname(),
+                                            m.getUuid());
+                                    data.setStats(gson.toJson(ClientStatistics.fromProtobuf(m)));
+                                    return data;
+                                }).collect(Collectors.toList()));
+                            }
                             try {
                                 systemStatistics.setHostname(InetAddress.getLocalHost().getHostName());
                             } catch (Exception ignored) {
