@@ -2,16 +2,13 @@ package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.kobe.xbot.Utilities.DataCompression;
+import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.PingResponse;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
-import org.kobe.xbot.Utilities.SystemStatistics;
-import org.kobe.xbot.Utilities.TempConnectionManager;
-import org.kobe.xbot.Utilities.XTablesByteUtils;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -43,7 +40,7 @@ import java.util.function.Consumer;
  * This is part of the XTABLES project and provides client-side functionality for
  * socket communication with the server.
  */
-public class XTablesClient {
+public class ConcurrentXTablesClient {
     // =============================================================
     // Static Variables
     // These variables belong to the class itself and are shared
@@ -72,12 +69,14 @@ public class XTablesClient {
     private final ZMQ.Socket pushSocket;
     private final ZMQ.Socket clientRegistrySocket;
     private ZMQ.Socket reqSocket;
-    private final SubscribeHandler subscribeHandler;
+    private final ConcurrentSubscribeHandler subscribeHandler;
+    private final ConcurrentPushHandler pushHandler;
+    public final CircularBuffer<byte[]> pushBuffer = new CircularBuffer<>(500);
     /**
      * Default constructor for XTablesClient.
      * Initializes the client without specifying an IP address.
      */
-    public XTablesClient() {
+    public ConcurrentXTablesClient() {
         this(null);
     }
 
@@ -95,7 +94,7 @@ public class XTablesClient {
      *
      * @param ip The IP address of the XTABLES server. If null, it will resolve the IP automatically.
      */
-    public XTablesClient(String ip) {
+    public ConcurrentXTablesClient(String ip) {
         this(ip, 1735, 1736, 1737);
     }
 
@@ -109,7 +108,7 @@ public class XTablesClient {
      * @param requestSocketPort   The port for the request socket.
      * @param subscribeSocketPort The port for the subscriber socket.
      */
-    public XTablesClient(String ip, int pushSocketPort, int requestSocketPort, int subscribeSocketPort) {
+    public ConcurrentXTablesClient(String ip, int pushSocketPort, int requestSocketPort, int subscribeSocketPort) {
         if (ip == null) {
             this.ip = resolveHostByName();
             if (this.ip == null) {
@@ -165,8 +164,10 @@ public class XTablesClient {
                 .build().toByteArray());
         this.subscriptionConsumers = new HashMap<>();
         this.logConsumers = new ArrayList<>();
-        this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
+        this.subscribeHandler = new ConcurrentSubscribeHandler(this.subSocket, this);
         this.subscribeHandler.start();
+        this.pushHandler = new ConcurrentPushHandler(this.pushSocket, this);
+        this.pushHandler.start();
     }
 
     private void reconnectRequestSocket() {
@@ -187,10 +188,9 @@ public class XTablesClient {
      *
      * @param key   The key associated with the value.
      * @param value The byte array value to be sent.
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putBytes(String key, byte[] value) {
-        return sendPutMessage(key, value, XTableProto.XTableMessage.Type.BYTES);
+    public void putBytes(String key, byte[] value) {
+         sendPutMessage(key, value, XTableProto.XTableMessage.Type.BYTES);
     }
 
     /**
@@ -202,10 +202,9 @@ public class XTablesClient {
      * @param key   The key associated with the value.
      * @param value The byte array value to be sent.
      * @param type  The type of the value being sent (e.g., STRING, INT64, etc.).
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putBytes(String key, byte[] value, XTableProto.XTableMessage.Type type) {
-        return sendPutMessage(key, value, type);
+    public void putBytes(String key, byte[] value, XTableProto.XTableMessage.Type type) {
+         sendPutMessage(key, value, type);
     }
 
     /**
@@ -216,10 +215,9 @@ public class XTablesClient {
      *
      * @param key   The key associated with the value. This is the identifier for the data.
      * @param value The byte array value to be sent. Contains the data to be sent to the server.
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putUnknownBytes(String key, byte[] value) {
-        return sendPutMessage(key, value, XTableProto.XTableMessage.Type.UNKNOWN);
+    public void putUnknownBytes(String key, byte[] value) {
+         sendPutMessage(key, value, XTableProto.XTableMessage.Type.UNKNOWN);
     }
 
     /**
@@ -229,10 +227,9 @@ public class XTablesClient {
      *
      * @param key   The key associated with the string value.
      * @param value The string value to be sent.
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putString(String key, String value) {
-        return sendPutMessage(key, value.getBytes(StandardCharsets.UTF_8), XTableProto.XTableMessage.Type.STRING);
+    public void putString(String key, String value) {
+         sendPutMessage(key, value.getBytes(StandardCharsets.UTF_8), XTableProto.XTableMessage.Type.STRING);
     }
 
     /**
@@ -243,12 +240,11 @@ public class XTablesClient {
      *
      * @param key   The key associated with the list of coordinates.
      * @param value The list of `Coordinate` objects to be sent.
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putCoordinates(String key, List<XTableValues.Coordinate> value) {
+    public void putCoordinates(String key, List<XTableValues.Coordinate> value) {
         XTableValues.CoordinateList list = XTableValues.CoordinateList.newBuilder()
                 .addAllCoordinates(value).build();
-        return sendPutMessage(key, list.toByteArray(), XTableProto.XTableMessage.Type.BYTES);
+         sendPutMessage(key, list.toByteArray(), XTableProto.XTableMessage.Type.BYTES);
     }
 
     /**
@@ -259,11 +255,10 @@ public class XTablesClient {
      *
      * @param key   The key associated with the Integer value.
      * @param value The Integer value to be sent.
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putInteger(String key, Integer value) {
+    public void putInteger(String key, Integer value) {
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(value).array();
-        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 4-byte Integer
+         sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 4-byte Integer
     }
 
     /**
@@ -273,11 +268,10 @@ public class XTablesClient {
      *
      * @param key   The key associated with the Long value.
      * @param value The Long value to be sent.
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putLong(String key, Long value) {
+    public void putLong(String key, Long value) {
         byte[] valueBytes = ByteBuffer.allocate(8).putLong(value).array();
-        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 8-byte Long
+         sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 8-byte Long
     }
 
     /**
@@ -287,11 +281,10 @@ public class XTablesClient {
      *
      * @param key   The key associated with the Double value.
      * @param value The Double value to be sent.
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putDouble(String key, Double value) {
+    public void putDouble(String key, Double value) {
         byte[] valueBytes = ByteBuffer.allocate(8).putDouble(value).array();
-        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE for 8-byte Double
+         sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE for 8-byte Double
     }
 
     /**
@@ -304,10 +297,9 @@ public class XTablesClient {
      *
      * @param key   The key associated with the boolean value.
      * @param value The boolean value to be sent (true or false).
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public boolean putBoolean(String key, boolean value) {
-        return sendPutMessage(key, value ? success : fail, XTableProto.XTableMessage.Type.BOOL); // Using DOUBLE for 8-byte Double
+    public void putBoolean(String key, boolean value) {
+         sendPutMessage(key, value ? success : fail, XTableProto.XTableMessage.Type.BOOL); // Using DOUBLE for 8-byte Double
     }
 
     /**
@@ -318,10 +310,9 @@ public class XTablesClient {
      * @param key   The key associated with the List value.
      * @param value The List of values to be sent.
      * @param <T>   The type of the elements in the list.
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    public <T> boolean putList(String key, T[] value) {
-        return sendPutMessage(key, XTablesByteUtils.toByteArray(value), XTableProto.XTableMessage.Type.ARRAY); // Using DOUBLE as the type for List serialization
+    public <T> void putList(String key, T[] value) {
+         sendPutMessage(key, XTablesByteUtils.toByteArray(value), XTableProto.XTableMessage.Type.ARRAY); // Using DOUBLE as the type for List serialization
     }
 
     /**
@@ -332,17 +323,16 @@ public class XTablesClient {
      * @param key   The key associated with the value.
      * @param value The byte array representing the value to be sent.
      * @param type  The type of the value being sent (e.g., STRING, INT64, etc.).
-     * @return True if the message was sent successfully; otherwise, false.
      */
-    private boolean sendPutMessage(String key, byte[] value, XTableProto.XTableMessage.Type type) {
+    private void sendPutMessage(String key, byte[] value, XTableProto.XTableMessage.Type type) {
         try {
-            return pushSocket.send(XTableProto.XTableMessage.newBuilder()
+            pushBuffer.write(XTableProto.XTableMessage.newBuilder()
                     .setKey(key)
                     .setCommand(XTableProto.XTableMessage.Command.PUT)
                     .setValue(ByteString.copyFrom(value))
                     .setType(type)
                     .build()
-                    .toByteArray(), ZMQ.DONTWAIT);
+                    .toByteArray());
         } catch (Exception e) {
             throw new XTablesException(e);
         }
@@ -354,17 +344,17 @@ public class XTablesClient {
      *
      * @param key   The key associated with the message being published.
      * @param value The value (byte array) to be published with the key.
-     * @return true if the message was successfully sent, false otherwise.
      * @throws XTablesException if there is an exception during the publication process.
      */
-    public boolean publish(String key, byte[] value) {
+    public void publish(String key, byte[] value) {
         try {
-            return pushSocket.send(XTableProto.XTableMessage.newBuilder()
+
+            pushBuffer.write(XTableProto.XTableMessage.newBuilder()
                     .setKey(key)
                     .setCommand(XTableProto.XTableMessage.Command.PUBLISH)
                     .setValue(ByteString.copyFrom(value))
                     .build()
-                    .toByteArray(), ZMQ.DONTWAIT);
+                    .toByteArray());
         } catch (Exception e) {
             throw new XTablesException(e);
         }
