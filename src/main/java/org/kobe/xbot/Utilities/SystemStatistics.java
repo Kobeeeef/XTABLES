@@ -2,10 +2,6 @@ package org.kobe.xbot.Utilities;
 
 import com.sun.management.OperatingSystemMXBean;
 import org.kobe.xbot.JServer.XTablesServer;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.HardwareAbstractionLayer;
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.RuntimeMXBean;
@@ -45,10 +41,6 @@ public class SystemStatistics {
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     private static final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-
-    private static final SystemInfo systemInfo = new SystemInfo();
-    private static final HardwareAbstractionLayer hal = systemInfo.getHardware();
-    private static final CentralProcessor processor = hal.getProcessor();
     private static final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
 
 
