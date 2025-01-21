@@ -1143,4 +1143,7 @@ public class XTablesClient {
         return subSocket;
     }
 
+    public String getIp() {
+        return ip;
+    }
 }
