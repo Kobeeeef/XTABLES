@@ -1,16 +1,4 @@
 #!/bin/bash
-
-# Check if the required arguments are provided
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <hostname> <username> <password>"
-    exit 1
-fi
-
-# Parse the arguments
-HOSTNAME=$1
-USERNAME=$2
-PASSWORD=$3
-
 # Variables
 SERVICE_NAME="xtables"
 SERVICE_DESC="XTABLES Service"
