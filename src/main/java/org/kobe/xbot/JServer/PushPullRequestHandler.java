@@ -46,7 +46,13 @@ public class PushPullRequestHandler extends BaseHandler {
                 instance.pullMessages.incrementAndGet();
                 try {
                     XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(bytes);
-                    processMessage(message);
+                    XTableProto.XTableMessage.Command command = message.getCommand();
+                    if (command.equals(XTableProto.XTableMessage.Command.BATCH)) {
+                        for (XTableProto.XTableMessage msg : message.getBatchList()) {
+                            processMessage(msg, msg.getCommand());
+                        }
+                    } else processMessage(message, command);
+
                 } catch (Exception e) {
                     handleException(e);
                 }
@@ -61,8 +67,8 @@ public class PushPullRequestHandler extends BaseHandler {
      *
      * @param message The received XTableMessage
      */
-    private void processMessage(XTableProto.XTableMessage message) {
-        XTableProto.XTableMessage.Command command = message.getCommand();
+    private void processMessage(XTableProto.XTableMessage message, XTableProto.XTableMessage.Command command) {
+
         switch (command) {
             case PUT -> {
                 if (message.hasKey() && message.hasValue()) {
@@ -132,6 +138,4 @@ public class PushPullRequestHandler extends BaseHandler {
             default -> logger.warning("Unhandled pull command: " + command);
         }
     }
-
-
 }

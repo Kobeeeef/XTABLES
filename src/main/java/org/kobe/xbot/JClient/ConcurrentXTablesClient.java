@@ -3,6 +3,7 @@ package org.kobe.xbot.JClient;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.Entities.BatchedPushRequests;
 import org.kobe.xbot.Utilities.Entities.PingResponse;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
@@ -57,7 +58,7 @@ public class ConcurrentXTablesClient {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v4.6.3 | Build Date: 1/10/2025";
+            "XTABLES Jero Client v4.6.7 | Build Date: 1/24/2025";
 
     private final String ip;
     private final int requestSocketPort;
@@ -302,18 +303,6 @@ public class ConcurrentXTablesClient {
          sendPutMessage(key, value ? success : fail, XTableProto.XTableMessage.Type.BOOL); // Using DOUBLE for 8-byte Double
     }
 
-    /**
-     * Sends a PUT request with a List of values to the server.
-     * <p>
-     * This method serializes the provided List to a byte array and sends it to the server with the ARRAY type.
-     *
-     * @param key   The key associated with the List value.
-     * @param value The List of values to be sent.
-     * @param <T>   The type of the elements in the list.
-     */
-    public <T> void putList(String key, T[] value) {
-         sendPutMessage(key, XTablesByteUtils.toByteArray(value), XTableProto.XTableMessage.Type.ARRAY); // Using DOUBLE as the type for List serialization
-    }
 
     /**
      * Sends a message via the PUSH socket to the server.
@@ -359,7 +348,28 @@ public class ConcurrentXTablesClient {
             throw new XTablesException(e);
         }
     }
-
+    /**
+     * Sends a batch of push requests to the push socket. The requests are sent using
+     * the "BATCH" command. The batch is serialized into a single message and sent
+     * as a payload.
+     *
+     * @param batchedPushRequests The collection of push requests to be sent.
+     *                            This should contain the data that will be part of
+     *                            the batched message.
+     * @throws XTablesException if any exception occurs during the process of sending
+     *                          the batched push requests.
+     */
+    public void sendBatchedPushRequests(BatchedPushRequests batchedPushRequests) {
+        try {
+             pushBuffer.write(XTableProto.XTableMessage.newBuilder()
+                    .setCommand(XTableProto.XTableMessage.Command.BATCH)
+                    .addAllBatch(batchedPushRequests.getData())
+                    .build()
+                    .toByteArray());
+        } catch (Exception e) {
+            throw new XTablesException(e);
+        }
+    }
     /**
      * Executes a GET request to retrieve a String value associated with the specified key.
      * <p>
@@ -493,56 +503,8 @@ public class ConcurrentXTablesClient {
         }
     }
 
-    /**
-     * Executes a GET request to retrieve a List of values associated with the specified key.
-     * <p>
-     * This method sends a GET request for the given key and checks if the returned message
-     * type is ARRAY. If so, it converts the byte array value to a List of the specified type
-     * using the `Utilities.fromByteArray()` method. Otherwise, it throws an IllegalArgumentException
-     * indicating the wrong type.
-     *
-     * @param key The key associated with the List value.
-     * @return A List of values associated with the given key.
-     * @throws IllegalArgumentException If the returned message type is not ARRAY.
-     */
-    public Object[] getList(String key) {
-        XTableProto.XTableMessage message = getXTableMessage(key);
-        if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.ARRAY)) {
-            byte[] valueBytes = message.getValue().toByteArray();
-            return XTablesByteUtils.fromByteArray(valueBytes);
-        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
-            return null;
-        } else {
-            throw new IllegalArgumentException("Expected ARRAY type, but got: " + message.getType());
-        }
-    }
 
-    /**
-     * Executes a GET request to retrieve a List of values for a given key.
-     * <p>
-     * This method sends a GET request for the given key and checks if the returned message
-     * type is ARRAY.
-     * If so, it converts the byte array value to a List of the specified type
-     * using the `XTablesByteUtils.fromByteArray()` method.
-     * Otherwise, it throws an IllegalArgumentException
-     * indicating the wrong type.
-     *
-     * @param key  The key associated with the List value.
-     * @param type The class type of the list values.
-     * @return A List of values associated with the given key.
-     * @throws IllegalArgumentException If the returned message type is not ARRAY.
-     */
-    public <T> T[] getList(String key, Class<T> type) {
-        XTableProto.XTableMessage message = getXTableMessage(key);
-        if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.ARRAY)) {
-            byte[] valueBytes = message.getValue().toByteArray();
-            return XTablesByteUtils.fromByteArray(valueBytes, type);
-        } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
-            return null;
-        } else {
-            throw new IllegalArgumentException("Expected ARRAY type, but got: " + message.getType());
-        }
-    }
+
 
     /**
      * Executes a GET request to retrieve a list of coordinates associated with the specified key.
