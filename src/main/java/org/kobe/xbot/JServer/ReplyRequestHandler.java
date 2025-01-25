@@ -6,6 +6,7 @@ import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.zeromq.ZMQ;
 
 import java.net.InetAddress;
@@ -101,18 +102,19 @@ public class ReplyRequestHandler extends BaseHandler {
 
 
                                 if (tables != null && !tables.isEmpty()) {
-                                    byte[] resp = XTablesByteUtils.toByteArray(tables.toArray(new String[0]));
-                                    if (resp != null) builder.setValue(ByteString.copyFrom(resp));
+                                   builder.setValue(XTableValues.StringList.newBuilder()
+                                            .addAllV(tables)
+                                            .build()
+                                            .toByteString());
                                 }
                             } else {
                                 tables = XTablesServer.table.getTables("");
                                 if (tables != null && !tables.isEmpty()) {
                                     List<String> tablesList = new ArrayList<>(tables);
-
-                                    byte[] resp = XTablesByteUtils.toByteArray(tablesList.toArray());
-                                    if (resp != null) {
-                                        builder.setValue(ByteString.copyFrom(resp));
-                                    }
+                                    builder.setValue(XTableValues.StringList.newBuilder()
+                                            .addAllV(tablesList)
+                                            .build()
+                                            .toByteString());
                                 }
                             }
                             socket.send(builder.build().toByteArray(), ZMQ.DONTWAIT);

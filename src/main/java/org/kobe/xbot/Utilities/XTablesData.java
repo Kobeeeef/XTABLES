@@ -2,7 +2,9 @@ package org.kobe.xbot.Utilities;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
 import java.lang.reflect.Type;
@@ -271,7 +273,85 @@ public class XTablesData {
                     case INT64 -> new JsonPrimitive(bytesToLong(node.value));
                     case BOOL -> new JsonPrimitive(node.value[0] == 0x01);
                     case DOUBLE -> new JsonPrimitive(bytesToDouble(node.value));
-
+                    case FLOAT_LIST -> {
+                        JsonArray jsonArray = new JsonArray();
+                        try {
+                            XTableValues.FloatList floatList = XTableValues.FloatList.parseFrom(node.value);
+                            for (float f : floatList.getVList()) {
+                                jsonArray.add(new JsonPrimitive(f));
+                            }
+                            yield jsonArray;
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException("Failed to parse FloatList", e);
+                        }
+                    }
+                    case DOUBLE_LIST -> {
+                        JsonArray jsonArray = new JsonArray();
+                        try {
+                            XTableValues.DoubleList doubleList = XTableValues.DoubleList.parseFrom(node.value);
+                            for (Double aDouble : doubleList.getVList()) {
+                                jsonArray.add(new JsonPrimitive(aDouble));
+                            }
+                            yield jsonArray;
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException("Failed to parse DoubleList", e);
+                        }
+                    }
+                    case STRING_LIST -> {
+                        JsonArray jsonArray = new JsonArray();
+                        try {
+                            XTableValues.StringList stringList = XTableValues.StringList.parseFrom(node.value);
+                            for (String str : stringList.getVList()) {
+                                jsonArray.add(new JsonPrimitive(str));
+                            }
+                            yield jsonArray;
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException("Failed to parse StringList", e);
+                        }
+                    }
+                    case INTEGER_LIST -> {
+                        JsonArray jsonArray = new JsonArray();
+                        try {
+                            XTableValues.IntegerList intList = XTableValues.IntegerList.parseFrom(node.value);
+                            for (int i : intList.getVList()) {
+                                jsonArray.add(new JsonPrimitive(i));
+                            }
+                            yield jsonArray;
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException("Failed to parse IntegerList", e);
+                        }
+                    }
+                    case LONG_LIST -> {
+                        JsonArray jsonArray = new JsonArray();
+                        try {
+                            XTableValues.LongList longList = XTableValues.LongList.parseFrom(node.value);
+                            for (long l : longList.getVList()) {
+                                jsonArray.add(new JsonPrimitive(l));
+                            }
+                            yield jsonArray;
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException("Failed to parse LongList", e);
+                        }
+                    }
+                    case BYTES_LIST -> {
+                        JsonArray byteArray = new JsonArray();
+                        for (byte b : node.value) {
+                            byteArray.add(b);
+                        }
+                        yield byteArray;
+                    }
+                    case BOOLEAN_LIST -> {
+                        JsonArray jsonArray = new JsonArray();
+                        try {
+                            XTableValues.BoolList boolList = XTableValues.BoolList.parseFrom(node.value);
+                            for (boolean bool : boolList.getVList()) {
+                                jsonArray.add(new JsonPrimitive(bool));
+                            }
+                            yield jsonArray;
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException("Failed to parse BoolList", e);
+                        }
+                    }
                     case BYTES, UNKNOWN -> {
                         JsonArray byteArray = new JsonArray();
                         for (byte b : node.value) {

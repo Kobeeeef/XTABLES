@@ -1,12 +1,10 @@
 package org.kobe.xbot.JClient;
 
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.kobe.xbot.Utilities.*;
-import org.kobe.xbot.Utilities.Entities.BatchedPushRequests;
-import org.kobe.xbot.Utilities.Entities.PingResponse;
-import org.kobe.xbot.Utilities.Entities.XTableProto;
-import org.kobe.xbot.Utilities.Entities.XTableValues;
+import org.kobe.xbot.Utilities.Entities.*;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
@@ -41,7 +39,7 @@ import java.util.function.Consumer;
  * This is part of the XTABLES project and provides client-side functionality for
  * socket communication with the server.
  */
-public class ConcurrentXTablesClient {
+public class ConcurrentXTablesClient implements PushRequests {
     // =============================================================
     // Static Variables
     // These variables belong to the class itself and are shared
@@ -49,10 +47,10 @@ public class ConcurrentXTablesClient {
     // =============================================================
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     public static final String UUID = java.util.UUID.randomUUID().toString();
-    private static final byte[] success = new byte[]{(byte) 0x01};
-    private static final byte[] fail = new byte[]{(byte) 0x00};
-    private static final ByteString successByte = ByteString.copyFrom(success);
-    private static final ByteString failByte = ByteString.copyFrom(fail);
+    public static final byte[] success = new byte[]{(byte) 0x01};
+    public static final byte[] fail = new byte[]{(byte) 0x00};
+    public static final ByteString successByte = ByteString.copyFrom(success);
+    public static final ByteString failByte = ByteString.copyFrom(fail);
     // =============================================================
     // Instance Variables
     // These variables are unique to each instance of the class.
@@ -189,9 +187,11 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the value.
      * @param value The byte array value to be sent.
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putBytes(String key, byte[] value) {
-         sendPutMessage(key, value, XTableProto.XTableMessage.Type.BYTES);
+    @Override
+    public boolean putBytes(String key, byte[] value) {
+        return sendPutMessage(key, value, XTableProto.XTableMessage.Type.BYTES);
     }
 
     /**
@@ -203,9 +203,11 @@ public class ConcurrentXTablesClient {
      * @param key   The key associated with the value.
      * @param value The byte array value to be sent.
      * @param type  The type of the value being sent (e.g., STRING, INT64, etc.).
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putBytes(String key, byte[] value, XTableProto.XTableMessage.Type type) {
-         sendPutMessage(key, value, type);
+    @Override
+    public boolean putBytes(String key, byte[] value, XTableProto.XTableMessage.Type type) {
+        return sendPutMessage(key, value, type);
     }
 
     /**
@@ -216,9 +218,11 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the value. This is the identifier for the data.
      * @param value The byte array value to be sent. Contains the data to be sent to the server.
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putUnknownBytes(String key, byte[] value) {
-         sendPutMessage(key, value, XTableProto.XTableMessage.Type.UNKNOWN);
+    @Override
+    public boolean putUnknownBytes(String key, byte[] value) {
+        return sendPutMessage(key, value, XTableProto.XTableMessage.Type.UNKNOWN);
     }
 
     /**
@@ -228,9 +232,11 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the string value.
      * @param value The string value to be sent.
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putString(String key, String value) {
-         sendPutMessage(key, value.getBytes(StandardCharsets.UTF_8), XTableProto.XTableMessage.Type.STRING);
+    @Override
+    public boolean putString(String key, String value) {
+        return sendPutMessage(key, value.getBytes(StandardCharsets.UTF_8), XTableProto.XTableMessage.Type.STRING);
     }
 
     /**
@@ -241,11 +247,13 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the list of coordinates.
      * @param value The list of `Coordinate` objects to be sent.
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putCoordinates(String key, List<XTableValues.Coordinate> value) {
+    @Override
+    public boolean putCoordinates(String key, List<XTableValues.Coordinate> value) {
         XTableValues.CoordinateList list = XTableValues.CoordinateList.newBuilder()
                 .addAllCoordinates(value).build();
-         sendPutMessage(key, list.toByteArray(), XTableProto.XTableMessage.Type.BYTES);
+        return sendPutMessage(key, list.toByteArray(), XTableProto.XTableMessage.Type.BYTES);
     }
 
     /**
@@ -256,10 +264,12 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the Integer value.
      * @param value The Integer value to be sent.
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putInteger(String key, Integer value) {
+    @Override
+    public boolean putInteger(String key, Integer value) {
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(value).array();
-         sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 4-byte Integer
+        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 4-byte Integer
     }
 
     /**
@@ -269,10 +279,12 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the Long value.
      * @param value The Long value to be sent.
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putLong(String key, Long value) {
+    @Override
+    public boolean putLong(String key, Long value) {
         byte[] valueBytes = ByteBuffer.allocate(8).putLong(value).array();
-         sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 8-byte Long
+        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 8-byte Long
     }
 
     /**
@@ -282,10 +294,12 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the Double value.
      * @param value The Double value to be sent.
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putDouble(String key, Double value) {
+    @Override
+    public boolean putDouble(String key, Double value) {
         byte[] valueBytes = ByteBuffer.allocate(8).putDouble(value).array();
-         sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE for 8-byte Double
+        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.DOUBLE); // Using DOUBLE for 8-byte Double
     }
 
     /**
@@ -298,11 +312,61 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the boolean value.
      * @param value The boolean value to be sent (true or false).
+     * @return True if the message was sent successfully; otherwise, false.
      */
-    public void putBoolean(String key, boolean value) {
-         sendPutMessage(key, value ? success : fail, XTableProto.XTableMessage.Type.BOOL); // Using DOUBLE for 8-byte Double
+    @Override
+    public boolean putBoolean(String key, boolean value) {
+        return sendPutMessage(key, value ? success : fail, XTableProto.XTableMessage.Type.BOOL); // Using DOUBLE for 8-byte Double
     }
 
+    @Override
+    public boolean putDoubleList(String key, List<Double> value) {
+        XTableValues.DoubleList.Builder builder = XTableValues.DoubleList.newBuilder()
+                .addAllV(value);
+        return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.DOUBLE_LIST);
+    }
+
+    @Override
+    public boolean putStringList(String key, List<String> value) {
+        XTableValues.StringList.Builder builder = XTableValues.StringList.newBuilder()
+                .addAllV(value);
+        return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.STRING_LIST);
+    }
+
+    @Override
+    public boolean putIntegerList(String key, List<Integer> value) {
+        XTableValues.IntegerList.Builder builder = XTableValues.IntegerList.newBuilder()
+                .addAllV(value);
+        return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.INTEGER_LIST);
+    }
+
+    @Override
+    public boolean putBytesList(String key, List<ByteString> value) {
+        XTableValues.BytesList.Builder builder = XTableValues.BytesList.newBuilder()
+                .addAllV(value);
+        return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.BYTES_LIST);
+    }
+
+    @Override
+    public boolean putLongList(String key, List<Long> value) {
+        XTableValues.LongList.Builder builder = XTableValues.LongList.newBuilder()
+                .addAllV(value);
+        return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.LONG_LIST);
+    }
+
+    @Override
+    public boolean putFloatList(String key, List<Float> value) {
+        XTableValues.FloatList.Builder builder = XTableValues.FloatList.newBuilder()
+                .addAllV(value);
+        return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.FLOAT_LIST);
+    }
+
+    @Override
+    public boolean putBooleanList(String key, List<Boolean> value) {
+        XTableValues.BoolList.Builder builder = XTableValues.BoolList.newBuilder()
+                .addAllV(value);
+        return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.BOOLEAN_LIST);
+    }
 
     /**
      * Sends a message via the PUSH socket to the server.
@@ -313,15 +377,17 @@ public class ConcurrentXTablesClient {
      * @param value The byte array representing the value to be sent.
      * @param type  The type of the value being sent (e.g., STRING, INT64, etc.).
      */
-    private void sendPutMessage(String key, byte[] value, XTableProto.XTableMessage.Type type) {
+    private boolean sendPutMessage(String key, byte[] value, XTableProto.XTableMessage.Type type) {
         try {
-            pushBuffer.write(XTableProto.XTableMessage.newBuilder()
+             pushBuffer.write(XTableProto.XTableMessage.newBuilder()
                     .setKey(key)
                     .setCommand(XTableProto.XTableMessage.Command.PUT)
                     .setValue(ByteString.copyFrom(value))
                     .setType(type)
                     .build()
-                    .toByteArray());
+                     .toByteArray()
+                   );
+             return true;
         } catch (Exception e) {
             throw new XTablesException(e);
         }
@@ -333,21 +399,23 @@ public class ConcurrentXTablesClient {
      *
      * @param key   The key associated with the message being published.
      * @param value The value (byte array) to be published with the key.
+     * @return true if the message was successfully sent, false otherwise.
      * @throws XTablesException if there is an exception during the publication process.
      */
-    public void publish(String key, byte[] value) {
+    public boolean publish(String key, byte[] value) {
         try {
-
-            pushBuffer.write(XTableProto.XTableMessage.newBuilder()
+             pushBuffer.write(XTableProto.XTableMessage.newBuilder()
                     .setKey(key)
                     .setCommand(XTableProto.XTableMessage.Command.PUBLISH)
                     .setValue(ByteString.copyFrom(value))
                     .build()
                     .toByteArray());
+             return true;
         } catch (Exception e) {
             throw new XTablesException(e);
         }
     }
+
     /**
      * Sends a batch of push requests to the push socket. The requests are sent using
      * the "BATCH" command. The batch is serialized into a single message and sent
@@ -356,6 +424,7 @@ public class ConcurrentXTablesClient {
      * @param batchedPushRequests The collection of push requests to be sent.
      *                            This should contain the data that will be part of
      *                            the batched message.
+     * @return true if the batched push requests were successfully sent; false otherwise.
      * @throws XTablesException if any exception occurs during the process of sending
      *                          the batched push requests.
      */
@@ -370,6 +439,7 @@ public class ConcurrentXTablesClient {
             throw new XTablesException(e);
         }
     }
+
     /**
      * Executes a GET request to retrieve a String value associated with the specified key.
      * <p>
@@ -503,9 +573,6 @@ public class ConcurrentXTablesClient {
         }
     }
 
-
-
-
     /**
      * Executes a GET request to retrieve a list of coordinates associated with the specified key.
      * <p>
@@ -536,6 +603,216 @@ public class ConcurrentXTablesClient {
 
 
         throw new IllegalArgumentException("Expected BYTES type, but got: " + message.getType());
+    }
+
+    /**
+     * Retrieves a list of strings associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is STRING_LIST. If so, it parses the byte array to extract the list of strings
+     * and returns it. Otherwise, it throws an IllegalArgumentException indicating the wrong type
+     * or if parsing fails.
+     *
+     * @param key The key associated with the list of strings.
+     * @return A List of strings associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not STRING_LIST or if parsing fails.
+     */
+    public List<String> getStringList(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.STRING_LIST) {
+            try {
+                return XTableValues.StringList.parseFrom(message.getValue().toByteArray()).getVList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected STRING_LIST type, but got: " + message.getType());
+    }
+
+    /**
+     * Retrieves a list of doubles associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is DOUBLE_LIST. If so, it parses the byte array to extract the list of doubles
+     * and returns it. Otherwise, it throws an IllegalArgumentException indicating the wrong type
+     * or if parsing fails.
+     *
+     * @param key The key associated with the list of doubles.
+     * @return A List of doubles associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not DOUBLE_LIST or if parsing fails.
+     */
+    public List<Double> getDoubleList(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.DOUBLE_LIST) {
+            try {
+                return XTableValues.DoubleList.parseFrom(message.getValue().toByteArray()).getVList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected DOUBLE_LIST type, but got: " + message.getType());
+    }
+
+    /**
+     * Retrieves a list of integers associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is INTEGER_LIST. If so, it parses the byte array to extract the list of integers
+     * and returns it. Otherwise, it throws an IllegalArgumentException indicating the wrong type
+     * or if parsing fails.
+     *
+     * @param key The key associated with the list of integers.
+     * @return A List of integers associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not INTEGER_LIST or if parsing fails.
+     */
+    public List<Integer> getIntegerList(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.INTEGER_LIST) {
+            try {
+                return XTableValues.IntegerList.parseFrom(message.getValue().toByteArray()).getVList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected INTEGER_LIST type, but got: " + message.getType());
+    }
+
+    /**
+     * Retrieves a list of ByteString objects associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is BYTES_LIST. If so, it parses the byte array to extract the list of ByteStrings
+     * and returns it. Otherwise, it throws an IllegalArgumentException indicating the wrong type
+     * or if parsing fails.
+     *
+     * @param key The key associated with the list of ByteString objects.
+     * @return A List of ByteString objects associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not BYTES_LIST or if parsing fails.
+     */
+    public List<ByteString> getBytesList(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.BYTES_LIST) {
+            try {
+                return XTableValues.BytesList.parseFrom(message.getValue().toByteArray()).getVList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected BYTES_LIST type, but got: " + message.getType());
+    }
+
+    /**
+     * Retrieves a list of longs associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is LONG_LIST. If so, it parses the byte array to extract the list of longs
+     * and returns it. Otherwise, it throws an IllegalArgumentException indicating the wrong type
+     * or if parsing fails.
+     *
+     * @param key The key associated with the list of longs.
+     * @return A List of longs associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not LONG_LIST or if parsing fails.
+     */
+    public List<Long> getLongList(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.LONG_LIST) {
+            try {
+                return XTableValues.LongList.parseFrom(message.getValue().toByteArray()).getVList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected LONG_LIST type, but got: " + message.getType());
+    }
+
+    /**
+     * Retrieves a list of floats associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is FLOAT_LIST. If so, it parses the byte array to extract the list of floats
+     * and returns it. Otherwise, it throws an IllegalArgumentException indicating the wrong type
+     * or if parsing fails.
+     *
+     * @param key The key associated with the list of floats.
+     * @return A List of floats associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not FLOAT_LIST or if parsing fails.
+     */
+    public List<Float> getFloatList(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.FLOAT_LIST) {
+            try {
+                return XTableValues.FloatList.parseFrom(message.getValue().toByteArray()).getVList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected FLOAT_LIST type, but got: " + message.getType());
+    }
+
+    /**
+     * Retrieves a list of booleans associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is BOOLEAN_LIST. If so, it parses the byte array to extract the list of booleans
+     * and returns it. Otherwise, it throws an IllegalArgumentException indicating the wrong type
+     * or if parsing fails.
+     *
+     * @param key The key associated with the list of booleans.
+     * @return A List of booleans associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not BOOLEAN_LIST or if parsing fails.
+     */
+    public List<Boolean> getBooleanList(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.BOOLEAN_LIST) {
+            try {
+                return XTableValues.BoolList.parseFrom(message.getValue().toByteArray()).getVList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected BOOLEAN_LIST type, but got: " + message.getType());
     }
 
 
@@ -696,19 +973,17 @@ public class ConcurrentXTablesClient {
                         .toByteArray());
             }
             byte[] response = reqSocket.recv();
-            if (response == null) return Collections.EMPTY_LIST;
+            if (response == null) return new ArrayList<>();
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             if (!message.hasValue())
-                return Collections.EMPTY_LIST;
-            Object[] respV = XTablesByteUtils.fromByteArray(message.getValue().toByteArray(), String.class);
-            if (respV == null) return Collections.EMPTY_LIST;
-            return List.of((String[]) respV);
+                return new ArrayList<>();
+            return XTableValues.StringList.parseFrom(message.getValue()).getVList();
         } catch (InvalidProtocolBufferException | NullPointerException e) {
-            return Collections.EMPTY_LIST;
+            return new ArrayList<>();
         } catch (ZMQException e) {
             logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
             reconnectRequestSocket();
-            return Collections.EMPTY_LIST;
+            return new ArrayList<>();
         }
     }
 

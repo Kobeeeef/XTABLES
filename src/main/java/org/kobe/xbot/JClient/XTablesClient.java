@@ -572,6 +572,38 @@ public class XTablesClient implements PushRequests {
     }
 
     /**
+     * Executes a GET request to retrieve a list of coordinates associated with the specified key.
+     * <p>
+     * This method sends a GET request for the given key and checks if the returned message
+     * type is BYTES.
+     * If so, it parses the byte array to extract a list of coordinates and returns it.
+     * Otherwise, it throws an IllegalArgumentException indicating the wrong type or if parsing fails.
+     *
+     * @param key The key associated with the list of coordinates.
+     * @return A List of `Coordinate` objects associated with the given key.
+     * @throws IllegalArgumentException If the returned message type is not BYTES or if parsing fails.
+     */
+    public List<XTableValues.Coordinate> getCoordinates(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.BYTES) {
+            try {
+                return XTableValues.CoordinateList.parseFrom(message.getValue().toByteArray()).getCoordinatesList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+
+
+        throw new IllegalArgumentException("Expected BYTES type, but got: " + message.getType());
+    }
+
+    /**
      * Retrieves a list of strings associated with the specified key.
      * <p>
      * This method sends a GET request for the given key and checks if the returned message
