@@ -1,6 +1,7 @@
 package org.kobe.xbot.JServer;
 
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.Utilities;
 
 /**
  * Main - The entry point for initializing and starting the XTablesServer with JeroMQ-based messaging.
@@ -71,7 +72,17 @@ public class Main {
                 logger.severe("Error: One or more specified ports are outside the valid range (0-65535).");
                 return;
             }
-            logger.info("Starting server with additional_features=" + additionalFeatures);
+            String ip = Utilities.getLocalIPAddress();
+            logger.info(
+                    "Starting XTABLES Server:\n" +
+                            "------------------------------------------------------------\n" +
+                            "Server IP: " + (ip == null ? "Unknown" : ip) + "\n" +
+                            "Pull Socket Port: " + pull + "\n" +
+                            "Reply Socket Port: " + rep + "\n" +
+                            "Publish Socket Port: " + pub + "\n" +
+                            "Additional Features: " + additionalFeatures + "\n" +
+                            "Web Interface: " + "http://" + (ip == null ? "localhost" : ip) + ":4880/" + "\n" +
+                            "------------------------------------------------------------");
             XTablesServer.initialize(XTABLES_SERVER_VERSION, pull, rep, pub, additionalFeatures);
 
         } catch (NumberFormatException e) {

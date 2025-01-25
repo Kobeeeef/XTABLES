@@ -27,8 +27,8 @@ public class Utilities {
                 return findNonLoopbackAddress().getHostAddress();
             }
             return localHost.getHostAddress();
-        } catch (UnknownHostException | SocketException e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
+
         }
         return null;
     }

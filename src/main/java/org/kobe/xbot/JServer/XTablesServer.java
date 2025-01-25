@@ -357,6 +357,7 @@ public class XTablesServer {
      * This method should only be called from the main thread.
      */
     private void performRestart() throws Exception {
+        status.set(XTableStatus.CLEANING);
         cleanup();
         status.set(XTableStatus.OFFLINE);
         logger.info("Starting server in 3 seconds...");
