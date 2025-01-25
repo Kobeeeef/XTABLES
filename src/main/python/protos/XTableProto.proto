@@ -17,8 +17,14 @@ message XTableMessage {
     BYTES = 7;
     ENUM = 8;
     MESSAGE = 9;
-    ARRAY = 10;
-    OBJECT = 11;
+    DOUBLE_LIST = 10;
+    STRING_LIST = 11;
+    FLOAT_LIST = 12;
+    INTEGER_LIST = 13;
+    LONG_LIST = 14;
+    BOOLEAN_LIST = 15;
+    BYTES_LIST = 16;
+    OBJECT = 17;
   }
   enum Command {
     UNKNOWN_COMMAND = 0;

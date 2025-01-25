@@ -18,7 +18,6 @@ try:
     from .XTablesByteUtils import XTablesByteUtils
     from . import TempConnectionManager as tcm
     from .XTablesSocketMonitor import XTablesSocketMonitor
-    from . import XTableArrayList_pb2 as XTableArrayProto
 except ImportError:
     # Standalone script imports
     import XTableProto_pb2 as XTableProto
@@ -28,7 +27,6 @@ except ImportError:
     from PingResponse import PingResponse
     from XTablesByteUtils import XTablesByteUtils
     from XTablesSocketMonitor import XTablesSocketMonitor
-    import XTableArrayList_pb2 as XTableArrayProto
 
 
 class XTablesClient:
@@ -388,14 +386,40 @@ class XTablesClient:
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value_bytes,
                                       XTableProto.XTableMessage.Type.BOOL)
 
-    def putArray(self, key, values):
-        """
-        Handles putting arrays to the server.
-        Assumes `values` is an array of values that can be serialized into a byte array.
-        """
+    def putDoubleList(self, key, value):
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
-                                      XTablesByteUtils.to_byte_array(values),
-                                      XTableProto.XTableMessage.Type.ARRAY)
+                                      XTableValues.DoubleList(v=value).SerializeToString(),
+                                      XTableProto.XTableMessage.Type.DOUBLE_LIST)
+
+    def putStringList(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      XTableValues.StringList(v=value).SerializeToString(),
+                                      XTableProto.XTableMessage.Type.STRING_LIST)
+
+    def putIntegerList(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      XTableValues.IntegerList(v=value).SerializeToString(),
+                                      XTableProto.XTableMessage.Type.INTEGER_LIST)
+
+    def putBytesList(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      XTableValues.BytesList(v=value).SerializeToString(),
+                                      XTableProto.XTableMessage.Type.BYTES_LIST)
+
+    def putLongList(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      XTableValues.LongList(v=value).SerializeToString(),
+                                      XTableProto.XTableMessage.Type.LONG_LIST)
+
+    def putFloatList(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      XTableValues.FloatList(v=value).SerializeToString(),
+                                      XTableProto.XTableMessage.Type.FLOAT_LIST)
+
+    def putBooleanList(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      XTableValues.BoolList(v=value).SerializeToString(),
+                                      XTableProto.XTableMessage.Type.BOOLEAN_LIST)
 
     # ====================
     # GET Methods
@@ -424,6 +448,104 @@ class XTablesClient:
                 raise ValueError(f"Invalid bytes returned from server: {message.value}")
 
         raise ValueError(f"Expected BYTES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getDoubleList(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.DOUBLE_LIST:
+            try:
+                return XTableValues.DoubleList.FromString(message.value).v
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+        raise ValueError(f"Expected DOUBLE_LIST type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getStringList(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.STRING_LIST:
+            try:
+                return XTableValues.StringList.FromString(message.value).v
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+        raise ValueError(f"Expected STRING_LIST type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getIntegerList(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.INTEGER_LIST:
+            try:
+                return XTableValues.IntegerList.FromString(message.value).v
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+        raise ValueError(f"Expected INTEGER_LIST type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getBytesList(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.BYTES_LIST:
+            try:
+                return XTableValues.BytesList.FromString(message.value).v
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+        raise ValueError(f"Expected BYTES_LIST type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getLongList(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.LONG_LIST:
+            try:
+                return XTableValues.LongList.FromString(message.value).v
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+        raise ValueError(f"Expected LONG_LIST type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getFloatList(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.FLOAT_LIST:
+            try:
+                return XTableValues.FloatList.FromString(message.value).v
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+        raise ValueError(f"Expected FLOAT_LIST type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getBooleanList(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.BOOLEAN_LIST:
+            try:
+                return XTableValues.BoolList.FromString(message.value).v
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+        raise ValueError(f"Expected BOOLEAN_LIST type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getInteger(self, key):
         message = self._get_xtable_message(key)
@@ -461,15 +583,6 @@ class XTablesClient:
         else:
             raise ValueError(f"Expected DOUBLE type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
-    def getArray(self, key):
-        message = self._get_xtable_message(key)
-        if message is not None and message.type == XTableProto.XTableMessage.Type.ARRAY:
-            return XTablesByteUtils.from_byte_array(message.value)
-        elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
-            return None
-        else:
-            raise ValueError(f"Expected ARRAY type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
-
     def getBytes(self, key):
         message = self._get_xtable_message(key)
         if message is not None and message.type == XTableProto.XTableMessage.Type.BYTES:
@@ -477,14 +590,14 @@ class XTablesClient:
         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
             return None
         else:
-            raise ValueError(f"Expected ARRAY type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+            raise ValueError(f"Expected BYTES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getUnknownBytes(self, key):
         message = self._get_xtable_message(key)
         if message is not None:
             return message.value
         else:
-            raise ValueError(f"Expected ARRAY type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+            raise ValueError(f"Expected BYTES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def _get_xtable_message(self, key):
         try:
@@ -581,7 +694,7 @@ class XTablesClient:
             response_message = XTableProto.XTableMessage.FromString(response_bytes)
 
             if response_message.HasField("value"):
-                return XTablesByteUtils.from_byte_array(response_message.value)
+                return XTableValues.StringList.FromString(response_message.value).v
             else:
                 return []
         except zmq.error.ZMQError:
@@ -617,16 +730,20 @@ class XTablesServerNotFound(Exception):
 # #         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 #
 #
-if __name__ == "__main__":
-    tcm.invalidate()
-    client = XTablesClient(debug_mode=True)
-    #client.subscribe_all(consumer)
-    coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
-    while True:
-        client.putCoordinates("test", coordinates)
-        print(client.getCoordinates("test")[0])
-    time.sleep(100000)
-
-    # print(client.getUnknownBytes("name"))
-    # print(client.getString("age"))
-    # print(client.getArray("numbers"))
+# if __name__ == "__main__":
+#     client = XTablesClient(debug_mode=False)
+#     # client.subscribe_all(consumer)
+#     # coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
+#     #
+#     # client.putCoordinates("test", coordinates)
+#     #
+#     # print(client.getCoordinates("test")[0].x)
+#
+#     client.putIntegerList("test", [1])
+#
+#     print(client.getStringList("test"))
+#     time.sleep(100000)
+#
+#     # print(client.getUnknownBytes("name"))
+#     # print(client.getString("age"))
+#     # print(client.getArray("numbers"))
