@@ -1304,6 +1304,8 @@ public class XTablesClient implements PushRequests {
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException ex) {
+                        logger.warning("Retry wait interrupted. Exiting...");
+                        Thread.currentThread().interrupt();
                     }
                     logger.severe("Exception on resolving XTABLES server: " + ei.getMessage());
                     return resolveHostByName();
