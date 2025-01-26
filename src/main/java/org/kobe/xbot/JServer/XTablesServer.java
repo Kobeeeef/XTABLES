@@ -339,6 +339,11 @@ public class XTablesServer {
      * Updates the server status appropriately and ensures proper resource management.
      */
     public void restart() {
+        if(status.get().equals(XTableStatus.OFFLINE) || status.get().equals(XTableStatus.CLEANING) || status.get().equals(XTableStatus.REBOOTING))
+        {
+            logger.warning("Server cannot restart at current state: " + status.get().name());
+            return;
+        }
         try {
             status.set(XTableStatus.REBOOTING);
             logger.info("Restarting server...");
