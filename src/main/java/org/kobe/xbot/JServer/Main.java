@@ -49,6 +49,7 @@ public class Main {
      * @param args Command-line arguments for server configuration.
      */
     public static void main(String[] args) {
+        System.setProperty("file.encoding", "UTF-8");
         boolean additionalFeatures = false;
         int pull = 1735;
         int rep = 1736;
