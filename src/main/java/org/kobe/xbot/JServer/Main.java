@@ -18,12 +18,16 @@ import org.kobe.xbot.Utilities.Utilities;
  * for messaging and service discovery using JeroMQ.
  */
 public class Main {
+
+    private static final String BUILD_DATE = "1/25/2025";
+    private static final String VERSION = "v4.6.9";
+    private static final String JAVA_VERSION = System.getProperty("java.version");
     /**
      * The version string for the XTablesServer.
      * Includes the software name, version, build date, and Java version.
      */
     public static final String XTABLES_SERVER_VERSION =
-            "XTABLES Jero Server v4.6.8 | Build Date: 1/25/2025 | Java 17";
+            "XTABLES Jero Server " + VERSION + " | Build Date: " + BUILD_DATE + " | Java " + JAVA_VERSION;
 
     /**
      * The logger instance for recording server events, warnings, and errors.
@@ -73,6 +77,9 @@ public class Main {
                 return;
             }
             String ip = Utilities.getLocalIPAddress();
+            logger.info(XTABLES_SERVER_VERSION);
+
+            logger.info("Developed by XBOT ROBOTICS - Kobe Lei");
             logger.info(
                     "Starting XTABLES Server:\n" +
                             "------------------------------------------------------------\n" +
