@@ -2,20 +2,9 @@ package org.kobe.xbot.JServer;
 
 
 import com.google.gson.Gson;
-import com.google.protobuf.ByteString;
-import org.kobe.xbot.Utilities.*;
-import org.kobe.xbot.Utilities.Entities.XTableClientStatistics;
-import org.kobe.xbot.Utilities.Entities.XTableProto;
-import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.zeromq.ZMQ;
 
-import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * ReplyRequestHandler - A handler for processing reply requests using JeroMQ.
@@ -55,9 +44,9 @@ public class TimeSyncHandler extends BaseHandler {
     public void run() {
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                byte[] bytes = socket.recv();
+                socket.recv();
                 try {
-                   socket.send( ByteBuffer.allocate(8).putLong(System.currentTimeMillis()).array(), ZMQ.DONTWAIT);
+                    socket.send(ByteBuffer.allocate(8).putLong(System.currentTimeMillis()).array(), ZMQ.DONTWAIT);
                 } catch (Exception e) {
                     handleException(e);
                 }

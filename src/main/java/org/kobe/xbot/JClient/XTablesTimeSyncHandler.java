@@ -25,6 +25,7 @@ public class XTablesTimeSyncHandler {
 
     private final ScheduledExecutorService scheduler;
     private final ZMQ.Socket socket;
+    private final byte[] bytes = new byte[] {};
     private static final XTablesLogger logger = XTablesLogger.getLogger(XTablesTimeSyncHandler.class);
 
     /**
@@ -50,7 +51,7 @@ public class XTablesTimeSyncHandler {
         scheduler.scheduleWithFixedDelay(() -> {
             try {
                 long t1 = System.currentTimeMillis();
-                socket.send(ByteBuffer.allocate(8).putLong(t1).array(), ZMQ.DONTWAIT);
+                socket.send(bytes, ZMQ.DONTWAIT);
                 byte[] bytes = socket.recv();
                 long t4 = System.currentTimeMillis();
                 long t3 = ByteBuffer.wrap(bytes).getLong();
@@ -61,7 +62,7 @@ public class XTablesTimeSyncHandler {
             } catch (Exception e) {
                 logger.warning("Error during time synchronization: " + e.getMessage());
             }
-        }, 0, 1, TimeUnit.MILLISECONDS);
+        }, 0, 10, TimeUnit.MILLISECONDS);
     }
 
     /**
