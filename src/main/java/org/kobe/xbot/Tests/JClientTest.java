@@ -10,7 +10,9 @@ import java.util.List;
 
 public class JClientTest {
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("OK2");
+        XTablesClient xTablesClient = new XTablesClient();
+
+        Thread.sleep(100000000);
 
 
 
