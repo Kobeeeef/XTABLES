@@ -296,7 +296,7 @@ public class XTablesServer {
      * @throws IOException If an error occurs during cleanup
      */
     private void cleanup() throws IOException {
-        status.set(XTableStatus.OFFLINE);
+        status.set(XTableStatus.CLEANING);
         if (context != null) {
             logger.info("Destroying ZMQ context and releasing resources...");
             context.destroy();
@@ -331,7 +331,7 @@ public class XTablesServer {
         pullMessages.set(0);
         replyMessages.set(0);
         publishMessages.set(0);
-
+        status.set(XTableStatus.OFFLINE);
     }
 
     /**
@@ -369,9 +369,7 @@ public class XTablesServer {
      * This method should only be called from the main thread.
      */
     private void performRestart() throws Exception {
-        status.set(XTableStatus.CLEANING);
         cleanup();
-        status.set(XTableStatus.OFFLINE);
         logger.info("Starting server in 3 seconds...");
         status.set(XTableStatus.STARTING);
         Thread.sleep(3000);
