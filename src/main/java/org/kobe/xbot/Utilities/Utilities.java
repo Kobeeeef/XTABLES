@@ -32,7 +32,6 @@ public class Utilities {
         }
         return null;
     }
-
     public static InetAddress getLocalInetAddress() {
         try {
             InetAddress localHost = Inet4Address.getLocalHost();
@@ -51,7 +50,7 @@ public class Utilities {
             NetworkInterface networkInterface = networkInterfaces.nextElement();
 
             // Skip loopback and down interfaces
-            if (networkInterface.isLoopback() || !networkInterface.isUp()) {
+            if (networkInterface.isLoopback() || !networkInterface.isUp() || networkInterface.getName().equals("docker0")) {
                 continue;
             }
 
