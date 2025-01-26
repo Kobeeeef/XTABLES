@@ -76,7 +76,7 @@ public class XTablesServer {
     private ServiceInfo serviceInfo;
     private PushPullRequestHandler pushPullRequestHandler;
     private ReplyRequestHandler replyRequestHandler;
-    private TimeSyncHandler timeSyncHandler;
+//    private TimeSyncHandler timeSyncHandler;
     private ClientRegistry clientRegistry;
     private WebInterface webInterface;
     private XTablesSocketMonitor socketMonitor;
@@ -194,12 +194,13 @@ public class XTablesServer {
             ZMQ.Socket repSocket = context.createSocket(SocketType.REP);
             repSocket.setHWM(500);
             repSocket.bind("tcp://*:" + repPort);
-            ZMQ.Socket syncSocket = context.createSocket(SocketType.REP);
-            syncSocket.setHWM(50);
-            syncSocket.setLinger(-1);
-            syncSocket.setHeartbeatTimeout(5000);
-            syncSocket.setHeartbeatIvl(1000);
-            syncSocket.bind("tcp://*:3123");
+
+//            ZMQ.Socket syncSocket = context.createSocket(SocketType.REP);
+//            syncSocket.setHWM(50);
+//            syncSocket.setLinger(-1);
+//            syncSocket.setHeartbeatTimeout(5000);
+//            syncSocket.setHeartbeatIvl(1000);
+//            syncSocket.bind("tcp://*:3123");
 
             this.publishQueue = new XTablesMessageQueue(this.pubSocket, this);
             this.publishQueue.start();
@@ -207,8 +208,8 @@ public class XTablesServer {
             this.pushPullRequestHandler.start();
             this.replyRequestHandler = new ReplyRequestHandler(repSocket, this);
             this.replyRequestHandler.start();
-            this.timeSyncHandler = new TimeSyncHandler(syncSocket, this);
-            this.timeSyncHandler.start();
+//            this.timeSyncHandler = new TimeSyncHandler(syncSocket, this);
+//            this.timeSyncHandler.start();
             initializeMDNSWithRetries(10);
             if (additionalFeatures) {
                 this.rate = new XTablesMessageRate(pullMessages, replyMessages, publishMessages);

@@ -43,14 +43,14 @@ public class Utilities {
         }
         return null;
     }
-
     private static InetAddress findNonLoopbackAddress() throws SocketException {
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         while (networkInterfaces.hasMoreElements()) {
             NetworkInterface networkInterface = networkInterfaces.nextElement();
 
-            // Skip loopback and down interfaces
-            if (networkInterface.isLoopback() || !networkInterface.isUp() || networkInterface.getName().equals("docker0")) {
+            // Skip loopback, down, or Docker-related interfaces
+            String name = networkInterface.getName().toLowerCase();
+            if (networkInterface.isLoopback() || !networkInterface.isUp() || name.contains("docker")) {
                 continue;
             }
 
@@ -58,15 +58,43 @@ public class Utilities {
             while (inetAddresses.hasMoreElements()) {
                 InetAddress inetAddress = inetAddresses.nextElement();
 
-                // Return the first non-loopback IPv4 address
+                // Skip Docker IP ranges and return the first valid site-local IPv4 address
                 if (!inetAddress.isLoopbackAddress() && inetAddress.isSiteLocalAddress() && inetAddress.getHostAddress().contains(".")) {
-                    return inetAddress;
+                    String ip = inetAddress.getHostAddress();
+                    if (!isDockerSubnet(ip)) {
+                        return inetAddress;
+                    }
                 }
             }
         }
         throw new SocketException("No non-loopback IPv4 address found");
     }
-
+    /**
+     * Check if the IP belongs to Docker's typical private subnet ranges.
+     *
+     * @param ip The IP address as a string.
+     * @return true if the IP is in Docker's subnet; false otherwise.
+     */
+    private static boolean isDockerSubnet(String ip) {
+        return ip.startsWith("172.") && isWithinRange(ip, 16, 31);
+    }
+    /**
+     * Helper method to determine if an IP's second octet is within a specific range.
+     *
+     * @param ip       The IP address as a string.
+     * @param start    The start of the range (inclusive).
+     * @param end      The end of the range (inclusive).
+     * @return true if within range; false otherwise.
+     */
+    private static boolean isWithinRange(String ip, int start, int end) {
+        try {
+            String[] parts = ip.split("\\.");
+            int secondOctet = Integer.parseInt(parts[1]);
+            return secondOctet >= start && secondOctet <= end;
+        } catch (Exception e) {
+            return false;
+        }
+    }
     public static <E extends Enum<E>> boolean contains(Class<E> enumClass, String constant) {
         for (E e : enumClass.getEnumConstants()) {
             if (e.name().equals(constant)) {

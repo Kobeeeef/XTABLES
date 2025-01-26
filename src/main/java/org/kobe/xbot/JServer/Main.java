@@ -23,7 +23,7 @@ public class Main {
      * Includes the software name, version, build date, and Java version.
      */
     public static final String XTABLES_SERVER_VERSION =
-            "XTABLES Jero Server v4.6.7 | Build Date: 1/24/2025 | Java 17";
+            "XTABLES Jero Server v4.6.8 | Build Date: 1/25/2025 | Java 17";
 
     /**
      * The logger instance for recording server events, warnings, and errors.

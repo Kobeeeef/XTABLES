@@ -48,7 +48,7 @@ public class XTablesClient implements PushRequests {
     // across all instances of the class.
     // =============================================================
     private static final XTablesLogger logger = XTablesLogger.getLogger();
-    private static final int TIME_SYNC_PORT = 3123;
+    public static final int TIME_SYNC_PORT = 3123;
     public static final String UUID = java.util.UUID.randomUUID().toString();
     public static final byte[] success = new byte[]{(byte) 0x01};
     public static final byte[] fail = new byte[]{(byte) 0x00};
@@ -59,7 +59,7 @@ public class XTablesClient implements PushRequests {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v4.6.7 | Build Date: 1/24/2025";
+            "XTABLES Jero Client v4.6.8 | Build Date: 1/25/2025";
 
     private final String ip;
     private final int requestSocketPort;
@@ -70,10 +70,9 @@ public class XTablesClient implements PushRequests {
     private final ZMQ.Socket subSocket;
     private final ZMQ.Socket pushSocket;
     private final ZMQ.Socket clientRegistrySocket;
-    private final ZMQ.Socket timeSyncSocket;
     private ZMQ.Socket reqSocket;
     private final SubscribeHandler subscribeHandler;
-    private final XTablesTimeSyncHandler timeSyncHandler;
+//    private final XTablesTimeSyncHandler timeSyncHandler;
 
     /**
      * Default constructor for XTablesClient.
@@ -146,12 +145,13 @@ public class XTablesClient implements PushRequests {
         this.clientRegistrySocket.setReconnectIVLMax(6000);
         this.socketMonitor.addSocket("REGISTRY", this.clientRegistrySocket);
         this.clientRegistrySocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
-        this.timeSyncSocket = context.createSocket(SocketType.REQ);
-        this.timeSyncSocket.setHWM(2);
-        this.timeSyncSocket.setReconnectIVL(1000);
-        this.timeSyncSocket.setReconnectIVLMax(1000);
-        this.socketMonitor.addSocket("TIMESYNC", this.timeSyncSocket);
-        this.timeSyncSocket.connect("tcp://" + this.ip + ":" + TIME_SYNC_PORT);
+//        ZMQ.Socket timeSyncSocket = context.createSocket(SocketType.REQ);
+//        timeSyncSocket.setHWM(2);
+//        timeSyncSocket.setReceiveTimeOut(1000);
+//        timeSyncSocket.setReconnectIVL(1000);
+//        timeSyncSocket.setReconnectIVLMax(1000);
+//        socketMonitor.addSocket("TIMESYNC", timeSyncSocket);
+//        timeSyncSocket.connect("tcp://" + this.ip + ":" + TIME_SYNC_PORT);
         this.reqSocket = context.createSocket(SocketType.REQ);
         this.reqSocket.setHWM(500);
         this.reqSocket.setReconnectIVL(1000);
@@ -175,7 +175,7 @@ public class XTablesClient implements PushRequests {
         this.logConsumers = new ArrayList<>();
         this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
         this.subscribeHandler.start();
-        this.timeSyncHandler = new XTablesTimeSyncHandler(this.timeSyncSocket);
+//        this.timeSyncHandler = new XTablesTimeSyncHandler(timeSyncSocket, this);
     }
 
     private void reconnectRequestSocket() {
@@ -1381,5 +1381,9 @@ public class XTablesClient implements PushRequests {
 
     public String getIp() {
         return ip;
+    }
+
+    public ZContext getContext() {
+        return context;
     }
 }
