@@ -101,7 +101,7 @@ public class WebInterface {
                 userInterfaceServer.start();
                 logger.info("The local XTABLES user interface started at http://localhost:4880!");
             } catch (Exception e) {
-                logger.warning("The local XTABLES user interface failed to start!");
+                logger.warning("The local XTABLES user interface failed to start: " + e.getMessage());
             }
         }
     }

@@ -1,13 +1,17 @@
 package org.kobe.xbot.Utilities;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message;
+import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
+import java.util.Map;
 
 /**
  * XTablesByteUtils - A utility class for converting between byte arrays, ByteString, and various data types.
@@ -26,6 +30,142 @@ public class XTablesByteUtils {
             .disableHtmlEscaping()
             .setLenient()
             .create();
+
+    public static String convertXTableUpdateToJsonString(XTableProto.XTableMessage.XTableUpdate node) {
+        return convertTypeValueToJsonString(node.getType(), node.getValue().toByteArray());
+    }
+
+
+    public static Map.Entry<XTableProto.XTableMessage.Type, byte[]> convertJsonStringToTypeValue(String json) {
+        JsonElement jsonElement = JsonParser.parseString(json);
+
+        if (jsonElement.isJsonPrimitive()) {
+            JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
+
+            if (primitive.isString()) {
+                return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.STRING, primitive.getAsString().getBytes());
+            } else if (primitive.isNumber()) {
+                if (primitive.getAsString().contains(".")) {
+                    return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.DOUBLE, doubleToBytes(primitive.getAsDouble()));
+                } else {
+                    return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.INT64, longToBytes(primitive.getAsLong()));
+                }
+            } else if (primitive.isBoolean()) {
+                return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.BOOL, new byte[]{(byte) (primitive.getAsBoolean() ? 0x01 : 0x00)});
+            }
+        } else if (jsonElement.isJsonArray()) {
+            JsonArray jsonArray = jsonElement.getAsJsonArray();
+
+            if (jsonArray.size() > 0) {
+                JsonElement firstElement = jsonArray.get(0);
+
+                if (firstElement.isJsonPrimitive()) {
+                    JsonPrimitive firstPrimitive = firstElement.getAsJsonPrimitive();
+
+                    if (firstPrimitive.isNumber()) {
+                        if (firstPrimitive.getAsString().contains(".")) {
+                            return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.DOUBLE_LIST, serializeList(jsonArray, XTableValues.DoubleList.newBuilder()));
+                        } else {
+                            return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.LONG_LIST, serializeList(jsonArray, XTableValues.LongList.newBuilder()));
+                        }
+                    } else if (firstPrimitive.isString()) {
+                        return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.STRING_LIST, serializeList(jsonArray, XTableValues.StringList.newBuilder()));
+                    } else if (firstPrimitive.isBoolean()) {
+                        return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.BOOLEAN_LIST, serializeList(jsonArray, XTableValues.BoolList.newBuilder()));
+                    }
+                } else {
+                    return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.BYTES_LIST, jsonArrayToByteArray(jsonArray));
+                }
+            }
+        }
+
+        return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.UNKNOWN, new byte[0]);
+    }
+    private static byte[] doubleToBytes(double value) {
+        return ByteBuffer.allocate(Double.BYTES).putDouble(value).array();
+    }
+
+    private static byte[] longToBytes(long value) {
+        return ByteBuffer.allocate(Long.BYTES).putLong(value).array();
+    }
+
+    private static byte[] serializeList(JsonArray jsonArray, Message.Builder builder) {
+        for (JsonElement element : jsonArray) {
+            if (builder instanceof XTableValues.DoubleList.Builder dblBuilder) {
+                dblBuilder.addV(element.getAsDouble());
+            } else if (builder instanceof XTableValues.LongList.Builder longBuilder) {
+                longBuilder.addV(element.getAsLong());
+            } else if (builder instanceof XTableValues.StringList.Builder strBuilder) {
+                strBuilder.addV(element.getAsString());
+            } else if (builder instanceof XTableValues.BoolList.Builder boolBuilder) {
+                boolBuilder.addV(element.getAsBoolean());
+            }
+        }
+        return builder.build().toByteArray();
+    }
+
+    private static byte[] jsonArrayToByteArray(JsonArray jsonArray) {
+        byte[] byteArray = new byte[jsonArray.size()];
+        for (int i = 0; i < jsonArray.size(); i++) {
+            byteArray[i] = (byte) jsonArray.get(i).getAsInt();
+        }
+        return byteArray;
+    }
+
+    public static String convertTypeValueToJsonString(XTableProto.XTableMessage.Type type, byte[] value) {
+        JsonElement jsonElement = switch (type) {
+            case STRING -> new JsonPrimitive(new String(value));
+            case INT64 -> new JsonPrimitive(bytesToLong(value));
+            case BOOL -> new JsonPrimitive(value[0] == 0x01);
+            case DOUBLE -> new JsonPrimitive(bytesToDouble(value));
+            case FLOAT_LIST -> parseList(value, XTableValues.FloatList.parser());
+            case DOUBLE_LIST -> parseList(value, XTableValues.DoubleList.parser());
+            case STRING_LIST -> parseList(value, XTableValues.StringList.parser());
+            case INTEGER_LIST -> parseList(value, XTableValues.IntegerList.parser());
+            case LONG_LIST -> parseList(value, XTableValues.LongList.parser());
+            case BOOLEAN_LIST -> parseList(value, XTableValues.BoolList.parser());
+            case BYTES_LIST, BYTES, UNKNOWN -> {
+                JsonArray byteArray = new JsonArray();
+                for (byte b : value) {
+                    byteArray.add(b);
+                }
+                yield byteArray;
+            }
+            default -> JsonNull.INSTANCE;
+        };
+
+        return gson.toJson(jsonElement);
+    }
+
+    /**
+     * Generic helper function to parse repeated Protobuf lists into JSON.
+     */
+    private static <T extends com.google.protobuf.Message> JsonArray parseList(
+            byte[] value,
+            com.google.protobuf.Parser<T> parser
+    ) {
+        JsonArray jsonArray = new JsonArray();
+        try {
+            T parsedMessage = parser.parseFrom(value);
+            if (parsedMessage instanceof XTableValues.FloatList floatList) {
+                floatList.getVList().forEach(f -> jsonArray.add(new JsonPrimitive(f)));
+            } else if (parsedMessage instanceof XTableValues.DoubleList doubleList) {
+                doubleList.getVList().forEach(d -> jsonArray.add(new JsonPrimitive(d)));
+            } else if (parsedMessage instanceof XTableValues.StringList stringList) {
+                stringList.getVList().forEach(jsonArray::add);
+            } else if (parsedMessage instanceof XTableValues.IntegerList intList) {
+                intList.getVList().forEach(i -> jsonArray.add(new JsonPrimitive(i)));
+            } else if (parsedMessage instanceof XTableValues.LongList longList) {
+                longList.getVList().forEach(l -> jsonArray.add(new JsonPrimitive(l)));
+            } else if (parsedMessage instanceof XTableValues.BoolList boolList) {
+                boolList.getVList().forEach(b -> jsonArray.add(new JsonPrimitive(b)));
+            }
+        } catch (InvalidProtocolBufferException e) {
+            throw new RuntimeException("Failed to parse list: " + parser.getClass().getSimpleName(), e);
+        }
+        return jsonArray;
+    }
+
 
     /**
      * Converts a byte array into an integer.
@@ -284,4 +424,35 @@ public class XTablesByteUtils {
         }
     }
 
+
+    private static long bytesToLong(byte[] bytes) {
+        if (bytes.length > 8) {
+            throw new IllegalArgumentException("Byte array is too large to fit in a long");
+        }
+
+        long result = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            result |= (bytes[i] & 0xFFL) << ((bytes.length - 1 - i) * 8);
+        }
+        return result;
+    }
+
+
+    private static double bytesToDouble(byte[] bytes) {
+        if (bytes.length >= 8) {
+            long longBits = ((long) bytes[0] << 56) |
+                    ((long) (bytes[1] & 0xFF) << 48) |
+                    ((long) (bytes[2] & 0xFF) << 40) |
+                    ((long) (bytes[3] & 0xFF) << 32) |
+                    ((long) (bytes[4] & 0xFF) << 24) |
+                    ((long) (bytes[5] & 0xFF) << 16) |
+                    ((long) (bytes[6] & 0xFF) << 8) |
+                    ((long) (bytes[7] & 0xFF));
+            return Double.longBitsToDouble(longBits);
+        }
+        return 0.0;
+    }
 }
+
+
+
