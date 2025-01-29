@@ -30,6 +30,17 @@ public class BatchedPushRequests implements PushRequests {
     }
 
     @Override
+    public boolean putTypedBytes(String key, XTableProto.XTableMessage.Type type, byte[] value) {
+        return data.add(XTableProto.XTableMessage.newBuilder()
+                .setKey(key)
+                .setCommand(XTableProto.XTableMessage.Command.PUT)
+                .setValue(ByteString.copyFrom(value))
+                .setType(type)
+                .build()
+        );
+    }
+
+    @Override
     public boolean putDoubleList(String key, List<Double> value) {
         XTableValues.DoubleList.Builder builder = XTableValues.DoubleList.newBuilder()
                 .addAllV(value);

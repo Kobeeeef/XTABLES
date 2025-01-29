@@ -22,4 +22,5 @@ public interface PushRequests {
     boolean putFloatList(String key, List<Float> value);
     boolean putBooleanList(String key, List<Boolean> value);
     boolean publish(String key, byte[] value);
+    boolean putTypedBytes(String key, XTableProto.XTableMessage.Type type, byte[] value);
 }
