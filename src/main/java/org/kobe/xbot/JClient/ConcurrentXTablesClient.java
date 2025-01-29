@@ -367,6 +367,10 @@ public class ConcurrentXTablesClient implements PushRequests {
                 .addAllV(value);
         return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.BOOLEAN_LIST);
     }
+    @Override
+    public boolean putTypedBytes(String key, XTableProto.XTableMessage.Type type, byte[] value) {
+        return sendPutMessage(key, value, type);
+    }
 
     /**
      * Sends a message via the PUSH socket to the server.
