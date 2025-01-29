@@ -11,6 +11,8 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +26,7 @@ public class Utilities {
         try {
             InetAddress localHost = Inet4Address.getLocalHost();
             if (localHost.isLoopbackAddress()) {
-                return findNonLoopbackAddress().getHostAddress();
+                return findBestNetworkAddress().getHostAddress();
             }
             return localHost.getHostAddress();
         } catch (Exception ignored) {
@@ -36,30 +38,25 @@ public class Utilities {
         try {
             InetAddress localHost = Inet4Address.getLocalHost();
             if (localHost.isLoopbackAddress()) {
-                return findNonLoopbackAddress();
+                return findBestNetworkAddress();
             }
             return localHost;
         } catch (UnknownHostException | SocketException ignored) {
         }
         return null;
     }
-    private static InetAddress findNonLoopbackAddress() throws SocketException {
-        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-        while (networkInterfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = networkInterfaces.nextElement();
 
-            // Skip loopback, down, or Docker-related interfaces
-            String name = networkInterface.getName().toLowerCase();
-            if (networkInterface.isLoopback() || !networkInterface.isUp() || name.contains("docker")) {
-                continue;
-            }
 
+    private static InetAddress findBestNetworkAddress() throws SocketException {
+        List<NetworkInterface> sortedInterfaces = getSortedNetworkInterfaces();
+
+        for (NetworkInterface networkInterface : sortedInterfaces) {
             Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
             while (inetAddresses.hasMoreElements()) {
                 InetAddress inetAddress = inetAddresses.nextElement();
 
-                // Skip Docker IP ranges and return the first valid site-local IPv4 address
-                if (!inetAddress.isLoopbackAddress() && inetAddress.isSiteLocalAddress() && inetAddress.getHostAddress().contains(".")) {
+                // Prioritize site-local IPv4 addresses, excluding Docker subnets
+                if (!inetAddress.isLoopbackAddress() && inetAddress.isSiteLocalAddress() && inetAddress instanceof Inet4Address) {
                     String ip = inetAddress.getHostAddress();
                     if (!isDockerSubnet(ip)) {
                         return inetAddress;
@@ -67,8 +64,31 @@ public class Utilities {
                 }
             }
         }
-        throw new SocketException("No non-loopback IPv4 address found");
+        throw new SocketException("No suitable non-loopback IPv4 address found");
     }
+
+    private static List<NetworkInterface> getSortedNetworkInterfaces() throws SocketException {
+        List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+
+        // Sort interfaces: Ethernet first, then WiFi, then others
+        interfaces.sort(Comparator.comparingInt(Utilities::getInterfacePriority));
+        return interfaces;
+    }
+
+    private static int getInterfacePriority(NetworkInterface networkInterface) {
+        String name = networkInterface.getName().toLowerCase();
+
+        if (name.startsWith("eth") || name.startsWith("enp") || name.startsWith("eno") || name.startsWith("ens")) {
+            return 0; // Ethernet (highest priority)
+        } else if (name.startsWith("wlan") || name.startsWith("wifi") || name.startsWith("wlp") || name.startsWith("wlo")) {
+            return 1; // WiFi
+        } else if (name.contains("docker") || name.contains("veth")) {
+            return 99; // Docker and virtual interfaces (lowest priority)
+        }
+        return 2; // Other interfaces
+    }
+
+
     /**
      * Check if the IP belongs to Docker's typical private subnet ranges.
      *
