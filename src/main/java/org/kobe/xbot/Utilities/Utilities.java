@@ -24,26 +24,18 @@ public class Utilities {
 
     public static String getLocalIPAddress() {
         try {
-            InetAddress localHost = Inet4Address.getLocalHost();
-            if (localHost.isLoopbackAddress()) {
                 return findBestNetworkAddress().getHostAddress();
-            }
-            return localHost.getHostAddress();
         } catch (Exception ignored) {
-
+            return null;
         }
-        return null;
     }
     public static InetAddress getLocalInetAddress() {
         try {
-            InetAddress localHost = Inet4Address.getLocalHost();
-            if (localHost.isLoopbackAddress()) {
                 return findBestNetworkAddress();
-            }
-            return localHost;
-        } catch (UnknownHostException | SocketException ignored) {
+        } catch (Exception ignored) {
+            return null;
         }
-        return null;
+
     }
 
 
@@ -78,7 +70,6 @@ public class Utilities {
     private static int getInterfacePriority(NetworkInterface networkInterface) {
         String os = System.getProperty("os.name").toLowerCase();
         String name = os.contains("win") ? networkInterface.getDisplayName().toLowerCase() : networkInterface.getName().toLowerCase();
-        System.out.println(name);
         if (name.startsWith("eth") || name.startsWith("enp") || name.startsWith("eno") || name.startsWith("ens") || name.contains("ethernet")) {
             return 0; // Ethernet (highest priority)
         } else if (name.startsWith("wlan") || name.startsWith("wifi") || name.startsWith("wlp") || name.startsWith("wlo") || name.contains("wi-fi")) {
