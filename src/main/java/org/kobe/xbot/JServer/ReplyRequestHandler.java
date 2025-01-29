@@ -86,6 +86,11 @@ public class ReplyRequestHandler extends BaseHandler {
                                 .setCommand(command)
                                 .setValue(ByteString.copyFrom(DataCompression.compressString(XTablesServer.table.toJSON())))
                                 .build().toByteArray(), ZMQ.DONTWAIT);
+                        case GET_PROTO_DATA -> {
+                            socket.send(XTableProto.XTableMessage.newBuilder()
+                                .setCommand(command)
+                                .setValue(XTablesServer.table.toProto().toByteString()).build().toByteArray(), ZMQ.DONTWAIT);
+                        }
                         case REBOOT_SERVER -> {
                             socket.send(XTableProto.XTableMessage.newBuilder()
                                     .setValue(successByte)
@@ -102,7 +107,7 @@ public class ReplyRequestHandler extends BaseHandler {
 
 
                                 if (tables != null && !tables.isEmpty()) {
-                                   builder.setValue(XTableValues.StringList.newBuilder()
+                                    builder.setValue(XTableValues.StringList.newBuilder()
                                             .addAllV(tables)
                                             .build()
                                             .toByteString());

@@ -2,14 +2,11 @@ package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.kobe.xbot.Utilities.DataCompression;
+import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.*;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
-import org.kobe.xbot.Utilities.SystemStatistics;
-import org.kobe.xbot.Utilities.TempConnectionManager;
-import org.kobe.xbot.Utilities.XTablesByteUtils;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -1072,6 +1069,27 @@ public class XTablesClient implements PushRequests {
                 byte[] decompressed = DataCompression.decompress(compressed);
                 if (decompressed == null) return null;
                 return new String(decompressed);
+            } else return null;
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        } catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
+            return null;
+        }
+    }
+
+    public  XTableProto.XTableMessage.XTablesData _getXTablesDataProto() {
+        try {
+            reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setCommand(XTableProto.XTableMessage.Command.GET_PROTO_DATA)
+                    .build()
+                    .toByteArray());
+            byte[] response = reqSocket.recv();
+            if (response == null) return null;
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            if (message.hasValue()) {
+                return XTableProto.XTableMessage.XTablesData.parseFrom(message.getValue());
             } else return null;
         } catch (InvalidProtocolBufferException e) {
             return null;

@@ -2,6 +2,7 @@ package org.kobe.xbot.Utilities;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
@@ -25,6 +26,55 @@ public class XTablesData {
     public XTablesData() {
         // Initialize the data map lazily
     }
+    public XTableProto.XTableMessage.XTablesData toProto() {
+        XTableProto.XTableMessage.XTablesData.Builder builder = XTableProto.XTableMessage.XTablesData.newBuilder();
+
+        if (data != null) {
+            for (Map.Entry<String, XTablesData> entry : data.entrySet()) {
+                builder.putData(entry.getKey(), entry.getValue().toProto());
+            }
+        }
+        if (value != null) {
+            builder.setValue(ByteString.copyFrom(value));
+        }
+        if (type != null) {
+            builder.setType(type);
+        }
+
+        return builder.build();
+    }
+    public void fromProto(XTableProto.XTableMessage.XTablesData proto) {
+        if(proto == null) {
+            return;
+        }
+        // Clear existing data if necessary
+        if (this.data != null) {
+            this.data.clear();
+        } else {
+            this.data = new HashMap<>();
+        }
+
+
+        // Populate the data map from the proto
+        if (!proto.getDataMap().isEmpty()) {
+            for (Map.Entry<String, XTableProto.XTableMessage.XTablesData> entry : proto.getDataMap().entrySet()) {
+                XTablesData childData = new XTablesData();
+                childData.fromProto(entry.getValue()); // Recursively populate child data
+                this.data.put(entry.getKey(), childData);
+            }
+        }
+
+        // Set the value from the proto
+        if (!proto.getValue().isEmpty()) {
+            this.value = proto.getValue().toByteArray();
+        } else {
+            this.value = null; // Clear the value if the proto has an empty value
+        }
+
+        // Set the type from the proto
+        this.type = proto.getType();
+    }
+
 
 
     public boolean put(String key, byte[] value, XTableProto.XTableMessage.Type type) {
@@ -238,6 +288,7 @@ public class XTablesData {
 
         this.data = newData; // Directly assign the new data
     }
+
     private static class XTablesDataSerializer implements JsonSerializer<XTablesData> {
         @Override
         public JsonElement serialize(XTablesData src, Type typeOfSrc, JsonSerializationContext context) {
@@ -246,6 +297,9 @@ public class XTablesData {
             // Serialize the `value` field if it exists at the root level
             if (src.value != null) {
                 jsonObject.add("value", serializeValue(src));
+                if(src.type != null) {
+                    jsonObject.addProperty("type", src.type.name());
+                }
             }
 
             // Serialize the `data` map if it exists

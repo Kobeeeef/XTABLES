@@ -9,6 +9,9 @@ public class JClientTest {
         xTablesClient.subscribe((xTableUpdate -> {
            System.out.println(xTableUpdate.getKey() + ": " + XTablesByteUtils.convertXTableUpdateToJsonString(xTableUpdate));
         }));
+        xTablesClient._getXTablesDataProto().getDataMap().forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
 
         Thread.sleep(100000000);
 

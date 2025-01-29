@@ -469,6 +469,10 @@ public final class XTableProto {
        * <code>BATCH = 19;</code>
        */
       BATCH(19),
+      /**
+       * <code>GET_PROTO_DATA = 20;</code>
+       */
+      GET_PROTO_DATA(20),
       UNRECOGNIZED(-1),
       ;
 
@@ -552,6 +556,10 @@ public final class XTableProto {
        * <code>BATCH = 19;</code>
        */
       public static final int BATCH_VALUE = 19;
+      /**
+       * <code>GET_PROTO_DATA = 20;</code>
+       */
+      public static final int GET_PROTO_DATA_VALUE = 20;
 
 
       public final int getNumber() {
@@ -598,6 +606,7 @@ public final class XTableProto {
           case 17: return REBOOT_SERVER;
           case 18: return REGISTRY;
           case 19: return BATCH;
+          case 20: return GET_PROTO_DATA;
           default: return null;
         }
       }
@@ -652,6 +661,1052 @@ public final class XTableProto {
       }
 
       // @@protoc_insertion_point(enum_scope:org.kobe.xbot.Utilities.Entities.XTableMessage.Command)
+    }
+
+    public interface XTablesDataOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData)
+        com.google.protobuf.MessageOrBuilder {
+
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      int getDataCount();
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      boolean containsData(
+          java.lang.String key);
+      /**
+       * Use {@link #getDataMap()} instead.
+       */
+      @java.lang.Deprecated
+      java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData>
+      getData();
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData>
+      getDataMap();
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      /* nullable */
+org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDataOrDefault(
+          java.lang.String key,
+          /* nullable */
+org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultValue);
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDataOrThrow(
+          java.lang.String key);
+
+      /**
+       * <pre>
+       * Byte array for storing values
+       * </pre>
+       *
+       * <code>bytes value = 2;</code>
+       * @return The value.
+       */
+      com.google.protobuf.ByteString getValue();
+
+      /**
+       * <pre>
+       * Enum for type
+       * </pre>
+       *
+       * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+       * @return The enum numeric value on the wire for type.
+       */
+      int getTypeValue();
+      /**
+       * <pre>
+       * Enum for type
+       * </pre>
+       *
+       * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+       * @return The type.
+       */
+      org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type getType();
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData}
+     */
+    public static final class XTablesData extends
+        com.google.protobuf.GeneratedMessageV3 implements
+        // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData)
+        XTablesDataOrBuilder {
+    private static final long serialVersionUID = 0L;
+      // Use XTablesData.newBuilder() to construct.
+      private XTablesData(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+        super(builder);
+      }
+      private XTablesData() {
+        value_ = com.google.protobuf.ByteString.EMPTY;
+        type_ = 0;
+      }
+
+      @java.lang.Override
+      @SuppressWarnings({"unused"})
+      protected java.lang.Object newInstance(
+          UnusedPrivateParameter unused) {
+        return new XTablesData();
+      }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableProto.internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_descriptor;
+      }
+
+      @SuppressWarnings({"rawtypes"})
+      @java.lang.Override
+      protected com.google.protobuf.MapFieldReflectionAccessor internalGetMapFieldReflection(
+          int number) {
+        switch (number) {
+          case 1:
+            return internalGetData();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableProto.internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.class, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.Builder.class);
+      }
+
+      public static final int DATA_FIELD_NUMBER = 1;
+      private static final class DataDefaultEntryHolder {
+        static final com.google.protobuf.MapEntry<
+            java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> defaultEntry =
+                com.google.protobuf.MapEntry
+                .<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData>newDefaultInstance(
+                    org.kobe.xbot.Utilities.Entities.XTableProto.internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_DataEntry_descriptor, 
+                    com.google.protobuf.WireFormat.FieldType.STRING,
+                    "",
+                    com.google.protobuf.WireFormat.FieldType.MESSAGE,
+                    org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.getDefaultInstance());
+      }
+      @SuppressWarnings("serial")
+      private com.google.protobuf.MapField<
+          java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> data_;
+      private com.google.protobuf.MapField<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData>
+      internalGetData() {
+        if (data_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              DataDefaultEntryHolder.defaultEntry);
+        }
+        return data_;
+      }
+      public int getDataCount() {
+        return internalGetData().getMap().size();
+      }
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      @java.lang.Override
+      public boolean containsData(
+          java.lang.String key) {
+        if (key == null) { throw new NullPointerException("map key"); }
+        return internalGetData().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getDataMap()} instead.
+       */
+      @java.lang.Override
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> getData() {
+        return getDataMap();
+      }
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      @java.lang.Override
+      public java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> getDataMap() {
+        return internalGetData().getMap();
+      }
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      @java.lang.Override
+      public /* nullable */
+org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDataOrDefault(
+          java.lang.String key,
+          /* nullable */
+org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultValue) {
+        if (key == null) { throw new NullPointerException("map key"); }
+        java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> map =
+            internalGetData().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Nested data map
+       * </pre>
+       *
+       * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+       */
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDataOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new NullPointerException("map key"); }
+        java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> map =
+            internalGetData().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public static final int VALUE_FIELD_NUMBER = 2;
+      private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <pre>
+       * Byte array for storing values
+       * </pre>
+       *
+       * <code>bytes value = 2;</code>
+       * @return The value.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString getValue() {
+        return value_;
+      }
+
+      public static final int TYPE_FIELD_NUMBER = 3;
+      private int type_ = 0;
+      /**
+       * <pre>
+       * Enum for type
+       * </pre>
+       *
+       * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+       * @return The enum numeric value on the wire for type.
+       */
+      @java.lang.Override public int getTypeValue() {
+        return type_;
+      }
+      /**
+       * <pre>
+       * Enum for type
+       * </pre>
+       *
+       * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+       * @return The type.
+       */
+      @java.lang.Override public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type getType() {
+        org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type result = org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type.forNumber(type_);
+        return result == null ? org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type.UNRECOGNIZED : result;
+      }
+
+      private byte memoizedIsInitialized = -1;
+      @java.lang.Override
+      public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized == 1) return true;
+        if (isInitialized == 0) return false;
+
+        memoizedIsInitialized = 1;
+        return true;
+      }
+
+      @java.lang.Override
+      public void writeTo(com.google.protobuf.CodedOutputStream output)
+                          throws java.io.IOException {
+        com.google.protobuf.GeneratedMessageV3
+          .serializeStringMapTo(
+            output,
+            internalGetData(),
+            DataDefaultEntryHolder.defaultEntry,
+            1);
+        if (!value_.isEmpty()) {
+          output.writeBytes(2, value_);
+        }
+        if (type_ != org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type.UNKNOWN.getNumber()) {
+          output.writeEnum(3, type_);
+        }
+        getUnknownFields().writeTo(output);
+      }
+
+      @java.lang.Override
+      public int getSerializedSize() {
+        int size = memoizedSize;
+        if (size != -1) return size;
+
+        size = 0;
+        for (java.util.Map.Entry<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> entry
+             : internalGetData().getMap().entrySet()) {
+          com.google.protobuf.MapEntry<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData>
+          data__ = DataDefaultEntryHolder.defaultEntry.newBuilderForType()
+              .setKey(entry.getKey())
+              .setValue(entry.getValue())
+              .build();
+          size += com.google.protobuf.CodedOutputStream
+              .computeMessageSize(1, data__);
+        }
+        if (!value_.isEmpty()) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(2, value_);
+        }
+        if (type_ != org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type.UNKNOWN.getNumber()) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(3, type_);
+        }
+        size += getUnknownFields().getSerializedSize();
+        memoizedSize = size;
+        return size;
+      }
+
+      @java.lang.Override
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData)) {
+          return super.equals(obj);
+        }
+        org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData other = (org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData) obj;
+
+        if (!internalGetData().equals(
+            other.internalGetData())) return false;
+        if (!getValue()
+            .equals(other.getValue())) return false;
+        if (type_ != other.type_) return false;
+        if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+        return true;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptor().hashCode();
+        if (!internalGetData().getMap().isEmpty()) {
+          hash = (37 * hash) + DATA_FIELD_NUMBER;
+          hash = (53 * hash) + internalGetData().hashCode();
+        }
+        hash = (37 * hash) + VALUE_FIELD_NUMBER;
+        hash = (53 * hash) + getValue().hashCode();
+        hash = (37 * hash) + TYPE_FIELD_NUMBER;
+        hash = (53 * hash) + type_;
+        hash = (29 * hash) + getUnknownFields().hashCode();
+        memoizedHashCode = hash;
+        return hash;
+      }
+
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(
+          java.nio.ByteBuffer data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(
+          java.nio.ByteBuffer data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(
+          com.google.protobuf.ByteString data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(
+          com.google.protobuf.ByteString data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(byte[] data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(
+          byte[] data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input, extensionRegistry);
+      }
+
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseDelimitedFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseDelimitedWithIOException(PARSER, input);
+      }
+
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseDelimitedFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(
+          com.google.protobuf.CodedInputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input);
+      }
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData parseFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input, extensionRegistry);
+      }
+
+      @java.lang.Override
+      public Builder newBuilderForType() { return newBuilder(); }
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
+      }
+      public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      @java.lang.Override
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
+
+      @java.lang.Override
+      protected Builder newBuilderForType(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+      }
+      /**
+       * Protobuf type {@code org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData}
+       */
+      public static final class Builder extends
+          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+          // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData)
+          org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+          return org.kobe.xbot.Utilities.Entities.XTableProto.internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_descriptor;
+        }
+
+        @SuppressWarnings({"rawtypes"})
+        protected com.google.protobuf.MapFieldReflectionAccessor internalGetMapFieldReflection(
+            int number) {
+          switch (number) {
+            case 1:
+              return internalGetData();
+            default:
+              throw new RuntimeException(
+                  "Invalid map field number: " + number);
+          }
+        }
+        @SuppressWarnings({"rawtypes"})
+        protected com.google.protobuf.MapFieldReflectionAccessor internalGetMutableMapFieldReflection(
+            int number) {
+          switch (number) {
+            case 1:
+              return internalGetMutableData();
+            default:
+              throw new RuntimeException(
+                  "Invalid map field number: " + number);
+          }
+        }
+        @java.lang.Override
+        protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+          return org.kobe.xbot.Utilities.Entities.XTableProto.internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                  org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.class, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.Builder.class);
+        }
+
+        // Construct using org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.newBuilder()
+        private Builder() {
+
+        }
+
+        private Builder(
+            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          super(parent);
+
+        }
+        @java.lang.Override
+        public Builder clear() {
+          super.clear();
+          bitField0_ = 0;
+          internalGetMutableData().clear();
+          value_ = com.google.protobuf.ByteString.EMPTY;
+          type_ = 0;
+          return this;
+        }
+
+        @java.lang.Override
+        public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+          return org.kobe.xbot.Utilities.Entities.XTableProto.internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_descriptor;
+        }
+
+        @java.lang.Override
+        public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDefaultInstanceForType() {
+          return org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.getDefaultInstance();
+        }
+
+        @java.lang.Override
+        public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData build() {
+          org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(result);
+          }
+          return result;
+        }
+
+        @java.lang.Override
+        public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData buildPartial() {
+          org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData result = new org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData(this);
+          if (bitField0_ != 0) { buildPartial0(result); }
+          onBuilt();
+          return result;
+        }
+
+        private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData result) {
+          int from_bitField0_ = bitField0_;
+          if (((from_bitField0_ & 0x00000001) != 0)) {
+            result.data_ = internalGetData().build(DataDefaultEntryHolder.defaultEntry);
+          }
+          if (((from_bitField0_ & 0x00000002) != 0)) {
+            result.value_ = value_;
+          }
+          if (((from_bitField0_ & 0x00000004) != 0)) {
+            result.type_ = type_;
+          }
+        }
+
+        @java.lang.Override
+        public Builder clone() {
+          return super.clone();
+        }
+        @java.lang.Override
+        public Builder setField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            java.lang.Object value) {
+          return super.setField(field, value);
+        }
+        @java.lang.Override
+        public Builder clearField(
+            com.google.protobuf.Descriptors.FieldDescriptor field) {
+          return super.clearField(field);
+        }
+        @java.lang.Override
+        public Builder clearOneof(
+            com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+          return super.clearOneof(oneof);
+        }
+        @java.lang.Override
+        public Builder setRepeatedField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            int index, java.lang.Object value) {
+          return super.setRepeatedField(field, index, value);
+        }
+        @java.lang.Override
+        public Builder addRepeatedField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            java.lang.Object value) {
+          return super.addRepeatedField(field, value);
+        }
+        @java.lang.Override
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+          if (other instanceof org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData) {
+            return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData)other);
+          } else {
+            super.mergeFrom(other);
+            return this;
+          }
+        }
+
+        public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData other) {
+          if (other == org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.getDefaultInstance()) return this;
+          internalGetMutableData().mergeFrom(
+              other.internalGetData());
+          bitField0_ |= 0x00000001;
+          if (other.getValue() != com.google.protobuf.ByteString.EMPTY) {
+            setValue(other.getValue());
+          }
+          if (other.type_ != 0) {
+            setTypeValue(other.getTypeValue());
+          }
+          this.mergeUnknownFields(other.getUnknownFields());
+          onChanged();
+          return this;
+        }
+
+        @java.lang.Override
+        public final boolean isInitialized() {
+          return true;
+        }
+
+        @java.lang.Override
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+          if (extensionRegistry == null) {
+            throw new java.lang.NullPointerException();
+          }
+          try {
+            boolean done = false;
+            while (!done) {
+              int tag = input.readTag();
+              switch (tag) {
+                case 0:
+                  done = true;
+                  break;
+                case 10: {
+                  com.google.protobuf.MapEntry<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData>
+                  data__ = input.readMessage(
+                      DataDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+                  internalGetMutableData().ensureBuilderMap().put(
+                      data__.getKey(), data__.getValue());
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+                case 18: {
+                  value_ = input.readBytes();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+                case 24: {
+                  type_ = input.readEnum();
+                  bitField0_ |= 0x00000004;
+                  break;
+                } // case 24
+                default: {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+              } // switch (tag)
+            } // while (!done)
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            throw e.unwrapIOException();
+          } finally {
+            onChanged();
+          } // finally
+          return this;
+        }
+        private int bitField0_;
+
+        private static final class DataConverter implements com.google.protobuf.MapFieldBuilder.Converter<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> {
+          @java.lang.Override
+          public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData build(org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder val) {
+            if (val instanceof org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData) { return (org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData) val; }
+            return ((org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.Builder) val).build();
+          }
+
+          @java.lang.Override
+          public com.google.protobuf.MapEntry<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> defaultEntry() {
+            return DataDefaultEntryHolder.defaultEntry;
+          }
+        };
+        private static final DataConverter dataConverter = new DataConverter();
+
+        private com.google.protobuf.MapFieldBuilder<
+            java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.Builder> data_;
+        private com.google.protobuf.MapFieldBuilder<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.Builder>
+            internalGetData() {
+          if (data_ == null) {
+            return new com.google.protobuf.MapFieldBuilder<>(dataConverter);
+          }
+          return data_;
+        }
+        private com.google.protobuf.MapFieldBuilder<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.Builder>
+            internalGetMutableData() {
+          if (data_ == null) {
+            data_ = new com.google.protobuf.MapFieldBuilder<>(dataConverter);
+          }
+          bitField0_ |= 0x00000001;
+          onChanged();
+          return data_;
+        }
+        public int getDataCount() {
+          return internalGetData().ensureBuilderMap().size();
+        }
+        /**
+         * <pre>
+         * Nested data map
+         * </pre>
+         *
+         * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+         */
+        @java.lang.Override
+        public boolean containsData(
+            java.lang.String key) {
+          if (key == null) { throw new NullPointerException("map key"); }
+          return internalGetData().ensureBuilderMap().containsKey(key);
+        }
+        /**
+         * Use {@link #getDataMap()} instead.
+         */
+        @java.lang.Override
+        @java.lang.Deprecated
+        public java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> getData() {
+          return getDataMap();
+        }
+        /**
+         * <pre>
+         * Nested data map
+         * </pre>
+         *
+         * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+         */
+        @java.lang.Override
+        public java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> getDataMap() {
+          return internalGetData().getImmutableMap();
+        }
+        /**
+         * <pre>
+         * Nested data map
+         * </pre>
+         *
+         * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+         */
+        @java.lang.Override
+        public /* nullable */
+org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDataOrDefault(
+            java.lang.String key,
+            /* nullable */
+org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultValue) {
+          if (key == null) { throw new NullPointerException("map key"); }
+          java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder> map = internalGetMutableData().ensureBuilderMap();
+          return map.containsKey(key) ? dataConverter.build(map.get(key)) : defaultValue;
+        }
+        /**
+         * <pre>
+         * Nested data map
+         * </pre>
+         *
+         * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+         */
+        @java.lang.Override
+        public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDataOrThrow(
+            java.lang.String key) {
+          if (key == null) { throw new NullPointerException("map key"); }
+          java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder> map = internalGetMutableData().ensureBuilderMap();
+          if (!map.containsKey(key)) {
+            throw new java.lang.IllegalArgumentException();
+          }
+          return dataConverter.build(map.get(key));
+        }
+        public Builder clearData() {
+          bitField0_ = (bitField0_ & ~0x00000001);
+          internalGetMutableData().clear();
+          return this;
+        }
+        /**
+         * <pre>
+         * Nested data map
+         * </pre>
+         *
+         * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+         */
+        public Builder removeData(
+            java.lang.String key) {
+          if (key == null) { throw new NullPointerException("map key"); }
+          internalGetMutableData().ensureBuilderMap()
+              .remove(key);
+          return this;
+        }
+        /**
+         * Use alternate mutation accessors instead.
+         */
+        @java.lang.Deprecated
+        public java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData>
+            getMutableData() {
+          bitField0_ |= 0x00000001;
+          return internalGetMutableData().ensureMessageMap();
+        }
+        /**
+         * <pre>
+         * Nested data map
+         * </pre>
+         *
+         * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+         */
+        public Builder putData(
+            java.lang.String key,
+            org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData value) {
+          if (key == null) { throw new NullPointerException("map key"); }
+          if (value == null) { throw new NullPointerException("map value"); }
+          internalGetMutableData().ensureBuilderMap()
+              .put(key, value);
+          bitField0_ |= 0x00000001;
+          return this;
+        }
+        /**
+         * <pre>
+         * Nested data map
+         * </pre>
+         *
+         * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+         */
+        public Builder putAllData(
+            java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> values) {
+          for (java.util.Map.Entry<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData> e : values.entrySet()) {
+            if (e.getKey() == null || e.getValue() == null) {
+              throw new NullPointerException();
+            }
+          }
+          internalGetMutableData().ensureBuilderMap()
+              .putAll(values);
+          bitField0_ |= 0x00000001;
+          return this;
+        }
+        /**
+         * <pre>
+         * Nested data map
+         * </pre>
+         *
+         * <code>map&lt;string, .org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData&gt; data = 1;</code>
+         */
+        public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.Builder putDataBuilderIfAbsent(
+            java.lang.String key) {
+          java.util.Map<java.lang.String, org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder> builderMap = internalGetMutableData().ensureBuilderMap();
+          org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesDataOrBuilder entry = builderMap.get(key);
+          if (entry == null) {
+            entry = org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.newBuilder();
+            builderMap.put(key, entry);
+          }
+          if (entry instanceof org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData) {
+            entry = ((org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData) entry).toBuilder();
+            builderMap.put(key, entry);
+          }
+          return (org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData.Builder) entry;
+        }
+
+        private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+        /**
+         * <pre>
+         * Byte array for storing values
+         * </pre>
+         *
+         * <code>bytes value = 2;</code>
+         * @return The value.
+         */
+        @java.lang.Override
+        public com.google.protobuf.ByteString getValue() {
+          return value_;
+        }
+        /**
+         * <pre>
+         * Byte array for storing values
+         * </pre>
+         *
+         * <code>bytes value = 2;</code>
+         * @param value The value to set.
+         * @return This builder for chaining.
+         */
+        public Builder setValue(com.google.protobuf.ByteString value) {
+          if (value == null) { throw new NullPointerException(); }
+          value_ = value;
+          bitField0_ |= 0x00000002;
+          onChanged();
+          return this;
+        }
+        /**
+         * <pre>
+         * Byte array for storing values
+         * </pre>
+         *
+         * <code>bytes value = 2;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearValue() {
+          bitField0_ = (bitField0_ & ~0x00000002);
+          value_ = getDefaultInstance().getValue();
+          onChanged();
+          return this;
+        }
+
+        private int type_ = 0;
+        /**
+         * <pre>
+         * Enum for type
+         * </pre>
+         *
+         * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+         * @return The enum numeric value on the wire for type.
+         */
+        @java.lang.Override public int getTypeValue() {
+          return type_;
+        }
+        /**
+         * <pre>
+         * Enum for type
+         * </pre>
+         *
+         * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+         * @param value The enum numeric value on the wire for type to set.
+         * @return This builder for chaining.
+         */
+        public Builder setTypeValue(int value) {
+          type_ = value;
+          bitField0_ |= 0x00000004;
+          onChanged();
+          return this;
+        }
+        /**
+         * <pre>
+         * Enum for type
+         * </pre>
+         *
+         * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+         * @return The type.
+         */
+        @java.lang.Override
+        public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type getType() {
+          org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type result = org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type.forNumber(type_);
+          return result == null ? org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type.UNRECOGNIZED : result;
+        }
+        /**
+         * <pre>
+         * Enum for type
+         * </pre>
+         *
+         * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+         * @param value The type to set.
+         * @return This builder for chaining.
+         */
+        public Builder setType(org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type value) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bitField0_ |= 0x00000004;
+          type_ = value.getNumber();
+          onChanged();
+          return this;
+        }
+        /**
+         * <pre>
+         * Enum for type
+         * </pre>
+         *
+         * <code>.org.kobe.xbot.Utilities.Entities.XTableMessage.Type type = 3;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearType() {
+          bitField0_ = (bitField0_ & ~0x00000004);
+          type_ = 0;
+          onChanged();
+          return this;
+        }
+        @java.lang.Override
+        public final Builder setUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
+          return super.setUnknownFields(unknownFields);
+        }
+
+        @java.lang.Override
+        public final Builder mergeUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
+          return super.mergeUnknownFields(unknownFields);
+        }
+
+
+        // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData)
+      }
+
+      // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.XTableMessage.XTablesData)
+      private static final org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData DEFAULT_INSTANCE;
+      static {
+        DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData();
+      }
+
+      public static org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      private static final com.google.protobuf.Parser<XTablesData>
+          PARSER = new com.google.protobuf.AbstractParser<XTablesData>() {
+        @java.lang.Override
+        public XTablesData parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          Builder builder = newBuilder();
+          try {
+            builder.mergeFrom(input, extensionRegistry);
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            throw e.setUnfinishedMessage(builder.buildPartial());
+          } catch (com.google.protobuf.UninitializedMessageException e) {
+            throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+          } catch (java.io.IOException e) {
+            throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                .setUnfinishedMessage(builder.buildPartial());
+          }
+          return builder.buildPartial();
+        }
+      };
+
+      public static com.google.protobuf.Parser<XTablesData> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<XTablesData> getParserForType() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface XTableLogOrBuilder extends
@@ -4988,6 +6043,16 @@ public final class XTableProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_DataEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_DataEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableLog_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -5012,45 +6077,53 @@ public final class XTableProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\030protos/XTableProto.proto\022 org.kobe.xbo" +
-      "t.Utilities.Entities\"\343\013\n\rXTableMessage\022H" +
+      "t.Utilities.Entities\"\231\016\n\rXTableMessage\022H" +
       "\n\007command\030\001 \001(\01627.org.kobe.xbot.Utilitie" +
       "s.Entities.XTableMessage.Command\022\020\n\003key\030" +
       "\002 \001(\tH\000\210\001\001\022\022\n\005value\030\003 \001(\014H\001\210\001\001\022G\n\004type\030\004" +
       " \001(\01624.org.kobe.xbot.Utilities.Entities." +
       "XTableMessage.TypeH\002\210\001\001\022\017\n\002id\030\005 \001(\014H\003\210\001\001" +
       "\022>\n\005batch\030\006 \003(\0132/.org.kobe.xbot.Utilitie" +
-      "s.Entities.XTableMessage\032\260\001\n\tXTableLog\022N" +
-      "\n\005level\030\001 \001(\0162?.org.kobe.xbot.Utilities." +
-      "Entities.XTableMessage.XTableLog.Level\022\017" +
-      "\n\007message\030\002 \001(\t\"B\n\005Level\022\013\n\007UNKNOWN\020\000\022\010\n" +
-      "\004INFO\020\001\022\013\n\007WARNING\020\002\022\n\n\006SEVERE\020\003\022\t\n\005FATA" +
-      "L\020\004\032\255\002\n\014XTableUpdate\022\013\n\003key\030\001 \001(\t\022W\n\010cat" +
-      "egory\030\002 \001(\0162E.org.kobe.xbot.Utilities.En" +
-      "tities.XTableMessage.XTableUpdate.Catego" +
-      "ry\022\r\n\005value\030\003 \001(\014\022B\n\004type\030\004 \001(\01624.org.ko" +
-      "be.xbot.Utilities.Entities.XTableMessage" +
-      ".Type\"d\n\010Category\022\013\n\007UNKNOWN\020\000\022\n\n\006UPDATE" +
-      "\020\001\022\n\n\006DELETE\020\002\022\013\n\007PUBLISH\020\003\022\014\n\010REGISTRY\020" +
-      "\004\022\017\n\013INFORMATION\020\005\022\007\n\003LOG\020\006\032\222\001\n\nClientIn" +
-      "fo\022\022\n\nip_address\030\001 \001(\t\022\020\n\010hostname\030\002 \001(\t" +
-      "\022\030\n\020operating_system\030\003 \001(\t\022\014\n\004port\030\004 \001(\005" +
-      "\022\021\n\tis_active\030\005 \001(\010\022\017\n\007version\030\006 \001(\t\022\022\n\n" +
-      "user_agent\030\007 \001(\t\"\343\001\n\004Type\022\013\n\007UNKNOWN\020\000\022\n" +
-      "\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT64\020\005\022\010\n\004BOO" +
-      "L\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007MESSAGE\020\t\022\017\n" +
-      "\013DOUBLE_LIST\020\n\022\017\n\013STRING_LIST\020\013\022\016\n\nFLOAT" +
-      "_LIST\020\014\022\020\n\014INTEGER_LIST\020\r\022\r\n\tLONG_LIST\020\016" +
-      "\022\020\n\014BOOLEAN_LIST\020\017\022\016\n\nBYTES_LIST\020\020\022\n\n\006OB" +
-      "JECT\020\021\"\307\002\n\007Command\022\023\n\017UNKNOWN_COMMAND\020\000\022" +
-      "\007\n\003PUT\020\001\022\007\n\003GET\020\002\022\t\n\005DEBUG\020\003\022\016\n\nGET_TABL" +
-      "ES\020\004\022\016\n\nRUN_SCRIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006" +
-      "DELETE\020\007\022\013\n\007PUBLISH\020\010\022\024\n\020SUBSCRIBE_DELET" +
-      "E\020\t\022\026\n\022UNSUBSCRIBE_DELETE\020\n\022\026\n\022UNSUBSCRI" +
-      "BE_UPDATE\020\013\022\010\n\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022" +
-      "\020\n\014DELETE_EVENT\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013I" +
-      "NFORMATION\020\020\022\021\n\rREBOOT_SERVER\020\021\022\014\n\010REGIS" +
-      "TRY\020\022\022\t\n\005BATCH\020\023B\006\n\004_keyB\010\n\006_valueB\007\n\005_t" +
-      "ypeB\005\n\003_idb\006proto3"
+      "s.Entities.XTableMessage\032\237\002\n\013XTablesData" +
+      "\022S\n\004data\030\001 \003(\0132E.org.kobe.xbot.Utilities" +
+      ".Entities.XTableMessage.XTablesData.Data" +
+      "Entry\022\r\n\005value\030\002 \001(\014\022B\n\004type\030\003 \001(\01624.org" +
+      ".kobe.xbot.Utilities.Entities.XTableMess" +
+      "age.Type\032h\n\tDataEntry\022\013\n\003key\030\001 \001(\t\022J\n\005va" +
+      "lue\030\002 \001(\0132;.org.kobe.xbot.Utilities.Enti" +
+      "ties.XTableMessage.XTablesData:\0028\001\032\260\001\n\tX" +
+      "TableLog\022N\n\005level\030\001 \001(\0162?.org.kobe.xbot." +
+      "Utilities.Entities.XTableMessage.XTableL" +
+      "og.Level\022\017\n\007message\030\002 \001(\t\"B\n\005Level\022\013\n\007UN" +
+      "KNOWN\020\000\022\010\n\004INFO\020\001\022\013\n\007WARNING\020\002\022\n\n\006SEVERE" +
+      "\020\003\022\t\n\005FATAL\020\004\032\255\002\n\014XTableUpdate\022\013\n\003key\030\001 " +
+      "\001(\t\022W\n\010category\030\002 \001(\0162E.org.kobe.xbot.Ut" +
+      "ilities.Entities.XTableMessage.XTableUpd" +
+      "ate.Category\022\r\n\005value\030\003 \001(\014\022B\n\004type\030\004 \001(" +
+      "\01624.org.kobe.xbot.Utilities.Entities.XTa" +
+      "bleMessage.Type\"d\n\010Category\022\013\n\007UNKNOWN\020\000" +
+      "\022\n\n\006UPDATE\020\001\022\n\n\006DELETE\020\002\022\013\n\007PUBLISH\020\003\022\014\n" +
+      "\010REGISTRY\020\004\022\017\n\013INFORMATION\020\005\022\007\n\003LOG\020\006\032\222\001" +
+      "\n\nClientInfo\022\022\n\nip_address\030\001 \001(\t\022\020\n\010host" +
+      "name\030\002 \001(\t\022\030\n\020operating_system\030\003 \001(\t\022\014\n\004" +
+      "port\030\004 \001(\005\022\021\n\tis_active\030\005 \001(\010\022\017\n\007version" +
+      "\030\006 \001(\t\022\022\n\nuser_agent\030\007 \001(\t\"\343\001\n\004Type\022\013\n\007U" +
+      "NKNOWN\020\000\022\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT6" +
+      "4\020\005\022\010\n\004BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007ME" +
+      "SSAGE\020\t\022\017\n\013DOUBLE_LIST\020\n\022\017\n\013STRING_LIST\020" +
+      "\013\022\016\n\nFLOAT_LIST\020\014\022\020\n\014INTEGER_LIST\020\r\022\r\n\tL" +
+      "ONG_LIST\020\016\022\020\n\014BOOLEAN_LIST\020\017\022\016\n\nBYTES_LI" +
+      "ST\020\020\022\n\n\006OBJECT\020\021\"\333\002\n\007Command\022\023\n\017UNKNOWN_" +
+      "COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GET\020\002\022\t\n\005DEBUG\020\003\022\016" +
+      "\n\nGET_TABLES\020\004\022\016\n\nRUN_SCRIPT\020\005\022\016\n\nUPDATE" +
+      "_KEY\020\006\022\n\n\006DELETE\020\007\022\013\n\007PUBLISH\020\010\022\024\n\020SUBSC" +
+      "RIBE_DELETE\020\t\022\026\n\022UNSUBSCRIBE_DELETE\020\n\022\026\n" +
+      "\022UNSUBSCRIBE_UPDATE\020\013\022\010\n\004PING\020\014\022\020\n\014GET_R" +
+      "AW_JSON\020\r\022\020\n\014DELETE_EVENT\020\016\022\020\n\014UPDATE_EV" +
+      "ENT\020\017\022\017\n\013INFORMATION\020\020\022\021\n\rREBOOT_SERVER\020" +
+      "\021\022\014\n\010REGISTRY\020\022\022\t\n\005BATCH\020\023\022\022\n\016GET_PROTO_" +
+      "DATA\020\024B\006\n\004_keyB\010\n\006_valueB\007\n\005_typeB\005\n\003_id" +
+      "b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -5062,20 +6135,32 @@ public final class XTableProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_descriptor,
         new java.lang.String[] { "Command", "Key", "Value", "Type", "Id", "Batch", });
-    internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableLog_descriptor =
+    internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_descriptor =
       internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_descriptor.getNestedTypes().get(0);
+    internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_descriptor,
+        new java.lang.String[] { "Data", "Value", "Type", });
+    internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_DataEntry_descriptor =
+      internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_descriptor.getNestedTypes().get(0);
+    internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_DataEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTablesData_DataEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
+    internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableLog_descriptor =
+      internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_descriptor.getNestedTypes().get(1);
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableLog_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableLog_descriptor,
         new java.lang.String[] { "Level", "Message", });
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableUpdate_descriptor =
-      internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_descriptor.getNestedTypes().get(1);
+      internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_descriptor.getNestedTypes().get(2);
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableUpdate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableUpdate_descriptor,
         new java.lang.String[] { "Key", "Category", "Value", "Type", });
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_ClientInfo_descriptor =
-      internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_descriptor.getNestedTypes().get(2);
+      internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_descriptor.getNestedTypes().get(3);
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_ClientInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_ClientInfo_descriptor,
