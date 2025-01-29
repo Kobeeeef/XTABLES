@@ -76,14 +76,15 @@ public class Utilities {
     }
 
     private static int getInterfacePriority(NetworkInterface networkInterface) {
-        String name = networkInterface.getName().toLowerCase();
-
-        if (name.startsWith("eth") || name.startsWith("enp") || name.startsWith("eno") || name.startsWith("ens")) {
+        String os = System.getProperty("os.name").toLowerCase();
+        String name = os.contains("win") ? networkInterface.getDisplayName().toLowerCase() : networkInterface.getName().toLowerCase();
+        System.out.println(name);
+        if (name.startsWith("eth") || name.startsWith("enp") || name.startsWith("eno") || name.startsWith("ens") || name.contains("ethernet")) {
             return 0; // Ethernet (highest priority)
-        } else if (name.startsWith("wlan") || name.startsWith("wifi") || name.startsWith("wlp") || name.startsWith("wlo")) {
+        } else if (name.startsWith("wlan") || name.startsWith("wifi") || name.startsWith("wlp") || name.startsWith("wlo") || name.contains("wi-fi")) {
             return 1; // WiFi
-        } else if (name.contains("docker") || name.contains("veth")) {
-            return 99; // Docker and virtual interfaces (lowest priority)
+        } else if (name.contains("tailscale") || name.contains("docker") || name.contains("virtual") || name.contains("veth")) {
+            return 99; // Tailscale, Docker, Virtual interfaces (lowest priority)
         }
         return 2; // Other interfaces
     }
@@ -96,7 +97,7 @@ public class Utilities {
      * @return true if the IP is in Docker's subnet; false otherwise.
      */
     private static boolean isDockerSubnet(String ip) {
-        return ip.startsWith("172.") && isWithinRange(ip, 16, 31);
+        return ip.startsWith("172.") && ip.startsWith("169.254") && isWithinRange(ip, 16, 31);
     }
     /**
      * Helper method to determine if an IP's second octet is within a specific range.

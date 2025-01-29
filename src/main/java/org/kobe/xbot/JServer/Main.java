@@ -19,8 +19,8 @@ import org.kobe.xbot.Utilities.Utilities;
  */
 public class Main {
 
-    private static final String BUILD_DATE = "1/25/2025";
-    private static final String VERSION = "v4.6.9";
+    private static final String BUILD_DATE = "1/29/2025";
+    private static final String VERSION = "v4.7.6";
     private static final String JAVA_VERSION = System.getProperty("java.version");
     /**
      * The version string for the XTablesServer.
