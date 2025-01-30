@@ -43,6 +43,7 @@ public class Utilities {
         List<NetworkInterface> sortedInterfaces = getSortedNetworkInterfaces();
 
         for (NetworkInterface networkInterface : sortedInterfaces) {
+            if (networkInterface.isLoopback() || networkInterface.isVirtual() || !networkInterface.isUp()) continue;
             Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
             while (inetAddresses.hasMoreElements()) {
                 InetAddress inetAddress = inetAddresses.nextElement();
@@ -88,7 +89,7 @@ public class Utilities {
      * @return true if the IP is in Docker's subnet; false otherwise.
      */
     private static boolean isDockerSubnet(String ip) {
-        return ip.startsWith("172.") && ip.startsWith("169.254") && isWithinRange(ip, 16, 31);
+        return (ip.startsWith("172.") && isWithinRange(ip, 16, 31)) || ip.startsWith("169.254");
     }
     /**
      * Helper method to determine if an IP's second octet is within a specific range.
