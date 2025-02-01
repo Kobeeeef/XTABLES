@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kobe.xbot</groupId>
     <artifactId>xtables</artifactId>
-    <version>4.7.6</version>
+    <version>4.7.7</version>
     <distributionManagement>
         <repository>
             <id>github</id>

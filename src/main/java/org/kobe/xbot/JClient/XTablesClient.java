@@ -1296,11 +1296,11 @@ public class XTablesClient implements PushRequests {
      * @return The resolved InetAddress of the XTABLES server, or null if failed to resolve.
      */
     private String resolveHostByName() {
-        String tempIp = TempConnectionManager.get();
-        if (tempIp != null) {
-            logger.info("Retrieved cached server IP: " + tempIp);
-            return tempIp;
-        }
+//        String tempIp = TempConnectionManager.get();
+//        if (tempIp != null) {
+//            logger.info("Retrieved cached server IP: " + tempIp);
+//            return tempIp;
+//        }
         InetAddress address = null;
 
         while (address == null) {
