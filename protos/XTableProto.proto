@@ -30,6 +30,7 @@ message XTableMessage {
     BOOLEAN_LIST = 15;
     BYTES_LIST = 16;
     OBJECT = 17;
+    IMAGE = 18;
   }
   enum Command {
     UNKNOWN_COMMAND = 0;
