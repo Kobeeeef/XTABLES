@@ -1420,4 +1420,10 @@ public class XTablesClient implements PushRequests {
     public ZContext getContext() {
         return context;
     }
+
+    public static XTablesClientManager getDefaultClientAsynchronously() {
+        return new XTablesClientManager();
+    }
+
+
 }

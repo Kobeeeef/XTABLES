@@ -196,14 +196,16 @@ public class SubscribeHandler extends BaseHandler {
                     // Process subscriptions
                     byte[] topic;
                     while ((topic = subscriptionQueue.poll()) != null) {
-                        subscriber.subscribe(topic);
-                        System.out.println("Subscribed to: " + topic);
+                        if(!subscriber.subscribe(topic)) {
+                            subscriptionQueue.put(topic);
+                        }
                     }
 
                     // Process unsubscriptions
                     while ((topic = unsubscriptionQueue.poll()) != null) {
-                        subscriber.unsubscribe(topic);
-                        System.out.println("Unsubscribed from: " + topic);
+                        if(!subscriber.unsubscribe(topic)) {
+                            unsubscriptionQueue.put(topic);
+                        };
                     }
 
                     Thread.sleep(100); // Prevent CPU overuse
