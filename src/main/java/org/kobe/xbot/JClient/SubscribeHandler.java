@@ -10,6 +10,8 @@ import org.kobe.xbot.Utilities.Utilities;
 import org.zeromq.ZMQ;
 
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 /**
@@ -30,7 +32,7 @@ public class SubscribeHandler extends BaseHandler {
     private final CircularBuffer<XTableProto.XTableMessage.XTableUpdate> buffer;
     private final Thread consumerHandlingThread;
     private final static int BUFFER_SIZE = 500;
-
+    private final SubscriberManager subscriberManager;
     /**
      * Constructor that initializes the handler with the provided socket and server instance.
      *
@@ -40,14 +42,30 @@ public class SubscribeHandler extends BaseHandler {
     public SubscribeHandler(ZMQ.Socket socket, XTablesClient instance) {
         super("XTABLES-SUBSCRIBE-HANDLER-DAEMON", true, socket);
         this.instance = instance;
-        this.buffer = new CircularBuffer<>(BUFFER_SIZE, (latest, current) -> {
-            return current.getKey().equals(latest.getKey());
-        });
+        this.buffer = new CircularBuffer<>(BUFFER_SIZE, (latest, current) -> current.getKey().equals(latest.getKey()));
         this.consumerHandlingThread = new ConsumerHandlingThread();
         this.consumerHandlingThread.start();
+        this.subscriberManager = new SubscriberManager(socket);
+        this.subscriberManager.start();
     }
 
+    /**
+     * Requests a new subscription to a topic.
+     *
+     * @param topic The topic to subscribe to.
+     */
+    public boolean requestSubscribe(byte[] topic) {
+       return subscriberManager.requestSubscription(topic);
+    }
 
+    /**
+     * Requests unsubscription from a topic.
+     *
+     * @param topic The topic to unsubscribe from.
+     */
+    public boolean requestUnsubscription(byte[] topic) {
+       return subscriberManager.requestUnsubscription(topic);
+    }
     /**
      * The main method for handling incoming messages.
      * <p>
@@ -95,6 +113,7 @@ public class SubscribeHandler extends BaseHandler {
     @Override
     public void interrupt() {
         this.consumerHandlingThread.interrupt();
+        this.subscriberManager.interrupt();
         super.interrupt();
     }
 
@@ -145,6 +164,57 @@ public class SubscribeHandler extends BaseHandler {
             } catch (Exception e) {
                 handleException(new XTablesException(e));
             }
+        }
+    }
+
+    /**
+     * SubscriberManager - Manages the ZeroMQ SUB socket subscriptions safely in a single thread.
+     */
+    private class SubscriberManager extends Thread {
+        private final ZMQ.Socket subscriber;
+        private final BlockingQueue<byte[]> subscriptionQueue;
+        private final BlockingQueue<byte[]> unsubscriptionQueue;
+
+        public SubscriberManager(ZMQ.Socket subscriber) {
+            this.subscriber = subscriber;
+            this.subscriptionQueue = new LinkedBlockingQueue<>();
+            this.unsubscriptionQueue = new LinkedBlockingQueue<>();
+        }
+
+        public boolean requestSubscription(byte[] topic) {
+           return subscriptionQueue.offer(topic);
+        }
+
+        public boolean requestUnsubscription(byte[] topic) {
+           return unsubscriptionQueue.offer(topic);
+        }
+
+        @Override
+        public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    // Process subscriptions
+                    byte[] topic;
+                    while ((topic = subscriptionQueue.poll()) != null) {
+                        subscriber.subscribe(topic);
+                        System.out.println("Subscribed to: " + topic);
+                    }
+
+                    // Process unsubscriptions
+                    while ((topic = unsubscriptionQueue.poll()) != null) {
+                        subscriber.unsubscribe(topic);
+                        System.out.println("Unsubscribed from: " + topic);
+                    }
+
+                    Thread.sleep(100); // Prevent CPU overuse
+
+                } catch (InterruptedException e) {
+                    break;
+                } catch (Exception e) {
+                    handleException(e);
+                }
+            }
+            subscriber.close();
         }
     }
 }

@@ -2,11 +2,14 @@ package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.kobe.xbot.Utilities.*;
+import org.kobe.xbot.Utilities.DataCompression;
 import org.kobe.xbot.Utilities.Entities.*;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
+import org.kobe.xbot.Utilities.SystemStatistics;
+import org.kobe.xbot.Utilities.TempConnectionManager;
+import org.kobe.xbot.Utilities.XTablesByteUtils;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -56,7 +59,7 @@ public class XTablesClient implements PushRequests {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v4.7.6 | Build Date: 1/29/2025";
+            "XTABLES Jero Client v4.7.9 | Build Date: 2/2/2025";
 
     private final String ip;
     private final int requestSocketPort;
@@ -164,16 +167,17 @@ public class XTablesClient implements PushRequests {
         this.subSocket.setReconnectIVLMax(1000);
         this.socketMonitor.addSocket("SUBSCRIBE", this.subSocket);
         this.subSocket.connect("tcp://" + this.ip + ":" + subscribeSocketPort);
-        this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
+        this.subscribeHandler.start();
+        this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
                 .build().toByteArray());
-        this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION)
                 .build().toByteArray());
         this.subscriptionConsumers = new HashMap<>();
         this.logConsumers = new ArrayList<>();
-        this.subscribeHandler = new SubscribeHandler(this.subSocket, this);
-        this.subscribeHandler.start();
+
 //        this.timeSyncHandler = new XTablesTimeSyncHandler(timeSyncSocket, this);
     }
 
@@ -186,9 +190,11 @@ public class XTablesClient implements PushRequests {
         this.reqSocket.setReceiveTimeOut(3000);
         this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
     }
+
     public CachedSubscriber subscribe(String key) {
         return new CachedSubscriber(key, this);
     }
+
     /**
      * Sends a PUT request with a byte array value to the server.
      * <p>
@@ -1083,7 +1089,7 @@ public class XTablesClient implements PushRequests {
         }
     }
 
-    public  XTableProto.XTableMessage.XTablesData _getXTablesDataProto() {
+    public XTableProto.XTableMessage.XTablesData _getXTablesDataProto() {
         try {
             reqSocket.send(XTableProto.XTableMessage.newBuilder()
                     .setCommand(XTableProto.XTableMessage.Command.GET_PROTO_DATA)
@@ -1145,7 +1151,7 @@ public class XTablesClient implements PushRequests {
      * @return true if the subscription was successful, false otherwise
      */
     public boolean subscribeToServerLogs(Consumer<XTableProto.XTableMessage.XTableLog> consumer) {
-        boolean success = this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        boolean success = this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
                 .build()
                 .toByteArray());
@@ -1167,7 +1173,7 @@ public class XTablesClient implements PushRequests {
     public boolean unsubscribeToServerLogs(Consumer<XTableProto.XTableMessage.XTableLog> consumer) {
         boolean success = this.logConsumers.remove(consumer);
         if (this.logConsumers.isEmpty()) {
-            return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+            return this.subscribeHandler.requestUnsubscription(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                     .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
                     .build()
                     .toByteArray());
@@ -1183,7 +1189,7 @@ public class XTablesClient implements PushRequests {
      * @return true if the subscription and consumer addition were successful, false otherwise.
      */
     public boolean subscribe(String key, Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
-        boolean success = this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        boolean success = this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setKey(key)
                 .build()
                 .toByteArray());
@@ -1200,7 +1206,7 @@ public class XTablesClient implements PushRequests {
      * @return true if the subscription and consumer addition were successful, false otherwise.
      */
     public boolean subscribe(Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
-        boolean success = this.subSocket.subscribe("");
+        boolean success = this.subscribeHandler.requestSubscribe("".getBytes(StandardCharsets.UTF_8));
         if (success) {
             return this.subscriptionConsumers.computeIfAbsent("", (k) -> new ArrayList<>()).add(consumer);
         }
@@ -1221,14 +1227,14 @@ public class XTablesClient implements PushRequests {
             boolean success = list.remove(consumer);
             if (list.isEmpty()) {
                 this.subscriptionConsumers.remove(key);
-                return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                return this.subscribeHandler.requestUnsubscription(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                         .setKey(key)
                         .build()
                         .toByteArray());
             }
             return success;
         } else {
-            return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+            return this.subscribeHandler.requestUnsubscription(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                     .setKey(key)
                     .build()
                     .toByteArray());
@@ -1248,11 +1254,11 @@ public class XTablesClient implements PushRequests {
             boolean success = list.remove(consumer);
             if (list.isEmpty()) {
                 this.subscriptionConsumers.remove("");
-                return this.subSocket.unsubscribe("");
+                return this.subscribeHandler.requestUnsubscription("".getBytes(StandardCharsets.UTF_8));
             }
             return success;
         } else {
-            return this.subSocket.unsubscribe("");
+            return this.subscribeHandler.requestUnsubscription("".getBytes(StandardCharsets.UTF_8));
         }
     }
 
