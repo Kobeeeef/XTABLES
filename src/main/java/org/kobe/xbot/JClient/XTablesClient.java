@@ -69,6 +69,8 @@ public class XTablesClient implements PushRequests {
     private final ZMQ.Socket clientRegistrySocket;
     private ZMQ.Socket reqSocket;
     private final SubscribeHandler subscribeHandler;
+
+
 //    private final XTablesTimeSyncHandler timeSyncHandler;
 
     /**
@@ -184,7 +186,9 @@ public class XTablesClient implements PushRequests {
         this.reqSocket.setReceiveTimeOut(3000);
         this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
     }
-
+    public CachedSubscriber subscribe(String key) {
+        return new CachedSubscriber(key, this);
+    }
     /**
      * Sends a PUT request with a byte array value to the server.
      * <p>
