@@ -92,9 +92,9 @@ public class XTablesClient implements PushRequests {
      * automatically resolve the IP address of the XTABLES server using mDNS (Multicast DNS).
      * <p>
      * The following default ports are used for socket communication:
-     * - Push socket port: 1735
-     * - Request socket port: 1736
-     * - Subscribe socket port: 1737
+     * - Push socket port: 48800
+     * - Request socket port: 48801
+     * - Subscribe socket port: 48802
      *
      * @param ip The IP address of the XTABLES server. If null, it will resolve the IP automatically.
      */
