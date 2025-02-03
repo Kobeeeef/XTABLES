@@ -25,6 +25,13 @@ public class CachedSubscriber {
         client.subscribe(key, this.subscriber);
     }
 
+    public XTableProto.XTableMessage.XTableUpdate[] readAll() {
+        return this.circularBuffer.readAll();
+    }
+
+    public void clear() {
+        this.circularBuffer.clear();
+    }
 
     public CachedSubscriber(String key, XTablesClient client) {
         this(key, client, 1);

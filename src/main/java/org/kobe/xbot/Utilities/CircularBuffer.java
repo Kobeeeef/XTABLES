@@ -30,8 +30,38 @@ public class CircularBuffer<T> {
         this.buffer = new Object[capacity];
         this.shouldRemove = null;
     }
-
-
+    public T[] readAll() {
+        lock.lock();
+        try {
+            if (size == 0) {
+                return (T[]) new Object[0]; // Return empty array if buffer is empty
+            }
+            T[] allData = (T[]) new Object[size];
+            int readIndex = (writeIndex - size + capacity) % capacity;
+            for (int i = 0; i < size; i++) {
+                allData[i] = (T) buffer[readIndex];
+                buffer[readIndex] = null; // Clear the slot
+                readIndex = (readIndex + 1) % capacity;
+            }
+            size = 0;
+            writeIndex = 0;
+            return allData;
+        } finally {
+            lock.unlock();
+        }
+    }
+    public void clear() {
+        lock.lock();
+        try {
+            for (int i = 0; i < capacity; i++) {
+                buffer[i] = null;
+            }
+            size = 0;
+            writeIndex = 0;
+        } finally {
+            lock.unlock();
+        }
+    }
     // Write data to the buffer
     public void write(T data) {
         lock.lock();

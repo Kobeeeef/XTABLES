@@ -30,6 +30,14 @@ public class ConcurrentCachedSubscriber {
         this(key, client, 1);
     }
 
+    public XTableProto.XTableMessage.XTableUpdate[] readAll() {
+        return this.circularBuffer.readAll();
+    }
+
+    public void clear() {
+        this.circularBuffer.clear();
+    }
+
     public void write(XTableProto.XTableMessage.XTableUpdate update) {
         this.circularBuffer.write(update);
     }
@@ -42,7 +50,7 @@ public class ConcurrentCachedSubscriber {
     }
 
     public void write(byte[] data) {
-        this.circularBuffer.write( XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        this.circularBuffer.write(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setType(XTableProto.XTableMessage.Type.UNKNOWN)
                 .setValue(ByteString.copyFrom(data))
                 .buildPartial());
