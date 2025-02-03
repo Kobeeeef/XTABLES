@@ -54,7 +54,7 @@ public class XTablesClient extends Requests {
     // Instance Variables
     // These variables are unique to each instance of the class.
     // =============================================================
-    private String XTABLES_CLIENT_VERSION = "XTABLES Jero Client v4.8.4 | Build Date: 2/2/2025";
+    private String XTABLES_CLIENT_VERSION = "XTABLES Jero Client v4.9.8 | Build Date: 2/3/2025";
 
     private final String ip;
     private final XTablesSocketMonitor socketMonitor;
