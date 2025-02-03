@@ -120,7 +120,7 @@ public class XTablesClient {
         this.subscribeSocketPort = subscribeSocketPort;
         logger.info("Connecting to XTABLES Server:\n" + "------------------------------------------------------------\n" + "Server IP: " + this.ip + "\n" + "Push Socket Port: " + pushSocketPort + "\n" + "Request Socket Port: " + requestSocketPort + "\n" + "Subscribe Socket Port: " + subscribeSocketPort + "\n" + "Web Interface: " + "http://" + this.ip + ":4880/" + "\n" + "------------------------------------------------------------");
         this.contexts = new LinkedHashMap<>();
-        this.context = new ZContext(30);
+        this.context = new ZContext(4);
         this.socketMonitor = new XTablesSocketMonitor(context);
         this.socketMonitor.start();
 
