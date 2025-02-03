@@ -10,8 +10,7 @@ import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * XTablesByteUtils - A utility class for converting between byte arrays, ByteString, and various data types.
@@ -81,6 +80,7 @@ public class XTablesByteUtils {
 
         return new AbstractMap.SimpleEntry<>(XTableProto.XTableMessage.Type.UNKNOWN, new byte[0]);
     }
+
     private static byte[] doubleToBytes(double value) {
         return ByteBuffer.allocate(Double.BYTES).putDouble(value).array();
     }
@@ -110,6 +110,18 @@ public class XTablesByteUtils {
             byteArray[i] = (byte) jsonArray.get(i).getAsInt();
         }
         return byteArray;
+    }
+
+    public static XTableValues.Coordinate getCoordinate(int x, int y) {
+        return XTableValues.Coordinate.newBuilder().setX(x).setY(y).build();
+    }
+
+    public static List<XTableValues.Coordinate> getCoordinateList(XTableValues.Coordinate... coordinate) {
+        return new ArrayList<>(Arrays.asList(coordinate));
+    }
+
+    public static XTableValues.CoordinateList getCoordinateListProto(XTableValues.Coordinate... coordinate) {
+        return XTableValues.CoordinateList.newBuilder().addAllCoordinates(List.of(coordinate)).buildPartial();
     }
 
     public static String convertTypeValueToJsonString(XTableProto.XTableMessage.Type type, byte[] value) {
