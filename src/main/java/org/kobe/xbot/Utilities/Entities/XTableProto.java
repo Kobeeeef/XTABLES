@@ -219,6 +219,10 @@ public final class XTableProto {
        * <code>OBJECT = 17;</code>
        */
       OBJECT(17),
+      /**
+       * <code>IMAGE = 18;</code>
+       */
+      IMAGE(18),
       UNRECOGNIZED(-1),
       ;
 
@@ -286,6 +290,10 @@ public final class XTableProto {
        * <code>OBJECT = 17;</code>
        */
       public static final int OBJECT_VALUE = 17;
+      /**
+       * <code>IMAGE = 18;</code>
+       */
+      public static final int IMAGE_VALUE = 18;
 
 
       public final int getNumber() {
@@ -328,6 +336,7 @@ public final class XTableProto {
           case 15: return BOOLEAN_LIST;
           case 16: return BYTES_LIST;
           case 17: return OBJECT;
+          case 18: return IMAGE;
           default: return null;
         }
       }
@@ -2544,6 +2553,17 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
        * @return The type.
        */
       org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type getType();
+
+      /**
+       * <code>optional int64 timestamp = 5;</code>
+       * @return Whether the timestamp field is set.
+       */
+      boolean hasTimestamp();
+      /**
+       * <code>optional int64 timestamp = 5;</code>
+       * @return The timestamp.
+       */
+      long getTimestamp();
     }
     /**
      * Protobuf type {@code org.kobe.xbot.Utilities.Entities.XTableMessage.XTableUpdate}
@@ -2737,6 +2757,7 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
         // @@protoc_insertion_point(enum_scope:org.kobe.xbot.Utilities.Entities.XTableMessage.XTableUpdate.Category)
       }
 
+      private int bitField0_;
       public static final int KEY_FIELD_NUMBER = 1;
       @SuppressWarnings("serial")
       private volatile java.lang.Object key_ = "";
@@ -2823,6 +2844,25 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
         return result == null ? org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type.UNRECOGNIZED : result;
       }
 
+      public static final int TIMESTAMP_FIELD_NUMBER = 5;
+      private long timestamp_ = 0L;
+      /**
+       * <code>optional int64 timestamp = 5;</code>
+       * @return Whether the timestamp field is set.
+       */
+      @java.lang.Override
+      public boolean hasTimestamp() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>optional int64 timestamp = 5;</code>
+       * @return The timestamp.
+       */
+      @java.lang.Override
+      public long getTimestamp() {
+        return timestamp_;
+      }
+
       private byte memoizedIsInitialized = -1;
       @java.lang.Override
       public final boolean isInitialized() {
@@ -2849,6 +2889,9 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
         if (type_ != org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.Type.UNKNOWN.getNumber()) {
           output.writeEnum(4, type_);
         }
+        if (((bitField0_ & 0x00000001) != 0)) {
+          output.writeInt64(5, timestamp_);
+        }
         getUnknownFields().writeTo(output);
       }
 
@@ -2873,6 +2916,10 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
           size += com.google.protobuf.CodedOutputStream
             .computeEnumSize(4, type_);
         }
+        if (((bitField0_ & 0x00000001) != 0)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeInt64Size(5, timestamp_);
+        }
         size += getUnknownFields().getSerializedSize();
         memoizedSize = size;
         return size;
@@ -2894,6 +2941,11 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
         if (!getValue()
             .equals(other.getValue())) return false;
         if (type_ != other.type_) return false;
+        if (hasTimestamp() != other.hasTimestamp()) return false;
+        if (hasTimestamp()) {
+          if (getTimestamp()
+              != other.getTimestamp()) return false;
+        }
         if (!getUnknownFields().equals(other.getUnknownFields())) return false;
         return true;
       }
@@ -2913,6 +2965,11 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
         hash = (53 * hash) + getValue().hashCode();
         hash = (37 * hash) + TYPE_FIELD_NUMBER;
         hash = (53 * hash) + type_;
+        if (hasTimestamp()) {
+          hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getTimestamp());
+        }
         hash = (29 * hash) + getUnknownFields().hashCode();
         memoizedHashCode = hash;
         return hash;
@@ -3048,6 +3105,7 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
           category_ = 0;
           value_ = com.google.protobuf.ByteString.EMPTY;
           type_ = 0;
+          timestamp_ = 0L;
           return this;
         }
 
@@ -3093,6 +3151,12 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
           if (((from_bitField0_ & 0x00000008) != 0)) {
             result.type_ = type_;
           }
+          int to_bitField0_ = 0;
+          if (((from_bitField0_ & 0x00000010) != 0)) {
+            result.timestamp_ = timestamp_;
+            to_bitField0_ |= 0x00000001;
+          }
+          result.bitField0_ |= to_bitField0_;
         }
 
         @java.lang.Override
@@ -3153,6 +3217,9 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
           if (other.type_ != 0) {
             setTypeValue(other.getTypeValue());
           }
+          if (other.hasTimestamp()) {
+            setTimestamp(other.getTimestamp());
+          }
           this.mergeUnknownFields(other.getUnknownFields());
           onChanged();
           return this;
@@ -3199,6 +3266,11 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
                   bitField0_ |= 0x00000008;
                   break;
                 } // case 32
+                case 40: {
+                  timestamp_ = input.readInt64();
+                  bitField0_ |= 0x00000010;
+                  break;
+                } // case 40
                 default: {
                   if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                     done = true; // was an endgroup tag
@@ -3422,6 +3494,46 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
         public Builder clearType() {
           bitField0_ = (bitField0_ & ~0x00000008);
           type_ = 0;
+          onChanged();
+          return this;
+        }
+
+        private long timestamp_ ;
+        /**
+         * <code>optional int64 timestamp = 5;</code>
+         * @return Whether the timestamp field is set.
+         */
+        @java.lang.Override
+        public boolean hasTimestamp() {
+          return ((bitField0_ & 0x00000010) != 0);
+        }
+        /**
+         * <code>optional int64 timestamp = 5;</code>
+         * @return The timestamp.
+         */
+        @java.lang.Override
+        public long getTimestamp() {
+          return timestamp_;
+        }
+        /**
+         * <code>optional int64 timestamp = 5;</code>
+         * @param value The timestamp to set.
+         * @return This builder for chaining.
+         */
+        public Builder setTimestamp(long value) {
+
+          timestamp_ = value;
+          bitField0_ |= 0x00000010;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional int64 timestamp = 5;</code>
+         * @return This builder for chaining.
+         */
+        public Builder clearTimestamp() {
+          bitField0_ = (bitField0_ & ~0x00000010);
+          timestamp_ = 0L;
           onChanged();
           return this;
         }
@@ -6077,7 +6189,7 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
   static {
     java.lang.String[] descriptorData = {
       "\n\030protos/XTableProto.proto\022 org.kobe.xbo" +
-      "t.Utilities.Entities\"\231\016\n\rXTableMessage\022H" +
+      "t.Utilities.Entities\"\312\016\n\rXTableMessage\022H" +
       "\n\007command\030\001 \001(\01627.org.kobe.xbot.Utilitie" +
       "s.Entities.XTableMessage.Command\022\020\n\003key\030" +
       "\002 \001(\tH\000\210\001\001\022\022\n\005value\030\003 \001(\014H\001\210\001\001\022G\n\004type\030\004" +
@@ -6096,34 +6208,35 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
       "Utilities.Entities.XTableMessage.XTableL" +
       "og.Level\022\017\n\007message\030\002 \001(\t\"B\n\005Level\022\013\n\007UN" +
       "KNOWN\020\000\022\010\n\004INFO\020\001\022\013\n\007WARNING\020\002\022\n\n\006SEVERE" +
-      "\020\003\022\t\n\005FATAL\020\004\032\255\002\n\014XTableUpdate\022\013\n\003key\030\001 " +
+      "\020\003\022\t\n\005FATAL\020\004\032\323\002\n\014XTableUpdate\022\013\n\003key\030\001 " +
       "\001(\t\022W\n\010category\030\002 \001(\0162E.org.kobe.xbot.Ut" +
       "ilities.Entities.XTableMessage.XTableUpd" +
       "ate.Category\022\r\n\005value\030\003 \001(\014\022B\n\004type\030\004 \001(" +
       "\01624.org.kobe.xbot.Utilities.Entities.XTa" +
-      "bleMessage.Type\"d\n\010Category\022\013\n\007UNKNOWN\020\000" +
-      "\022\n\n\006UPDATE\020\001\022\n\n\006DELETE\020\002\022\013\n\007PUBLISH\020\003\022\014\n" +
-      "\010REGISTRY\020\004\022\017\n\013INFORMATION\020\005\022\007\n\003LOG\020\006\032\222\001" +
-      "\n\nClientInfo\022\022\n\nip_address\030\001 \001(\t\022\020\n\010host" +
-      "name\030\002 \001(\t\022\030\n\020operating_system\030\003 \001(\t\022\014\n\004" +
-      "port\030\004 \001(\005\022\021\n\tis_active\030\005 \001(\010\022\017\n\007version" +
-      "\030\006 \001(\t\022\022\n\nuser_agent\030\007 \001(\t\"\343\001\n\004Type\022\013\n\007U" +
-      "NKNOWN\020\000\022\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT6" +
-      "4\020\005\022\010\n\004BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007ME" +
-      "SSAGE\020\t\022\017\n\013DOUBLE_LIST\020\n\022\017\n\013STRING_LIST\020" +
-      "\013\022\016\n\nFLOAT_LIST\020\014\022\020\n\014INTEGER_LIST\020\r\022\r\n\tL" +
-      "ONG_LIST\020\016\022\020\n\014BOOLEAN_LIST\020\017\022\016\n\nBYTES_LI" +
-      "ST\020\020\022\n\n\006OBJECT\020\021\"\333\002\n\007Command\022\023\n\017UNKNOWN_" +
-      "COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GET\020\002\022\t\n\005DEBUG\020\003\022\016" +
-      "\n\nGET_TABLES\020\004\022\016\n\nRUN_SCRIPT\020\005\022\016\n\nUPDATE" +
-      "_KEY\020\006\022\n\n\006DELETE\020\007\022\013\n\007PUBLISH\020\010\022\024\n\020SUBSC" +
-      "RIBE_DELETE\020\t\022\026\n\022UNSUBSCRIBE_DELETE\020\n\022\026\n" +
-      "\022UNSUBSCRIBE_UPDATE\020\013\022\010\n\004PING\020\014\022\020\n\014GET_R" +
-      "AW_JSON\020\r\022\020\n\014DELETE_EVENT\020\016\022\020\n\014UPDATE_EV" +
-      "ENT\020\017\022\017\n\013INFORMATION\020\020\022\021\n\rREBOOT_SERVER\020" +
-      "\021\022\014\n\010REGISTRY\020\022\022\t\n\005BATCH\020\023\022\022\n\016GET_PROTO_" +
-      "DATA\020\024B\006\n\004_keyB\010\n\006_valueB\007\n\005_typeB\005\n\003_id" +
-      "b\006proto3"
+      "bleMessage.Type\022\026\n\ttimestamp\030\005 \001(\003H\000\210\001\001\"" +
+      "d\n\010Category\022\013\n\007UNKNOWN\020\000\022\n\n\006UPDATE\020\001\022\n\n\006" +
+      "DELETE\020\002\022\013\n\007PUBLISH\020\003\022\014\n\010REGISTRY\020\004\022\017\n\013I" +
+      "NFORMATION\020\005\022\007\n\003LOG\020\006B\014\n\n_timestamp\032\222\001\n\n" +
+      "ClientInfo\022\022\n\nip_address\030\001 \001(\t\022\020\n\010hostna" +
+      "me\030\002 \001(\t\022\030\n\020operating_system\030\003 \001(\t\022\014\n\004po" +
+      "rt\030\004 \001(\005\022\021\n\tis_active\030\005 \001(\010\022\017\n\007version\030\006" +
+      " \001(\t\022\022\n\nuser_agent\030\007 \001(\t\"\356\001\n\004Type\022\013\n\007UNK" +
+      "NOWN\020\000\022\n\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT64\020" +
+      "\005\022\010\n\004BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007MESS" +
+      "AGE\020\t\022\017\n\013DOUBLE_LIST\020\n\022\017\n\013STRING_LIST\020\013\022" +
+      "\016\n\nFLOAT_LIST\020\014\022\020\n\014INTEGER_LIST\020\r\022\r\n\tLON" +
+      "G_LIST\020\016\022\020\n\014BOOLEAN_LIST\020\017\022\016\n\nBYTES_LIST" +
+      "\020\020\022\n\n\006OBJECT\020\021\022\t\n\005IMAGE\020\022\"\333\002\n\007Command\022\023\n" +
+      "\017UNKNOWN_COMMAND\020\000\022\007\n\003PUT\020\001\022\007\n\003GET\020\002\022\t\n\005" +
+      "DEBUG\020\003\022\016\n\nGET_TABLES\020\004\022\016\n\nRUN_SCRIPT\020\005\022" +
+      "\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE\020\007\022\013\n\007PUBLISH\020\010" +
+      "\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n\022UNSUBSCRIBE_DE" +
+      "LETE\020\n\022\026\n\022UNSUBSCRIBE_UPDATE\020\013\022\010\n\004PING\020\014" +
+      "\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DELETE_EVENT\020\016\022\020\n\014" +
+      "UPDATE_EVENT\020\017\022\017\n\013INFORMATION\020\020\022\021\n\rREBOO" +
+      "T_SERVER\020\021\022\014\n\010REGISTRY\020\022\022\t\n\005BATCH\020\023\022\022\n\016G" +
+      "ET_PROTO_DATA\020\024B\006\n\004_keyB\010\n\006_valueB\007\n\005_ty" +
+      "peB\005\n\003_idb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -6158,7 +6271,7 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableUpdate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_XTableUpdate_descriptor,
-        new java.lang.String[] { "Key", "Category", "Value", "Type", });
+        new java.lang.String[] { "Key", "Category", "Value", "Type", "Timestamp", });
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_ClientInfo_descriptor =
       internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_descriptor.getNestedTypes().get(3);
     internal_static_org_kobe_xbot_Utilities_Entities_XTableMessage_ClientInfo_fieldAccessorTable = new

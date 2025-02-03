@@ -77,6 +77,7 @@ public class PushPullRequestHandler extends BaseHandler {
                     if (XTablesServer.table.put(key, value, message.getType())) {
                         instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                                 .setType(message.getType())
+                                .setTimestamp(System.currentTimeMillis())
                                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.UPDATE)
                                 .setKey(key)
                                 .setValue(ByteString.copyFrom(value))
@@ -89,6 +90,7 @@ public class PushPullRequestHandler extends BaseHandler {
                 if (message.hasKey() && message.hasValue()) {
                     instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                             .setKey(message.getKey())
+                            .setTimestamp(System.currentTimeMillis())
                             .setType(message.getType())
                             .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.PUBLISH)
                             .setValue(ByteString.copyFrom(message.getValue().toByteArray()))

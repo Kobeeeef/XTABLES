@@ -30,6 +30,7 @@ message XTableMessage {
     BOOLEAN_LIST = 15;
     BYTES_LIST = 16;
     OBJECT = 17;
+    IMAGE = 18;
   }
   enum Command {
     UNKNOWN_COMMAND = 0;
@@ -52,6 +53,7 @@ message XTableMessage {
     REBOOT_SERVER = 17;
     REGISTRY = 18;
     BATCH = 19;
+    GET_PROTO_DATA = 20;
   }
   message XTableLog {
     Level level = 1;
@@ -69,6 +71,7 @@ message XTableMessage {
     Category category = 2;
     bytes value = 3;
     XTableMessage.Type type = 4;
+    optional int64 timestamp = 5;
     enum Category {
       UNKNOWN = 0;
       UPDATE = 1;

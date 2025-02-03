@@ -71,6 +71,7 @@ message XTableMessage {
     Category category = 2;
     bytes value = 3;
     XTableMessage.Type type = 4;
+    optional int64 timestamp = 5;
     enum Category {
       UNKNOWN = 0;
       UPDATE = 1;
