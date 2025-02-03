@@ -1,6 +1,8 @@
-package org.kobe.xbot.JClient;
+package org.kobe.xbot.JClient.Concurrency;
 
 import com.google.protobuf.ByteString;
+import org.kobe.xbot.JClient.BaseHandler;
+import org.kobe.xbot.JClient.XTablesClient;
 import org.kobe.xbot.Utilities.CircularBuffer;
 import org.kobe.xbot.Utilities.ClientStatistics;
 import org.kobe.xbot.Utilities.Entities.XTableProto;

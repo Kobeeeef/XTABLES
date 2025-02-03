@@ -1,7 +1,9 @@
-package org.kobe.xbot.JClient;
+package org.kobe.xbot.JClient.Concurrency;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.kobe.xbot.JClient.XTablesClientManager;
+import org.kobe.xbot.JClient.XTablesSocketMonitor;
 import org.kobe.xbot.Utilities.*;
 import org.kobe.xbot.Utilities.Entities.*;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
@@ -56,7 +58,7 @@ public class ConcurrentXTablesClient implements PushRequests {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v4.8.2 | Build Date: 2/2/2025";
+            "XTABLES Jero Client v4.8.4 | Build Date: 2/2/2025";
 
     private final String ip;
     private final int requestSocketPort;
@@ -191,9 +193,9 @@ public class ConcurrentXTablesClient implements PushRequests {
         this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
     }
 
-//    public CachedSubscriber subscribe(String key) {
-//        return new CachedSubscriber(key, this);
-//    }
+    public ConcurrentCachedSubscriber subscribe(String key) {
+        return new ConcurrentCachedSubscriber(key, this);
+    }
 
     /**
      * Sends a PUT request with a byte array value to the server.
