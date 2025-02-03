@@ -59,7 +59,7 @@ public class XTablesClient implements PushRequests {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v4.8.1 | Build Date: 2/2/2025";
+            "XTABLES Jero Client v4.8.2 | Build Date: 2/2/2025";
 
     private final String ip;
     private final int requestSocketPort;
