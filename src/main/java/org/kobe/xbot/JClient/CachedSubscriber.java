@@ -21,7 +21,12 @@ public class CachedSubscriber {
         this.subscriber = xTable -> this.lastUpdate = xTable;
         client.subscribe(key, this.subscriber);
     }
+    public void update(XTableProto.XTableMessage.XTableUpdate update) {
+        this.lastUpdate = update;
+    }
+    public void update(Consumer<XTableProto.XTableMessage.XTableUpdate> update) {
 
+    }
     public boolean unsubscribe() {
         return client.unsubscribe(this.subscriber);
     }

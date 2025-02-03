@@ -48,7 +48,7 @@ public class XTablesClient implements PushRequests {
     // across all instances of the class.
     // =============================================================
     private static final XTablesLogger logger = XTablesLogger.getLogger();
-    public static final int TIME_SYNC_PORT = 3123;
+//    public static final int TIME_SYNC_PORT = 3123;
     public static final String UUID = java.util.UUID.randomUUID().toString();
     public static final byte[] success = new byte[]{(byte) 0x01};
     public static final byte[] fail = new byte[]{(byte) 0x00};
@@ -59,7 +59,7 @@ public class XTablesClient implements PushRequests {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v4.7.9 | Build Date: 2/2/2025";
+            "XTABLES Jero Client v4.8.1 | Build Date: 2/2/2025";
 
     private final String ip;
     private final int requestSocketPort;
@@ -99,7 +99,7 @@ public class XTablesClient implements PushRequests {
      * @param ip The IP address of the XTABLES server. If null, it will resolve the IP automatically.
      */
     public XTablesClient(String ip) {
-        this(ip, 1735, 1736, 1737);
+        this(ip, 48800, 48801, 48802);
     }
 
 

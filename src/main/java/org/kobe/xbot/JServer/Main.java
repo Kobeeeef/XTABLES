@@ -20,7 +20,7 @@ import org.kobe.xbot.Utilities.Utilities;
 public class Main {
 
     private static final String BUILD_DATE = "2/2/2025";
-    private static final String VERSION = "v4.7.9";
+    private static final String VERSION = "v4.8.1";
     private static final String JAVA_VERSION = System.getProperty("java.version");
     /**
      * The version string for the XTablesServer.
@@ -64,9 +64,9 @@ public class Main {
                         ███████████████   ███████ ███████                                                                                                                                                                                                                                                                                                \s
                 \s""");
         boolean additionalFeatures = true;
-        int pull = 1735;
-        int rep = 1736;
-        int pub = 1737;
+        int pull = 48800;
+        int rep = 48801;
+        int pub = 48802;
 
         try {
             for (int i = 0; i < args.length; i++) {
