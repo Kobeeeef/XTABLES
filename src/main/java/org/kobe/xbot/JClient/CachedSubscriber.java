@@ -1,6 +1,7 @@
 package org.kobe.xbot.JClient;
 
 
+import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
 
@@ -21,12 +22,25 @@ public class CachedSubscriber {
         this.subscriber = xTable -> this.lastUpdate = xTable;
         client.subscribe(key, this.subscriber);
     }
+
     public void update(XTableProto.XTableMessage.XTableUpdate update) {
         this.lastUpdate = update;
     }
-    public void update(Consumer<XTableProto.XTableMessage.XTableUpdate> update) {
 
+    public void update(XTableProto.XTableMessage.Type type, byte[] data) {
+        this.lastUpdate = XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                .setType(type)
+                .setValue(ByteString.copyFrom(data))
+                .buildPartial();
     }
+
+    public void update(byte[] data) {
+        this.lastUpdate = XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                .setType(XTableProto.XTableMessage.Type.UNKNOWN)
+                .setValue(ByteString.copyFrom(data))
+                .buildPartial();
+    }
+
     public boolean unsubscribe() {
         return client.unsubscribe(this.subscriber);
     }
@@ -71,7 +85,7 @@ public class CachedSubscriber {
     }
 
     public List<XTableValues.Coordinate> getAsCoordinates(List<XTableValues.Coordinate> defaultValue) {
-        if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BYTES)) {
+        if (lastUpdate != null && (lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BYTES) || lastUpdate.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
             try {
                 return XTableValues.CoordinateList.parseFrom(lastUpdate.getValue().toByteArray()).getCoordinatesList();
             } catch (Exception e) {
