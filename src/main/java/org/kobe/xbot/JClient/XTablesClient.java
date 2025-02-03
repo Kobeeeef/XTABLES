@@ -1,6 +1,10 @@
 package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
+import org.kobe.xbot.JClient.Concurrency.ConcurrentPushHandler;
+import org.kobe.xbot.Utilities.CircularBuffer;
+import org.kobe.xbot.Utilities.Entities.QueuedRequests;
+import org.kobe.xbot.Utilities.Entities.Requests;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
@@ -33,7 +37,7 @@ import java.util.function.Consumer;
  * This is part of the XTABLES project and provides client-side functionality for
  * socket communication with the server.
  */
-public class XTablesClient {
+public class XTablesClient extends Requests {
     // =============================================================
     // Static Variables
     // These variables belong to the class itself and are shared
@@ -65,6 +69,8 @@ public class XTablesClient {
     private final int pushSocketPort;
     private final int subscribeSocketPort;
     private final int requestSocketPort;
+//    private final ConcurrentPushHandler pushHandler;
+//    public final CircularBuffer<byte[]> pushBuffer = new CircularBuffer<>(500);
 
 //    private final XTablesTimeSyncHandler timeSyncHandler;
 
@@ -105,6 +111,7 @@ public class XTablesClient {
      * @param subscribeSocketPort The port for the subscriber socket.
      */
     public XTablesClient(String ip, int pushSocketPort, int requestSocketPort, int subscribeSocketPort) {
+        super();
         if (ip == null) {
             this.ip = resolveHostByName();
             if (this.ip == null) {
@@ -117,12 +124,12 @@ public class XTablesClient {
         this.requestSocketPort = requestSocketPort;
         this.pushSocketPort = pushSocketPort;
         this.subscribeSocketPort = subscribeSocketPort;
+
         logger.info("Connecting to XTABLES Server:\n" + "------------------------------------------------------------\n" + "Server IP: " + this.ip + "\n" + "Push Socket Port: " + pushSocketPort + "\n" + "Request Socket Port: " + requestSocketPort + "\n" + "Subscribe Socket Port: " + subscribeSocketPort + "\n" + "Web Interface: " + "http://" + this.ip + ":4880/" + "\n" + "------------------------------------------------------------");
         this.contexts = new LinkedHashMap<>();
         this.context = new ZContext(4);
         this.socketMonitor = new XTablesSocketMonitor(context);
         this.socketMonitor.start();
-
         this.clientRegistrySocket = context.createSocket(SocketType.PUSH);
         this.clientRegistrySocket.setHWM(500);
         this.clientRegistrySocket.setReconnectIVL(2000);
@@ -149,6 +156,25 @@ public class XTablesClient {
         this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder().setCategory(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION).build().toByteArray());
         this.subscriptionConsumers = new HashMap<>();
         this.logConsumers = new ArrayList<>();
+
+
+        ZMQ.Socket pushSocket = context.createSocket(SocketType.PUSH);
+        pushSocket.setHWM(500);
+        pushSocket.setReconnectIVL(500);
+        pushSocket.setReconnectIVLMax(1000);
+        this.socketMonitor.addSocket("PUSH", pushSocket);
+        pushSocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
+        ZMQ.Socket reqSocket = context.createSocket(SocketType.REQ);
+        reqSocket.setHWM(500);
+        reqSocket.setReconnectIVL(500);
+        reqSocket.setReconnectIVLMax(1000);
+        reqSocket.setReceiveTimeOut(3000);
+        socketMonitor.addSocket("REQUEST", reqSocket);
+        reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
+//        this.pushHandler = new ConcurrentPushHandler(pushSocket, this);
+//        this.pushHandler.start();
+//        super.setBuffer(this.pushBuffer);
+        super.set(reqSocket, pushSocket, this);
 
 //        this.timeSyncHandler = new XTablesTimeSyncHandler(timeSyncSocket, this);
     }

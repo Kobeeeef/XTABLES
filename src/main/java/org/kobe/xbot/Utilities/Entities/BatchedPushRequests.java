@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BatchedPushRequests implements PushRequests {
+public class BatchedPushRequests extends Requests {
     private final List<XTableProto.XTableMessage> data;
 
     public BatchedPushRequests() {
