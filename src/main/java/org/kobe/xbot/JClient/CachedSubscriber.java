@@ -2,6 +2,7 @@ package org.kobe.xbot.JClient;
 
 
 import com.google.protobuf.ByteString;
+import org.kobe.xbot.Utilities.CircularBuffer;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
 
@@ -15,30 +16,36 @@ import static org.kobe.xbot.JClient.XTablesClient.successByte;
 public class CachedSubscriber {
     private final XTablesClient client;
     private final Consumer<XTableProto.XTableMessage.XTableUpdate> subscriber;
-    private XTableProto.XTableMessage.XTableUpdate lastUpdate;
+    private final CircularBuffer<XTableProto.XTableMessage.XTableUpdate> circularBuffer;
 
-    public CachedSubscriber(String key, XTablesClient client) {
+    public CachedSubscriber(String key, XTablesClient client, int readQueueSize) {
         this.client = client;
-        this.subscriber = xTable -> this.lastUpdate = xTable;
+        this.circularBuffer = new CircularBuffer<>(readQueueSize);
+        this.subscriber = this.circularBuffer::write;
         client.subscribe(key, this.subscriber);
     }
 
-    public void update(XTableProto.XTableMessage.XTableUpdate update) {
-        this.lastUpdate = update;
+
+    public CachedSubscriber(String key, XTablesClient client) {
+        this(key, client, 1);
     }
 
-    public void update(XTableProto.XTableMessage.Type type, byte[] data) {
-        this.lastUpdate = XTableProto.XTableMessage.XTableUpdate.newBuilder()
+    public void write(XTableProto.XTableMessage.XTableUpdate update) {
+        this.circularBuffer.write(update);
+    }
+
+    public void write(XTableProto.XTableMessage.Type type, byte[] data) {
+        this.circularBuffer.write(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setType(type)
                 .setValue(ByteString.copyFrom(data))
-                .buildPartial();
+                .buildPartial());
     }
 
-    public void update(byte[] data) {
-        this.lastUpdate = XTableProto.XTableMessage.XTableUpdate.newBuilder()
+    public void write(byte[] data) {
+        this.circularBuffer.write(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setType(XTableProto.XTableMessage.Type.UNKNOWN)
                 .setValue(ByteString.copyFrom(data))
-                .buildPartial();
+                .buildPartial());
     }
 
     public boolean unsubscribe() {
@@ -46,10 +53,11 @@ public class CachedSubscriber {
     }
 
     public XTableProto.XTableMessage.XTableUpdate get() {
-        return lastUpdate;
+        return this.circularBuffer.read();
     }
 
     public String getAsString(String defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.STRING)) {
             return new String(lastUpdate.getValue().toByteArray(), StandardCharsets.UTF_8);
         }
@@ -57,6 +65,7 @@ public class CachedSubscriber {
     }
 
     public boolean getAsBoolean(boolean defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BOOL)) {
             return lastUpdate.getValue().equals(successByte);
         }
@@ -64,6 +73,7 @@ public class CachedSubscriber {
     }
 
     public int getAsInteger(int defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
             return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getInt();
         }
@@ -71,6 +81,7 @@ public class CachedSubscriber {
     }
 
     public long getAsLong(long defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
             return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getLong();
         }
@@ -78,6 +89,7 @@ public class CachedSubscriber {
     }
 
     public double getAsDouble(double defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.DOUBLE)) {
             return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getDouble();
         }
@@ -85,6 +97,7 @@ public class CachedSubscriber {
     }
 
     public List<XTableValues.Coordinate> getAsCoordinates(List<XTableValues.Coordinate> defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && (lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BYTES) || lastUpdate.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
             try {
                 return XTableValues.CoordinateList.parseFrom(lastUpdate.getValue().toByteArray()).getCoordinatesList();
@@ -96,6 +109,7 @@ public class CachedSubscriber {
     }
 
     public List<String> getAsStringList(List<String> defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.STRING_LIST)) {
             try {
                 return XTableValues.StringList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -107,6 +121,7 @@ public class CachedSubscriber {
     }
 
     public List<Integer> getAsIntegerList(List<Integer> defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INTEGER_LIST)) {
             try {
                 return XTableValues.IntegerList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -118,6 +133,7 @@ public class CachedSubscriber {
     }
 
     public List<Boolean> getAsBooleanList(List<Boolean> defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BOOLEAN_LIST)) {
             try {
                 return XTableValues.BoolList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -129,6 +145,7 @@ public class CachedSubscriber {
     }
 
     public List<Long> getAsLongList(List<Long> defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.LONG_LIST)) {
             try {
                 return XTableValues.LongList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -140,6 +157,7 @@ public class CachedSubscriber {
     }
 
     public List<Float> getAsFloatList(List<Float> defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.LONG_LIST)) {
             try {
                 return XTableValues.FloatList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
