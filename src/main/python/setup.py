@@ -11,7 +11,7 @@ setup(
     author_email="kobelei335@gmail.com",
     url="https://github.com/Kobeeeef/XTABLES",
     packages=find_packages(),
-    install_requires=open('requirements.txt', encoding='utf-16').read().splitlines(),
+    install_requires=open('requirements.txt', encoding='utf-8').read().splitlines(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
