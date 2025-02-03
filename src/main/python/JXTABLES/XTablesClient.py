@@ -730,20 +730,20 @@ class XTablesServerNotFound(Exception):
 # #         XTablesByteUtils.to_int(test.value)) + " TYPE: " + XTableProto.XTableMessage.Type.Name(test.type))
 #
 #
-if __name__ == "__main__":
-    client = XTablesClient(debug_mode=False)
-    # client.subscribe_all(consumer)
-    # coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
-    #
-    # client.putCoordinates("test", coordinates)
-    #
-    # print(client.getCoordinates("test")[0].x)
-
-    client.putIntegerList("test", [1])
-
-    print(client.getStringList("test"))
-    time.sleep(100000)
-
-    # print(client.getUnknownBytes("name"))
-    # print(client.getString("age"))
-    # print(client.getArray("numbers"))
+# if __name__ == "__main__":
+#     client = XTablesClient(debug_mode=False)
+#     # client.subscribe_all(consumer)
+#     # coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
+#     #
+#     # client.putCoordinates("test", coordinates)
+#     #
+#     # print(client.getCoordinates("test")[0].x)
+# 
+#     client.putIntegerList("test", [1])
+# 
+#     print(client.getStringList("test"))
+#     time.sleep(100000)
+# 
+#     # print(client.getUnknownBytes("name"))
+#     # print(client.getString("age"))
+#     # print(client.getArray("numbers"))
