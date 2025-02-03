@@ -1,6 +1,5 @@
 package org.kobe.xbot.JClient;
 
-
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.kobe.xbot.Utilities.*;
@@ -46,6 +45,7 @@ public class ConcurrentXTablesClient implements PushRequests {
     // across all instances of the class.
     // =============================================================
     private static final XTablesLogger logger = XTablesLogger.getLogger();
+//    public static final int TIME_SYNC_PORT = 3123;
     public static final String UUID = java.util.UUID.randomUUID().toString();
     public static final byte[] success = new byte[]{(byte) 0x01};
     public static final byte[] fail = new byte[]{(byte) 0x00};
@@ -56,7 +56,7 @@ public class ConcurrentXTablesClient implements PushRequests {
     // These variables are unique to each instance of the class.
     // =============================================================
     private String XTABLES_CLIENT_VERSION =
-            "XTABLES Jero Client v4.6.7 | Build Date: 1/24/2025";
+            "XTABLES Jero Client v4.8.2 | Build Date: 2/2/2025";
 
     private final String ip;
     private final int requestSocketPort;
@@ -71,6 +71,10 @@ public class ConcurrentXTablesClient implements PushRequests {
     private final ConcurrentSubscribeHandler subscribeHandler;
     private final ConcurrentPushHandler pushHandler;
     public final CircularBuffer<byte[]> pushBuffer = new CircularBuffer<>(500);
+
+
+//    private final XTablesTimeSyncHandler timeSyncHandler;
+
     /**
      * Default constructor for XTablesClient.
      * Initializes the client without specifying an IP address.
@@ -94,7 +98,7 @@ public class ConcurrentXTablesClient implements PushRequests {
      * @param ip The IP address of the XTABLES server. If null, it will resolve the IP automatically.
      */
     public ConcurrentXTablesClient(String ip) {
-        this(ip, 1735, 1736, 1737);
+        this(ip, 48800, 48801, 48802);
     }
 
 
@@ -142,6 +146,13 @@ public class ConcurrentXTablesClient implements PushRequests {
         this.clientRegistrySocket.setReconnectIVLMax(6000);
         this.socketMonitor.addSocket("REGISTRY", this.clientRegistrySocket);
         this.clientRegistrySocket.connect("tcp://" + this.ip + ":" + pushSocketPort);
+//        ZMQ.Socket timeSyncSocket = context.createSocket(SocketType.REQ);
+//        timeSyncSocket.setHWM(2);
+//        timeSyncSocket.setReceiveTimeOut(1000);
+//        timeSyncSocket.setReconnectIVL(1000);
+//        timeSyncSocket.setReconnectIVLMax(1000);
+//        socketMonitor.addSocket("TIMESYNC", timeSyncSocket);
+//        timeSyncSocket.connect("tcp://" + this.ip + ":" + TIME_SYNC_PORT);
         this.reqSocket = context.createSocket(SocketType.REQ);
         this.reqSocket.setHWM(500);
         this.reqSocket.setReconnectIVL(1000);
@@ -155,18 +166,19 @@ public class ConcurrentXTablesClient implements PushRequests {
         this.subSocket.setReconnectIVLMax(1000);
         this.socketMonitor.addSocket("SUBSCRIBE", this.subSocket);
         this.subSocket.connect("tcp://" + this.ip + ":" + subscribeSocketPort);
-        this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        this.subscribeHandler = new ConcurrentSubscribeHandler(this.subSocket, this);
+        this.subscribeHandler.start();
+        this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY)
                 .build().toByteArray());
-        this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION)
                 .build().toByteArray());
         this.subscriptionConsumers = new HashMap<>();
         this.logConsumers = new ArrayList<>();
-        this.subscribeHandler = new ConcurrentSubscribeHandler(this.subSocket, this);
-        this.subscribeHandler.start();
         this.pushHandler = new ConcurrentPushHandler(this.pushSocket, this);
         this.pushHandler.start();
+//        this.timeSyncHandler = new XTablesTimeSyncHandler(timeSyncSocket, this);
     }
 
     private void reconnectRequestSocket() {
@@ -178,6 +190,10 @@ public class ConcurrentXTablesClient implements PushRequests {
         this.reqSocket.setReceiveTimeOut(3000);
         this.reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
     }
+
+//    public CachedSubscriber subscribe(String key) {
+//        return new CachedSubscriber(key, this);
+//    }
 
     /**
      * Sends a PUT request with a byte array value to the server.
@@ -367,10 +383,12 @@ public class ConcurrentXTablesClient implements PushRequests {
                 .addAllV(value);
         return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.BOOLEAN_LIST);
     }
+
     @Override
     public boolean putTypedBytes(String key, XTableProto.XTableMessage.Type type, byte[] value) {
         return sendPutMessage(key, value, type);
     }
+
 
     /**
      * Sends a message via the PUSH socket to the server.
@@ -380,6 +398,7 @@ public class ConcurrentXTablesClient implements PushRequests {
      * @param key   The key associated with the value.
      * @param value The byte array representing the value to be sent.
      * @param type  The type of the value being sent (e.g., STRING, INT64, etc.).
+     * @return True if the message was sent successfully; otherwise, false.
      */
     private boolean sendPutMessage(String key, byte[] value, XTableProto.XTableMessage.Type type) {
         try {
@@ -389,8 +408,7 @@ public class ConcurrentXTablesClient implements PushRequests {
                     .setValue(ByteString.copyFrom(value))
                     .setType(type)
                     .build()
-                     .toByteArray()
-                   );
+                    .toByteArray());
              return true;
         } catch (Exception e) {
             throw new XTablesException(e);
@@ -406,6 +424,7 @@ public class ConcurrentXTablesClient implements PushRequests {
      * @return true if the message was successfully sent, false otherwise.
      * @throws XTablesException if there is an exception during the publication process.
      */
+    @Override
     public boolean publish(String key, byte[] value) {
         try {
              pushBuffer.write(XTableProto.XTableMessage.newBuilder()
@@ -414,7 +433,7 @@ public class ConcurrentXTablesClient implements PushRequests {
                     .setValue(ByteString.copyFrom(value))
                     .build()
                     .toByteArray());
-             return true;
+            return true;
         } catch (Exception e) {
             throw new XTablesException(e);
         }
@@ -432,13 +451,14 @@ public class ConcurrentXTablesClient implements PushRequests {
      * @throws XTablesException if any exception occurs during the process of sending
      *                          the batched push requests.
      */
-    public void sendBatchedPushRequests(BatchedPushRequests batchedPushRequests) {
+    public boolean sendBatchedPushRequests(BatchedPushRequests batchedPushRequests) {
         try {
              pushBuffer.write(XTableProto.XTableMessage.newBuilder()
                     .setCommand(XTableProto.XTableMessage.Command.BATCH)
                     .addAllBatch(batchedPushRequests.getData())
                     .build()
                     .toByteArray());
+             return true;
         } catch (Exception e) {
             throw new XTablesException(e);
         }
@@ -1072,6 +1092,27 @@ public class ConcurrentXTablesClient implements PushRequests {
         }
     }
 
+    public XTableProto.XTableMessage.XTablesData _getXTablesDataProto() {
+        try {
+            reqSocket.send(XTableProto.XTableMessage.newBuilder()
+                    .setCommand(XTableProto.XTableMessage.Command.GET_PROTO_DATA)
+                    .build()
+                    .toByteArray());
+            byte[] response = reqSocket.recv();
+            if (response == null) return null;
+            XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
+            if (message.hasValue()) {
+                return XTableProto.XTableMessage.XTablesData.parseFrom(message.getValue());
+            } else return null;
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        } catch (ZMQException e) {
+            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
+            reconnectRequestSocket();
+            return null;
+        }
+    }
+
     /**
      * Sends a ping request to the server and measures the round-trip time.
      * <p>
@@ -1113,7 +1154,7 @@ public class ConcurrentXTablesClient implements PushRequests {
      * @return true if the subscription was successful, false otherwise
      */
     public boolean subscribeToServerLogs(Consumer<XTableProto.XTableMessage.XTableLog> consumer) {
-        boolean success = this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        boolean success = this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
                 .build()
                 .toByteArray());
@@ -1135,7 +1176,7 @@ public class ConcurrentXTablesClient implements PushRequests {
     public boolean unsubscribeToServerLogs(Consumer<XTableProto.XTableMessage.XTableLog> consumer) {
         boolean success = this.logConsumers.remove(consumer);
         if (this.logConsumers.isEmpty()) {
-            return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+            return this.subscribeHandler.requestUnsubscription(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                     .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG)
                     .build()
                     .toByteArray());
@@ -1151,7 +1192,7 @@ public class ConcurrentXTablesClient implements PushRequests {
      * @return true if the subscription and consumer addition were successful, false otherwise.
      */
     public boolean subscribe(String key, Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
-        boolean success = this.subSocket.subscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+        boolean success = this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                 .setKey(key)
                 .build()
                 .toByteArray());
@@ -1168,7 +1209,7 @@ public class ConcurrentXTablesClient implements PushRequests {
      * @return true if the subscription and consumer addition were successful, false otherwise.
      */
     public boolean subscribe(Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
-        boolean success = this.subSocket.subscribe("");
+        boolean success = this.subscribeHandler.requestSubscribe("".getBytes(StandardCharsets.UTF_8));
         if (success) {
             return this.subscriptionConsumers.computeIfAbsent("", (k) -> new ArrayList<>()).add(consumer);
         }
@@ -1189,14 +1230,14 @@ public class ConcurrentXTablesClient implements PushRequests {
             boolean success = list.remove(consumer);
             if (list.isEmpty()) {
                 this.subscriptionConsumers.remove(key);
-                return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+                return this.subscribeHandler.requestUnsubscription(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                         .setKey(key)
                         .build()
                         .toByteArray());
             }
             return success;
         } else {
-            return this.subSocket.unsubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder()
+            return this.subscribeHandler.requestUnsubscription(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                     .setKey(key)
                     .build()
                     .toByteArray());
@@ -1216,11 +1257,11 @@ public class ConcurrentXTablesClient implements PushRequests {
             boolean success = list.remove(consumer);
             if (list.isEmpty()) {
                 this.subscriptionConsumers.remove("");
-                return this.subSocket.unsubscribe("");
+                return this.subscribeHandler.requestUnsubscription("".getBytes(StandardCharsets.UTF_8));
             }
             return success;
         } else {
-            return this.subSocket.unsubscribe("");
+            return this.subscribeHandler.requestUnsubscription("".getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -1268,11 +1309,11 @@ public class ConcurrentXTablesClient implements PushRequests {
      * @return The resolved InetAddress of the XTABLES server, or null if failed to resolve.
      */
     private String resolveHostByName() {
-        String tempIp = TempConnectionManager.get();
-        if (tempIp != null) {
-            logger.info("Retrieved cached server IP: " + tempIp);
-            return tempIp;
-        }
+//        String tempIp = TempConnectionManager.get();
+//        if (tempIp != null) {
+//            logger.info("Retrieved cached server IP: " + tempIp);
+//            return tempIp;
+//        }
         InetAddress address = null;
 
         while (address == null) {
@@ -1310,6 +1351,8 @@ public class ConcurrentXTablesClient implements PushRequests {
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException ex) {
+                        logger.warning("Retry wait interrupted. Exiting...");
+                        Thread.currentThread().interrupt();
                     }
                     logger.severe("Exception on resolving XTABLES server: " + ei.getMessage());
                     return resolveHostByName();
@@ -1376,4 +1419,14 @@ public class ConcurrentXTablesClient implements PushRequests {
     public String getIp() {
         return ip;
     }
+
+    public ZContext getContext() {
+        return context;
+    }
+
+    public static XTablesClientManager getDefaultClientAsynchronously() {
+        return new XTablesClientManager();
+    }
+
+
 }
