@@ -1,21 +1,30 @@
 package org.kobe.xbot.Tests;
 
-import org.kobe.xbot.JClient.CachedSubscriber;
-import org.kobe.xbot.JClient.XTablesClient;
-import org.kobe.xbot.JClient.XTablesClientManager;
-import org.kobe.xbot.Utilities.Entities.XTableValues;
-import org.kobe.xbot.Utilities.XTablesByteUtils;
 
-import java.util.List;
+import org.kobe.xbot.JClient.XTableContext;
+import org.kobe.xbot.JClient.XTablesClient;
+
 import java.util.concurrent.ExecutionException;
 
 public class JClientTest {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-        XTablesClientManager xTablesClient = XTablesClient.getDefaultClientAsynchronously();
-        xTablesClient.getAndBlock();
-       CachedSubscriber subscriber =   xTablesClient.getAndBlock().subscribe("photonvisionfrontleft.active_agents.Orange_Pi_Process.log");
+        XTablesClient client = new XTablesClient();
 
-       Thread.sleep(1000000);
+        XTableContext context = client.registerNewThreadedContext("thread-1");
+        XTableContext context2 = client.registerNewThreadedContext("thread-2");
+
+        new Thread(() -> {
+            while (true) {
+                context.publish("test1", new byte[]{});
+            }
+        }).start();
+        new Thread(() -> {
+            while (true) {
+                context2.publish("test2", new byte[]{});
+            }
+        }).start();
+
+//       Thread.sleep(1000000);
 
     }
 }

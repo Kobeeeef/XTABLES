@@ -175,5 +175,15 @@ public class CachedSubscriber {
         return defaultValue;
     }
 
-
+    public List<Double> getAsDoubleList(List<Double> defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
+        if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.DOUBLE_LIST)) {
+            try {
+                return XTableValues.DoubleList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
 }
