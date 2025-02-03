@@ -9,14 +9,12 @@ try:
     from .BaseHandler import BaseHandler
     from .ClientStatistics import ClientStatistics
     from .CircularBuffer import CircularBuffer
-    from . import Utilities
     from . import XTableProto_pb2 as XTableProto
 except ImportError:
     # Standalone script imports
     from BaseHandler import BaseHandler
     from ClientStatistics import ClientStatistics
     from CircularBuffer import CircularBuffer
-    import Utilities
     import XTableProto_pb2 as XTableProto
 
 
