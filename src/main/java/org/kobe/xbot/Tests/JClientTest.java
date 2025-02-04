@@ -17,16 +17,11 @@ public class JClientTest {
         pushRequests.putInteger("c", 5);
         pushRequests.putInteger("4", 5);
         pushRequests.putInteger("vg", 5);
-//        new Thread(() -> {
-//            while (true) {
-//               System.out.println(client.getString("photonvisionfrontleft.active_agents.Orange_Pi_Process.Status"));
-//                try {
-//                    Thread.sleep(1);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        }).start();
+        new Thread(() -> {
+            while (true) {
+               client.putBytes("a", new byte[]{});
+            }
+        }).start();
 
 
        Thread.sleep(1000000);

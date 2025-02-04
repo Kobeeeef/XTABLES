@@ -4,11 +4,14 @@ import com.google.gson.*;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -127,6 +130,7 @@ public class XTablesByteUtils {
     public static String convertTypeValueToJsonString(XTableProto.XTableMessage.Type type, byte[] value) {
         JsonElement jsonElement = switch (type) {
             case STRING -> new JsonPrimitive(new String(value));
+            case POSE2D -> new JsonPrimitive(XTablesByteUtils.pose2dToString(value));
             case INT64 -> new JsonPrimitive(bytesToLong(value));
             case BOOL -> new JsonPrimitive(value[0] == 0x01);
             case DOUBLE -> new JsonPrimitive(bytesToDouble(value));
@@ -463,6 +467,71 @@ public class XTablesByteUtils {
             return Double.longBitsToDouble(longBits);
         }
         return 0.0;
+    }
+
+
+    /**
+     * Packs a Pose2d object into a byte array.
+     *
+     * @param pose The Pose2d object to pack.
+     * @return A byte array representation of the Pose2d object.
+     */
+    public static byte[] packPose2d(Pose2d pose) {
+        try {
+            ByteBuffer bb = ByteBuffer.allocate(Double.BYTES * 3); // x, y, rotation
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+
+            bb.putDouble(pose.getX());
+            bb.putDouble(pose.getY());
+            bb.putDouble(pose.getRotation().getRadians());
+
+            return bb.array();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Return null if packing fails
+        }
+    }
+
+    /**
+     * Converts a Pose2d byte array into a human-readable string.
+     * If deserialization fails, it returns "Invalid Pose2d Data".
+     *
+     * @param data The byte array representing a serialized Pose2d.
+     * @return A human-readable string representation of the Pose2d.
+     */
+    public static String pose2dToString(byte[] data) {
+        Pose2d pose = unpackPose2d(data);
+        if (pose == null) {
+            return "Invalid Pose2d Data";
+        }
+        double degrees = Math.toDegrees(pose.getRotation().getRadians());
+        return String.format("Pose2d(X: %.2f m, Y: %.2f m, Rotation: %.2f°)", pose.getX(), pose.getY(), degrees);
+    }
+
+    /**
+     * Unpacks a byte array into a Pose2d object.
+     *
+     * @param data The byte array to unpack.
+     * @return A Pose2d object if successful, or null if unpacking fails.
+     */
+    public static Pose2d unpackPose2d(byte[] data) {
+        try {
+            if (data == null || data.length != Double.BYTES * 3) {
+                return null; // Invalid input length
+            }
+
+            ByteBuffer bb = ByteBuffer.wrap(data);
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+
+            double x = bb.getDouble();
+            double y = bb.getDouble();
+            double rotation = bb.getDouble();
+
+            return new Pose2d(x, y, new Rotation2d(rotation));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Return null on failure
+        }
     }
 }
 

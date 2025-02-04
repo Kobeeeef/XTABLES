@@ -14,18 +14,22 @@ import java.util.*;
 public class XTablesData {
     private static final XTablesLogger logger = XTablesLogger.getLogger();
     private static final Gson gson;
+
     static {
         // Register custom serializer for XTablesData class
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(XTablesData.class, new XTablesDataSerializer());
         gson = gsonBuilder.create();
     }
+
     private Map<String, XTablesData> data;
     private byte[] value;
     private XTableProto.XTableMessage.Type type;
+
     public XTablesData() {
         // Initialize the data map lazily
     }
+
     public XTableProto.XTableMessage.XTablesData toProto() {
         XTableProto.XTableMessage.XTablesData.Builder builder = XTableProto.XTableMessage.XTablesData.newBuilder();
 
@@ -43,8 +47,9 @@ public class XTablesData {
 
         return builder.build();
     }
+
     public void fromProto(XTableProto.XTableMessage.XTablesData proto) {
-        if(proto == null) {
+        if (proto == null) {
             return;
         }
         // Clear existing data if necessary
@@ -74,7 +79,6 @@ public class XTablesData {
         // Set the type from the proto
         this.type = proto.getType();
     }
-
 
 
     public boolean put(String key, byte[] value, XTableProto.XTableMessage.Type type) {
@@ -120,6 +124,7 @@ public class XTablesData {
         }
         return count;
     }
+
     /**
      * Retrieves the value and its type for the given key.
      *
@@ -230,6 +235,7 @@ public class XTablesData {
 
         return current.data != null && current.data.remove(keys[keys.length - 1]) != null;
     }
+
     /**
      * Retrieves all key-value pairs in dot notation from the current data structure.
      *
@@ -261,8 +267,9 @@ public class XTablesData {
             }
         }
     }
+
     public String toJSON() {
-        if(this.data == null) return null;
+        if (this.data == null) return null;
         return gson.toJson(new HashMap<>(this.data));
     }
 
@@ -273,9 +280,11 @@ public class XTablesData {
     public Map<String, XTablesData> getTablesMap() {
         return data;
     }
+
     public byte[] getValue() {
         return value;
     }
+
     public void updateFromRawJSON(String json) {
 
         Map<String, XTablesData> newData = gson.fromJson(json, new TypeToken<Map<String, XTablesData>>() {
@@ -297,7 +306,7 @@ public class XTablesData {
             // Serialize the `value` field if it exists at the root level
             if (src.value != null) {
                 jsonObject.add("value", serializeValue(src));
-                if(src.type != null) {
+                if (src.type != null) {
                     jsonObject.addProperty("type", src.type.name());
                 }
             }
@@ -319,7 +328,6 @@ public class XTablesData {
         }
 
 
-
         private JsonElement serializeValue(XTablesData node) {
             if (node.value != null && node.type != null) {
                 return switch (node.type) {
@@ -327,6 +335,7 @@ public class XTablesData {
                     case INT64 -> new JsonPrimitive(bytesToLong(node.value));
                     case BOOL -> new JsonPrimitive(node.value[0] == 0x01);
                     case DOUBLE -> new JsonPrimitive(bytesToDouble(node.value));
+                    case POSE2D -> new JsonPrimitive(XTablesByteUtils.pose2dToString(node.value));
                     case FLOAT_LIST -> {
                         JsonArray jsonArray = new JsonArray();
                         try {
@@ -432,7 +441,6 @@ public class XTablesData {
         }
 
 
-
         private double bytesToDouble(byte[] bytes) {
             if (bytes.length >= 8) {
                 long longBits = ((long) bytes[0] << 56) |
@@ -448,7 +456,6 @@ public class XTablesData {
             return 0.0;
         }
     }
-
 
 
 }

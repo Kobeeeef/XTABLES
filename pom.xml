@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kobe.xbot</groupId>
     <artifactId>xtables</artifactId>
-    <version>4.9.9</version>
+    <version>5.0.0</version>
     <distributionManagement>
         <repository>
             <id>github</id>
@@ -49,6 +49,13 @@
             </plugin>
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>wpi-maven</id>
+            <url>https://frcmaven.wpi.edu/artifactory/release/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.zeromq</groupId>
@@ -70,6 +77,24 @@
             <artifactId>jetty-webapp</artifactId>
             <version>11.0.21</version>
         </dependency>
+
+        <dependency>
+            <groupId>edu.wpi.first.wpimath</groupId>
+            <artifactId>wpimath-java</artifactId>
+            <version>2025.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpiutil</groupId>
+            <artifactId>wpiutil-java</artifactId>
+            <version>2025.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.wpi.first.wpiunits</groupId>
+            <artifactId>wpiunits-java</artifactId>
+            <version>2025.2.1</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlets</artifactId>
