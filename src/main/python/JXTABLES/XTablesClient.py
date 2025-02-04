@@ -817,14 +817,13 @@ class XTablesServerNotFound(Exception):
 # if __name__ == "__main__":
 #     client = XTablesClient(debug_mode=False)
 #     # client.subscribe_all(consumer)
-#     # coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4)]
-#     #
-#     # client.putCoordinates("test", coordinates)
+#     coordinates = [XTableValues.Coordinate(x=1, y=2), XTableValues.Coordinate(x=3, y=4), XTableValues.Coordinate(x=123, y=123   )]
+#
+#     client.putCoordinates("test", coordinates)
 #     #
 #     # print(client.getCoordinates("test")[0].x)
 #     client.putPose2d("PoseSubsystem", (100, 100, 3))
 #     print(XTablesByteUtils.pose2d_tuple_to_string(client.getPose2d("PoseSubsystem")))
-#     print(client.getStringList("test"))
 #     time.sleep(100000)
 #
 #     # print(client.getUnknownBytes("name"))
