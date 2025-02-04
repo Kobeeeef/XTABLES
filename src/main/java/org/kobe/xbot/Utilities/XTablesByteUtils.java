@@ -508,6 +508,22 @@ public class XTablesByteUtils {
         return String.format("Pose2d(X: %.2f m, Y: %.2f m, Rotation: %.2f°)", pose.getX(), pose.getY(), degrees);
     }
 
+
+    /**
+     * Converts a Pose2d byte array into a human-readable string.
+     * If deserialization fails, it returns "Invalid Pose2d Data".
+     *
+     * @param pose The pose
+     * @return A human-readable string representation of the Pose2d.
+     */
+    public static String pose2dToString(Pose2d pose) {
+        if (pose == null) {
+            return "Invalid Pose2d Data";
+        }
+        double degrees = Math.toDegrees(pose.getRotation().getRadians());
+        return String.format("Pose2d(X: %.2f m, Y: %.2f m, Rotation: %.2f°)", pose.getX(), pose.getY(), degrees);
+    }
+
     /**
      * Unpacks a byte array into a Pose2d object.
      *

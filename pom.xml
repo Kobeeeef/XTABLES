@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kobe.xbot</groupId>
     <artifactId>xtables</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.1</version>
     <distributionManagement>
         <repository>
             <id>github</id>
@@ -92,6 +92,11 @@
             <groupId>edu.wpi.first.wpiunits</groupId>
             <artifactId>wpiunits-java</artifactId>
             <version>2025.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>us.hebi.quickbuf</groupId>
+            <artifactId>quickbuf-runtime</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
 
