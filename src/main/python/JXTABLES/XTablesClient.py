@@ -641,8 +641,8 @@ class XTablesClient:
         message = self._get_xtable_message(key)
         if message is not None:
             return message.value
-        else:
-            raise ValueError(f"Expected BYTES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+        return None
 
     def _get_xtable_message(self, key):
         try:
