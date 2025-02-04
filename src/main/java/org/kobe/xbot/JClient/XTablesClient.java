@@ -2,9 +2,8 @@ package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
 import org.kobe.xbot.JClient.Concurrency.ConcurrentPushHandler;
-import org.kobe.xbot.Utilities.CircularBuffer;
+import org.kobe.xbot.JClient.Concurrency.ConcurrentRequestHandler;
 import org.kobe.xbot.Utilities.Entities.QueuedRequests;
-import org.kobe.xbot.Utilities.Entities.Requests;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
@@ -37,7 +36,7 @@ import java.util.function.Consumer;
  * This is part of the XTABLES project and provides client-side functionality for
  * socket communication with the server.
  */
-public class XTablesClient extends Requests {
+public class XTablesClient extends QueuedRequests {
     // =============================================================
     // Static Variables
     // These variables belong to the class itself and are shared
@@ -69,8 +68,8 @@ public class XTablesClient extends Requests {
     private final int pushSocketPort;
     private final int subscribeSocketPort;
     private final int requestSocketPort;
-//    private final ConcurrentPushHandler pushHandler;
-//    public final CircularBuffer<byte[]> pushBuffer = new CircularBuffer<>(500);
+    private final ConcurrentPushHandler pushHandler;
+//    private final ConcurrentRequestHandler requestHandler;
 
 //    private final XTablesTimeSyncHandler timeSyncHandler;
 
@@ -171,9 +170,13 @@ public class XTablesClient extends Requests {
         reqSocket.setReceiveTimeOut(3000);
         socketMonitor.addSocket("REQUEST", reqSocket);
         reqSocket.connect("tcp://" + this.ip + ":" + requestSocketPort);
-//        this.pushHandler = new ConcurrentPushHandler(pushSocket, this);
-//        this.pushHandler.start();
-//        super.setBuffer(this.pushBuffer);
+
+        this.pushHandler = new ConcurrentPushHandler(pushSocket);
+        this.pushHandler.start();
+//        this.requestHandler = new ConcurrentRequestHandler(reqSocket, this);
+//        this.requestHandler.start();
+//        super.setHandlers(this.pushHandler, this.requestHandler);
+        super.setPushHandler(this.pushHandler);
         super.set(reqSocket, pushSocket, this);
 
 //        this.timeSyncHandler = new XTablesTimeSyncHandler(timeSyncSocket, this);
@@ -195,7 +198,7 @@ public class XTablesClient extends Requests {
      * @param key The unique identifier for the context.
      * @return The XTableContext instance associated with the given key.
      */
-    public XTableContext getXTableContext(String key) {
+    public XTableContext registerXTableContext(String key) {
         return contexts.computeIfAbsent(key, (k) -> {
             ZMQ.Socket pushSocket = context.createSocket(SocketType.PUSH);
             pushSocket.setHWM(500);
@@ -223,7 +226,7 @@ public class XTablesClient extends Requests {
      * @return The newly created or retrieved XTableContext.
      */
     public XTableContext registerNewThreadedContext(String key) {
-        return getXTableContext(key);
+        return registerXTableContext(key);
     }
 
     /**
@@ -358,6 +361,9 @@ public class XTablesClient extends Requests {
         }
         if (this.subscribeHandler != null && !this.subscribeHandler.isInterrupted() && this.subscribeHandler.isAlive()) {
             this.subscribeHandler.interrupt();
+        }
+        if (this.pushHandler != null && !this.pushHandler.isInterrupted() && this.pushHandler.isAlive()) {
+            this.pushHandler.interrupt();
         }
         logger.info("XTablesClient has been shutdown gracefully.");
     }

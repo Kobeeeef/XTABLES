@@ -338,8 +338,7 @@ public abstract class Requests {
      */
     public String getRawJson() {
         try {
-            get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET_RAW_JSON).build().toByteArray());
-            byte[] response = get.recv();
+            byte[] response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET_RAW_JSON).build().toByteArray());
             if (response == null) return null;
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             if (message.hasValue()) {
@@ -368,8 +367,8 @@ public abstract class Requests {
      */
     public boolean reboot() {
         try {
-            get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.REBOOT_SERVER).build().toByteArray());
-            byte[] response = get.recv();
+            byte[] response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.REBOOT_SERVER).build().toByteArray());
+
             if (response == null) return false;
 
 
@@ -398,12 +397,12 @@ public abstract class Requests {
      */
     public boolean delete(String key) {
         try {
+            byte[] response;
             if (key == null) {
-                get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.DELETE).build().toByteArray());
+                response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.DELETE).build().toByteArray());
             } else {
-                get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.DELETE).setKey(key).build().toByteArray());
+                response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.DELETE).setKey(key).build().toByteArray());
             }
-            byte[] response = get.recv();
             if (response == null) return false;
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             if (!message.hasValue()) return false;
@@ -443,15 +442,11 @@ public abstract class Requests {
 
     public boolean setServerDebug(boolean value) {
         try {
-            get.send(XTableProto.XTableMessage.newBuilder().setValue(value ? successByte : failByte).setCommand(XTableProto.XTableMessage.Command.DEBUG).build().toByteArray());
-            byte[] response = get.recv();
+            byte[] response = getRawBytes(XTableProto.XTableMessage.newBuilder().setValue(value ? successByte : failByte).setCommand(XTableProto.XTableMessage.Command.DEBUG).build().toByteArray());
+            if (response == null) return false;
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             return message.hasValue() && message.getValue().equals(successByte);
-        } catch (InvalidProtocolBufferException | NullPointerException e) {
-            return false;
-        } catch (ZMQException e) {
-            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
-            reconnectRequestSocket();
+        } catch (InvalidProtocolBufferException | NullPointerException | ZMQException e) {
             return false;
         }
     }
@@ -459,8 +454,7 @@ public abstract class Requests {
 
     public SystemStatistics getServerStatistics() {
         try {
-            get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.INFORMATION).build().toByteArray());
-            byte[] response = get.recv();
+            byte[] response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.INFORMATION).build().toByteArray());
             if (response == null) return null;
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             if (message.hasValue()) {
@@ -468,11 +462,7 @@ public abstract class Requests {
             } else {
                 return null;
             }
-        } catch (InvalidProtocolBufferException | NullPointerException | XTablesException e) {
-            return null;
-        } catch (ZMQException e) {
-            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
-            reconnectRequestSocket();
+        } catch (InvalidProtocolBufferException | NullPointerException | XTablesException | ZMQException e) {
             return null;
         }
     }
@@ -490,21 +480,17 @@ public abstract class Requests {
 
     public List<String> getTables(String key) {
         try {
+            byte[] response;
             if (key == null) {
-                get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET_TABLES).build().toByteArray());
+                response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET_TABLES).build().toByteArray());
             } else {
-                get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET_TABLES).setKey(key).build().toByteArray());
+                response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET_TABLES).setKey(key).build().toByteArray());
             }
-            byte[] response = get.recv();
             if (response == null) return new ArrayList<>();
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             if (!message.hasValue()) return new ArrayList<>();
             return XTableValues.StringList.parseFrom(message.getValue()).getVList();
-        } catch (InvalidProtocolBufferException | NullPointerException e) {
-            return new ArrayList<>();
-        } catch (ZMQException e) {
-            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
-            reconnectRequestSocket();
+        } catch (InvalidProtocolBufferException | NullPointerException | ZMQException e) {
             return new ArrayList<>();
         }
     }
@@ -525,18 +511,14 @@ public abstract class Requests {
 
     public XTableProto.XTableMessage.XTablesData _getXTablesDataProto() {
         try {
-            get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET_PROTO_DATA).build().toByteArray());
-            byte[] response = get.recv();
+            byte[] response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET_PROTO_DATA).build().toByteArray());
+
             if (response == null) return null;
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             if (message.hasValue()) {
                 return XTableProto.XTableMessage.XTablesData.parseFrom(message.getValue());
             } else return null;
-        } catch (InvalidProtocolBufferException e) {
-            return null;
-        } catch (ZMQException e) {
-            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
-            reconnectRequestSocket();
+        } catch (InvalidProtocolBufferException | ZMQException e) {
             return null;
         }
     }
@@ -553,20 +535,29 @@ public abstract class Requests {
     public PingResponse getPing() {
         try {
             long time = System.nanoTime();
-            get.send(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.PING).build().toByteArray());
-            byte[] response = get.recv();
+            byte[] response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.PING).build().toByteArray());
             long diff = System.nanoTime() - time;
             if (response == null) return new PingResponse(false, -1);
             XTableProto.XTableMessage message = XTableProto.XTableMessage.parseFrom(response);
             if (message.hasValue()) {
                 return new PingResponse(message.getValue().equals(successByte), diff);
             } else return new PingResponse(false, -1);
-        } catch (InvalidProtocolBufferException e) {
+        } catch (InvalidProtocolBufferException | ZMQException e) {
             return new PingResponse(false, -1);
+        }
+    }
+
+    /**
+     * Sends a GET request to the server for the specified key and returns the raw message.
+     */
+    protected byte[] getRawBytes(byte[] data) {
+        try {
+            get.send(data, ZMQ.DONTWAIT);
+            return get.recv();
         } catch (ZMQException e) {
             logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
             reconnectRequestSocket();
-            return new PingResponse(false, -1);
+            return null;
         }
     }
 
@@ -582,14 +573,13 @@ public abstract class Requests {
      */
     private XTableProto.XTableMessage getXTableMessage(String key) {
         try {
-            get.send(XTableProto.XTableMessage.newBuilder().setKey(key).setCommand(XTableProto.XTableMessage.Command.GET).build().toByteArray());
-            return XTableProto.XTableMessage.parseFrom(get.recv());
+            byte[] response = getRawBytes(XTableProto.XTableMessage.newBuilder().setCommand(XTableProto.XTableMessage.Command.GET).setKey(key).build().toByteArray());
+            if (response == null) return null;
+            return XTableProto.XTableMessage.parseFrom(response);
         } catch (InvalidProtocolBufferException | NullPointerException e) {
             logger.warning(e.getMessage());
             return null;
         } catch (ZMQException e) {
-            logger.warning("ZMQ Exception on request socket, reconnecting to clear states.");
-            reconnectRequestSocket();
             return null;
         }
     }
@@ -979,7 +969,7 @@ public abstract class Requests {
         }
     }
 
-    private void reconnectRequestSocket() {
+    protected void reconnectRequestSocket() {
         String socketName = key == null ? "REQUEST" : "REQUEST" + key;
         this.xTablesClient.getSocketMonitor().removeSocket(socketName);
         this.get.close();

@@ -4,6 +4,7 @@ package org.kobe.xbot.JClient.Concurrency;
 import org.kobe.xbot.JClient.BaseHandler;
 import org.kobe.xbot.JClient.XTableContext;
 import org.kobe.xbot.JClient.XTablesClient;
+import org.kobe.xbot.Utilities.CircularBuffer;
 import org.zeromq.ZMQ;
 
 /**
@@ -20,16 +21,16 @@ import org.zeromq.ZMQ;
  * This is part of the XTABLES project and facilitates subscribing and handling incoming messages from the server.
  */
 public class ConcurrentPushHandler extends BaseHandler {
-    private final XTablesClient instance;
+    public final CircularBuffer<byte[]> pushBuffer;
+
     /**
      * Constructor that initializes the handler with the provided socket and server instance.
      *
      * @param socket   The ZeroMQ socket to receive messages on
-     * @param instance The XTablesClient instance
      */
-    public ConcurrentPushHandler(ZMQ.Socket socket, XTablesClient instance) {
+    public ConcurrentPushHandler(ZMQ.Socket socket) {
         super("XTABLES-PUSH-HANDLER-DAEMON", true, socket);
-        this.instance = instance;
+        this.pushBuffer = new CircularBuffer<>(500);
     }
 
 
@@ -43,16 +44,16 @@ public class ConcurrentPushHandler extends BaseHandler {
      */
     @Override
     public void run() {
-//        try {
-//            while (!Thread.currentThread().isInterrupted()) {
-//                byte[] message = instance.pushBuffer.readAndBlock();
-//                if (message != null) {
-//                    socket.send(message, ZMQ.DONTWAIT);
-//                }
-//            }
-//        } catch (Exception e) {
-//            handleException(e);
-//        }
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    byte[] message = this.pushBuffer.readAndBlock();
+                    if (message != null) {
+                        socket.send(message, ZMQ.DONTWAIT);
+                    }
+                }
+            } catch (Exception e) {
+                handleException(e);
+            }
     }
 
     /**

@@ -14,7 +14,7 @@ import org.zeromq.ZMQ;
  */
 public abstract class BaseHandler extends Thread {
     protected static final XTablesLogger logger = XTablesLogger.getLogger();
-    protected final ZMQ.Socket socket;
+    protected ZMQ.Socket socket;
 
     /**
      * Constructor to initialize the thread with a custom name, daemon status, and socket.
