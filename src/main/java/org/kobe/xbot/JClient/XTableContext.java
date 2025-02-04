@@ -21,6 +21,9 @@ public class XTableContext extends Requests implements AutoCloseable {
         super.setSockets(get, push);
     }
 
+    public XTablesClient getxTablesClient() {
+        return xTablesClient;
+    }
 
     @Override
     public void close() {

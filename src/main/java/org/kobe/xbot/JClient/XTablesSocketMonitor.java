@@ -191,7 +191,7 @@ public class XTablesSocketMonitor extends Thread {
     public void run() {
         try {
             while (running) {
-                int events = poller.poll(1000); // Poll with a timeout to avoid blocking indefinitely
+                int events = poller.poll(500); // Poll with a timeout to avoid blocking indefinitely
                 if (events > 0) {
                     for (int i = 0; i < poller.getSize(); i++) {
                         if (poller.pollin(i)) {
