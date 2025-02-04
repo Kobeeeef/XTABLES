@@ -335,7 +335,6 @@ public class XTablesData {
                     case INT64 -> new JsonPrimitive(bytesToLong(node.value));
                     case BOOL -> new JsonPrimitive(node.value[0] == 0x01);
                     case DOUBLE -> new JsonPrimitive(bytesToDouble(node.value));
-                    case POSE2D -> new JsonPrimitive(XTablesByteUtils.pose2dToString(node.value));
                     case FLOAT_LIST -> {
                         JsonArray jsonArray = new JsonArray();
                         try {
@@ -415,7 +414,7 @@ public class XTablesData {
                             throw new RuntimeException("Failed to parse BoolList", e);
                         }
                     }
-                    case BYTES, UNKNOWN -> {
+                    case BYTES, UNKNOWN, COORDINATES -> {
                         JsonArray byteArray = new JsonArray();
                         for (byte b : node.value) {
                             byteArray.add(b);

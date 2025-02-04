@@ -5,7 +5,9 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
@@ -126,11 +128,50 @@ public class XTablesByteUtils {
     public static XTableValues.CoordinateList getCoordinateListProto(XTableValues.Coordinate... coordinate) {
         return XTableValues.CoordinateList.newBuilder().addAllCoordinates(List.of(coordinate)).buildPartial();
     }
+    /**
+     * Converts a list of Coordinate protobuf objects into a human-readable string.
+     *
+     * @param coordinateList The CoordinateList protobuf object.
+     * @return A formatted string representing the list of coordinates.
+     */
+    public static String coordinateListToString(XTableValues.CoordinateList coordinateList) {
+        if (coordinateList == null || coordinateList.getCoordinatesList().isEmpty()) {
+            return "No Coordinates Available";
+        }
 
+        StringBuilder sb = new StringBuilder("Coordinates: [");
+        List<XTableValues.Coordinate> coordinates = coordinateList.getCoordinatesList();
+
+        for (int i = 0; i < coordinates.size(); i++) {
+            XTableValues.Coordinate coord = coordinates.get(i);
+            sb.append(String.format("(X: %.2f, Y: %.2f)", coord.getX(), coord.getY()));
+            if (i < coordinates.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    /**
+     * Converts a raw protobuf byte array into a human-readable string of coordinates.
+     *
+     * @param rawData The byte array representing a serialized CoordinateList.
+     * @return A formatted string representation of the list of coordinates, or an error message if parsing fails.
+     */
+    public static String coordinateListToString(byte[] rawData) {
+        try {
+            XTableValues.CoordinateList coordinateList = XTableValues.CoordinateList.parseFrom(rawData);
+            return coordinateListToString(coordinateList);
+        } catch (Exception e) {
+            return "Invalid CoordinateList Data";
+        }
+    }
     public static String convertTypeValueToJsonString(XTableProto.XTableMessage.Type type, byte[] value) {
         JsonElement jsonElement = switch (type) {
             case STRING -> new JsonPrimitive(new String(value));
             case POSE2D -> new JsonPrimitive(XTablesByteUtils.pose2dToString(value));
+            case POSE3D -> new JsonPrimitive(XTablesByteUtils.pose3dToString(value));
+            case COORDINATES -> new JsonPrimitive(XTablesByteUtils.coordinateListToString(value));
             case INT64 -> new JsonPrimitive(bytesToLong(value));
             case BOOL -> new JsonPrimitive(value[0] == 0x01);
             case DOUBLE -> new JsonPrimitive(bytesToDouble(value));
@@ -469,7 +510,92 @@ public class XTablesByteUtils {
         return 0.0;
     }
 
+    /**
+     * Packs a Pose3d object into a byte array.
+     *
+     * @param pose The Pose3d object to pack.
+     * @return A byte array representation of the Pose3d object.
+     */
+    public static byte[] packPose3d(Pose3d pose) {
+        try {
+            ByteBuffer bb = ByteBuffer.allocate(Double.BYTES * 6); // x, y, z, roll, pitch, yaw
+            bb.order(ByteOrder.LITTLE_ENDIAN);
 
+            bb.putDouble(pose.getX());
+            bb.putDouble(pose.getY());
+            bb.putDouble(pose.getZ());
+            bb.putDouble(pose.getRotation().getX());
+            bb.putDouble(pose.getRotation().getY());
+            bb.putDouble(pose.getRotation().getZ());
+
+            return bb.array();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Return null if packing fails
+        }
+    }
+
+    /**
+     * Converts a Pose3d byte array into a human-readable string.
+     * If deserialization fails, it returns "Invalid Pose3d Data".
+     *
+     * @param data The byte array representing a serialized Pose3d.
+     * @return A human-readable string representation of the Pose3d.
+     */
+    public static String pose3dToString(byte[] data) {
+        Pose3d pose = unpackPose3d(data);
+        if (pose == null) {
+            return "Invalid Pose3d Data";
+        }
+        return pose3dToString(pose);
+    }
+
+    /**
+     * Converts a Pose3d object into a human-readable string.
+     * If deserialization fails, it returns "Invalid Pose3d Data".
+     *
+     * @param pose The Pose3d object.
+     * @return A human-readable string representation of the Pose3d.
+     */
+    public static String pose3dToString(Pose3d pose) {
+        if (pose == null) {
+            return "Invalid Pose3d Data";
+        }
+        return String.format("Pose3d(X: %.2f m, Y: %.2f m, Z: %.2f m, Roll: %.2f°, Pitch: %.2f°, Yaw: %.2f°)",
+                pose.getX(), pose.getY(), pose.getZ(),
+                Math.toDegrees(pose.getRotation().getX()),
+                Math.toDegrees(pose.getRotation().getY()),
+                Math.toDegrees(pose.getRotation().getZ()));
+    }
+
+    /**
+     * Unpacks a byte array into a Pose3d object.
+     *
+     * @param data The byte array to unpack.
+     * @return A Pose3d object if successful, or null if unpacking fails.
+     */
+    public static Pose3d unpackPose3d(byte[] data) {
+        try {
+            if (data == null || data.length != Double.BYTES * 6) {
+                return null; // Invalid input length
+            }
+
+            ByteBuffer bb = ByteBuffer.wrap(data);
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+
+            double x = bb.getDouble();
+            double y = bb.getDouble();
+            double z = bb.getDouble();
+            double roll = bb.getDouble();
+            double pitch = bb.getDouble();
+            double yaw = bb.getDouble();
+
+            return new Pose3d(x, y, z, new Rotation3d(roll, pitch, yaw));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Return null on failure
+        }
+    }
     /**
      * Packs a Pose2d object into a byte array.
      *

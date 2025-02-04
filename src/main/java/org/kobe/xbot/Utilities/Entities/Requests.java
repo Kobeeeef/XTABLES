@@ -130,7 +130,7 @@ public abstract class Requests {
     public boolean putCoordinates(String key, List<XTableValues.Coordinate> value) {
         XTableValues.CoordinateList list = XTableValues.CoordinateList.newBuilder()
                 .addAllCoordinates(value).build();
-        return sendPutMessage(key, list.toByteArray(), XTableProto.XTableMessage.Type.BYTES);
+        return sendPutMessage(key, list.toByteArray(), XTableProto.XTableMessage.Type.COORDINATES);
     }
 
 
@@ -967,7 +967,7 @@ public abstract class Requests {
         if (!message.hasValue()) {
             return null;
         }
-        if (message.getType() == XTableProto.XTableMessage.Type.BYTES) {
+        if (message.getType() == XTableProto.XTableMessage.Type.COORDINATES) {
             try {
                 return XTableValues.CoordinateList.parseFrom(message.getValue().toByteArray()).getCoordinatesList();
             } catch (InvalidProtocolBufferException e) {
@@ -976,7 +976,7 @@ public abstract class Requests {
         }
 
 
-        throw new IllegalArgumentException("Expected BYTES type, but got: " + message.getType());
+        throw new IllegalArgumentException("Expected COORDINATES type, but got: " + message.getType());
     }
 
 

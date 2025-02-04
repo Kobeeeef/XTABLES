@@ -31,6 +31,8 @@ message XTableMessage {
     BYTES_LIST = 16;
     OBJECT = 17;
     POSE2D = 18;
+    POSE3D = 19;
+    COORDINATES = 20;
   }
   enum Command {
     UNKNOWN_COMMAND = 0;

@@ -2,6 +2,7 @@ import struct
 import traceback
 import math
 
+
 class XTablesByteUtils:
     def __init__(self):
         pass
@@ -102,8 +103,6 @@ class XTablesByteUtils:
         """
         return bytes([0x01 if i else 0x00])
 
-
-
     @staticmethod
     def from_string(i):
         """
@@ -113,6 +112,68 @@ class XTablesByteUtils:
         """
         return i.encode('utf-8')
 
+    @staticmethod
+    def pack_pose3d(pose):
+        """
+        Packs a (x, y, z, roll_radians, pitch_radians, yaw_radians) tuple into a byte array.
+
+        :param pose: A tuple (x, y, z, roll_radians, pitch_radians, yaw_radians).
+        :return: A byte array representation of the Pose3d.
+        """
+        try:
+            x, y, z, roll, pitch, yaw = pose
+            return struct.pack('<dddddd', x, y, z, roll, pitch, yaw)  # Little-endian double precision floats
+        except Exception as e:
+            print(f"Error packing Pose3d: {e}")
+            return None  # Return None if packing fails
+
+    @staticmethod
+    def unpack_pose3d(data):
+        """
+        Unpacks a byte array into a (x, y, z, roll_radians, pitch_radians, yaw_radians) tuple.
+
+        :param data: The byte array to unpack.
+        :return: A (x, y, z, roll_radians, pitch_radians, yaw_radians) tuple if successful, or None if unpacking fails.
+        """
+        try:
+            if data is None or len(data) != 48:  # 6 doubles (8 bytes each)
+                return None  # Invalid input length
+            return struct.unpack('<dddddd', data)
+        except Exception as e:
+            print(f"Error unpacking Pose3d: {e}")
+            return None  # Return None on failure
+
+    @staticmethod
+    def pose3d_to_string(data):
+        """
+        Converts a Pose3d byte array into a human-readable string.
+        If deserialization fails, it returns "Invalid Pose3d Data".
+
+        :param data: The byte array representing a serialized Pose3d.
+        :return: A human-readable string representation of the Pose3d.
+        """
+        pose = Pose3dUtils.unpack_pose3d(data)
+        if pose is None:
+            return "Invalid Pose3d Data"
+
+        return Pose3dUtils.pose3d_tuple_to_string(pose)
+
+    @staticmethod
+    def pose3d_tuple_to_string(pose):
+        """
+        Converts a (x, y, z, roll_radians, pitch_radians, yaw_radians) tuple into a human-readable string.
+
+        :param pose: A tuple (x, y, z, roll_radians, pitch_radians, yaw_radians).
+        :return: A human-readable string representation of the Pose3d.
+        """
+        if pose is None:
+            return "Invalid Pose3d Data"
+
+        x, y, z, roll, pitch, yaw = pose
+        roll_degrees = math.degrees(roll)
+        pitch_degrees = math.degrees(pitch)
+        yaw_degrees = math.degrees(yaw)
+        return f"Pose3d(X: {x:.2f} m, Y: {y:.2f} m, Z: {z:.2f} m, Roll: {roll_degrees:.2f}°, Pitch: {pitch_degrees:.2f}°, Yaw: {yaw_degrees:.2f}°)"
 
     @staticmethod
     def pack_pose2d(pose):
@@ -128,6 +189,7 @@ class XTablesByteUtils:
         except Exception as e:
             print(f"Error packing Pose2d: {e}")
             return None  # Return None if packing fails
+
     @staticmethod
     def unpack_pose2d(data):
         """
@@ -143,6 +205,7 @@ class XTablesByteUtils:
         except Exception as e:
             print(f"Error unpacking Pose2d: {e}")
             return None  # Return None on failure
+
     @staticmethod
     def pose2d_to_string(data):
         """
@@ -159,6 +222,7 @@ class XTablesByteUtils:
         x, y, rotation_radians = pose
         rotation_degrees = math.degrees(rotation_radians)
         return f"Pose2d(X: {x:.2f} m, Y: {y:.2f} m, Rotation: {rotation_degrees:.2f}°)"
+
     @staticmethod
     def pose2d_tuple_to_string(pose):
         """
@@ -173,4 +237,3 @@ class XTablesByteUtils:
         x, y, rotation_radians = pose
         rotation_degrees = math.degrees(rotation_radians)
         return f"Pose2d(X: {x:.2f} m, Y: {y:.2f} m, Rotation: {rotation_degrees:.2f}°)"
-

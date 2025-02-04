@@ -379,7 +379,7 @@ class XTablesClient:
     def putCoordinates(self, key, value):
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
                                       XTableValues.CoordinateList(coordinates=value).SerializeToString(),
-                                      XTableProto.XTableMessage.Type.BYTES)
+                                      XTableProto.XTableMessage.Type.COORDINATES)
 
     def putPose2d(self, key, tuple):
         """
@@ -403,6 +403,31 @@ class XTablesClient:
             return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
                                           pose,
                                           XTableProto.XTableMessage.Type.POSE2D)
+        else:
+            return False
+
+    def putPose3d(self, key, tuple):
+        """
+            Sends a PUT request with a Pose2d tuple to the server.
+
+            This method takes a Pose2d represented as a tuple `(x, y, rotation_radians)`,
+            serializes it into a byte array using `XTablesByteUtils.pack_pose2d()`,
+            and sends it to the server with the `POSE2D` type.
+
+            Usage Example:
+            ```python
+            client.putPose2d("robot_position", (1.5, 2.3, math.radians(45)))
+            ```
+
+            :param key: The key associated with the Pose2d data.
+            :param pose_tuple: A tuple representing Pose2d in the format `(x, y, rotation_radians)`.
+            :return: True if the message was sent successfully; otherwise, False.
+        """
+        pose = XTablesByteUtils.pack_pose3d(tuple)
+        if pose is not None:
+            return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                          pose,
+                                          XTableProto.XTableMessage.Type.POSE3D)
         else:
             return False
 
@@ -470,14 +495,14 @@ class XTablesClient:
             raise ValueError("No message received from the XTABLES server.")
         if not message.HasField("value"):
             return None
-        if message.type == XTableProto.XTableMessage.Type.BYTES:
+        if message.type == XTableProto.XTableMessage.Type.COORDINATES:
             try:
                 return XTableValues.CoordinateList.FromString(message.value).coordinates
             except Exception:
                 traceback.print_exc()
                 raise ValueError(f"Invalid bytes returned from server: {message.value}")
 
-        raise ValueError(f"Expected BYTES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+        raise ValueError(f"Expected COORDINATES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getPose2d(self, key):
         message = self._get_xtable_message(key)
@@ -493,6 +518,21 @@ class XTablesClient:
                 raise ValueError(f"Invalid bytes returned from server: {message.value}")
 
         raise ValueError(f"Expected POSE2D type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+
+    def getPose3d(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.POSE3D:
+            try:
+                return XTablesByteUtils.unpack_pose3d(message.value)
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+
+        raise ValueError(f"Expected POSE3D type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getDoubleList(self, key):
         message = self._get_xtable_message(key)
