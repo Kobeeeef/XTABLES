@@ -152,6 +152,22 @@ public class XTablesByteUtils {
         sb.append("]");
         return sb.toString();
     }
+
+    /**
+     * Converts a byte array into a list of Coordinate objects.
+     *
+     * @param bytes The byte array representing a serialized CoordinateList.
+     * @return A list of Coordinate objects, or null if parsing fails.
+     */
+    public static List<XTableValues.Coordinate> unpack_coordinates_list(byte[] bytes) {
+        try {
+            return XTableValues.CoordinateList.parseFrom(bytes).getCoordinatesList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+
+
     /**
      * Converts a raw protobuf byte array into a human-readable string of coordinates.
      *

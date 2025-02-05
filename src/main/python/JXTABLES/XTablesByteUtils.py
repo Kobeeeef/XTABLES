@@ -113,6 +113,19 @@ class XTablesByteUtils:
         return i.encode('utf-8')
 
     @staticmethod
+    def unpack_coordinates_list(bytes):
+        """
+        Converts a byte array into a list of Coordinate objects.
+
+        :param bytes: The byte array representing a serialized CoordinateList.
+        :return: A list of Coordinate objects, or None if parsing fails.
+        """
+        try:
+            return XTableValues.CoordinateList.FromString(bytes).coordinates
+        except Exception:
+            return None
+
+    @staticmethod
     def pack_pose3d(pose):
         """
         Packs a (x, y, z, roll_radians, pitch_radians, yaw_radians) tuple into a byte array.
