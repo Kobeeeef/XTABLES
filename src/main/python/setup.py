@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="XTablesClient",
-    version="5.3.8",
+    version="5.3.9",
     description="A high-performance Python client for real-time management of XTablesServer network tables, "
                 "designed for robotics and complex data-driven systems.",
     long_description=open('README.md').read(),
