@@ -1,16 +1,16 @@
-name: Build and Upload ARM Linux Wheel
+name: Build and Upload Python Wheel
 
 on:
   push:
     branches:
-      - master  # Change if your main branch is named differently
+      - master  # Change if needed
   workflow_dispatch:  # Allows manual triggering
 
 permissions:
   contents: read
 
 jobs:
-  build-arm-linux:
+  build-and-upload:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,37 +22,28 @@ jobs:
         with:
           python-version: "3.x"
 
-      # Install required dependencies
+      # Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install setuptools wheel twine cibuildwheel
+          python -m pip install setuptools wheel twine
 
-      # Enable QEMU for ARM builds
-      - name: Enable QEMU for ARM builds
-        run: |
-          sudo apt update && sudo apt install -y qemu-user-static
-
-      # Clean up old build files in the correct directory
+      # Clean up old build files
       - name: Clean up old build files
         run: |
           rm -rf src/main/python/build src/main/python/dist src/main/python/*.egg-info
 
-      # Build the package (source distribution and wheel) for ARM Linux
-      - name: Build ARM64 wheel
+      # Build the package (pure Python wheel)
+      - name: Build Python wheel
         working-directory: src/main/python
-        env:
-          CIBW_ARCHS_LINUX: "aarch64"  # Target ARM 64-bit architecture
-          CIBW_SKIP: "cp27-* cp35-* cp36-*"  # Skip old Python versions
-          CIBW_TEST_SKIP: "*_arm64"  # Skip testing since we're cross-compiling
         run: |
-          python -m cibuildwheel --output-dir dist
+          python -m pip wheel . --wheel-dir dist
 
       # Upload wheel artifacts for inspection
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: arm64-linux-wheels
+          name: python-wheels
           path: src/main/python/dist/*.whl
 
       # Upload the package to PyPI
