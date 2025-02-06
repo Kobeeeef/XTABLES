@@ -1,0 +1,62 @@
+name: Build and Upload ARM Linux Wheel
+
+on:
+  push:
+    branches:
+      - master  # Change if your main branch is named differently
+  workflow_dispatch:  # Allows manual triggering
+
+permissions:
+  contents: read
+
+jobs:
+  build-arm-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # Install required dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install setuptools wheel twine cibuildwheel
+
+      # Enable QEMU for ARM builds
+      - name: Enable QEMU for ARM builds
+        run: |
+          sudo apt update && sudo apt install -y qemu-user-static
+
+      # Clean up old build files in the correct directory
+      - name: Clean up old build files
+        run: |
+          rm -rf src/main/python/build src/main/python/dist src/main/python/*.egg-info
+
+      # Build the package (source distribution and wheel) for ARM Linux
+      - name: Build ARM64 wheel
+        working-directory: src/main/python
+        env:
+          CIBW_ARCHS_LINUX: "aarch64"  # Target ARM 64-bit architecture
+          CIBW_SKIP: "cp27-* cp35-* cp36-*"  # Skip old Python versions
+          CIBW_TEST_SKIP: "*_arm64"  # Skip testing since we're cross-compiling
+        run: |
+          python -m cibuildwheel --output-dir dist
+
+      # Upload wheel artifacts for inspection
+      - name: Upload wheel artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: arm64-linux-wheels
+          path: src/main/python/dist/*.whl
+
+      # Upload the package to PyPI
+      - name: Upload package to PyPI
+        working-directory: src/main/python
+        run: |
+          twine upload dist/* -u __token__ -p "${{ secrets.PYPI_API_TOKEN }}"
