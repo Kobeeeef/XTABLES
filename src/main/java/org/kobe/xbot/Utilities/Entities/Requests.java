@@ -3,6 +3,7 @@ package org.kobe.xbot.Utilities.Entities;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import org.kobe.xbot.JClient.XTablesClient;
 import org.kobe.xbot.Utilities.DataCompression;
 import org.kobe.xbot.Utilities.Exceptions.XTablesException;
@@ -149,6 +150,24 @@ public abstract class Requests {
         byte[] poseBytes = XTablesByteUtils.packPose2d(pose2d);
         if (poseBytes == null) return false;
         return sendPutMessage(key, poseBytes, XTableProto.XTableMessage.Type.POSE2D);
+    }
+
+
+    /**
+     * Sends a PUT request with a `Pose3d` object to the server.
+     * <p>
+     * This method serializes the given `Pose3d` object into a byte array using `XTablesByteUtils.packPose3d()`
+     * and sends it to the server with the `POSE3D` type.
+     * If serialization fails, the method returns false.
+     *
+     * @param key    The key associated with the `Pose3d` object.
+     * @param pose3d The `Pose3d` object to be sent.
+     * @return True if the message was sent successfully; otherwise, false.
+     */
+    public boolean putPose3d(String key, Pose3d pose3d) {
+        byte[] poseBytes = XTablesByteUtils.packPose3d(pose3d);
+        if (poseBytes == null) return false;
+        return sendPutMessage(key, poseBytes, XTableProto.XTableMessage.Type.POSE3D);
     }
 
     /**
@@ -994,6 +1013,22 @@ public abstract class Requests {
 
 
         throw new IllegalArgumentException("Expected POSE2D type, but got: " + message.getType());
+    }
+
+    public Pose3d getPose3d(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.POSE3D) {
+            return XTablesByteUtils.unpackPose3d(message.getValue().toByteArray());
+        }
+
+
+        throw new IllegalArgumentException("Expected POSE3D type, but got: " + message.getType());
     }
 
     public byte[] getUnknownBytes(String key) {
