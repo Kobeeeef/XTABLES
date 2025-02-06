@@ -2,6 +2,13 @@ import struct
 import traceback
 import math
 
+try:
+    # Package-level imports
+    from . import XTableValues_pb2 as XTableValues
+except ImportError:
+    # Standalone script imports
+    import XTableValues_pb2 as XTableValues
+
 
 class XTablesByteUtils:
     def __init__(self):
@@ -113,15 +120,99 @@ class XTablesByteUtils:
         return i.encode('utf-8')
 
     @staticmethod
-    def unpack_coordinates_list(bytes):
+    def to_string_list(list_bytes):
+        """
+        Converts a byte array into a list of strings.
+
+        :param list_bytes: The byte array to convert.
+        :return: The list of strings represented by the byte array.
+        :raises ValueError: If the byte array is None or does not have a valid format.
+        """
+        try:
+            return XTableValues.StringList.FromString(list_bytes).v
+        except Exception:
+            return None
+
+    @staticmethod
+    def to_double_list(list_bytes):
+        """
+        Converts a byte array into a list of doubles.
+
+        :param list_bytes: The byte array to convert.
+        :return: The list of double values represented by the byte array.
+        :raises ValueError: If the byte array is None or does not have a valid format.
+        """
+        try:
+            return XTableValues.DoubleList.FromString(list_bytes).v
+        except Exception:
+            return None
+
+    @staticmethod
+    def to_float_list(list_bytes):
+        """
+        Converts a byte array into a list of floats.
+
+        :param list_bytes: The byte array to convert.
+        :return: The list of float values represented by the byte array.
+        :raises ValueError: If the byte array is None or does not have a valid format.
+        """
+        try:
+            return XTableValues.FloatList.FromString(list_bytes).v
+        except Exception:
+            return None
+
+    @staticmethod
+    def to_integer_list(list_bytes):
+        """
+        Converts a byte array into a list of integers.
+
+        :param list_bytes: The byte array to convert.
+        :return: The list of integer values represented by the byte array.
+        :raises ValueError: If the byte array is None or does not have a valid format.
+        """
+        try:
+            return XTableValues.IntegerList.FromString(list_bytes).v
+        except Exception:
+            return None
+
+    @staticmethod
+    def to_long_list(list_bytes):
+        """
+        Converts a byte array into a list of long integers.
+
+        :param list_bytes: The byte array to convert.
+        :return: The list of long integer values represented by the byte array.
+        :raises ValueError: If the byte array is None or does not have a valid format.
+        """
+        try:
+            return XTableValues.LongList.FromString(list_bytes).v
+        except Exception:
+            return None
+
+    @staticmethod
+    def to_boolean_list(list_bytes):
+        """
+        Converts a byte array into a list of booleans.
+
+        :param list_bytes: The byte array to convert.
+        :return: The list of boolean values represented by the byte array.
+        :raises ValueError: If the byte array is None or does not have a valid format.
+        """
+        try:
+            return XTableValues.BooleanList.FromString(list_bytes).v
+        except Exception:
+            return None
+
+    @staticmethod
+    def unpack_coordinates_list(list_bytes):
         """
         Converts a byte array into a list of Coordinate objects.
 
-        :param bytes: The byte array representing a serialized CoordinateList.
+        :param list_bytes: The byte array representing a serialized CoordinateList.
         :return: A list of Coordinate objects, or None if parsing fails.
         """
         try:
-            return XTableValues.CoordinateList.FromString(bytes).coordinates
+            return XTableValues.CoordinateList.FromString(list_bytes).coordinates
         except Exception:
             return None
 
