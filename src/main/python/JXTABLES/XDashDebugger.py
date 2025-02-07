@@ -16,24 +16,22 @@ except ImportError:
 
 class XDashDebugger:
     _ip_cache = {}
-    _quality_cache = {}  # Stores best JPEG quality per key
+    _quality_cache = {}
 
     def __init__(self, hostname: str = "XDASH.local", port: int = 57341):
         self.logger = logging.getLogger(__name__)
         logging.basicConfig(
             format="%(asctime)s - %(levelname)s - %(message)s",
             level=logging.INFO,  # Change to DEBUG to see all logs
-            handlers=[logging.StreamHandler()]  # Ensure logs print to console
         )
         self.hostname = hostname
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 9999999)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 9999999)
-
         self._resolved_ip = None
         self._resolve_thread = None
-        self._resolving = False  # Flag to track if resolution is running
+        self._resolving = False
         self._ensure_ip_resolved()
         self._loop = asyncio.new_event_loop()
         self._last_task = None  # Track last encoding task
@@ -47,8 +45,8 @@ class XDashDebugger:
     def _resolve_ip(self):
         """Resolve the hostname to an IP and cache it."""
         if self._resolving:
-            return  # Skip if already resolving
-        self._resolving = True  # Mark as resolving
+            return
+        self._resolving = True
 
         try:
             resolved_ip = socket.gethostbyname(self.hostname)
@@ -59,7 +57,7 @@ class XDashDebugger:
             self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH Address. Retrying on next request.")
             pass
         finally:
-            self._resolving = False  # Reset flag after completion
+            self._resolving = False
 
     def _ensure_ip_resolved(self):
         """Ensure hostname is resolved in a non-blocking way (Only one thread at a time)."""
@@ -91,11 +89,13 @@ class XDashDebugger:
             quality = XDashDebugger._quality_cache[key]
         else:
             # Iterate from highest to lowest quality
-            for quality in range(80, 10, -10):
+            for quality in range(80, -1, -10):
+                if quality <= 0:
+                    quality = 1
                 _, encoded_frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, quality])
                 frame_bytes = encoded_frame.tobytes()
 
-                if len(frame_bytes) < 55000:
+                if len(frame_bytes) < 55000: # This is the maximum packet size for UDP, it will continue to lower quality till it matches!
                     XDashDebugger._quality_cache[key] = quality  # Cache the quality
                     self.logger.info(f"XDASH DEBUGGER: Cached JPEG quality {quality} for key '{key}', frame size: {len(frame_bytes)} bytes")
                     break
@@ -106,18 +106,13 @@ class XDashDebugger:
 
     def send_frame(self, key: str, timestamp, frame: ndarray):
         """Encodes and sends the frame asynchronously without blocking the main loop."""
-        # Cancel the last task if it's still running (drop old frames)
         if self._last_task and not self._last_task.done():
             self._last_task.cancel()
-            print("Dropped an old frame due to backup.")
-
-        # Start a new encoding task
         self._last_task = asyncio.run_coroutine_threadsafe(
             self._async_send_frame(key, timestamp, frame), self._loop
         )
 
     async def _async_send_frame(self, key: str, timestamp, frame: ndarray):
-        """Async wrapper for encoding and sending the frame."""
         frame_bytes = await self._determine_quality_and_encode(key, frame)
         self.__send(key, timestamp, XDashDebuggerProto.Message.Type.IMAGE, frame_bytes)
 
@@ -125,6 +120,7 @@ class XDashDebugger:
 # # Example usage:
 # sender = XDashDebugger()
 # cap = cv2.VideoCapture(0)
-# 
-# while True:
-#     time.sleep(10000)
+# ret, frame = cap.read()
+# sender.send_frame("exampleKey", time.time(), frame)
+
+
