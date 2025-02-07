@@ -432,11 +432,11 @@ public class XTablesClient extends QueuedRequests implements Subscriptions {
                             logger.severe("Failed to retrieve IPv4 address from XTablesService.");
                         }
                     } else {
-                        logger.severe("Failed to resolve 'XTablesService' using jmDNS. Retrying in 1 second...");
+                        logger.severe("Failed to resolve 'XTablesService' using jmDNS. Retrying in a second...");
                     }
 
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(500);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         logger.warning("Retry wait interrupted. Exiting...");
@@ -444,7 +444,7 @@ public class XTablesClient extends QueuedRequests implements Subscriptions {
                     }
                 } catch (IOException ei) {
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         logger.warning("Retry wait interrupted. Exiting...");
                         Thread.currentThread().interrupt();
