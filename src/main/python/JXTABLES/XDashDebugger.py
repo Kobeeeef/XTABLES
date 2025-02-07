@@ -5,7 +5,7 @@ import time
 import cv2
 import numpy as np
 from numpy import ndarray
-
+import logging
 try:
     # Package-level imports
     from . import XDashDebugger_pb2 as XDashDebuggerProto
@@ -19,12 +19,21 @@ class XDashDebugger:
     _quality_cache = {}  # Stores best JPEG quality per key
 
     def __init__(self, hostname: str = "XDASH.local", port: int = 57341):
+        self.logger = logging.getLogger(__name__)
+        logging.basicConfig(
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            level=logging.INFO,  # Change to DEBUG to see all logs
+            handlers=[logging.StreamHandler()]  # Ensure logs print to console
+        )
         self.hostname = hostname
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 9999999)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 9999999)
+
         self._resolved_ip = None
         self._resolve_thread = None
+        self._resolving = False  # Flag to track if resolution is running
         self._ensure_ip_resolved()
         self._loop = asyncio.new_event_loop()
         self._last_task = None  # Track last encoding task
@@ -37,18 +46,27 @@ class XDashDebugger:
 
     def _resolve_ip(self):
         """Resolve the hostname to an IP and cache it."""
+        if self._resolving:
+            return  # Skip if already resolving
+        self._resolving = True  # Mark as resolving
+
         try:
             resolved_ip = socket.gethostbyname(self.hostname)
             XDashDebugger._ip_cache[self.hostname] = resolved_ip
             self._resolved_ip = resolved_ip
+            self.logger.info("XDASH DEBUGGER: Resolved XDASH IP to %s", resolved_ip)
         except socket.gaierror:
+            self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH Address. Retrying on next request.")
             pass
+        finally:
+            self._resolving = False  # Reset flag after completion
 
     def _ensure_ip_resolved(self):
-        """Ensure hostname is resolved in a non-blocking way."""
+        """Ensure hostname is resolved in a non-blocking way (Only one thread at a time)."""
         if self.hostname in XDashDebugger._ip_cache:
             self._resolved_ip = XDashDebugger._ip_cache[self.hostname]
-        else:
+        elif not self._resolving:  # Only start if no thread is running
+            self.logger.info("XDASH DEBUGGER: Resolving XDASH address...")
             self._resolve_thread = threading.Thread(target=self._resolve_ip, daemon=True)
             self._resolve_thread.start()
 
@@ -73,13 +91,13 @@ class XDashDebugger:
             quality = XDashDebugger._quality_cache[key]
         else:
             # Iterate from highest to lowest quality
-            for quality in range(90, 10, -10):
+            for quality in range(80, 10, -10):
                 _, encoded_frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, quality])
                 frame_bytes = encoded_frame.tobytes()
 
                 if len(frame_bytes) < 55000:
                     XDashDebugger._quality_cache[key] = quality  # Cache the quality
-                    print(f"Cached JPEG quality {quality} for key '{key}', frame size: {len(frame_bytes)} bytes")
+                    self.logger.info(f"XDASH DEBUGGER: Cached JPEG quality {quality} for key '{key}', frame size: {len(frame_bytes)} bytes")
                     break
 
         # Final encoding with the best quality
@@ -103,11 +121,10 @@ class XDashDebugger:
         frame_bytes = await self._determine_quality_and_encode(key, frame)
         self.__send(key, timestamp, XDashDebuggerProto.Message.Type.IMAGE, frame_bytes)
 
+
 # # Example usage:
 # sender = XDashDebugger()
 # cap = cv2.VideoCapture(0)
 # 
 # while True:
-#     ret, frame = cap.read()
-#     if ret:
-#         sender.send_frame("opi", time.time(), frame)
+#     time.sleep(10000)
