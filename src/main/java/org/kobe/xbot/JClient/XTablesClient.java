@@ -2,9 +2,10 @@ package org.kobe.xbot.JClient;
 
 import com.google.protobuf.ByteString;
 import org.kobe.xbot.JClient.Concurrency.ConcurrentPushHandler;
-import org.kobe.xbot.JClient.Concurrency.ConcurrentRequestHandler;
 import org.kobe.xbot.Utilities.Entities.QueuedRequests;
+import org.kobe.xbot.Utilities.Entities.Subscriptions;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.zeromq.SocketType;
@@ -36,7 +37,7 @@ import java.util.function.Consumer;
  * This is part of the XTABLES project and provides client-side functionality for
  * socket communication with the server.
  */
-public class XTablesClient extends QueuedRequests {
+public class XTablesClient extends QueuedRequests implements Subscriptions {
     // =============================================================
     // Static Variables
     // These variables belong to the class itself and are shared
@@ -182,11 +183,11 @@ public class XTablesClient extends QueuedRequests {
 //        this.timeSyncHandler = new XTablesTimeSyncHandler(timeSyncSocket, this);
     }
 
-
+    @Override
     public CachedSubscriber subscribe(String key) {
         return new CachedSubscriber(key, this);
     }
-
+    @Override
     public CachedSubscriber subscribe(String key, int queue) {
         return new CachedSubscriber(key, this, queue);
     }
@@ -252,6 +253,7 @@ public class XTablesClient extends QueuedRequests {
      * @param consumer a Consumer function to handle incoming server log messages
      * @return true if the subscription was successful, false otherwise
      */
+    @Override
     public boolean subscribeToServerLogs(Consumer<XTableProto.XTableMessage.XTableLog> consumer) {
         boolean success = this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder().setCategory(XTableProto.XTableMessage.XTableUpdate.Category.LOG).build().toByteArray());
         if (success) {
@@ -269,6 +271,7 @@ public class XTablesClient extends QueuedRequests {
      * @param consumer a Consumer function previously registered to handle server log messages
      * @return true if the consumer was removed successfully, false otherwise
      */
+    @Override
     public boolean unsubscribeToServerLogs(Consumer<XTableProto.XTableMessage.XTableLog> consumer) {
         boolean success = this.logConsumers.remove(consumer);
         if (this.logConsumers.isEmpty()) {
@@ -284,6 +287,7 @@ public class XTablesClient extends QueuedRequests {
      * @param consumer The consumer function that processes updates for the specified key.
      * @return true if the subscription and consumer addition were successful, false otherwise.
      */
+    @Override
     public boolean subscribe(String key, Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
         boolean success = this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder().setKey(key).build().toByteArray());
         if (success) {
@@ -298,6 +302,7 @@ public class XTablesClient extends QueuedRequests {
      * @param consumer The consumer function that processes updates for any key.
      * @return true if the subscription and consumer addition were successful, false otherwise.
      */
+    @Override
     public boolean subscribe(Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
         boolean success = this.subscribeHandler.requestSubscribe("".getBytes(StandardCharsets.UTF_8));
         if (success) {
@@ -314,6 +319,7 @@ public class XTablesClient extends QueuedRequests {
      * @param consumer The consumer function to remove from the key's subscription.
      * @return true if the consumer was successfully removed or the key was unsubscribed, false otherwise.
      */
+    @Override
     public boolean unsubscribe(String key, Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
         if (this.subscriptionConsumers.containsKey(key)) {
             List<Consumer<XTableProto.XTableMessage.XTableUpdate>> list = this.subscriptionConsumers.get(key);
@@ -335,6 +341,7 @@ public class XTablesClient extends QueuedRequests {
      * @param consumer The consumer function to remove from all key subscriptions.
      * @return true if the consumer was successfully removed or unsubscribed from all keys, false otherwise.
      */
+    @Override
     public boolean unsubscribe(Consumer<XTableProto.XTableMessage.XTableUpdate> consumer) {
         if (this.subscriptionConsumers.containsKey("")) {
             List<Consumer<XTableProto.XTableMessage.XTableUpdate>> list = this.subscriptionConsumers.get("");
@@ -348,6 +355,9 @@ public class XTablesClient extends QueuedRequests {
             return this.subscribeHandler.requestUnsubscription("".getBytes(StandardCharsets.UTF_8));
         }
     }
+
+
+
 
     /**
      * Gracefully shuts down the XTablesClient.

@@ -183,7 +183,7 @@ public abstract class Requests {
 
     public boolean putInteger(String key, Integer value) {
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(value).array();
-        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT64); // Using INT64 for 4-byte Integer
+        return sendPutMessage(key, valueBytes, XTableProto.XTableMessage.Type.INT32); // Using INT64 for 4-byte Integer
     }
 
     /**
@@ -648,23 +648,23 @@ public abstract class Requests {
      * Executes a GET request to retrieve an Integer value associated with the specified key.
      * <p>
      * This method sends a GET request for the given key and checks if the returned message
-     * type is INT64. If so, it converts the byte array value to an Integer and returns it.
+     * type is INT32. If so, it converts the byte array value to an Integer and returns it.
      * Otherwise, it throws an IllegalArgumentException indicating the wrong type.
      *
      * @param key The key associated with the Integer value.
      * @return The Integer value associated with the given key.
-     * @throws IllegalArgumentException If the returned message type is not INT64.
+     * @throws IllegalArgumentException If the returned message type is not INT32.
      */
 
     public Integer getInteger(String key) {
         XTableProto.XTableMessage message = getXTableMessage(key);
-        if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
+        if (message != null && message.getType().equals(XTableProto.XTableMessage.Type.INT32)) {
             byte[] valueBytes = message.getValue().toByteArray();
             return ByteBuffer.wrap(valueBytes).getInt();
         } else if (message == null || message.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN)) {
             return null;
         } else {
-            throw new IllegalArgumentException("Expected INT64 type, but got: " + message.getType());
+            throw new IllegalArgumentException("Expected INT32 type, but got: " + message.getType());
         }
     }
 

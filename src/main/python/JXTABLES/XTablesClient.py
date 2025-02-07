@@ -364,7 +364,7 @@ class XTablesClient:
     def putInteger(self, key, value):
         value_bytes = struct.pack('!i', value)
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key, value_bytes,
-                                      XTableProto.XTableMessage.Type.INT64)
+                                      XTableProto.XTableMessage.Type.INT32)
 
     def putLong(self, key, value):
         value_bytes = struct.pack('!q', value)
@@ -634,12 +634,12 @@ class XTablesClient:
 
     def getInteger(self, key):
         message = self._get_xtable_message(key)
-        if message is not None and message.type == XTableProto.XTableMessage.Type.INT64:
+        if message is not None and message.type == XTableProto.XTableMessage.Type.INT32:
             return struct.unpack('!i', message.value)[0]
         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
             return None
         else:
-            raise ValueError(f"Expected INT type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+            raise ValueError(f"Expected INT32 type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getBoolean(self, key):
         message = self._get_xtable_message(key)
@@ -657,7 +657,7 @@ class XTablesClient:
         elif message is None or message.type == XTableProto.XTableMessage.Type.UNKNOWN:
             return None
         else:
-            raise ValueError(f"Expected LONG type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+            raise ValueError(f"Expected INT64 type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getDouble(self, key):
         message = self._get_xtable_message(key)

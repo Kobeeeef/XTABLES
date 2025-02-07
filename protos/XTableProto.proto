@@ -17,6 +17,7 @@ message XTableMessage {
     UNKNOWN = 0;
     STRING = 1;
     DOUBLE = 2;
+    INT32 = 3;
     INT64 = 5;
     BOOL = 6;
     BYTES = 7;

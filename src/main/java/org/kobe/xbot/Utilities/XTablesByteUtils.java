@@ -166,6 +166,68 @@ public class XTablesByteUtils {
             return null;
         }
     }
+    public static List<String> unpack_string_list(ByteString bytes) {
+        try {
+            return XTableValues.StringList.parseFrom(bytes).getVList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static List<Double> unpack_double_list(ByteString bytes) {
+        try {
+            return XTableValues.DoubleList.parseFrom(bytes).getVList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static List<Integer> unpack_integer_list(ByteString bytes) {
+        try {
+            return XTableValues.IntegerList.parseFrom(bytes).getVList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static List<Long> unpack_long_list(ByteString bytes) {
+        try {
+            return XTableValues.LongList.parseFrom(bytes).getVList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static List<Float> unpack_float_list(ByteString bytes) {
+        try {
+            return XTableValues.FloatList.parseFrom(bytes).getVList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static List<Boolean> unpack_boolean_list(ByteString bytes) {
+        try {
+            return XTableValues.BoolList.parseFrom(bytes).getVList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static List<ByteString> unpack_bytes_list(ByteString bytes) {
+        try {
+            return XTableValues.BytesList.parseFrom(bytes).getVList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    /**
+     * Converts a byte array into a list of Coordinate objects.
+     *
+     * @param bytes The byte array representing a serialized CoordinateList.
+     * @return A list of Coordinate objects, or null if parsing fails.
+     */
+    public static List<XTableValues.Coordinate> unpack_coordinates_list(ByteString bytes) {
+        try {
+            return XTableValues.CoordinateList.parseFrom(bytes).getCoordinatesList();
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
 
 
     /**
@@ -189,6 +251,7 @@ public class XTablesByteUtils {
             case POSE3D -> new JsonPrimitive(XTablesByteUtils.pose3dToString(value));
             case COORDINATES -> new JsonPrimitive(XTablesByteUtils.coordinateListToString(value));
             case INT64 -> new JsonPrimitive(bytesToLong(value));
+            case INT32 -> new JsonPrimitive(to_Primitive_Int(value));
             case BOOL -> new JsonPrimitive(value[0] == 0x01);
             case DOUBLE -> new JsonPrimitive(bytesToDouble(value));
             case FLOAT_LIST -> parseList(value, XTableValues.FloatList.parser());
@@ -249,12 +312,13 @@ public class XTablesByteUtils {
      * @return The integer value represented by the byte array.
      * @throws IllegalArgumentException If the byte array is null or does not have a length of 4.
      */
-    public static int toInt(byte[] bytes) {
+    public static int to_Primitive_Int(byte[] bytes) {
         if (bytes == null || bytes.length != Integer.BYTES) {
             throw new IllegalArgumentException("Invalid byte array for int conversion.");
         }
         return ByteBuffer.wrap(bytes).getInt();
     }
+
 
     /**
      * Converts a byte array into a long.
@@ -281,7 +345,7 @@ public class XTablesByteUtils {
      * @return The double value represented by the byte array.
      * @throws IllegalArgumentException If the byte array is null or does not have a length of 8.
      */
-    public static double toDouble(byte[] bytes) {
+    public static double to_Primitive_Double(byte[] bytes) {
         if (bytes == null || bytes.length != Double.BYTES) {
             throw new IllegalArgumentException("Invalid byte array for double conversion.");
         }
@@ -313,7 +377,7 @@ public class XTablesByteUtils {
      * @return The boolean value represented by the byte array.
      * @throws IllegalArgumentException If the byte array is null or does not have a length of 1.
      */
-    public static boolean toBoolean(byte[] bytes) {
+    public static boolean to_Primitive_Boolean(byte[] bytes) {
         if (bytes == null || bytes.length != 1) {
             throw new IllegalArgumentException("Invalid byte array for boolean conversion.");
         }
@@ -329,12 +393,31 @@ public class XTablesByteUtils {
      * @return The integer value represented by the ByteString.
      * @throws IllegalArgumentException If the ByteString is null or does not have a size of 4.
      */
-    public static int toInt(ByteString byteString) {
+    public static int to_Primitive_Integer(ByteString byteString) {
         if (byteString == null || byteString.size() != Integer.BYTES) {
             throw new IllegalArgumentException("Invalid ByteString for int conversion.");
         }
         return ByteBuffer.wrap(byteString.toByteArray()).getInt();
     }
+
+    public static Integer toInteger(ByteString byteString) {
+        if (byteString == null || byteString.size() != Integer.BYTES) {
+            return null;
+        }
+        try {
+            return ByteBuffer.wrap(byteString.toByteArray()).getInt();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    public static Integer toInteger(byte[] byteString) {
+        try {
+            return ByteBuffer.wrap(byteString).getInt();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     /**
      * Converts a ByteString into a long.
@@ -345,11 +428,22 @@ public class XTablesByteUtils {
      * @return The long value represented by the ByteString.
      * @throws IllegalArgumentException If the ByteString is null or does not have a size of 8.
      */
-    public static long toLong(ByteString byteString) {
+    public static long to_Primitive_Long(ByteString byteString) {
         if (byteString == null || byteString.size() != Long.BYTES) {
             throw new IllegalArgumentException("Invalid ByteString for long conversion.");
         }
         return ByteBuffer.wrap(byteString.toByteArray()).getLong();
+    }
+
+    public static Long toLong(ByteString byteString) {
+        if (byteString == null || byteString.size() != Long.BYTES) {
+            return null;
+        }
+        try {
+            return ByteBuffer.wrap(byteString.toByteArray()).getLong();
+        }catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -361,11 +455,15 @@ public class XTablesByteUtils {
      * @return The double value represented by the ByteString.
      * @throws IllegalArgumentException If the ByteString is null or does not have a size of 8.
      */
-    public static double toDouble(ByteString byteString) {
+    public static Double toDouble(ByteString byteString) {
         if (byteString == null || byteString.size() != Double.BYTES) {
-            throw new IllegalArgumentException("Invalid ByteString for double conversion.");
+            return null;
         }
-        return ByteBuffer.wrap(byteString.toByteArray()).getDouble();
+        try {
+            return ByteBuffer.wrap(byteString.toByteArray()).getDouble();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -393,9 +491,9 @@ public class XTablesByteUtils {
      * @return The boolean value represented by the ByteString.
      * @throws IllegalArgumentException If the ByteString is null or does not have a size of 1.
      */
-    public static boolean toBoolean(ByteString byteString) {
+    public static Boolean toBoolean(ByteString byteString) {
         if (byteString == null || byteString.size() != 1) {
-            throw new IllegalArgumentException("Invalid ByteString for boolean conversion.");
+            return null;
         }
         return byteString.byteAt(0) == (byte) 0x01;
     }

@@ -332,6 +332,7 @@ public class XTablesData {
             if (node.value != null && node.type != null) {
                 return switch (node.type) {
                     case STRING -> new JsonPrimitive(new String(node.value));
+                    case INT32 -> new JsonPrimitive(XTablesByteUtils.to_Primitive_Int(node.value));
                     case INT64 -> new JsonPrimitive(bytesToLong(node.value));
                     case BOOL -> new JsonPrimitive(node.value[0] == 0x01);
                     case DOUBLE -> new JsonPrimitive(bytesToDouble(node.value));
