@@ -4,18 +4,24 @@ import zmq
 import traceback
 from google.protobuf.message import DecodeError
 
+try:
+    # Package-level imports
+    from .BaseHandler import BaseHandler
+    from .ClientStatistics import ClientStatistics
+    from .CircularBuffer import CircularBuffer
+    from . import XTableProto_pb2 as XTableProto
+except ImportError:
+    # Standalone script imports
+    from BaseHandler import BaseHandler
+    from ClientStatistics import ClientStatistics
+    from CircularBuffer import CircularBuffer
+    import XTableProto_pb2 as XTableProto
 
-from .BaseHandler import BaseHandler
-from .ClientStatistics import ClientStatistics
-from .CircularBuffer import CircularBuffer
-from . import Utilities
-from . import XTableProto_pb2 as XTableProto
 
 class SubscribeHandler(BaseHandler):
     """
     A handler for processing incoming subscription messages using ZeroMQ.
     """
-
 
     def __init__(self, socket: zmq.Socket, instance: Any):
         super().__init__("XTABLES-SUBSCRIBE-HANDLER-DAEMON", True, socket)
@@ -34,32 +40,31 @@ class SubscribeHandler(BaseHandler):
             while not self._stop:
                 try:
                     bytes_message = self.socket.recv()
-                    self.instance.subscribe_messages_count += 1
                     message = XTableProto.XTableMessage.XTableUpdate.FromString(bytes_message)
 
                     if message.category in {XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION,
                                             XTableProto.XTableMessage.XTableUpdate.Category.REGISTRY}:
-                        stats = ClientStatistics()
-                        stats.set_buffer_size(self.buffer.size)
-                        stats.set_uuid(self.instance.uuid)
-                        stats.set_version(self.instance.get_version())
-                        stats.set_max_buffer_size(self.BUFFER_SIZE)
-                        info_bytes = stats.to_protobuf()
-                        response = XTableProto.XTableMessage(
-                            id=message.value,
-                            value=info_bytes.SerializeToString(),
-                            command=XTableProto.XTableMessage.Command.INFORMATION
-                            if message.category == XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION
-                            else XTableProto.XTableMessage.Command.REGISTRY,
-                        )
-                        self.instance.push_socket.send(response.SerializeToString(), zmq.DONTWAIT)
+                        if not self.instance.ghost:
+                            stats = ClientStatistics()
+                            stats.set_buffer_size(self.buffer.size)
+                            stats.set_uuid(self.instance.uuid)
+                            stats.set_version(self.instance.get_version())
+                            stats.set_max_buffer_size(self.BUFFER_SIZE)
+                            info_bytes = stats.to_protobuf()
+                            response = XTableProto.XTableMessage(
+                                id=message.value,
+                                value=info_bytes.SerializeToString(),
+                                command=XTableProto.XTableMessage.Command.INFORMATION
+                                if message.category == XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION
+                                else XTableProto.XTableMessage.Command.REGISTRY,
+                            )
+                            self.instance.registry_socket.send(response.SerializeToString(), zmq.DONTWAIT)
                     else:
                         self.buffer.write(message)
 
-                except DecodeError as e:
+                except DecodeError:
                     if self.instance.debug:
                         traceback.print_exc()
-                    self.logger.warning(f"Failed to decode message: {e}")
                 except Exception as e:
                     if self.instance.debug:
                         traceback.print_exc()

@@ -1,7 +1,7 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: XTablesClient
-Version: 5.0.2
-Summary: A high-performance Python client for real-time management of XTablesServer network tables, designed for robotics and complex data-driven systems.
+Version: 5.3.9
+Summary: Team 488 XTABLES Python
 Home-page: https://github.com/Kobeeeef/XTABLES
 Author: Kobe Lei
 Author-email: kobelei335@gmail.com
@@ -23,13 +23,10 @@ Requires-Dist: keyring==25.4.1
 Requires-Dist: markdown-it-py==3.0.0
 Requires-Dist: mdurl==0.1.2
 Requires-Dist: more-itertools==10.5.0
-Requires-Dist: msgpack==1.1.0
 Requires-Dist: nh3==0.2.18
 Requires-Dist: pkginfo==1.10.0
 Requires-Dist: protobuf==5.29.2
 Requires-Dist: psutil==6.1.0
-Requires-Dist: pyarmor==9.0.6
-Requires-Dist: pyarmor.cli.core==7.6.2
 Requires-Dist: Pygments==2.18.0
 Requires-Dist: pywin32-ctypes==0.2.3
 Requires-Dist: pyzmq==26.2.0
@@ -41,88 +38,18 @@ Requires-Dist: rich==13.9.2
 Requires-Dist: setuptools==75.1.0
 Requires-Dist: twine==5.1.1
 Requires-Dist: urllib3==2.2.3
-Requires-Dist: zeroconf==0.134.0
+Requires-Dist: zeroconf==0.143.0
 Requires-Dist: zipp==3.20.2
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
+This project is made for Team 488 XBOT Robotics. There will be no documentation outside of this.
 
-# XTablesClient
-
-`XTablesClient` is a Python client library for connecting to an XTABLES server, supporting both direct socket and ZeroMQ-based communication. This client provides methods for data operations on network tables and offers convenient functionality for interacting with robotic applications or distributed systems.
-
-## Features
-- **Flexible Initialization**: Connects to a server directly or discovers it via mDNS.
-- **Data Operations**: Supports multiple data types (`Boolean`, `String`, `Integer`, `Float`, `Array`, `Class`, `Bytes`) for seamless data transmission.
-- **ZeroMQ Support**: Configurable ZeroMQ PUSH/PULL and PUB/SUB communication for real-time message streaming.
-- **Robust Connection Management**: Includes automatic reconnection and resubscription after disconnection.
-- **Subscription**: Allows for subscriptions to data updates for specific keys, invoking consumer functions on updates.
-
-## Installation
-
-Install `xtables-client` from PyPI:
-```bash
-pip install xtables-client
-```
-
-## Usage
-
-### Import and Initialization
-```python
-from xtables_client import XTablesClient
-
-# Initialize the client
-client = XTablesClient(server_ip="192.168.1.10", server_port=1735, useZeroMQ=True)
-```
-
-### Data Operations
-
-1. **Setting Values**
-   - **Boolean**: `client.executePutBoolean("key", True)`
-   - **String**: `client.executePutString("key", "value")`
-   - **Integer**: `client.executePutInteger("key", 42)`
-   - **Float**: `client.executePutFloat("key", 3.14)`
-
-2. **Retrieving Values**
-   - **Get Integer**: `value = client.getInteger("key")`
-   - **Get String**: `value = client.getString("key")`
-   - **Get Float**: `value = client.getFloat("key")`
-
-3. **Subscriptions**
-   - Subscribe to updates for a key and handle updates with a custom function:
-     ```python
-     def my_consumer(key, value):
-         print(f"Update for {key}: {value}")
-
-     client.subscribeForUpdates("key", my_consumer)
-     ```
-
-4. **ZeroMQ Operations**
-   - **Push Data**: `client.push_frame("identifier", "message")`
-   - **Receive Next**: `key, value = client.recv_next()`
-
-### Connection Management
-- **Reconnect**: Automatic reconnection and re-subscription to previously subscribed keys.
-- **Shutdown**: Gracefully shuts down the client connection.
-  ```python
-  client.shutdown()
-  ```
-
-## Example
-
-```python
-from xtables_client import XTablesClient
-
-client = XTablesClient(useZeroMQ=True, server_port=1735)
-client.subscribe("image")
-
-while True:
-    key, value = client.recv_next()
-    if key is not None:
-        print(f"Received data for {key}: {value}")
-```
-
-## License
-This project is licensed under the MIT License.
-
-```
-
-This README provides a clear overview of the clientâ€™s capabilities, installation instructions, and usage examples to facilitate integration with any XTABLES server.
+- Kobe Lei

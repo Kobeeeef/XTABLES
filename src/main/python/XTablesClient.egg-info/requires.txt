@@ -11,13 +11,10 @@ keyring==25.4.1
 markdown-it-py==3.0.0
 mdurl==0.1.2
 more-itertools==10.5.0
-msgpack==1.1.0
 nh3==0.2.18
 pkginfo==1.10.0
 protobuf==5.29.2
 psutil==6.1.0
-pyarmor==9.0.6
-pyarmor.cli.core==7.6.2
 Pygments==2.18.0
 pywin32-ctypes==0.2.3
 pyzmq==26.2.0
@@ -29,5 +26,5 @@ rich==13.9.2
 setuptools==75.1.0
 twine==5.1.1
 urllib3==2.2.3
-zeroconf==0.134.0
+zeroconf==0.143.0
 zipp==3.20.2
