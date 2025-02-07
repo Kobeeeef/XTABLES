@@ -18,7 +18,7 @@ class XDashDebugger:
     _ip_cache = {}
     _quality_cache = {}
 
-    def __init__(self, hostname: str = "XDASH.local", port: int = 57341):
+    def __init__(self, hostname: str = "XDASH.local", port: int = 57341, best_byte_size: int = 54000):
         self.logger = logging.getLogger(__name__)
         logging.basicConfig(
             format="%(asctime)s - %(levelname)s - %(message)s",
@@ -31,6 +31,7 @@ class XDashDebugger:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 9999999)
         self._resolved_ip = None
         self._resolve_thread = None
+        self.best_byte_size = best_byte_size
         self._resolving = False
         self._ensure_ip_resolved()
         self._loop = asyncio.new_event_loop()
@@ -89,13 +90,16 @@ class XDashDebugger:
             quality = XDashDebugger._quality_cache[key]
         else:
             # Iterate from highest to lowest quality
-            for quality in range(80, -1, -10):
+            for quality in range(80, -10, -8):
                 if quality <= 0:
-                    quality = 1
+                    XDashDebugger._quality_cache[key] = 1
+                    self.logger.info(f"XDASH DEBUGGER: Cached JPEG quality 1 for key '{key}', no smaller size found.")
+                    break
+
                 _, encoded_frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, quality])
                 frame_bytes = encoded_frame.tobytes()
 
-                if len(frame_bytes) < 55000: # This is the maximum packet size for UDP, it will continue to lower quality till it matches!
+                if len(frame_bytes) < self.best_byte_size: # This is the maximum packet size for UDP, it will continue to lower quality till it matches!
                     XDashDebugger._quality_cache[key] = quality  # Cache the quality
                     self.logger.info(f"XDASH DEBUGGER: Cached JPEG quality {quality} for key '{key}', frame size: {len(frame_bytes)} bytes")
                     break
@@ -120,7 +124,8 @@ class XDashDebugger:
 # # Example usage:
 # sender = XDashDebugger()
 # cap = cv2.VideoCapture(0)
-# ret, frame = cap.read()
-# sender.send_frame("exampleKey", time.time(), frame)
+# while True:
+#     ret, frame = cap.read()
+#     sender.send_frame("exampleKey", time.time(), frame)
 
 
