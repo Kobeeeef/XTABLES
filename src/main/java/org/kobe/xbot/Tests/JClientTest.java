@@ -8,17 +8,28 @@ import org.kobe.xbot.JClient.XTableContext;
 import org.kobe.xbot.JClient.XTablesClient;
 import org.kobe.xbot.Utilities.Entities.BatchedPushRequests;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
+import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.kobe.xbot.Utilities.XTablesByteUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class JClientTest {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         XTablesClient client = new XTablesClient();
+        List<XTableValues.Coordinate> coordinates = new ArrayList<>();
+        coordinates.add(XTableValues.Coordinate.newBuilder()
+                .setX(3)
+                .setY(2).build());
+        coordinates.add(XTableValues.Coordinate.newBuilder()
+                .setX(Math.random())
+                .setY(3).build());
+        while (true) {
 
-        client.subscribe("test", (test) -> {
-        }, XTableProto.XTableMessage.Type.STRING);
-       Thread.sleep(1000000);
+            client.putCoordinates("target_waypoints", coordinates);
+        }
+//       Thread.sleep(1000000);
 
     }
 }
