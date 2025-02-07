@@ -1,5 +1,8 @@
 org.kobe.xbot.JClient
+org.kobe.xbot.JClient.Concurrency
 org.kobe.xbot.JServer
+org.kobe.xbot.Tests
 org.kobe.xbot.Utilities
 org.kobe.xbot.Utilities.Entities
 org.kobe.xbot.Utilities.Exceptions
+org.kobe.xbot.Utilities.Logger
