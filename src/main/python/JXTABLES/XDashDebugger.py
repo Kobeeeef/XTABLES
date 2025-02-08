@@ -53,11 +53,17 @@ class XDashDebugger:
         try:
             self.logger.info("XDASH DEBUGGER: Resolving XDASH address: %s", self.hostname)
             resolved_ip = self.resolve_host_by_name(self.hostname)
-            XDashDebugger._ip_cache[self.hostname] = resolved_ip
-            self._resolved_ip = resolved_ip
-            self.logger.info("XDASH DEBUGGER: Resolved XDASH IP to %s", resolved_ip)
+            if resolved_ip is not None:
+                XDashDebugger._ip_cache[self.hostname] = resolved_ip
+                self._resolved_ip = resolved_ip
+                self.logger.info("XDASH DEBUGGER: Resolved XDASH IP to %s", resolved_ip)
+            else:
+                raise Exception("XDASH DEBUGGER: Resolved XDASH IP not found")
         except socket.gaierror:
             self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH Address. Retrying on next request.")
+            pass
+        except Exception as e:
+            self.logger.warning("XDASH DEBUGGER: Unexpected error while resolving XDASH Address: %s", e, exc_info=True)
             pass
         finally:
             self._resolving = False
@@ -91,7 +97,7 @@ class XDashDebugger:
             quality = XDashDebugger._quality_cache[key]
         else:
             # Iterate from highest to lowest quality
-            for quality in range(80, -10, -8):
+            for quality in range(60, -10, -8):
                 if quality <= 0:
                     XDashDebugger._quality_cache[key] = 1
                     self.logger.info(f"XDASH DEBUGGER: Cached JPEG quality 1 for key '{key}', no smaller size found.")
@@ -142,11 +148,11 @@ class XDashDebugger:
             zeroconf.close()
         return None
 
-# Example usage:
-sender = XDashDebugger()
-cap = cv2.VideoCapture(0)
-while True:
-    ret, frame = cap.read()
-    sender.send_frame("exampleKey", time.time(), frame)
+# # Example usage:
+# sender = XDashDebugger()
+# cap = cv2.VideoCapture(0)
+# while True:
+#     ret, frame = cap.read()
+#     sender.send_frame("exampleKey", time.time(), frame)
 
 
