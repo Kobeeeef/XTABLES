@@ -25,9 +25,11 @@ public class JClientTest {
         coordinates.add(XTableValues.Coordinate.newBuilder()
                 .setX(Math.random())
                 .setY(3).build());
+        int degrees = 0;
         while (true) {
-
-            client.putCoordinates("target_waypoints", coordinates);
+            degrees -= 5;
+            client.putPose2d("PoseSubsystem.RobotPose", new Pose2d(Math.random() * 50,Math.random() * 30 ,new Rotation2d(Units.degreesToRadians(degrees))));
+            Thread.sleep(10);
         }
 //       Thread.sleep(1000000);
 
