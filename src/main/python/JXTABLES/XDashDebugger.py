@@ -142,11 +142,11 @@ class XDashDebugger:
             zeroconf.close()
         return None
 
-# Example usage:
-sender = XDashDebugger()
-cap = cv2.VideoCapture(0)
-while True:
-    ret, frame = cap.read()
-    sender.send_frame("exampleKey", time.time(), frame)
+# # Example usage:
+# sender = XDashDebugger()
+# cap = cv2.VideoCapture(0)
+# while True:
+#     ret, frame = cap.read()
+#     sender.send_frame("exampleKey", time.time(), frame)
 
 
