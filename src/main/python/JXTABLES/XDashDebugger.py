@@ -5,7 +5,6 @@ import time
 import cv2
 import numpy as np
 from numpy import ndarray
-import logging
 from zeroconf import Zeroconf
 try:
     # Package-level imports
@@ -20,11 +19,6 @@ class XDashDebugger:
     _quality_cache = {}
 
     def __init__(self, hostname: str = "XDASH.local", port: int = 57341, best_byte_size: int = 54000):
-        self.logger = logging.getLogger(__name__)
-        logging.basicConfig(
-            format="%(asctime)s - %(levelname)s - %(message)s",
-            level=logging.INFO,
-        )
         self.hostname = hostname
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -51,19 +45,19 @@ class XDashDebugger:
         self._resolving = True
 
         try:
-            self.logger.info("XDASH DEBUGGER: Resolving XDASH address: %s", self.hostname)
+            print(f"XDASH DEBUGGER: Resolving XDASH address: {self.hostname}")
             resolved_ip = self.resolve_host_by_name(self.hostname)
             if resolved_ip is not None:
                 XDashDebugger._ip_cache[self.hostname] = resolved_ip
                 self._resolved_ip = resolved_ip
-                self.logger.info("XDASH DEBUGGER: Resolved XDASH IP to %s", resolved_ip)
+                print(f"XDASH DEBUGGER: Resolved XDASH IP to {resolved_ip}")
             else:
                 raise Exception("XDASH DEBUGGER: Resolved XDASH IP not found")
         except socket.gaierror:
-            self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH Address. Retrying on next request.")
+            print("XDASH DEBUGGER: Could not resolve XDASH Address. Retrying on next request.")
             pass
         except Exception as e:
-            self.logger.warning("XDASH DEBUGGER: Unexpected error while resolving XDASH Address: %s", e, exc_info=True)
+            print(f"XDASH DEBUGGER: Unexpected error while resolving XDASH Address: {e}")
             pass
         finally:
             self._resolving = False
@@ -100,7 +94,7 @@ class XDashDebugger:
             for quality in range(60, -10, -8):
                 if quality <= 0:
                     XDashDebugger._quality_cache[key] = 1
-                    self.logger.info(f"XDASH DEBUGGER: Cached JPEG quality 1 for key '{key}', no smaller size found.")
+                    print(f"XDASH DEBUGGER: Cached JPEG quality 1 for key '{key}', no smaller size found.")
                     break
 
                 _, encoded_frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, quality])
@@ -108,7 +102,7 @@ class XDashDebugger:
 
                 if len(frame_bytes) < self.best_byte_size: # This is the maximum packet size for UDP, it will continue to lower quality till it matches!
                     XDashDebugger._quality_cache[key] = quality  # Cache the quality
-                    self.logger.info(f"XDASH DEBUGGER: Cached JPEG quality {quality} for key '{key}', frame size: {len(frame_bytes)} bytes")
+                    print(f"XDASH DEBUGGER: Cached JPEG quality {quality} for key '{key}', frame size: {len(frame_bytes)} bytes")
                     break
 
         # Final encoding with the best quality
@@ -139,20 +133,20 @@ class XDashDebugger:
                     if addresses:
                         return addresses[0]
                     else:
-                        self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH address. No Addresses found.")
+                        print("XDASH DEBUGGER: Could not resolve XDASH address. No Addresses found.")
                 else:
-                    self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH address. No Info Returned.")
+                    print("XDASH DEBUGGER: Could not resolve XDASH address. No Info Returned.")
             except Exception as e:
-                self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH address. Exception occured.")
+                print(f"XDASH DEBUGGER: Could not resolve XDASH address. Exception occured: {e}")
         finally:
             zeroconf.close()
         return None
 
-# # Example usage:
-# sender = XDashDebugger()
-# cap = cv2.VideoCapture(0)
-# while True:
-#     ret, frame = cap.read()
-#     sender.send_frame("exampleKey", time.time(), frame)
+# Example usage:
+sender = XDashDebugger()
+cap = cv2.VideoCapture(0)
+while True:
+    ret, frame = cap.read()
+    sender.send_frame("exampleKey", time.time(), frame)
 
 
