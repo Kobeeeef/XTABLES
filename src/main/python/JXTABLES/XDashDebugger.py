@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from numpy import ndarray
 import logging
+from zeroconf import Zeroconf
 try:
     # Package-level imports
     from . import XDashDebugger_pb2 as XDashDebuggerProto
@@ -50,7 +51,8 @@ class XDashDebugger:
         self._resolving = True
 
         try:
-            resolved_ip = socket.gethostbyname(self.hostname)
+            self.logger.info("XDASH DEBUGGER: Resolving XDASH address: %s", self.hostname)
+            resolved_ip = self.resolve_host_by_name(self.hostname)
             XDashDebugger._ip_cache[self.hostname] = resolved_ip
             self._resolved_ip = resolved_ip
             self.logger.info("XDASH DEBUGGER: Resolved XDASH IP to %s", resolved_ip)
@@ -65,7 +67,6 @@ class XDashDebugger:
         if self.hostname in XDashDebugger._ip_cache:
             self._resolved_ip = XDashDebugger._ip_cache[self.hostname]
         elif not self._resolving:  # Only start if no thread is running
-            self.logger.info("XDASH DEBUGGER: Resolving XDASH address...")
             self._resolve_thread = threading.Thread(target=self._resolve_ip, daemon=True)
             self._resolve_thread.start()
 
@@ -120,12 +121,32 @@ class XDashDebugger:
         frame_bytes = await self._determine_quality_and_encode(key, frame)
         self.__send(key, timestamp, XDashDebuggerProto.Message.Type.IMAGE, frame_bytes)
 
+    def resolve_host_by_name(self, hostname: str):
+        zeroconf = Zeroconf()
+        try:
+            return socket.gethostbyname(hostname)
+        except socket.gaierror:
+            try:
+                info = zeroconf.get_service_info("_xdash._tcp.local.", "XDashService._xdash._tcp.local.")
+                if info:
+                    addresses = info.parsed_addresses()
+                    if addresses:
+                        return addresses[0]
+                    else:
+                        self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH address. No Addresses found.")
+                else:
+                    self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH address. No Info Returned.")
+            except Exception as e:
+                self.logger.warning("XDASH DEBUGGER: Could not resolve XDASH address. Exception occured.")
+        finally:
+            zeroconf.close()
+        return None
 
-# # Example usage:
-# sender = XDashDebugger()
-# cap = cv2.VideoCapture(0)
-# while True:
-#     ret, frame = cap.read()
-#     sender.send_frame("exampleKey", time.time(), frame)
+# Example usage:
+sender = XDashDebugger()
+cap = cv2.VideoCapture(0)
+while True:
+    ret, frame = cap.read()
+    sender.send_frame("exampleKey", time.time(), frame)
 
 
