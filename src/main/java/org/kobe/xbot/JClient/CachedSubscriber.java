@@ -66,39 +66,60 @@ public class CachedSubscriber {
     public String getAsString(String defaultValue) {
         XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.STRING)) {
-            return new String(lastUpdate.getValue().toByteArray(), StandardCharsets.UTF_8);
+            try {
+                return new String(lastUpdate.getValue().toByteArray(), StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                return defaultValue;
+            }
         }
         return defaultValue;
     }
 
-    public boolean getAsBoolean(boolean defaultValue) {
+    public Boolean getAsBoolean(Boolean defaultValue) {
         XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BOOL)) {
-            return lastUpdate.getValue().equals(successByte);
+            try {
+                return lastUpdate.getValue().equals(successByte);
+            } catch (Exception e) {
+                return defaultValue;
+            }
         }
         return defaultValue;
     }
 
-    public int getAsInteger(int defaultValue) {
+    public Integer getAsInteger(Integer defaultValue) {
         XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
-            return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getInt();
+            try {
+                return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getInt();
+            } catch (Exception e) {
+                return defaultValue;
+            }
         }
         return defaultValue;
     }
 
-    public long getAsLong(long defaultValue) {
+    public Long getAsLong(Long defaultValue) {
         XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
-            return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getLong();
+            try {
+                return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getLong();
+            } catch (Exception e) {
+                return defaultValue;
+            }
         }
+
         return defaultValue;
     }
 
-    public double getAsDouble(double defaultValue) {
+    public Double getAsDouble(Double defaultValue) {
         XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.DOUBLE)) {
-            return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getDouble();
+            try {
+                return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getDouble();
+            } catch (Exception e) {
+                return defaultValue;
+            }
         }
         return defaultValue;
     }
