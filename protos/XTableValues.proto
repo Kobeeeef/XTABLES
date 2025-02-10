@@ -10,6 +10,15 @@ message CoordinateList {
   repeated Coordinate coordinates = 1;
 }
 
+message BezierCurve {
+  double metersPerSecond = 1;
+  double timeToTraverse = 2;
+  repeated double controlPoints = 3;
+}
+
+message BezierCurves {
+  repeated BezierCurve curves = 1;
+}
 
 
 message DoubleList {
