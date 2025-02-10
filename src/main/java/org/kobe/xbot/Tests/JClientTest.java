@@ -27,6 +27,15 @@ public class JClientTest {
                 .setY(3).build());
         int degrees = 0;
 
+
+       XTableValues.BezierCurve curve = XTableValues.BezierCurve.newBuilder()
+                .setMetersPerSecond(0.3d)
+                .setTimeToTraverse(30.2)
+                .addAllControlPoints(List.of(XTableValues.ControlPoint.newBuilder().setX(20).setY(20).build()))
+               .build();
+
+
+
         while (true) {
             degrees -= 5;
             client.putPose2d("PoseSubsystem.RobotPose", new Pose2d(Math.random() * 50,Math.random() * 30 ,new Rotation2d(Units.degreesToRadians(degrees))));
