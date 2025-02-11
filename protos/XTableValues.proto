@@ -16,13 +16,14 @@ message ControlPoint {
 }
 
 message BezierCurve {
-  double metersPerSecond = 1;
-  double timeToTraverse = 2;
-  repeated ControlPoint controlPoints = 3;
+  double timeToTraverse = 1;
+  repeated ControlPoint controlPoints = 2;
 }
 
 message BezierCurves {
   repeated BezierCurve curves = 1;
+  bool pathFound = 2;
+  double metersPerSecond = 3;
 }
 
 
