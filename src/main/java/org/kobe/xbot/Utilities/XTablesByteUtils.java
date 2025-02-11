@@ -250,6 +250,29 @@ public class XTablesByteUtils {
     public static String bezierCurvesToString(byte[] bezierCurves) {
         return bezierCurvesToString(unpack_bezier_curves(bezierCurves));
     }
+    public static double[][][] bezierCurvesToArray(XTableValues.BezierCurves bezierCurves) {
+        if (bezierCurves == null || bezierCurves.getCurvesList().isEmpty()) {
+            return new double[0][][];
+        }
+
+        List<XTableValues.BezierCurve> curves = bezierCurves.getCurvesList();
+        double[][][] controlPointsArray = new double[curves.size()][][];
+
+        for (int i = 0; i < curves.size(); i++) {
+            List<XTableValues.ControlPoint> controlPoints = curves.get(i).getControlPointsList();
+            double[][] curvePoints = new double[controlPoints.size()][2];
+
+            for (int j = 0; j < controlPoints.size(); j++) {
+                curvePoints[j][0] = controlPoints.get(j).getX();
+                curvePoints[j][1] = controlPoints.get(j).getY();
+            }
+
+            controlPointsArray[i] = curvePoints;
+        }
+
+        return controlPointsArray;
+    }
+
     public static String bezierCurvesToString(XTableValues.BezierCurves bezierCurves) {
         if (bezierCurves == null || bezierCurves.getCurvesList().isEmpty()) {
             return "No Bezier Curves Available";
