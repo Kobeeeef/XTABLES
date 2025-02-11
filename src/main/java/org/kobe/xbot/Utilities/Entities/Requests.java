@@ -134,6 +134,10 @@ public abstract class Requests {
         return sendPutMessage(key, list.toByteArray(), XTableProto.XTableMessage.Type.COORDINATES);
     }
 
+    public boolean putBezierCurves(String key, XTableValues.BezierCurves value) {
+        return sendPutMessage(key, value.toByteArray(), XTableProto.XTableMessage.Type.BEZIER_CURVES);
+    }
+
 
     /**
      * Sends a PUT request with a `Pose2d` object to the server.
@@ -993,9 +997,25 @@ public abstract class Requests {
                 throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
             }
         }
-
-
         throw new IllegalArgumentException("Expected COORDINATES type, but got: " + message.getType());
+    }
+
+    public XTableValues.BezierCurves getBezierCurves(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.BEZIER_CURVES) {
+            try {
+                return XTableValues.BezierCurves.parseFrom(message.getValue().toByteArray());
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected BEZIER_CURVES type, but got: " + message.getType());
     }
 
 

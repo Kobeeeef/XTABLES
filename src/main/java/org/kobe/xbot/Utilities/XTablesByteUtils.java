@@ -229,6 +229,44 @@ public class XTablesByteUtils {
         }
     }
 
+    public static XTableValues.BezierCurves unpack_bezier_curves(ByteString bytes) {
+        try {
+            return XTableValues.BezierCurves.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+
+    public static XTableValues.BezierCurves unpack_bezier_curves(byte[] bytes) {
+        try {
+            return XTableValues.BezierCurves.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static String bezierCurvesToString(ByteString bezierCurves) {
+        return bezierCurvesToString(unpack_bezier_curves(bezierCurves));
+    }
+    public static String bezierCurvesToString(byte[] bezierCurves) {
+        return bezierCurvesToString(unpack_bezier_curves(bezierCurves));
+    }
+    public static String bezierCurvesToString(XTableValues.BezierCurves bezierCurves) {
+        if (bezierCurves == null || bezierCurves.getCurvesList().isEmpty()) {
+            return "No Bezier Curves Available";
+        }
+
+        List<XTableValues.BezierCurve> curves = bezierCurves.getCurvesList();
+        int segmentCount = curves.size();
+
+        XTableValues.ControlPoint start = curves.get(0).getControlPointsList().isEmpty() ? null : curves.get(0).getControlPointsList().get(0);
+        XTableValues.ControlPoint goal = curves.get(segmentCount - 1).getControlPointsList().isEmpty() ? null : curves.get(segmentCount - 1).getControlPointsList().get(curves.get(segmentCount - 1).getControlPointsList().size() - 1);
+
+        return String.format("Start: (X: %.2f, Y: %.2f), Goal: (X: %.2f, Y: %.2f), Segments: %d",
+                start != null ? start.getX() : 0, start != null ? start.getY() : 0,
+                goal != null ? goal.getX() : 0, goal != null ? goal.getY() : 0,
+                segmentCount);
+    }
+
 
     /**
      * Converts a raw protobuf byte array into a human-readable string of coordinates.
@@ -250,6 +288,7 @@ public class XTablesByteUtils {
             case POSE2D -> new JsonPrimitive(XTablesByteUtils.pose2dToString(value));
             case POSE3D -> new JsonPrimitive(XTablesByteUtils.pose3dToString(value));
             case COORDINATES -> new JsonPrimitive(XTablesByteUtils.coordinateListToString(value));
+            case BEZIER_CURVES -> new JsonPrimitive(bezierCurvesToString(value));
             case INT64 -> new JsonPrimitive(bytesToLong(value));
             case INT32 -> new JsonPrimitive(to_Primitive_Int(value));
             case BOOL -> new JsonPrimitive(value[0] == 0x01);

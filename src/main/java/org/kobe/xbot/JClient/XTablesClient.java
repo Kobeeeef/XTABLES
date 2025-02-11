@@ -54,7 +54,7 @@ public class XTablesClient extends QueuedRequests implements Subscriptions {
     // Instance Variables
     // These variables are unique to each instance of the class.
     // =============================================================
-    private String XTABLES_CLIENT_VERSION = "XTABLES Jero Client v5.1.8 | Build Date: 2/6/2025";
+    private String XTABLES_CLIENT_VERSION = "XTABLES Jero Client v5.2.5 | Build Date: 2/6/2025";
 
     private final String ip;
     private final XTablesSocketMonitor socketMonitor;
@@ -156,8 +156,6 @@ public class XTablesClient extends QueuedRequests implements Subscriptions {
         this.subscribeHandler.requestSubscribe(XTableProto.XTableMessage.XTableUpdate.newBuilder().setCategory(XTableProto.XTableMessage.XTableUpdate.Category.INFORMATION).build().toByteArray());
         this.subscriptionConsumers = new HashMap<>();
         this.logConsumers = new ArrayList<>();
-
-
         ZMQ.Socket pushSocket = context.createSocket(SocketType.PUSH);
         pushSocket.setHWM(500);
         pushSocket.setReconnectIVL(500);
