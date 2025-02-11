@@ -30,7 +30,6 @@ public class CurveDemo {
 
         XTableValues.BezierCurve firstCurve = curves.get(0);
         // speed
-        System.out.println(firstCurve.getMetersPerSecond());
         // time
         System.out.println(firstCurve.getTimeToTraverse());
         // control points
