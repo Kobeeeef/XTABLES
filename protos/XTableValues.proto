@@ -23,7 +23,7 @@ message BezierCurve {
 message BezierCurves {
   repeated BezierCurve curves = 1;
   bool pathFound = 2;
-  double metersPerSecond = 3;
+  optional double metersPerSecond = 3;
 }
 
 
