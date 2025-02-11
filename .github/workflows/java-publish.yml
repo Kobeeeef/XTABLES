@@ -24,19 +24,3 @@ jobs:
         run: mvn --batch-mode deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  delete-packages:
-    runs-on: ubuntu-latest
-    needs: publish # Ensures cleanup only runs after a successful package upload
-    if: success() # Only runs if the publish job is successful
-
-    steps:
-      - name: Delete Old Package Versions
-        uses: actions/delete-package-versions@v5.0.0
-        with:
-          package-name: org.kobe.xbot.xtables # Replace with your package name
-          package-type: maven
-          min-versions-to-keep: 5
-          delete-only-pre-release-versions: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
