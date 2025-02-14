@@ -129,6 +129,9 @@ class XTablesClient:
         self.socketMonitor.add_socket("REQUEST", self.req_socket)
         self.req_socket.connect(f"tcp://{self.ip}:{self.req_port}")
 
+    def get_socket_montior(self):
+        return self.socketMonitor
+
     def connect(self):
         """
         Attempts to reconnect the sockets to the server.
