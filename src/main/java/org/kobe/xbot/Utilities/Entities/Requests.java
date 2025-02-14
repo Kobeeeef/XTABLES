@@ -137,6 +137,9 @@ public abstract class Requests {
     public boolean putBezierCurves(String key, XTableValues.BezierCurves value) {
         return sendPutMessage(key, value.toByteArray(), XTableProto.XTableMessage.Type.BEZIER_CURVES);
     }
+    public boolean putBezierCurve(String key, XTableValues.BezierCurve value) {
+        return sendPutMessage(key, value.toByteArray(), XTableProto.XTableMessage.Type.BEZIER_CURVE);
+    }
 
 
     /**
@@ -1016,6 +1019,24 @@ public abstract class Requests {
             }
         }
         throw new IllegalArgumentException("Expected BEZIER_CURVES type, but got: " + message.getType());
+    }
+
+    public XTableValues.BezierCurve getBezierCurve(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.BEZIER_CURVE) {
+            try {
+                return XTableValues.BezierCurve.parseFrom(message.getValue().toByteArray());
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected BEZIER_CURVE type, but got: " + message.getType());
     }
 
 

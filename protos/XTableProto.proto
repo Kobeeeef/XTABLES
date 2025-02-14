@@ -35,6 +35,7 @@ message XTableMessage {
     POSE3D = 19;
     COORDINATES = 20;
     BEZIER_CURVES = 21;
+    BEZIER_CURVE = 22;
   }
   enum Command {
     UNKNOWN_COMMAND = 0;
