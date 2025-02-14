@@ -1934,6 +1934,17 @@ public final class XTableValues {
      */
     org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getControlPointsOrBuilder(
         int index);
+
+    /**
+     * <code>optional double metersPerSecondSpeed = 3;</code>
+     * @return Whether the metersPerSecondSpeed field is set.
+     */
+    boolean hasMetersPerSecondSpeed();
+    /**
+     * <code>optional double metersPerSecondSpeed = 3;</code>
+     * @return The metersPerSecondSpeed.
+     */
+    double getMetersPerSecondSpeed();
   }
   /**
    * Protobuf type {@code org.kobe.xbot.Utilities.Entities.BezierCurve}
@@ -1971,6 +1982,7 @@ public final class XTableValues {
               org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve.class, org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve.Builder.class);
     }
 
+    private int bitField0_;
     public static final int TIMETOTRAVERSE_FIELD_NUMBER = 1;
     private double timeToTraverse_ = 0D;
     /**
@@ -2023,6 +2035,25 @@ public final class XTableValues {
       return controlPoints_.get(index);
     }
 
+    public static final int METERSPERSECONDSPEED_FIELD_NUMBER = 3;
+    private double metersPerSecondSpeed_ = 0D;
+    /**
+     * <code>optional double metersPerSecondSpeed = 3;</code>
+     * @return Whether the metersPerSecondSpeed field is set.
+     */
+    @java.lang.Override
+    public boolean hasMetersPerSecondSpeed() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional double metersPerSecondSpeed = 3;</code>
+     * @return The metersPerSecondSpeed.
+     */
+    @java.lang.Override
+    public double getMetersPerSecondSpeed() {
+      return metersPerSecondSpeed_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2043,6 +2074,9 @@ public final class XTableValues {
       for (int i = 0; i < controlPoints_.size(); i++) {
         output.writeMessage(2, controlPoints_.get(i));
       }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeDouble(3, metersPerSecondSpeed_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -2059,6 +2093,10 @@ public final class XTableValues {
       for (int i = 0; i < controlPoints_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, controlPoints_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(3, metersPerSecondSpeed_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -2080,6 +2118,12 @@ public final class XTableValues {
               other.getTimeToTraverse())) return false;
       if (!getControlPointsList()
           .equals(other.getControlPointsList())) return false;
+      if (hasMetersPerSecondSpeed() != other.hasMetersPerSecondSpeed()) return false;
+      if (hasMetersPerSecondSpeed()) {
+        if (java.lang.Double.doubleToLongBits(getMetersPerSecondSpeed())
+            != java.lang.Double.doubleToLongBits(
+                other.getMetersPerSecondSpeed())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -2097,6 +2141,11 @@ public final class XTableValues {
       if (getControlPointsCount() > 0) {
         hash = (37 * hash) + CONTROLPOINTS_FIELD_NUMBER;
         hash = (53 * hash) + getControlPointsList().hashCode();
+      }
+      if (hasMetersPerSecondSpeed()) {
+        hash = (37 * hash) + METERSPERSECONDSPEED_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getMetersPerSecondSpeed()));
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -2237,6 +2286,7 @@ public final class XTableValues {
           controlPointsBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
+        metersPerSecondSpeed_ = 0D;
         return this;
       }
 
@@ -2286,6 +2336,12 @@ public final class XTableValues {
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.timeToTraverse_ = timeToTraverse_;
         }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.metersPerSecondSpeed_ = metersPerSecondSpeed_;
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -2361,6 +2417,9 @@ public final class XTableValues {
             }
           }
         }
+        if (other.hasMetersPerSecondSpeed()) {
+          setMetersPerSecondSpeed(other.getMetersPerSecondSpeed());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -2405,6 +2464,11 @@ public final class XTableValues {
                 }
                 break;
               } // case 18
+              case 25: {
+                metersPerSecondSpeed_ = input.readDouble();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 25
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -2692,6 +2756,46 @@ public final class XTableValues {
           controlPoints_ = null;
         }
         return controlPointsBuilder_;
+      }
+
+      private double metersPerSecondSpeed_ ;
+      /**
+       * <code>optional double metersPerSecondSpeed = 3;</code>
+       * @return Whether the metersPerSecondSpeed field is set.
+       */
+      @java.lang.Override
+      public boolean hasMetersPerSecondSpeed() {
+        return ((bitField0_ & 0x00000004) != 0);
+      }
+      /**
+       * <code>optional double metersPerSecondSpeed = 3;</code>
+       * @return The metersPerSecondSpeed.
+       */
+      @java.lang.Override
+      public double getMetersPerSecondSpeed() {
+        return metersPerSecondSpeed_;
+      }
+      /**
+       * <code>optional double metersPerSecondSpeed = 3;</code>
+       * @param value The metersPerSecondSpeed to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMetersPerSecondSpeed(double value) {
+
+        metersPerSecondSpeed_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double metersPerSecondSpeed = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMetersPerSecondSpeed() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        metersPerSecondSpeed_ = 0D;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -7975,18 +8079,19 @@ public final class XTableValues {
       "\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\"S\n\016CoordinateList\022A\n\013c" +
       "oordinates\030\001 \003(\0132,.org.kobe.xbot.Utiliti" +
       "es.Entities.Coordinate\"$\n\014ControlPoint\022\t" +
-      "\n\001x\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\"l\n\013BezierCurve\022\026\n\016t" +
-      "imeToTraverse\030\001 \001(\001\022E\n\rcontrolPoints\030\002 \003" +
-      "(\0132..org.kobe.xbot.Utilities.Entities.Co" +
-      "ntrolPoint\"\222\001\n\014BezierCurves\022=\n\006curves\030\001 " +
-      "\003(\0132-.org.kobe.xbot.Utilities.Entities.B" +
-      "ezierCurve\022\021\n\tpathFound\030\002 \001(\010\022\034\n\017metersP" +
-      "erSecond\030\003 \001(\001H\000\210\001\001B\022\n\020_metersPerSecond\"" +
-      "\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027\n\nStringList\022\t" +
-      "\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t\n\001v\030\001 \003(\005\"\026\n\tB" +
-      "ytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010LongList\022\t\n\001v\030\001 \003" +
-      "(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolList\022\t" +
-      "\n\001v\030\001 \003(\010b\006proto3"
+      "\n\001x\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\"\250\001\n\013BezierCurve\022\026\n\016" +
+      "timeToTraverse\030\001 \001(\001\022E\n\rcontrolPoints\030\002 " +
+      "\003(\0132..org.kobe.xbot.Utilities.Entities.C" +
+      "ontrolPoint\022!\n\024metersPerSecondSpeed\030\003 \001(" +
+      "\001H\000\210\001\001B\027\n\025_metersPerSecondSpeed\"\222\001\n\014Bezi" +
+      "erCurves\022=\n\006curves\030\001 \003(\0132-.org.kobe.xbot" +
+      ".Utilities.Entities.BezierCurve\022\021\n\tpathF" +
+      "ound\030\002 \001(\010\022\034\n\017metersPerSecond\030\003 \001(\001H\000\210\001\001" +
+      "B\022\n\020_metersPerSecond\"\027\n\nDoubleList\022\t\n\001v\030" +
+      "\001 \003(\001\"\027\n\nStringList\022\t\n\001v\030\001 \003(\t\"\030\n\013Intege" +
+      "rList\022\t\n\001v\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014" +
+      "\"\025\n\010LongList\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001" +
+      "v\030\001 \003(\002\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -8015,7 +8120,7 @@ public final class XTableValues {
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurve_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurve_descriptor,
-        new java.lang.String[] { "TimeToTraverse", "ControlPoints", });
+        new java.lang.String[] { "TimeToTraverse", "ControlPoints", "MetersPerSecondSpeed", });
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_fieldAccessorTable = new
