@@ -2905,6 +2905,23 @@ public final class XTableValues {
      * @return The metersPerSecond.
      */
     double getMetersPerSecond();
+
+    /**
+     * <code>double finalRotationDegrees = 4;</code>
+     * @return The finalRotationDegrees.
+     */
+    double getFinalRotationDegrees();
+
+    /**
+     * <code>optional double accelerationMetersPerSecond = 5;</code>
+     * @return Whether the accelerationMetersPerSecond field is set.
+     */
+    boolean hasAccelerationMetersPerSecond();
+    /**
+     * <code>optional double accelerationMetersPerSecond = 5;</code>
+     * @return The accelerationMetersPerSecond.
+     */
+    double getAccelerationMetersPerSecond();
   }
   /**
    * Protobuf type {@code org.kobe.xbot.Utilities.Entities.BezierCurves}
@@ -3014,6 +3031,36 @@ public final class XTableValues {
       return metersPerSecond_;
     }
 
+    public static final int FINALROTATIONDEGREES_FIELD_NUMBER = 4;
+    private double finalRotationDegrees_ = 0D;
+    /**
+     * <code>double finalRotationDegrees = 4;</code>
+     * @return The finalRotationDegrees.
+     */
+    @java.lang.Override
+    public double getFinalRotationDegrees() {
+      return finalRotationDegrees_;
+    }
+
+    public static final int ACCELERATIONMETERSPERSECOND_FIELD_NUMBER = 5;
+    private double accelerationMetersPerSecond_ = 0D;
+    /**
+     * <code>optional double accelerationMetersPerSecond = 5;</code>
+     * @return Whether the accelerationMetersPerSecond field is set.
+     */
+    @java.lang.Override
+    public boolean hasAccelerationMetersPerSecond() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>optional double accelerationMetersPerSecond = 5;</code>
+     * @return The accelerationMetersPerSecond.
+     */
+    @java.lang.Override
+    public double getAccelerationMetersPerSecond() {
+      return accelerationMetersPerSecond_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3037,6 +3084,12 @@ public final class XTableValues {
       if (((bitField0_ & 0x00000001) != 0)) {
         output.writeDouble(3, metersPerSecond_);
       }
+      if (java.lang.Double.doubleToRawLongBits(finalRotationDegrees_) != 0) {
+        output.writeDouble(4, finalRotationDegrees_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        output.writeDouble(5, accelerationMetersPerSecond_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -3057,6 +3110,14 @@ public final class XTableValues {
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeDoubleSize(3, metersPerSecond_);
+      }
+      if (java.lang.Double.doubleToRawLongBits(finalRotationDegrees_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(4, finalRotationDegrees_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(5, accelerationMetersPerSecond_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3083,6 +3144,15 @@ public final class XTableValues {
             != java.lang.Double.doubleToLongBits(
                 other.getMetersPerSecond())) return false;
       }
+      if (java.lang.Double.doubleToLongBits(getFinalRotationDegrees())
+          != java.lang.Double.doubleToLongBits(
+              other.getFinalRotationDegrees())) return false;
+      if (hasAccelerationMetersPerSecond() != other.hasAccelerationMetersPerSecond()) return false;
+      if (hasAccelerationMetersPerSecond()) {
+        if (java.lang.Double.doubleToLongBits(getAccelerationMetersPerSecond())
+            != java.lang.Double.doubleToLongBits(
+                other.getAccelerationMetersPerSecond())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -3105,6 +3175,14 @@ public final class XTableValues {
         hash = (37 * hash) + METERSPERSECOND_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
             java.lang.Double.doubleToLongBits(getMetersPerSecond()));
+      }
+      hash = (37 * hash) + FINALROTATIONDEGREES_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getFinalRotationDegrees()));
+      if (hasAccelerationMetersPerSecond()) {
+        hash = (37 * hash) + ACCELERATIONMETERSPERSECOND_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getAccelerationMetersPerSecond()));
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -3246,6 +3324,8 @@ public final class XTableValues {
         bitField0_ = (bitField0_ & ~0x00000001);
         pathFound_ = false;
         metersPerSecond_ = 0D;
+        finalRotationDegrees_ = 0D;
+        accelerationMetersPerSecond_ = 0D;
         return this;
       }
 
@@ -3299,6 +3379,13 @@ public final class XTableValues {
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.metersPerSecond_ = metersPerSecond_;
           to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.finalRotationDegrees_ = finalRotationDegrees_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.accelerationMetersPerSecond_ = accelerationMetersPerSecond_;
+          to_bitField0_ |= 0x00000002;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -3379,6 +3466,12 @@ public final class XTableValues {
         if (other.hasMetersPerSecond()) {
           setMetersPerSecond(other.getMetersPerSecond());
         }
+        if (other.getFinalRotationDegrees() != 0D) {
+          setFinalRotationDegrees(other.getFinalRotationDegrees());
+        }
+        if (other.hasAccelerationMetersPerSecond()) {
+          setAccelerationMetersPerSecond(other.getAccelerationMetersPerSecond());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -3428,6 +3521,16 @@ public final class XTableValues {
                 bitField0_ |= 0x00000004;
                 break;
               } // case 25
+              case 33: {
+                finalRotationDegrees_ = input.readDouble();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 33
+              case 41: {
+                accelerationMetersPerSecond_ = input.readDouble();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 41
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -3753,6 +3856,78 @@ public final class XTableValues {
       public Builder clearMetersPerSecond() {
         bitField0_ = (bitField0_ & ~0x00000004);
         metersPerSecond_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double finalRotationDegrees_ ;
+      /**
+       * <code>double finalRotationDegrees = 4;</code>
+       * @return The finalRotationDegrees.
+       */
+      @java.lang.Override
+      public double getFinalRotationDegrees() {
+        return finalRotationDegrees_;
+      }
+      /**
+       * <code>double finalRotationDegrees = 4;</code>
+       * @param value The finalRotationDegrees to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFinalRotationDegrees(double value) {
+
+        finalRotationDegrees_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double finalRotationDegrees = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFinalRotationDegrees() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        finalRotationDegrees_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double accelerationMetersPerSecond_ ;
+      /**
+       * <code>optional double accelerationMetersPerSecond = 5;</code>
+       * @return Whether the accelerationMetersPerSecond field is set.
+       */
+      @java.lang.Override
+      public boolean hasAccelerationMetersPerSecond() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <code>optional double accelerationMetersPerSecond = 5;</code>
+       * @return The accelerationMetersPerSecond.
+       */
+      @java.lang.Override
+      public double getAccelerationMetersPerSecond() {
+        return accelerationMetersPerSecond_;
+      }
+      /**
+       * <code>optional double accelerationMetersPerSecond = 5;</code>
+       * @param value The accelerationMetersPerSecond to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAccelerationMetersPerSecond(double value) {
+
+        accelerationMetersPerSecond_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double accelerationMetersPerSecond = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAccelerationMetersPerSecond() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        accelerationMetersPerSecond_ = 0D;
         onChanged();
         return this;
       }
@@ -8083,15 +8258,18 @@ public final class XTableValues {
       "timeToTraverse\030\001 \001(\001\022E\n\rcontrolPoints\030\002 " +
       "\003(\0132..org.kobe.xbot.Utilities.Entities.C" +
       "ontrolPoint\022!\n\024metersPerSecondSpeed\030\003 \001(" +
-      "\001H\000\210\001\001B\027\n\025_metersPerSecondSpeed\"\222\001\n\014Bezi" +
+      "\001H\000\210\001\001B\027\n\025_metersPerSecondSpeed\"\372\001\n\014Bezi" +
       "erCurves\022=\n\006curves\030\001 \003(\0132-.org.kobe.xbot" +
       ".Utilities.Entities.BezierCurve\022\021\n\tpathF" +
       "ound\030\002 \001(\010\022\034\n\017metersPerSecond\030\003 \001(\001H\000\210\001\001" +
-      "B\022\n\020_metersPerSecond\"\027\n\nDoubleList\022\t\n\001v\030" +
-      "\001 \003(\001\"\027\n\nStringList\022\t\n\001v\030\001 \003(\t\"\030\n\013Intege" +
-      "rList\022\t\n\001v\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014" +
-      "\"\025\n\010LongList\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001" +
-      "v\030\001 \003(\002\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010b\006proto3"
+      "\022\034\n\024finalRotationDegrees\030\004 \001(\001\022(\n\033accele" +
+      "rationMetersPerSecond\030\005 \001(\001H\001\210\001\001B\022\n\020_met" +
+      "ersPerSecondB\036\n\034_accelerationMetersPerSe" +
+      "cond\"\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027\n\nStringL" +
+      "ist\022\t\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t\n\001v\030\001 \003(\005" +
+      "\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010LongList\022\t\n\001" +
+      "v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolL" +
+      "ist\022\t\n\001v\030\001 \003(\010b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -8126,7 +8304,7 @@ public final class XTableValues {
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor,
-        new java.lang.String[] { "Curves", "PathFound", "MetersPerSecond", });
+        new java.lang.String[] { "Curves", "PathFound", "MetersPerSecond", "FinalRotationDegrees", "AccelerationMetersPerSecond", });
     internal_static_org_kobe_xbot_Utilities_Entities_DoubleList_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_org_kobe_xbot_Utilities_Entities_DoubleList_fieldAccessorTable = new

@@ -44,8 +44,8 @@ public class JClientTest {
 
 
         while (true) {
-            degrees -= 5;
-            client.putPose2d("PoseSubsystem.RobotPose", new Pose2d(Math.random() * 50,Math.random() * 30 ,new Rotation2d(Units.degreesToRadians(degrees))));
+
+            client.putPose2d("PoseSubsystem.RobotPose",new Pose2d(0.764, 1.247, Rotation2d.fromDegrees(54.012)));
             Thread.sleep(10);
         }
 
