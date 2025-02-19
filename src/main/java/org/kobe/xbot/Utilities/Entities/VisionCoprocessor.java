@@ -8,13 +8,15 @@ public enum VisionCoprocessor {
     ORANGE_PI_FRONT_LEFT("photonvisionfrontleft"),
     ORANGE_PI_REAR_RIGHT("photonvisionrearright"),
     ORANGE_PI_REAR_LEFT("photonvisionrearleft"),
-    ORANGE_PI_BACK("photonvisionback");
+    ORANGE_PI_BACK("photonvisionback"),
+    LOCALHOST("localhost");
     private final String hostname;
+
     VisionCoprocessor(String hostname) {
         this.hostname = hostname;
     }
 
     public String getQualifiedHostname() {
-        return hostname + ".local";
+        return this.equals(LOCALHOST) ? hostname : hostname + ".local";
     }
 }
