@@ -15,6 +15,114 @@ public final class XTableValues {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  /**
+   * Protobuf enum {@code org.kobe.xbot.Utilities.Entities.RobotDirection}
+   */
+  public enum RobotDirection
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>FRONT = 0;</code>
+     */
+    FRONT(0),
+    /**
+     * <code>BACK = 1;</code>
+     */
+    BACK(1),
+    UNRECOGNIZED(-1),
+    ;
+
+    /**
+     * <code>FRONT = 0;</code>
+     */
+    public static final int FRONT_VALUE = 0;
+    /**
+     * <code>BACK = 1;</code>
+     */
+    public static final int BACK_VALUE = 1;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static RobotDirection valueOf(int value) {
+      return forNumber(value);
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     */
+    public static RobotDirection forNumber(int value) {
+      switch (value) {
+        case 0: return FRONT;
+        case 1: return BACK;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<RobotDirection>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        RobotDirection> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<RobotDirection>() {
+            public RobotDirection findValueByNumber(int number) {
+              return RobotDirection.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalStateException(
+            "Can't get the descriptor of an unrecognized enum value.");
+      }
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final RobotDirection[] VALUES = values();
+
+    public static RobotDirection valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private RobotDirection(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:org.kobe.xbot.Utilities.Entities.RobotDirection)
+  }
+
   public interface CoordinateOrBuilder extends
       // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.Coordinate)
       com.google.protobuf.MessageOrBuilder {
@@ -2683,6 +2791,1148 @@ public final class XTableValues {
 
   }
 
+  public interface TraversalOptionsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.TraversalOptions)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional double metersPerSecond = 1;</code>
+     * @return Whether the metersPerSecond field is set.
+     */
+    boolean hasMetersPerSecond();
+    /**
+     * <code>optional double metersPerSecond = 1;</code>
+     * @return The metersPerSecond.
+     */
+    double getMetersPerSecond();
+
+    /**
+     * <code>optional double finalRotationDegrees = 2;</code>
+     * @return Whether the finalRotationDegrees field is set.
+     */
+    boolean hasFinalRotationDegrees();
+    /**
+     * <code>optional double finalRotationDegrees = 2;</code>
+     * @return The finalRotationDegrees.
+     */
+    double getFinalRotationDegrees();
+
+    /**
+     * <code>optional double accelerationMetersPerSecond = 3;</code>
+     * @return Whether the accelerationMetersPerSecond field is set.
+     */
+    boolean hasAccelerationMetersPerSecond();
+    /**
+     * <code>optional double accelerationMetersPerSecond = 3;</code>
+     * @return The accelerationMetersPerSecond.
+     */
+    double getAccelerationMetersPerSecond();
+
+    /**
+     * <code>optional bool faceNearestReefAprilTag = 4;</code>
+     * @return Whether the faceNearestReefAprilTag field is set.
+     */
+    boolean hasFaceNearestReefAprilTag();
+    /**
+     * <code>optional bool faceNearestReefAprilTag = 4;</code>
+     * @return The faceNearestReefAprilTag.
+     */
+    boolean getFaceNearestReefAprilTag();
+
+    /**
+     * <code>optional double faceNearestReefAprilTagPathThresholdPercentage = 5;</code>
+     * @return Whether the faceNearestReefAprilTagPathThresholdPercentage field is set.
+     */
+    boolean hasFaceNearestReefAprilTagPathThresholdPercentage();
+    /**
+     * <code>optional double faceNearestReefAprilTagPathThresholdPercentage = 5;</code>
+     * @return The faceNearestReefAprilTagPathThresholdPercentage.
+     */
+    double getFaceNearestReefAprilTagPathThresholdPercentage();
+
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+     * @return Whether the faceNearestReefAprilTagDirection field is set.
+     */
+    boolean hasFaceNearestReefAprilTagDirection();
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+     * @return The enum numeric value on the wire for faceNearestReefAprilTagDirection.
+     */
+    int getFaceNearestReefAprilTagDirectionValue();
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+     * @return The faceNearestReefAprilTagDirection.
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection getFaceNearestReefAprilTagDirection();
+
+    /**
+     * <code>optional double finalRotationTurnSpeedFactor = 7;</code>
+     * @return Whether the finalRotationTurnSpeedFactor field is set.
+     */
+    boolean hasFinalRotationTurnSpeedFactor();
+    /**
+     * <code>optional double finalRotationTurnSpeedFactor = 7;</code>
+     * @return The finalRotationTurnSpeedFactor.
+     */
+    double getFinalRotationTurnSpeedFactor();
+  }
+  /**
+   * Protobuf type {@code org.kobe.xbot.Utilities.Entities.TraversalOptions}
+   */
+  public static final class TraversalOptions extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.TraversalOptions)
+      TraversalOptionsOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use TraversalOptions.newBuilder() to construct.
+    private TraversalOptions(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private TraversalOptions() {
+      faceNearestReefAprilTagDirection_ = 0;
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new TraversalOptions();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.class, org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int METERSPERSECOND_FIELD_NUMBER = 1;
+    private double metersPerSecond_ = 0D;
+    /**
+     * <code>optional double metersPerSecond = 1;</code>
+     * @return Whether the metersPerSecond field is set.
+     */
+    @java.lang.Override
+    public boolean hasMetersPerSecond() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional double metersPerSecond = 1;</code>
+     * @return The metersPerSecond.
+     */
+    @java.lang.Override
+    public double getMetersPerSecond() {
+      return metersPerSecond_;
+    }
+
+    public static final int FINALROTATIONDEGREES_FIELD_NUMBER = 2;
+    private double finalRotationDegrees_ = 0D;
+    /**
+     * <code>optional double finalRotationDegrees = 2;</code>
+     * @return Whether the finalRotationDegrees field is set.
+     */
+    @java.lang.Override
+    public boolean hasFinalRotationDegrees() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>optional double finalRotationDegrees = 2;</code>
+     * @return The finalRotationDegrees.
+     */
+    @java.lang.Override
+    public double getFinalRotationDegrees() {
+      return finalRotationDegrees_;
+    }
+
+    public static final int ACCELERATIONMETERSPERSECOND_FIELD_NUMBER = 3;
+    private double accelerationMetersPerSecond_ = 0D;
+    /**
+     * <code>optional double accelerationMetersPerSecond = 3;</code>
+     * @return Whether the accelerationMetersPerSecond field is set.
+     */
+    @java.lang.Override
+    public boolean hasAccelerationMetersPerSecond() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <code>optional double accelerationMetersPerSecond = 3;</code>
+     * @return The accelerationMetersPerSecond.
+     */
+    @java.lang.Override
+    public double getAccelerationMetersPerSecond() {
+      return accelerationMetersPerSecond_;
+    }
+
+    public static final int FACENEARESTREEFAPRILTAG_FIELD_NUMBER = 4;
+    private boolean faceNearestReefAprilTag_ = false;
+    /**
+     * <code>optional bool faceNearestReefAprilTag = 4;</code>
+     * @return Whether the faceNearestReefAprilTag field is set.
+     */
+    @java.lang.Override
+    public boolean hasFaceNearestReefAprilTag() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>optional bool faceNearestReefAprilTag = 4;</code>
+     * @return The faceNearestReefAprilTag.
+     */
+    @java.lang.Override
+    public boolean getFaceNearestReefAprilTag() {
+      return faceNearestReefAprilTag_;
+    }
+
+    public static final int FACENEARESTREEFAPRILTAGPATHTHRESHOLDPERCENTAGE_FIELD_NUMBER = 5;
+    private double faceNearestReefAprilTagPathThresholdPercentage_ = 0D;
+    /**
+     * <code>optional double faceNearestReefAprilTagPathThresholdPercentage = 5;</code>
+     * @return Whether the faceNearestReefAprilTagPathThresholdPercentage field is set.
+     */
+    @java.lang.Override
+    public boolean hasFaceNearestReefAprilTagPathThresholdPercentage() {
+      return ((bitField0_ & 0x00000010) != 0);
+    }
+    /**
+     * <code>optional double faceNearestReefAprilTagPathThresholdPercentage = 5;</code>
+     * @return The faceNearestReefAprilTagPathThresholdPercentage.
+     */
+    @java.lang.Override
+    public double getFaceNearestReefAprilTagPathThresholdPercentage() {
+      return faceNearestReefAprilTagPathThresholdPercentage_;
+    }
+
+    public static final int FACENEARESTREEFAPRILTAGDIRECTION_FIELD_NUMBER = 6;
+    private int faceNearestReefAprilTagDirection_ = 0;
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+     * @return Whether the faceNearestReefAprilTagDirection field is set.
+     */
+    @java.lang.Override public boolean hasFaceNearestReefAprilTagDirection() {
+      return ((bitField0_ & 0x00000020) != 0);
+    }
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+     * @return The enum numeric value on the wire for faceNearestReefAprilTagDirection.
+     */
+    @java.lang.Override public int getFaceNearestReefAprilTagDirectionValue() {
+      return faceNearestReefAprilTagDirection_;
+    }
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+     * @return The faceNearestReefAprilTagDirection.
+     */
+    @java.lang.Override public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection getFaceNearestReefAprilTagDirection() {
+      org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection result = org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection.forNumber(faceNearestReefAprilTagDirection_);
+      return result == null ? org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection.UNRECOGNIZED : result;
+    }
+
+    public static final int FINALROTATIONTURNSPEEDFACTOR_FIELD_NUMBER = 7;
+    private double finalRotationTurnSpeedFactor_ = 0D;
+    /**
+     * <code>optional double finalRotationTurnSpeedFactor = 7;</code>
+     * @return Whether the finalRotationTurnSpeedFactor field is set.
+     */
+    @java.lang.Override
+    public boolean hasFinalRotationTurnSpeedFactor() {
+      return ((bitField0_ & 0x00000040) != 0);
+    }
+    /**
+     * <code>optional double finalRotationTurnSpeedFactor = 7;</code>
+     * @return The finalRotationTurnSpeedFactor.
+     */
+    @java.lang.Override
+    public double getFinalRotationTurnSpeedFactor() {
+      return finalRotationTurnSpeedFactor_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeDouble(1, metersPerSecond_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        output.writeDouble(2, finalRotationDegrees_);
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        output.writeDouble(3, accelerationMetersPerSecond_);
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        output.writeBool(4, faceNearestReefAprilTag_);
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        output.writeDouble(5, faceNearestReefAprilTagPathThresholdPercentage_);
+      }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        output.writeEnum(6, faceNearestReefAprilTagDirection_);
+      }
+      if (((bitField0_ & 0x00000040) != 0)) {
+        output.writeDouble(7, finalRotationTurnSpeedFactor_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(1, metersPerSecond_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(2, finalRotationDegrees_);
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(3, accelerationMetersPerSecond_);
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, faceNearestReefAprilTag_);
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(5, faceNearestReefAprilTagPathThresholdPercentage_);
+      }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(6, faceNearestReefAprilTagDirection_);
+      }
+      if (((bitField0_ & 0x00000040) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(7, finalRotationTurnSpeedFactor_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions)) {
+        return super.equals(obj);
+      }
+      org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions other = (org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions) obj;
+
+      if (hasMetersPerSecond() != other.hasMetersPerSecond()) return false;
+      if (hasMetersPerSecond()) {
+        if (java.lang.Double.doubleToLongBits(getMetersPerSecond())
+            != java.lang.Double.doubleToLongBits(
+                other.getMetersPerSecond())) return false;
+      }
+      if (hasFinalRotationDegrees() != other.hasFinalRotationDegrees()) return false;
+      if (hasFinalRotationDegrees()) {
+        if (java.lang.Double.doubleToLongBits(getFinalRotationDegrees())
+            != java.lang.Double.doubleToLongBits(
+                other.getFinalRotationDegrees())) return false;
+      }
+      if (hasAccelerationMetersPerSecond() != other.hasAccelerationMetersPerSecond()) return false;
+      if (hasAccelerationMetersPerSecond()) {
+        if (java.lang.Double.doubleToLongBits(getAccelerationMetersPerSecond())
+            != java.lang.Double.doubleToLongBits(
+                other.getAccelerationMetersPerSecond())) return false;
+      }
+      if (hasFaceNearestReefAprilTag() != other.hasFaceNearestReefAprilTag()) return false;
+      if (hasFaceNearestReefAprilTag()) {
+        if (getFaceNearestReefAprilTag()
+            != other.getFaceNearestReefAprilTag()) return false;
+      }
+      if (hasFaceNearestReefAprilTagPathThresholdPercentage() != other.hasFaceNearestReefAprilTagPathThresholdPercentage()) return false;
+      if (hasFaceNearestReefAprilTagPathThresholdPercentage()) {
+        if (java.lang.Double.doubleToLongBits(getFaceNearestReefAprilTagPathThresholdPercentage())
+            != java.lang.Double.doubleToLongBits(
+                other.getFaceNearestReefAprilTagPathThresholdPercentage())) return false;
+      }
+      if (hasFaceNearestReefAprilTagDirection() != other.hasFaceNearestReefAprilTagDirection()) return false;
+      if (hasFaceNearestReefAprilTagDirection()) {
+        if (faceNearestReefAprilTagDirection_ != other.faceNearestReefAprilTagDirection_) return false;
+      }
+      if (hasFinalRotationTurnSpeedFactor() != other.hasFinalRotationTurnSpeedFactor()) return false;
+      if (hasFinalRotationTurnSpeedFactor()) {
+        if (java.lang.Double.doubleToLongBits(getFinalRotationTurnSpeedFactor())
+            != java.lang.Double.doubleToLongBits(
+                other.getFinalRotationTurnSpeedFactor())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasMetersPerSecond()) {
+        hash = (37 * hash) + METERSPERSECOND_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getMetersPerSecond()));
+      }
+      if (hasFinalRotationDegrees()) {
+        hash = (37 * hash) + FINALROTATIONDEGREES_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getFinalRotationDegrees()));
+      }
+      if (hasAccelerationMetersPerSecond()) {
+        hash = (37 * hash) + ACCELERATIONMETERSPERSECOND_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getAccelerationMetersPerSecond()));
+      }
+      if (hasFaceNearestReefAprilTag()) {
+        hash = (37 * hash) + FACENEARESTREEFAPRILTAG_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getFaceNearestReefAprilTag());
+      }
+      if (hasFaceNearestReefAprilTagPathThresholdPercentage()) {
+        hash = (37 * hash) + FACENEARESTREEFAPRILTAGPATHTHRESHOLDPERCENTAGE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getFaceNearestReefAprilTagPathThresholdPercentage()));
+      }
+      if (hasFaceNearestReefAprilTagDirection()) {
+        hash = (37 * hash) + FACENEARESTREEFAPRILTAGDIRECTION_FIELD_NUMBER;
+        hash = (53 * hash) + faceNearestReefAprilTagDirection_;
+      }
+      if (hasFinalRotationTurnSpeedFactor()) {
+        hash = (37 * hash) + FINALROTATIONTURNSPEEDFACTOR_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getFinalRotationTurnSpeedFactor()));
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.TraversalOptions}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.TraversalOptions)
+        org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.class, org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.Builder.class);
+      }
+
+      // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        metersPerSecond_ = 0D;
+        finalRotationDegrees_ = 0D;
+        accelerationMetersPerSecond_ = 0D;
+        faceNearestReefAprilTag_ = false;
+        faceNearestReefAprilTagPathThresholdPercentage_ = 0D;
+        faceNearestReefAprilTagDirection_ = 0;
+        finalRotationTurnSpeedFactor_ = 0D;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions getDefaultInstanceForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions build() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions buildPartial() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions result = new org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions result) {
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.metersPerSecond_ = metersPerSecond_;
+          to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.finalRotationDegrees_ = finalRotationDegrees_;
+          to_bitField0_ |= 0x00000002;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.accelerationMetersPerSecond_ = accelerationMetersPerSecond_;
+          to_bitField0_ |= 0x00000004;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.faceNearestReefAprilTag_ = faceNearestReefAprilTag_;
+          to_bitField0_ |= 0x00000008;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.faceNearestReefAprilTagPathThresholdPercentage_ = faceNearestReefAprilTagPathThresholdPercentage_;
+          to_bitField0_ |= 0x00000010;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.faceNearestReefAprilTagDirection_ = faceNearestReefAprilTagDirection_;
+          to_bitField0_ |= 0x00000020;
+        }
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.finalRotationTurnSpeedFactor_ = finalRotationTurnSpeedFactor_;
+          to_bitField0_ |= 0x00000040;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions) {
+          return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions other) {
+        if (other == org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance()) return this;
+        if (other.hasMetersPerSecond()) {
+          setMetersPerSecond(other.getMetersPerSecond());
+        }
+        if (other.hasFinalRotationDegrees()) {
+          setFinalRotationDegrees(other.getFinalRotationDegrees());
+        }
+        if (other.hasAccelerationMetersPerSecond()) {
+          setAccelerationMetersPerSecond(other.getAccelerationMetersPerSecond());
+        }
+        if (other.hasFaceNearestReefAprilTag()) {
+          setFaceNearestReefAprilTag(other.getFaceNearestReefAprilTag());
+        }
+        if (other.hasFaceNearestReefAprilTagPathThresholdPercentage()) {
+          setFaceNearestReefAprilTagPathThresholdPercentage(other.getFaceNearestReefAprilTagPathThresholdPercentage());
+        }
+        if (other.hasFaceNearestReefAprilTagDirection()) {
+          setFaceNearestReefAprilTagDirection(other.getFaceNearestReefAprilTagDirection());
+        }
+        if (other.hasFinalRotationTurnSpeedFactor()) {
+          setFinalRotationTurnSpeedFactor(other.getFinalRotationTurnSpeedFactor());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 9: {
+                metersPerSecond_ = input.readDouble();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 9
+              case 17: {
+                finalRotationDegrees_ = input.readDouble();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 17
+              case 25: {
+                accelerationMetersPerSecond_ = input.readDouble();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 25
+              case 32: {
+                faceNearestReefAprilTag_ = input.readBool();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              case 41: {
+                faceNearestReefAprilTagPathThresholdPercentage_ = input.readDouble();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 41
+              case 48: {
+                faceNearestReefAprilTagDirection_ = input.readEnum();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 48
+              case 57: {
+                finalRotationTurnSpeedFactor_ = input.readDouble();
+                bitField0_ |= 0x00000040;
+                break;
+              } // case 57
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private double metersPerSecond_ ;
+      /**
+       * <code>optional double metersPerSecond = 1;</code>
+       * @return Whether the metersPerSecond field is set.
+       */
+      @java.lang.Override
+      public boolean hasMetersPerSecond() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>optional double metersPerSecond = 1;</code>
+       * @return The metersPerSecond.
+       */
+      @java.lang.Override
+      public double getMetersPerSecond() {
+        return metersPerSecond_;
+      }
+      /**
+       * <code>optional double metersPerSecond = 1;</code>
+       * @param value The metersPerSecond to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMetersPerSecond(double value) {
+
+        metersPerSecond_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double metersPerSecond = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMetersPerSecond() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        metersPerSecond_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double finalRotationDegrees_ ;
+      /**
+       * <code>optional double finalRotationDegrees = 2;</code>
+       * @return Whether the finalRotationDegrees field is set.
+       */
+      @java.lang.Override
+      public boolean hasFinalRotationDegrees() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>optional double finalRotationDegrees = 2;</code>
+       * @return The finalRotationDegrees.
+       */
+      @java.lang.Override
+      public double getFinalRotationDegrees() {
+        return finalRotationDegrees_;
+      }
+      /**
+       * <code>optional double finalRotationDegrees = 2;</code>
+       * @param value The finalRotationDegrees to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFinalRotationDegrees(double value) {
+
+        finalRotationDegrees_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double finalRotationDegrees = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFinalRotationDegrees() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        finalRotationDegrees_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double accelerationMetersPerSecond_ ;
+      /**
+       * <code>optional double accelerationMetersPerSecond = 3;</code>
+       * @return Whether the accelerationMetersPerSecond field is set.
+       */
+      @java.lang.Override
+      public boolean hasAccelerationMetersPerSecond() {
+        return ((bitField0_ & 0x00000004) != 0);
+      }
+      /**
+       * <code>optional double accelerationMetersPerSecond = 3;</code>
+       * @return The accelerationMetersPerSecond.
+       */
+      @java.lang.Override
+      public double getAccelerationMetersPerSecond() {
+        return accelerationMetersPerSecond_;
+      }
+      /**
+       * <code>optional double accelerationMetersPerSecond = 3;</code>
+       * @param value The accelerationMetersPerSecond to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAccelerationMetersPerSecond(double value) {
+
+        accelerationMetersPerSecond_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double accelerationMetersPerSecond = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAccelerationMetersPerSecond() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        accelerationMetersPerSecond_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private boolean faceNearestReefAprilTag_ ;
+      /**
+       * <code>optional bool faceNearestReefAprilTag = 4;</code>
+       * @return Whether the faceNearestReefAprilTag field is set.
+       */
+      @java.lang.Override
+      public boolean hasFaceNearestReefAprilTag() {
+        return ((bitField0_ & 0x00000008) != 0);
+      }
+      /**
+       * <code>optional bool faceNearestReefAprilTag = 4;</code>
+       * @return The faceNearestReefAprilTag.
+       */
+      @java.lang.Override
+      public boolean getFaceNearestReefAprilTag() {
+        return faceNearestReefAprilTag_;
+      }
+      /**
+       * <code>optional bool faceNearestReefAprilTag = 4;</code>
+       * @param value The faceNearestReefAprilTag to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFaceNearestReefAprilTag(boolean value) {
+
+        faceNearestReefAprilTag_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool faceNearestReefAprilTag = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFaceNearestReefAprilTag() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        faceNearestReefAprilTag_ = false;
+        onChanged();
+        return this;
+      }
+
+      private double faceNearestReefAprilTagPathThresholdPercentage_ ;
+      /**
+       * <code>optional double faceNearestReefAprilTagPathThresholdPercentage = 5;</code>
+       * @return Whether the faceNearestReefAprilTagPathThresholdPercentage field is set.
+       */
+      @java.lang.Override
+      public boolean hasFaceNearestReefAprilTagPathThresholdPercentage() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <code>optional double faceNearestReefAprilTagPathThresholdPercentage = 5;</code>
+       * @return The faceNearestReefAprilTagPathThresholdPercentage.
+       */
+      @java.lang.Override
+      public double getFaceNearestReefAprilTagPathThresholdPercentage() {
+        return faceNearestReefAprilTagPathThresholdPercentage_;
+      }
+      /**
+       * <code>optional double faceNearestReefAprilTagPathThresholdPercentage = 5;</code>
+       * @param value The faceNearestReefAprilTagPathThresholdPercentage to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFaceNearestReefAprilTagPathThresholdPercentage(double value) {
+
+        faceNearestReefAprilTagPathThresholdPercentage_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double faceNearestReefAprilTagPathThresholdPercentage = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFaceNearestReefAprilTagPathThresholdPercentage() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        faceNearestReefAprilTagPathThresholdPercentage_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private int faceNearestReefAprilTagDirection_ = 0;
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+       * @return Whether the faceNearestReefAprilTagDirection field is set.
+       */
+      @java.lang.Override public boolean hasFaceNearestReefAprilTagDirection() {
+        return ((bitField0_ & 0x00000020) != 0);
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+       * @return The enum numeric value on the wire for faceNearestReefAprilTagDirection.
+       */
+      @java.lang.Override public int getFaceNearestReefAprilTagDirectionValue() {
+        return faceNearestReefAprilTagDirection_;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+       * @param value The enum numeric value on the wire for faceNearestReefAprilTagDirection to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFaceNearestReefAprilTagDirectionValue(int value) {
+        faceNearestReefAprilTagDirection_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+       * @return The faceNearestReefAprilTagDirection.
+       */
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection getFaceNearestReefAprilTagDirection() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection result = org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection.forNumber(faceNearestReefAprilTagDirection_);
+        return result == null ? org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+       * @param value The faceNearestReefAprilTagDirection to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFaceNearestReefAprilTagDirection(org.kobe.xbot.Utilities.Entities.XTableValues.RobotDirection value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000020;
+        faceNearestReefAprilTagDirection_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.RobotDirection faceNearestReefAprilTagDirection = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFaceNearestReefAprilTagDirection() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        faceNearestReefAprilTagDirection_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private double finalRotationTurnSpeedFactor_ ;
+      /**
+       * <code>optional double finalRotationTurnSpeedFactor = 7;</code>
+       * @return Whether the finalRotationTurnSpeedFactor field is set.
+       */
+      @java.lang.Override
+      public boolean hasFinalRotationTurnSpeedFactor() {
+        return ((bitField0_ & 0x00000040) != 0);
+      }
+      /**
+       * <code>optional double finalRotationTurnSpeedFactor = 7;</code>
+       * @return The finalRotationTurnSpeedFactor.
+       */
+      @java.lang.Override
+      public double getFinalRotationTurnSpeedFactor() {
+        return finalRotationTurnSpeedFactor_;
+      }
+      /**
+       * <code>optional double finalRotationTurnSpeedFactor = 7;</code>
+       * @param value The finalRotationTurnSpeedFactor to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFinalRotationTurnSpeedFactor(double value) {
+
+        finalRotationTurnSpeedFactor_ = value;
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double finalRotationTurnSpeedFactor = 7;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFinalRotationTurnSpeedFactor() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        finalRotationTurnSpeedFactor_ = 0D;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.TraversalOptions)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.TraversalOptions)
+    private static final org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions();
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<TraversalOptions>
+        PARSER = new com.google.protobuf.AbstractParser<TraversalOptions>() {
+      @java.lang.Override
+      public TraversalOptions parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<TraversalOptions> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TraversalOptions> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface BezierCurvesOrBuilder extends
       // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.BezierCurves)
       com.google.protobuf.MessageOrBuilder {
@@ -2712,38 +3962,19 @@ public final class XTableValues {
         int index);
 
     /**
-     * <code>bool pathFound = 2;</code>
-     * @return The pathFound.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+     * @return Whether the options field is set.
      */
-    boolean getPathFound();
-
+    boolean hasOptions();
     /**
-     * <code>optional double metersPerSecond = 3;</code>
-     * @return Whether the metersPerSecond field is set.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+     * @return The options.
      */
-    boolean hasMetersPerSecond();
+    org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions getOptions();
     /**
-     * <code>optional double metersPerSecond = 3;</code>
-     * @return The metersPerSecond.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
      */
-    double getMetersPerSecond();
-
-    /**
-     * <code>double finalRotationDegrees = 4;</code>
-     * @return The finalRotationDegrees.
-     */
-    double getFinalRotationDegrees();
-
-    /**
-     * <code>optional double accelerationMetersPerSecond = 5;</code>
-     * @return Whether the accelerationMetersPerSecond field is set.
-     */
-    boolean hasAccelerationMetersPerSecond();
-    /**
-     * <code>optional double accelerationMetersPerSecond = 5;</code>
-     * @return The accelerationMetersPerSecond.
-     */
-    double getAccelerationMetersPerSecond();
+    org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder getOptionsOrBuilder();
   }
   /**
    * Protobuf type {@code org.kobe.xbot.Utilities.Entities.BezierCurves}
@@ -2823,64 +4054,30 @@ public final class XTableValues {
       return curves_.get(index);
     }
 
-    public static final int PATHFOUND_FIELD_NUMBER = 2;
-    private boolean pathFound_ = false;
+    public static final int OPTIONS_FIELD_NUMBER = 2;
+    private org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions options_;
     /**
-     * <code>bool pathFound = 2;</code>
-     * @return The pathFound.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+     * @return Whether the options field is set.
      */
     @java.lang.Override
-    public boolean getPathFound() {
-      return pathFound_;
-    }
-
-    public static final int METERSPERSECOND_FIELD_NUMBER = 3;
-    private double metersPerSecond_ = 0D;
-    /**
-     * <code>optional double metersPerSecond = 3;</code>
-     * @return Whether the metersPerSecond field is set.
-     */
-    @java.lang.Override
-    public boolean hasMetersPerSecond() {
+    public boolean hasOptions() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>optional double metersPerSecond = 3;</code>
-     * @return The metersPerSecond.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+     * @return The options.
      */
     @java.lang.Override
-    public double getMetersPerSecond() {
-      return metersPerSecond_;
-    }
-
-    public static final int FINALROTATIONDEGREES_FIELD_NUMBER = 4;
-    private double finalRotationDegrees_ = 0D;
-    /**
-     * <code>double finalRotationDegrees = 4;</code>
-     * @return The finalRotationDegrees.
-     */
-    @java.lang.Override
-    public double getFinalRotationDegrees() {
-      return finalRotationDegrees_;
-    }
-
-    public static final int ACCELERATIONMETERSPERSECOND_FIELD_NUMBER = 5;
-    private double accelerationMetersPerSecond_ = 0D;
-    /**
-     * <code>optional double accelerationMetersPerSecond = 5;</code>
-     * @return Whether the accelerationMetersPerSecond field is set.
-     */
-    @java.lang.Override
-    public boolean hasAccelerationMetersPerSecond() {
-      return ((bitField0_ & 0x00000002) != 0);
+    public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions getOptions() {
+      return options_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance() : options_;
     }
     /**
-     * <code>optional double accelerationMetersPerSecond = 5;</code>
-     * @return The accelerationMetersPerSecond.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
      */
     @java.lang.Override
-    public double getAccelerationMetersPerSecond() {
-      return accelerationMetersPerSecond_;
+    public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder getOptionsOrBuilder() {
+      return options_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance() : options_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2900,17 +4097,8 @@ public final class XTableValues {
       for (int i = 0; i < curves_.size(); i++) {
         output.writeMessage(1, curves_.get(i));
       }
-      if (pathFound_ != false) {
-        output.writeBool(2, pathFound_);
-      }
       if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeDouble(3, metersPerSecond_);
-      }
-      if (java.lang.Double.doubleToRawLongBits(finalRotationDegrees_) != 0) {
-        output.writeDouble(4, finalRotationDegrees_);
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        output.writeDouble(5, accelerationMetersPerSecond_);
+        output.writeMessage(2, getOptions());
       }
       getUnknownFields().writeTo(output);
     }
@@ -2925,21 +4113,9 @@ public final class XTableValues {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, curves_.get(i));
       }
-      if (pathFound_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(2, pathFound_);
-      }
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(3, metersPerSecond_);
-      }
-      if (java.lang.Double.doubleToRawLongBits(finalRotationDegrees_) != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(4, finalRotationDegrees_);
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(5, accelerationMetersPerSecond_);
+          .computeMessageSize(2, getOptions());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -2958,22 +4134,10 @@ public final class XTableValues {
 
       if (!getCurvesList()
           .equals(other.getCurvesList())) return false;
-      if (getPathFound()
-          != other.getPathFound()) return false;
-      if (hasMetersPerSecond() != other.hasMetersPerSecond()) return false;
-      if (hasMetersPerSecond()) {
-        if (java.lang.Double.doubleToLongBits(getMetersPerSecond())
-            != java.lang.Double.doubleToLongBits(
-                other.getMetersPerSecond())) return false;
-      }
-      if (java.lang.Double.doubleToLongBits(getFinalRotationDegrees())
-          != java.lang.Double.doubleToLongBits(
-              other.getFinalRotationDegrees())) return false;
-      if (hasAccelerationMetersPerSecond() != other.hasAccelerationMetersPerSecond()) return false;
-      if (hasAccelerationMetersPerSecond()) {
-        if (java.lang.Double.doubleToLongBits(getAccelerationMetersPerSecond())
-            != java.lang.Double.doubleToLongBits(
-                other.getAccelerationMetersPerSecond())) return false;
+      if (hasOptions() != other.hasOptions()) return false;
+      if (hasOptions()) {
+        if (!getOptions()
+            .equals(other.getOptions())) return false;
       }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
@@ -2990,21 +4154,9 @@ public final class XTableValues {
         hash = (37 * hash) + CURVES_FIELD_NUMBER;
         hash = (53 * hash) + getCurvesList().hashCode();
       }
-      hash = (37 * hash) + PATHFOUND_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getPathFound());
-      if (hasMetersPerSecond()) {
-        hash = (37 * hash) + METERSPERSECOND_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-            java.lang.Double.doubleToLongBits(getMetersPerSecond()));
-      }
-      hash = (37 * hash) + FINALROTATIONDEGREES_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          java.lang.Double.doubleToLongBits(getFinalRotationDegrees()));
-      if (hasAccelerationMetersPerSecond()) {
-        hash = (37 * hash) + ACCELERATIONMETERSPERSECOND_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-            java.lang.Double.doubleToLongBits(getAccelerationMetersPerSecond()));
+      if (hasOptions()) {
+        hash = (37 * hash) + OPTIONS_FIELD_NUMBER;
+        hash = (53 * hash) + getOptions().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -3125,13 +4277,20 @@ public final class XTableValues {
 
       // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurves.newBuilder()
       private Builder() {
-
+        maybeForceBuilderInitialization();
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getCurvesFieldBuilder();
+          getOptionsFieldBuilder();
+        }
       }
       @java.lang.Override
       public Builder clear() {
@@ -3144,10 +4303,11 @@ public final class XTableValues {
           curvesBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
-        pathFound_ = false;
-        metersPerSecond_ = 0D;
-        finalRotationDegrees_ = 0D;
-        accelerationMetersPerSecond_ = 0D;
+        options_ = null;
+        if (optionsBuilder_ != null) {
+          optionsBuilder_.dispose();
+          optionsBuilder_ = null;
+        }
         return this;
       }
 
@@ -3194,20 +4354,12 @@ public final class XTableValues {
 
       private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurves result) {
         int from_bitField0_ = bitField0_;
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.pathFound_ = pathFound_;
-        }
         int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.metersPerSecond_ = metersPerSecond_;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.options_ = optionsBuilder_ == null
+              ? options_
+              : optionsBuilder_.build();
           to_bitField0_ |= 0x00000001;
-        }
-        if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.finalRotationDegrees_ = finalRotationDegrees_;
-        }
-        if (((from_bitField0_ & 0x00000010) != 0)) {
-          result.accelerationMetersPerSecond_ = accelerationMetersPerSecond_;
-          to_bitField0_ |= 0x00000002;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -3282,17 +4434,8 @@ public final class XTableValues {
             }
           }
         }
-        if (other.getPathFound() != false) {
-          setPathFound(other.getPathFound());
-        }
-        if (other.hasMetersPerSecond()) {
-          setMetersPerSecond(other.getMetersPerSecond());
-        }
-        if (other.getFinalRotationDegrees() != 0D) {
-          setFinalRotationDegrees(other.getFinalRotationDegrees());
-        }
-        if (other.hasAccelerationMetersPerSecond()) {
-          setAccelerationMetersPerSecond(other.getAccelerationMetersPerSecond());
+        if (other.hasOptions()) {
+          mergeOptions(other.getOptions());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -3333,26 +4476,13 @@ public final class XTableValues {
                 }
                 break;
               } // case 10
-              case 16: {
-                pathFound_ = input.readBool();
+              case 18: {
+                input.readMessage(
+                    getOptionsFieldBuilder().getBuilder(),
+                    extensionRegistry);
                 bitField0_ |= 0x00000002;
                 break;
-              } // case 16
-              case 25: {
-                metersPerSecond_ = input.readDouble();
-                bitField0_ |= 0x00000004;
-                break;
-              } // case 25
-              case 33: {
-                finalRotationDegrees_ = input.readDouble();
-                bitField0_ |= 0x00000008;
-                break;
-              } // case 33
-              case 41: {
-                accelerationMetersPerSecond_ = input.readDouble();
-                bitField0_ |= 0x00000010;
-                break;
-              } // case 41
+              } // case 18
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -3610,148 +4740,125 @@ public final class XTableValues {
         return curvesBuilder_;
       }
 
-      private boolean pathFound_ ;
+      private org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions options_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions, org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder> optionsBuilder_;
       /**
-       * <code>bool pathFound = 2;</code>
-       * @return The pathFound.
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+       * @return Whether the options field is set.
        */
-      @java.lang.Override
-      public boolean getPathFound() {
-        return pathFound_;
+      public boolean hasOptions() {
+        return ((bitField0_ & 0x00000002) != 0);
       }
       /**
-       * <code>bool pathFound = 2;</code>
-       * @param value The pathFound to set.
-       * @return This builder for chaining.
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+       * @return The options.
        */
-      public Builder setPathFound(boolean value) {
-
-        pathFound_ = value;
+      public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions getOptions() {
+        if (optionsBuilder_ == null) {
+          return options_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance() : options_;
+        } else {
+          return optionsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+       */
+      public Builder setOptions(org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions value) {
+        if (optionsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          options_ = value;
+        } else {
+          optionsBuilder_.setMessage(value);
+        }
         bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
       /**
-       * <code>bool pathFound = 2;</code>
-       * @return This builder for chaining.
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
        */
-      public Builder clearPathFound() {
+      public Builder setOptions(
+          org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.Builder builderForValue) {
+        if (optionsBuilder_ == null) {
+          options_ = builderForValue.build();
+        } else {
+          optionsBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+       */
+      public Builder mergeOptions(org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions value) {
+        if (optionsBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+            options_ != null &&
+            options_ != org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance()) {
+            getOptionsBuilder().mergeFrom(value);
+          } else {
+            options_ = value;
+          }
+        } else {
+          optionsBuilder_.mergeFrom(value);
+        }
+        if (options_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
+       */
+      public Builder clearOptions() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        pathFound_ = false;
-        onChanged();
-        return this;
-      }
-
-      private double metersPerSecond_ ;
-      /**
-       * <code>optional double metersPerSecond = 3;</code>
-       * @return Whether the metersPerSecond field is set.
-       */
-      @java.lang.Override
-      public boolean hasMetersPerSecond() {
-        return ((bitField0_ & 0x00000004) != 0);
-      }
-      /**
-       * <code>optional double metersPerSecond = 3;</code>
-       * @return The metersPerSecond.
-       */
-      @java.lang.Override
-      public double getMetersPerSecond() {
-        return metersPerSecond_;
-      }
-      /**
-       * <code>optional double metersPerSecond = 3;</code>
-       * @param value The metersPerSecond to set.
-       * @return This builder for chaining.
-       */
-      public Builder setMetersPerSecond(double value) {
-
-        metersPerSecond_ = value;
-        bitField0_ |= 0x00000004;
+        options_ = null;
+        if (optionsBuilder_ != null) {
+          optionsBuilder_.dispose();
+          optionsBuilder_ = null;
+        }
         onChanged();
         return this;
       }
       /**
-       * <code>optional double metersPerSecond = 3;</code>
-       * @return This builder for chaining.
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
        */
-      public Builder clearMetersPerSecond() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        metersPerSecond_ = 0D;
+      public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.Builder getOptionsBuilder() {
+        bitField0_ |= 0x00000002;
         onChanged();
-        return this;
-      }
-
-      private double finalRotationDegrees_ ;
-      /**
-       * <code>double finalRotationDegrees = 4;</code>
-       * @return The finalRotationDegrees.
-       */
-      @java.lang.Override
-      public double getFinalRotationDegrees() {
-        return finalRotationDegrees_;
+        return getOptionsFieldBuilder().getBuilder();
       }
       /**
-       * <code>double finalRotationDegrees = 4;</code>
-       * @param value The finalRotationDegrees to set.
-       * @return This builder for chaining.
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
        */
-      public Builder setFinalRotationDegrees(double value) {
-
-        finalRotationDegrees_ = value;
-        bitField0_ |= 0x00000008;
-        onChanged();
-        return this;
+      public org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder getOptionsOrBuilder() {
+        if (optionsBuilder_ != null) {
+          return optionsBuilder_.getMessageOrBuilder();
+        } else {
+          return options_ == null ?
+              org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance() : options_;
+        }
       }
       /**
-       * <code>double finalRotationDegrees = 4;</code>
-       * @return This builder for chaining.
+       * <code>optional .org.kobe.xbot.Utilities.Entities.TraversalOptions options = 2;</code>
        */
-      public Builder clearFinalRotationDegrees() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        finalRotationDegrees_ = 0D;
-        onChanged();
-        return this;
-      }
-
-      private double accelerationMetersPerSecond_ ;
-      /**
-       * <code>optional double accelerationMetersPerSecond = 5;</code>
-       * @return Whether the accelerationMetersPerSecond field is set.
-       */
-      @java.lang.Override
-      public boolean hasAccelerationMetersPerSecond() {
-        return ((bitField0_ & 0x00000010) != 0);
-      }
-      /**
-       * <code>optional double accelerationMetersPerSecond = 5;</code>
-       * @return The accelerationMetersPerSecond.
-       */
-      @java.lang.Override
-      public double getAccelerationMetersPerSecond() {
-        return accelerationMetersPerSecond_;
-      }
-      /**
-       * <code>optional double accelerationMetersPerSecond = 5;</code>
-       * @param value The accelerationMetersPerSecond to set.
-       * @return This builder for chaining.
-       */
-      public Builder setAccelerationMetersPerSecond(double value) {
-
-        accelerationMetersPerSecond_ = value;
-        bitField0_ |= 0x00000010;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional double accelerationMetersPerSecond = 5;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearAccelerationMetersPerSecond() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        accelerationMetersPerSecond_ = 0D;
-        onChanged();
-        return this;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions, org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder> 
+          getOptionsFieldBuilder() {
+        if (optionsBuilder_ == null) {
+          optionsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions, org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder>(
+                  getOptions(),
+                  getParentForChildren(),
+                  isClean());
+          options_ = null;
+        }
+        return optionsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -8023,6 +9130,11 @@ public final class XTableValues {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_org_kobe_xbot_Utilities_Entities_BezierCurve_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -8078,18 +9190,32 @@ public final class XTableValues {
       "es.Entities.Coordinate\"$\n\014ControlPoint\022\t" +
       "\n\001x\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\"T\n\013BezierCurve\022E\n\rc" +
       "ontrolPoints\030\001 \003(\0132..org.kobe.xbot.Utili" +
-      "ties.Entities.ControlPoint\"\372\001\n\014BezierCur" +
-      "ves\022=\n\006curves\030\001 \003(\0132-.org.kobe.xbot.Util" +
-      "ities.Entities.BezierCurve\022\021\n\tpathFound\030" +
-      "\002 \001(\010\022\034\n\017metersPerSecond\030\003 \001(\001H\000\210\001\001\022\034\n\024f" +
-      "inalRotationDegrees\030\004 \001(\001\022(\n\033acceleratio" +
-      "nMetersPerSecond\030\005 \001(\001H\001\210\001\001B\022\n\020_metersPe" +
-      "rSecondB\036\n\034_accelerationMetersPerSecond\"" +
-      "\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027\n\nStringList\022\t" +
-      "\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t\n\001v\030\001 \003(\005\"\026\n\tB" +
-      "ytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010LongList\022\t\n\001v\030\001 \003" +
-      "(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolList\022\t" +
-      "\n\001v\030\001 \003(\010b\006proto3"
+      "ties.Entities.ControlPoint\"\316\004\n\020Traversal" +
+      "Options\022\034\n\017metersPerSecond\030\001 \001(\001H\000\210\001\001\022!\n" +
+      "\024finalRotationDegrees\030\002 \001(\001H\001\210\001\001\022(\n\033acce" +
+      "lerationMetersPerSecond\030\003 \001(\001H\002\210\001\001\022$\n\027fa" +
+      "ceNearestReefAprilTag\030\004 \001(\010H\003\210\001\001\022;\n.face" +
+      "NearestReefAprilTagPathThresholdPercenta" +
+      "ge\030\005 \001(\001H\004\210\001\001\022_\n faceNearestReefAprilTag" +
+      "Direction\030\006 \001(\01620.org.kobe.xbot.Utilitie" +
+      "s.Entities.RobotDirectionH\005\210\001\001\022)\n\034finalR" +
+      "otationTurnSpeedFactor\030\007 \001(\001H\006\210\001\001B\022\n\020_me" +
+      "tersPerSecondB\027\n\025_finalRotationDegreesB\036" +
+      "\n\034_accelerationMetersPerSecondB\032\n\030_faceN" +
+      "earestReefAprilTagB1\n/_faceNearestReefAp" +
+      "rilTagPathThresholdPercentageB#\n!_faceNe" +
+      "arestReefAprilTagDirectionB\037\n\035_finalRota" +
+      "tionTurnSpeedFactor\"\243\001\n\014BezierCurves\022=\n\006" +
+      "curves\030\001 \003(\0132-.org.kobe.xbot.Utilities.E" +
+      "ntities.BezierCurve\022H\n\007options\030\002 \001(\01322.o" +
+      "rg.kobe.xbot.Utilities.Entities.Traversa" +
+      "lOptionsH\000\210\001\001B\n\n\010_options\"\027\n\nDoubleList\022" +
+      "\t\n\001v\030\001 \003(\001\"\027\n\nStringList\022\t\n\001v\030\001 \003(\t\"\030\n\013I" +
+      "ntegerList\022\t\n\001v\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001v\030" +
+      "\001 \003(\014\"\025\n\010LongList\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatLis" +
+      "t\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010*%\n\016R" +
+      "obotDirection\022\t\n\005FRONT\020\000\022\010\n\004BACK\020\001b\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -8119,50 +9245,56 @@ public final class XTableValues {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurve_descriptor,
         new java.lang.String[] { "ControlPoints", });
-    internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor =
+    internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor =
       getDescriptor().getMessageTypes().get(4);
+    internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor,
+        new java.lang.String[] { "MetersPerSecond", "FinalRotationDegrees", "AccelerationMetersPerSecond", "FaceNearestReefAprilTag", "FaceNearestReefAprilTagPathThresholdPercentage", "FaceNearestReefAprilTagDirection", "FinalRotationTurnSpeedFactor", });
+    internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor =
+      getDescriptor().getMessageTypes().get(5);
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor,
-        new java.lang.String[] { "Curves", "PathFound", "MetersPerSecond", "FinalRotationDegrees", "AccelerationMetersPerSecond", });
+        new java.lang.String[] { "Curves", "Options", });
     internal_static_org_kobe_xbot_Utilities_Entities_DoubleList_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_org_kobe_xbot_Utilities_Entities_DoubleList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_DoubleList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_StringList_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_org_kobe_xbot_Utilities_Entities_StringList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_StringList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_IntegerList_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_org_kobe_xbot_Utilities_Entities_IntegerList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_IntegerList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_BytesList_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_org_kobe_xbot_Utilities_Entities_BytesList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BytesList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_LongList_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_org_kobe_xbot_Utilities_Entities_LongList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_LongList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_FloatList_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_org_kobe_xbot_Utilities_Entities_FloatList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_FloatList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_BoolList_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_org_kobe_xbot_Utilities_Entities_BoolList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BoolList_descriptor,
