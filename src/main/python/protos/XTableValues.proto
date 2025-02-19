@@ -10,6 +10,33 @@ message CoordinateList {
   repeated Coordinate coordinates = 1;
 }
 
+message ControlPoint {
+  double x = 1;
+  double y = 2;
+}
+
+message BezierCurve {
+  repeated ControlPoint controlPoints = 1;
+}
+
+enum RobotDirection {
+  FRONT = 0;
+  BACK = 1;
+}
+
+message TraversalOptions {
+  optional double metersPerSecond = 1;
+  optional double finalRotationDegrees = 2;
+  optional double accelerationMetersPerSecond = 3;
+  optional bool faceNearestReefAprilTag = 4;
+  optional double faceNearestReefAprilTagPathThresholdPercentage = 5;
+  optional RobotDirection faceNearestReefAprilTagDirection = 6;
+  optional double finalRotationTurnSpeedFactor = 7;
+}
+message BezierCurves {
+  repeated BezierCurve curves = 1;
+  optional TraversalOptions options = 2;
+}
 
 
 message DoubleList {
