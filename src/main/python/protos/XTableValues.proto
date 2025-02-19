@@ -13,6 +13,7 @@ message CoordinateList {
 message ControlPoint {
   double x = 1;
   double y = 2;
+  optional double rotationDegrees = 3;
 }
 
 message BezierCurve {
@@ -22,6 +23,15 @@ message BezierCurve {
 enum RobotDirection {
   FRONT = 0;
   BACK = 1;
+}
+service VisionCoprocessor {
+  rpc RequestBezierPathWithOptions (RequestVisionCoprocessorMessage) returns (BezierCurves);
+}
+
+message RequestVisionCoprocessorMessage {
+  ControlPoint start = 1;
+  ControlPoint end = 2;
+  TraversalOptions options = 3;
 }
 
 message TraversalOptions {
