@@ -14,15 +14,15 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19protos/XTableValues.proto\x12 org.kobe.xbot.Utilities.Entities\"\"\n\nCoordinate\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"S\n\x0e\x43oordinateList\x12\x41\n\x0b\x63oordinates\x18\x01 \x03(\x0b\x32,.org.kobe.xbot.Utilities.Entities.Coordinate\"$\n\x0c\x43ontrolPoint\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"T\n\x0b\x42\x65zierCurve\x12\x45\n\rcontrolPoints\x18\x01 \x03(\x0b\x32..org.kobe.xbot.Utilities.Entities.ControlPoint\"\xce\x04\n\x10TraversalOptions\x12\x1c\n\x0fmetersPerSecond\x18\x01 \x01(\x01H\x00\x88\x01\x01\x12!\n\x14\x66inalRotationDegrees\x18\x02 \x01(\x01H\x01\x88\x01\x01\x12(\n\x1b\x61\x63\x63\x65lerationMetersPerSecond\x18\x03 \x01(\x01H\x02\x88\x01\x01\x12$\n\x17\x66\x61\x63\x65NearestReefAprilTag\x18\x04 \x01(\x08H\x03\x88\x01\x01\x12;\n.faceNearestReefAprilTagPathThresholdPercentage\x18\x05 \x01(\x01H\x04\x88\x01\x01\x12_\n faceNearestReefAprilTagDirection\x18\x06 \x01(\x0e\x32\x30.org.kobe.xbot.Utilities.Entities.RobotDirectionH\x05\x88\x01\x01\x12)\n\x1c\x66inalRotationTurnSpeedFactor\x18\x07 \x01(\x01H\x06\x88\x01\x01\x42\x12\n\x10_metersPerSecondB\x17\n\x15_finalRotationDegreesB\x1e\n\x1c_accelerationMetersPerSecondB\x1a\n\x18_faceNearestReefAprilTagB1\n/_faceNearestReefAprilTagPathThresholdPercentageB#\n!_faceNearestReefAprilTagDirectionB\x1f\n\x1d_finalRotationTurnSpeedFactor\"\xa3\x01\n\x0c\x42\x65zierCurves\x12=\n\x06\x63urves\x18\x01 \x03(\x0b\x32-.org.kobe.xbot.Utilities.Entities.BezierCurve\x12H\n\x07options\x18\x02 \x01(\x0b\x32\x32.org.kobe.xbot.Utilities.Entities.TraversalOptionsH\x00\x88\x01\x01\x42\n\n\x08_options\"\x17\n\nDoubleList\x12\t\n\x01v\x18\x01 \x03(\x01\"\x17\n\nStringList\x12\t\n\x01v\x18\x01 \x03(\t\"\x18\n\x0bIntegerList\x12\t\n\x01v\x18\x01 \x03(\x05\"\x16\n\tBytesList\x12\t\n\x01v\x18\x01 \x03(\x0c\"\x15\n\x08LongList\x12\t\n\x01v\x18\x01 \x03(\x03\"\x16\n\tFloatList\x12\t\n\x01v\x18\x01 \x03(\x02\"\x15\n\x08\x42oolList\x12\t\n\x01v\x18\x01 \x03(\x08*%\n\x0eRobotDirection\x12\t\n\x05\x46RONT\x10\x00\x12\x08\n\x04\x42\x41\x43K\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19protos/XTableValues.proto\x12 org.kobe.xbot.Utilities.Entities\"\"\n\nCoordinate\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"S\n\x0e\x43oordinateList\x12\x41\n\x0b\x63oordinates\x18\x01 \x03(\x0b\x32,.org.kobe.xbot.Utilities.Entities.Coordinate\"$\n\x0c\x43ontrolPoint\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"T\n\x0b\x42\x65zierCurve\x12\x45\n\rcontrolPoints\x18\x01 \x03(\x0b\x32..org.kobe.xbot.Utilities.Entities.ControlPoint\"\xe2\x06\n\x10TraversalOptions\x12\x1c\n\x0fmetersPerSecond\x18\x01 \x01(\x01H\x00\x88\x01\x01\x12!\n\x14\x66inalRotationDegrees\x18\x02 \x01(\x01H\x01\x88\x01\x01\x12(\n\x1b\x61\x63\x63\x65lerationMetersPerSecond\x18\x03 \x01(\x01H\x02\x88\x01\x01\x12$\n\x17\x66\x61\x63\x65NearestReefAprilTag\x18\x04 \x01(\x08H\x03\x88\x01\x01\x12;\n.faceNearestReefAprilTagPathThresholdPercentage\x18\x05 \x01(\x01H\x04\x88\x01\x01\x12_\n faceNearestReefAprilTagDirection\x18\x06 \x01(\x0e\x32\x30.org.kobe.xbot.Utilities.Entities.RobotDirectionH\x05\x88\x01\x01\x12)\n\x1c\x66inalRotationTurnSpeedFactor\x18\x07 \x01(\x01H\x06\x88\x01\x01\x12\x35\n(startAprilTagLockPathThresholdPercentage\x18\x08 \x01(\x08H\x07\x88\x01\x01\x12\"\n\x15snapToNearestAprilTag\x18\t \x01(\x08H\x08\x88\x01\x01\x12<\n/aprilTagRotationDegreesTurnSpeedFactorPerSecond\x18\n \x01(\x01H\t\x88\x01\x01\x42\x12\n\x10_metersPerSecondB\x17\n\x15_finalRotationDegreesB\x1e\n\x1c_accelerationMetersPerSecondB\x1a\n\x18_faceNearestReefAprilTagB1\n/_faceNearestReefAprilTagPathThresholdPercentageB#\n!_faceNearestReefAprilTagDirectionB\x1f\n\x1d_finalRotationTurnSpeedFactorB+\n)_startAprilTagLockPathThresholdPercentageB\x18\n\x16_snapToNearestAprilTagB2\n0_aprilTagRotationDegreesTurnSpeedFactorPerSecond\"\xa3\x01\n\x0c\x42\x65zierCurves\x12=\n\x06\x63urves\x18\x01 \x03(\x0b\x32-.org.kobe.xbot.Utilities.Entities.BezierCurve\x12H\n\x07options\x18\x02 \x01(\x0b\x32\x32.org.kobe.xbot.Utilities.Entities.TraversalOptionsH\x00\x88\x01\x01\x42\n\n\x08_options\"\x17\n\nDoubleList\x12\t\n\x01v\x18\x01 \x03(\x01\"\x17\n\nStringList\x12\t\n\x01v\x18\x01 \x03(\t\"\x18\n\x0bIntegerList\x12\t\n\x01v\x18\x01 \x03(\x05\"\x16\n\tBytesList\x12\t\n\x01v\x18\x01 \x03(\x0c\"\x15\n\x08LongList\x12\t\n\x01v\x18\x01 \x03(\x03\"\x16\n\tFloatList\x12\t\n\x01v\x18\x01 \x03(\x02\"\x15\n\x08\x42oolList\x12\t\n\x01v\x18\x01 \x03(\x08*%\n\x0eRobotDirection\x12\t\n\x05\x46RONT\x10\x00\x12\x08\n\x04\x42\x41\x43K\x10\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'protos.XTableValues_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_ROBOTDIRECTION']._serialized_start=1237
-  _globals['_ROBOTDIRECTION']._serialized_end=1274
+  _globals['_ROBOTDIRECTION']._serialized_start=1513
+  _globals['_ROBOTDIRECTION']._serialized_end=1550
   _globals['_COORDINATE']._serialized_start=63
   _globals['_COORDINATE']._serialized_end=97
   _globals['_COORDINATELIST']._serialized_start=99
@@ -32,21 +32,21 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_BEZIERCURVE']._serialized_start=222
   _globals['_BEZIERCURVE']._serialized_end=306
   _globals['_TRAVERSALOPTIONS']._serialized_start=309
-  _globals['_TRAVERSALOPTIONS']._serialized_end=899
-  _globals['_BEZIERCURVES']._serialized_start=902
-  _globals['_BEZIERCURVES']._serialized_end=1065
-  _globals['_DOUBLELIST']._serialized_start=1067
-  _globals['_DOUBLELIST']._serialized_end=1090
-  _globals['_STRINGLIST']._serialized_start=1092
-  _globals['_STRINGLIST']._serialized_end=1115
-  _globals['_INTEGERLIST']._serialized_start=1117
-  _globals['_INTEGERLIST']._serialized_end=1141
-  _globals['_BYTESLIST']._serialized_start=1143
-  _globals['_BYTESLIST']._serialized_end=1165
-  _globals['_LONGLIST']._serialized_start=1167
-  _globals['_LONGLIST']._serialized_end=1188
-  _globals['_FLOATLIST']._serialized_start=1190
-  _globals['_FLOATLIST']._serialized_end=1212
-  _globals['_BOOLLIST']._serialized_start=1214
-  _globals['_BOOLLIST']._serialized_end=1235
+  _globals['_TRAVERSALOPTIONS']._serialized_end=1175
+  _globals['_BEZIERCURVES']._serialized_start=1178
+  _globals['_BEZIERCURVES']._serialized_end=1341
+  _globals['_DOUBLELIST']._serialized_start=1343
+  _globals['_DOUBLELIST']._serialized_end=1366
+  _globals['_STRINGLIST']._serialized_start=1368
+  _globals['_STRINGLIST']._serialized_end=1391
+  _globals['_INTEGERLIST']._serialized_start=1393
+  _globals['_INTEGERLIST']._serialized_end=1417
+  _globals['_BYTESLIST']._serialized_start=1419
+  _globals['_BYTESLIST']._serialized_end=1441
+  _globals['_LONGLIST']._serialized_start=1443
+  _globals['_LONGLIST']._serialized_end=1464
+  _globals['_FLOATLIST']._serialized_start=1466
+  _globals['_FLOATLIST']._serialized_end=1488
+  _globals['_BOOLLIST']._serialized_start=1490
+  _globals['_BOOLLIST']._serialized_end=1511
 # @@protoc_insertion_point(module_scope)

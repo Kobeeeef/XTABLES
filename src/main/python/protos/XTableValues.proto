@@ -32,6 +32,9 @@ message TraversalOptions {
   optional double faceNearestReefAprilTagPathThresholdPercentage = 5;
   optional RobotDirection faceNearestReefAprilTagDirection = 6;
   optional double finalRotationTurnSpeedFactor = 7;
+  optional bool startAprilTagLockPathThresholdPercentage = 8;
+  optional bool snapToNearestAprilTag = 9;
+  optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;
 }
 message BezierCurves {
   repeated BezierCurve curves = 1;
