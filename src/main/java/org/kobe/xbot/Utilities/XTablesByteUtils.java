@@ -320,13 +320,14 @@ public class XTablesByteUtils {
 
         XTableValues.ControlPoint start = curves.get(0).getControlPointsList().isEmpty() ? null : curves.get(0).getControlPointsList().get(0);
         XTableValues.ControlPoint goal = curves.get(segmentCount - 1).getControlPointsList().isEmpty() ? null : curves.get(segmentCount - 1).getControlPointsList().get(curves.get(segmentCount - 1).getControlPointsList().size() - 1);
+        XTableValues.TraversalOptions options = bezierCurves.hasOptions() ? bezierCurves.getOptions() : null;
 
         return String.format("BezierCurves(Start: (X: %.2f, Y: %.2f), Goal: (X: %.2f, Y: %.2f), Segments: %d, MPS: %s, Rotation: %.2f)",
                 start != null ? start.getX() : 0, start != null ? start.getY() : 0,
                 goal != null ? goal.getX() : 0, goal != null ? goal.getY() : 0,
                 segmentCount,
-                bezierCurves.getMetersPerSecond(),
-                bezierCurves.getFinalRotationDegrees()
+                options  != null ? options.hasMetersPerSecond() ? options.getMetersPerSecond() : "N/A" : "No Options",
+                options  != null ? options.hasFinalRotationDegrees() ? options.getFinalRotationDegrees() : 0 : 0
         );
     }
 
