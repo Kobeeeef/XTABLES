@@ -1,5 +1,5 @@
 syntax = "proto3";
-
+package JXTABLES;
 message Coordinate {
   double x = 1;
   double y = 2;
