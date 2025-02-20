@@ -32,6 +32,7 @@ message RequestVisionCoprocessorMessage {
   ControlPoint start = 1;
   ControlPoint end = 2;
   TraversalOptions options = 3;
+  optional double safeDistanceInches = 4;
 }
 
 message TraversalOptions {
