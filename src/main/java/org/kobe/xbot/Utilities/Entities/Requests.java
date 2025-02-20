@@ -289,7 +289,11 @@ public abstract class Requests {
         return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.BOOLEAN_LIST);
     }
 
-
+    public boolean putBezierCurvesList(String key, List<XTableValues.BezierCurves> value) {
+        XTableValues.BezierCurvesList.Builder builder = XTableValues.BezierCurvesList.newBuilder()
+                .addAllV(value);
+        return sendPutMessage(key, builder.build().toByteArray(), XTableProto.XTableMessage.Type.BEZIER_CURVES_LIST);
+    }
     public boolean putTypedBytes(String key, XTableProto.XTableMessage.Type type, byte[] value) {
         return sendPutMessage(key, value, type);
     }
@@ -971,7 +975,23 @@ public abstract class Requests {
         throw new IllegalArgumentException("Expected BOOLEAN_LIST type, but got: " + message.getType());
     }
 
-
+    public List<XTableValues.BezierCurves> getBezierCurvesList(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.BEZIER_CURVES_LIST) {
+            try {
+                return XTableValues.BezierCurvesList.parseFrom(message.getValue().toByteArray()).getVList();
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected BEZIER_CURVES_LIST type, but got: " + message.getType());
+    }
     /**
      * Executes a GET request to retrieve a list of coordinates associated with the specified key.
      * <p>
