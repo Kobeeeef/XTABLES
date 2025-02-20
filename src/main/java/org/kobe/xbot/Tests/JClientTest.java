@@ -47,8 +47,10 @@ public class JClientTest {
                                 .setRotationDegrees(2)
                                 .build())
                         .setOptions(XTableValues.TraversalOptions.newBuilder()
-                                .setStartFaceNearestReefAprilTagPathThresholdPercentage(10).build())
-                        .build(), 3, TimeUnit.SECONDS);
+                                .setStartFaceNearestReefAprilTagPathThresholdPercentage(10)
+                                .setSnapToNearestAprilTag(true)
+                                .setEndFaceNearestReefAprilTagPathThresholdPercentage(80).build())
+                        .build(), 5, TimeUnit.SECONDS);
 
         System.out.println(curves);
 
