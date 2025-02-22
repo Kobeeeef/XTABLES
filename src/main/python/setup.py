@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="XTablesClient",
-    version="5.6.9",
+    version="5.7.0",
     description="Team 488 XTABLES Python",
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
