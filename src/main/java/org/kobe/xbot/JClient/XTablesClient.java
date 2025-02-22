@@ -54,7 +54,7 @@ public class XTablesClient extends QueuedRequests implements Subscriptions {
     // Instance Variables
     // These variables are unique to each instance of the class.
     // =============================================================
-    private String XTABLES_CLIENT_VERSION = "XTABLES Jero Client v5.2.9 | Build Date: 2/15/2025";
+    private String XTABLES_CLIENT_VERSION = "XTABLES Jero Client v5.3.1 | Build Date: 2/21/2025";
 
     private final String ip;
     private final XTablesSocketMonitor socketMonitor;

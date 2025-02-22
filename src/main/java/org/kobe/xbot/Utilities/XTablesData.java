@@ -25,6 +25,7 @@ public class XTablesData {
     private Map<String, XTablesData> data;
     private byte[] value;
     private XTableProto.XTableMessage.Type type;
+    private long timestamp;
 
     public XTablesData() {
         // Initialize the data map lazily
@@ -80,6 +81,39 @@ public class XTablesData {
         this.type = proto.getType();
     }
 
+    public boolean putWithTimestamp(String key, byte[] value, XTableProto.XTableMessage.Type type, long timestamp) {
+        Utilities.validateKey(key, true);
+        XTablesData current = this;
+        int start = 0;
+        int length = key.length();
+        for (int i = 0; i < length; i++) {
+            if (key.charAt(i) == '.') {
+                if (i > start) {
+                    String k = key.substring(start, i);
+
+                    if (current.data == null) {
+                        current.data = new HashMap<>();
+                    }
+                    current.data.putIfAbsent(k, new XTablesData());
+                    current = current.data.get(k);
+                }
+                start = i + 1;
+            }
+        }
+        if (start < length) {
+            String k = key.substring(start);
+
+            if (current.data == null) {
+                current.data = new HashMap<>();
+            }
+            current.data.putIfAbsent(k, new XTablesData());
+            current = current.data.get(k);
+        }
+        current.type = type;
+        current.value = value;
+        current.timestamp = timestamp;
+        return true;
+    }
 
     public boolean put(String key, byte[] value, XTableProto.XTableMessage.Type type) {
         Utilities.validateKey(key, true);
@@ -137,6 +171,20 @@ public class XTablesData {
             return new AbstractMap.SimpleEntry<>(current.value, current.type);
         }
         return null;
+    }
+
+    public XTableValue getWithTypeAndTimestamp(String key) {
+        XTablesData current = getLevelxTablesData(key);
+        if (current != null && current.value != null && current.type != null) {
+            return new XTableValue(current.value, current.timestamp, current.type);
+        }
+        return null;
+    }
+
+
+    public Map.Entry<byte[], Long> getWithTimestamp(String key) {
+        XTablesData current = getLevelxTablesData(key);
+        return (current != null) ? new AbstractMap.SimpleEntry<>(current.value, current.timestamp) : null;
     }
 
     public byte[] get(String key) {
@@ -456,6 +504,7 @@ public class XTablesData {
             return 0.0;
         }
     }
-
+    public record XTableValue(byte[] value, long timestamp,XTableProto.XTableMessage.Type type){
+    }
 
 }
