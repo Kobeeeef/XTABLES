@@ -22,9 +22,16 @@ public class VisionCoprocessorCommander implements AutoCloseable {
      * @param coprocessor the vision host
      */
     public VisionCoprocessorCommander(VisionCoprocessor coprocessor) {
-        System.out.println(coprocessor.getQualifiedHostname());
         // Create a channel to the gRPC server.
         this.channel = ManagedChannelBuilder.forAddress(coprocessor.getQualifiedHostname(), 9281)
+                .usePlaintext()
+                .build();
+        this.blockingStub = VisionCoprocessorGrpc.newBlockingV2Stub(channel);
+    }
+
+    public VisionCoprocessorCommander(String hostname) {
+        // Create a channel to the gRPC server.
+        this.channel = ManagedChannelBuilder.forAddress(hostname, 9281)
                 .usePlaintext()
                 .build();
         this.blockingStub = VisionCoprocessorGrpc.newBlockingV2Stub(channel);
