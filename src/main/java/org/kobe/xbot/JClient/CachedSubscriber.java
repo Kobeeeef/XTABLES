@@ -65,7 +65,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public boolean unsubscribe() {
-        return client.unsubscribe(this.subscriber);
+        return client.unsubscribe(this.key, this.subscriber);
     }
 
     public XTableProto.XTableMessage.XTableUpdate get() {
