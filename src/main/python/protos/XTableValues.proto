@@ -34,25 +34,46 @@ message RequestVisionCoprocessorMessage {
   TraversalOptions options = 3;
   optional double safeDistanceInches = 4;
 }
+enum AprilTagCamera {
+  FRONT_LEFT = 0;
+  FRONT_RIGHT = 1;
+  REAR = 2;
+}
+message AlignToReefAprilTagOptions {
+  uint32 aprilTagID = 1;
+  AprilTagCamera camera = 2;
+}
+
+enum Alliance {
+  BLUE_1 = 0;
+  BLUE_2 = 1;
+  BLUE_3 = 2;
+  RED_1 = 3;
+  RED_2 = 4;
+  RED_3 = 5;
+}
+
+message AdditionalArguments {
+  Alliance alliance = 1;
+  optional bool setGoalToBestReefBranch = 2;
+  optional bool setGoalToBestCoralStation = 3;
+  optional bool setGoalToAlgaeStation = 4;
+}
 
 message TraversalOptions {
   optional double metersPerSecond = 1;
   optional double finalRotationDegrees = 2;
   optional double accelerationMetersPerSecond = 3;
-  optional bool faceNearestReefAprilTag = 4;
-  optional double endFaceNearestReefAprilTagPathThresholdPercentage = 5;
-  optional RobotDirection faceNearestReefAprilTagDirection = 6;
-  optional double finalRotationTurnSpeedFactor = 7;
-  optional double startFaceNearestReefAprilTagPathThresholdPercentage = 8;
-  optional bool snapToNearestAprilTag = 9;
-  optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;
 }
 message BezierCurves {
   repeated BezierCurve curves = 1;
   optional TraversalOptions options = 2;
+  AdditionalArguments arguments = 3;
 }
 
-
+message BezierCurvesList {
+  repeated BezierCurves v = 1;
+}
 message DoubleList {
   repeated double v = 1;
 }
