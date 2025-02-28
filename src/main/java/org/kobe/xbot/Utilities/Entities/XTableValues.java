@@ -246,56 +246,24 @@ public final class XTableValues {
   public enum Alliance
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>BLUE_1 = 0;</code>
+     * <code>BLUE = 0;</code>
      */
-    BLUE_1(0),
+    BLUE(0),
     /**
-     * <code>BLUE_2 = 1;</code>
+     * <code>RED = 1;</code>
      */
-    BLUE_2(1),
-    /**
-     * <code>BLUE_3 = 2;</code>
-     */
-    BLUE_3(2),
-    /**
-     * <code>RED_1 = 3;</code>
-     */
-    RED_1(3),
-    /**
-     * <code>RED_2 = 4;</code>
-     */
-    RED_2(4),
-    /**
-     * <code>RED_3 = 5;</code>
-     */
-    RED_3(5),
+    RED(1),
     UNRECOGNIZED(-1),
     ;
 
     /**
-     * <code>BLUE_1 = 0;</code>
+     * <code>BLUE = 0;</code>
      */
-    public static final int BLUE_1_VALUE = 0;
+    public static final int BLUE_VALUE = 0;
     /**
-     * <code>BLUE_2 = 1;</code>
+     * <code>RED = 1;</code>
      */
-    public static final int BLUE_2_VALUE = 1;
-    /**
-     * <code>BLUE_3 = 2;</code>
-     */
-    public static final int BLUE_3_VALUE = 2;
-    /**
-     * <code>RED_1 = 3;</code>
-     */
-    public static final int RED_1_VALUE = 3;
-    /**
-     * <code>RED_2 = 4;</code>
-     */
-    public static final int RED_2_VALUE = 4;
-    /**
-     * <code>RED_3 = 5;</code>
-     */
-    public static final int RED_3_VALUE = 5;
+    public static final int RED_VALUE = 1;
 
 
     public final int getNumber() {
@@ -322,12 +290,8 @@ public final class XTableValues {
      */
     public static Alliance forNumber(int value) {
       switch (value) {
-        case 0: return BLUE_1;
-        case 1: return BLUE_2;
-        case 2: return BLUE_3;
-        case 3: return RED_1;
-        case 4: return RED_2;
-        case 5: return RED_3;
+        case 0: return BLUE;
+        case 1: return RED;
         default: return null;
       }
     }
@@ -5224,7 +5188,7 @@ public final class XTableValues {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (alliance_ != org.kobe.xbot.Utilities.Entities.XTableValues.Alliance.BLUE_1.getNumber()) {
+      if (alliance_ != org.kobe.xbot.Utilities.Entities.XTableValues.Alliance.BLUE.getNumber()) {
         output.writeEnum(1, alliance_);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
@@ -5245,7 +5209,7 @@ public final class XTableValues {
       if (size != -1) return size;
 
       size = 0;
-      if (alliance_ != org.kobe.xbot.Utilities.Entities.XTableValues.Alliance.BLUE_1.getNumber()) {
+      if (alliance_ != org.kobe.xbot.Utilities.Entities.XTableValues.Alliance.BLUE.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, alliance_);
       }
@@ -12873,13 +12837,12 @@ public final class XTableValues {
       "ist\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010*%\n" +
       "\016RobotDirection\022\t\n\005FRONT\020\000\022\010\n\004BACK\020\001*;\n\016" +
       "AprilTagCamera\022\016\n\nFRONT_LEFT\020\000\022\017\n\013FRONT_" +
-      "RIGHT\020\001\022\010\n\004REAR\020\002*O\n\010Alliance\022\n\n\006BLUE_1\020" +
-      "\000\022\n\n\006BLUE_2\020\001\022\n\n\006BLUE_3\020\002\022\t\n\005RED_1\020\003\022\t\n\005" +
-      "RED_2\020\004\022\t\n\005RED_3\020\0052\247\001\n\021VisionCoprocessor" +
-      "\022\221\001\n\034RequestBezierPathWithOptions\022A.org." +
-      "kobe.xbot.Utilities.Entities.RequestVisi" +
-      "onCoprocessorMessage\032..org.kobe.xbot.Uti" +
-      "lities.Entities.BezierCurvesb\006proto3"
+      "RIGHT\020\001\022\010\n\004REAR\020\002*\035\n\010Alliance\022\010\n\004BLUE\020\000\022" +
+      "\007\n\003RED\020\0012\247\001\n\021VisionCoprocessor\022\221\001\n\034Reque" +
+      "stBezierPathWithOptions\022A.org.kobe.xbot." +
+      "Utilities.Entities.RequestVisionCoproces" +
+      "sorMessage\032..org.kobe.xbot.Utilities.Ent" +
+      "ities.BezierCurvesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
