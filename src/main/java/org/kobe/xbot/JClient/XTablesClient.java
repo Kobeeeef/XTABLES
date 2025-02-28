@@ -5,7 +5,6 @@ import org.kobe.xbot.JClient.Concurrency.ConcurrentPushHandler;
 import org.kobe.xbot.Utilities.Entities.QueuedRequests;
 import org.kobe.xbot.Utilities.Entities.Subscriptions;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
-import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.zeromq.SocketType;
@@ -54,7 +53,7 @@ public class XTablesClient extends QueuedRequests implements Subscriptions {
     // Instance Variables
     // These variables are unique to each instance of the class.
     // =============================================================
-    private String XTABLES_CLIENT_VERSION = "XTABLES Jero Client v5.3.3 | Build Date: 2/25/2025";
+    private String XTABLES_CLIENT_VERSION = "XTABLES Jero Client v5.3.8 | Build Date: 2/28/2025";
 
     private final String ip;
     private final XTablesSocketMonitor socketMonitor;
