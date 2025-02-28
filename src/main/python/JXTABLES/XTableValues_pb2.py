@@ -24,19 +24,21 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19protos/XTableValues.proto\x12 org.kobe.xbot.Utilities.Entities\"\"\n\nCoordinate\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"S\n\x0e\x43oordinateList\x12\x41\n\x0b\x63oordinates\x18\x01 \x03(\x0b\x32,.org.kobe.xbot.Utilities.Entities.Coordinate\"V\n\x0c\x43ontrolPoint\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\x1c\n\x0frotationDegrees\x18\x03 \x01(\x01H\x00\x88\x01\x01\x42\x12\n\x10_rotationDegrees\"T\n\x0b\x42\x65zierCurve\x12\x45\n\rcontrolPoints\x18\x01 \x03(\x0b\x32..org.kobe.xbot.Utilities.Entities.ControlPoint\"\xe4\x02\n\x1fRequestVisionCoprocessorMessage\x12=\n\x05start\x18\x01 \x01(\x0b\x32..org.kobe.xbot.Utilities.Entities.ControlPoint\x12;\n\x03\x65nd\x18\x02 \x01(\x0b\x32..org.kobe.xbot.Utilities.Entities.ControlPoint\x12\x43\n\x07options\x18\x03 \x01(\x0b\x32\x32.org.kobe.xbot.Utilities.Entities.TraversalOptions\x12H\n\targuments\x18\x04 \x01(\x0b\x32\x35.org.kobe.xbot.Utilities.Entities.AdditionalArguments\x12\x1f\n\x12safeDistanceInches\x18\x05 \x01(\x01H\x00\x88\x01\x01\x42\x15\n\x13_safeDistanceInches\"r\n\x1a\x41lignToReefAprilTagOptions\x12\x12\n\naprilTagID\x18\x01 \x01(\r\x12@\n\x06\x63\x61mera\x18\x02 \x01(\x0e\x32\x30.org.kobe.xbot.Utilities.Entities.AprilTagCamera\"\x99\x02\n\x13\x41\x64\x64itionalArguments\x12<\n\x08\x61lliance\x18\x01 \x01(\x0e\x32*.org.kobe.xbot.Utilities.Entities.Alliance\x12$\n\x17setGoalToBestReefBranch\x18\x02 \x01(\x08H\x00\x88\x01\x01\x12&\n\x19setGoalToBestCoralStation\x18\x03 \x01(\x08H\x01\x88\x01\x01\x12\"\n\x15setGoalToAlgaeStation\x18\x04 \x01(\x08H\x02\x88\x01\x01\x42\x1a\n\x18_setGoalToBestReefBranchB\x1c\n\x1a_setGoalToBestCoralStationB\x18\n\x16_setGoalToAlgaeStation\"\xca\x01\n\x10TraversalOptions\x12\x1c\n\x0fmetersPerSecond\x18\x01 \x01(\x01H\x00\x88\x01\x01\x12!\n\x14\x66inalRotationDegrees\x18\x02 \x01(\x01H\x01\x88\x01\x01\x12(\n\x1b\x61\x63\x63\x65lerationMetersPerSecond\x18\x03 \x01(\x01H\x02\x88\x01\x01\x42\x12\n\x10_metersPerSecondB\x17\n\x15_finalRotationDegreesB\x1e\n\x1c_accelerationMetersPerSecond\"\xa9\x02\n\x0c\x42\x65zierCurves\x12=\n\x06\x63urves\x18\x01 \x03(\x0b\x32-.org.kobe.xbot.Utilities.Entities.BezierCurve\x12H\n\x07options\x18\x02 \x01(\x0b\x32\x32.org.kobe.xbot.Utilities.Entities.TraversalOptionsH\x00\x88\x01\x01\x12\x65\n\x1a\x61lignToReefAprilTagOptions\x18\x03 \x01(\x0b\x32<.org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptionsH\x01\x88\x01\x01\x42\n\n\x08_optionsB\x1d\n\x1b_alignToReefAprilTagOptions\"M\n\x10\x42\x65zierCurvesList\x12\x39\n\x01v\x18\x01 \x03(\x0b\x32..org.kobe.xbot.Utilities.Entities.BezierCurves\"\x17\n\nDoubleList\x12\t\n\x01v\x18\x01 \x03(\x01\"\x17\n\nStringList\x12\t\n\x01v\x18\x01 \x03(\t\"\x18\n\x0bIntegerList\x12\t\n\x01v\x18\x01 \x03(\x05\"\x16\n\tBytesList\x12\t\n\x01v\x18\x01 \x03(\x0c\"\x15\n\x08LongList\x12\t\n\x01v\x18\x01 \x03(\x03\"\x16\n\tFloatList\x12\t\n\x01v\x18\x01 \x03(\x02\"\x15\n\x08\x42oolList\x12\t\n\x01v\x18\x01 \x03(\x08*%\n\x0eRobotDirection\x12\t\n\x05\x46RONT\x10\x00\x12\x08\n\x04\x42\x41\x43K\x10\x01*;\n\x0e\x41prilTagCamera\x12\x0e\n\nFRONT_LEFT\x10\x00\x12\x0f\n\x0b\x46RONT_RIGHT\x10\x01\x12\x08\n\x04REAR\x10\x02*\x1d\n\x08\x41lliance\x12\x08\n\x04\x42LUE\x10\x00\x12\x07\n\x03RED\x10\x01\x32\xa7\x01\n\x11VisionCoprocessor\x12\x91\x01\n\x1cRequestBezierPathWithOptions\x12\x41.org.kobe.xbot.Utilities.Entities.RequestVisionCoprocessorMessage\x1a..org.kobe.xbot.Utilities.Entities.BezierCurvesb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19protos/XTableValues.proto\x12 org.kobe.xbot.Utilities.Entities\"\"\n\nCoordinate\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"S\n\x0e\x43oordinateList\x12\x41\n\x0b\x63oordinates\x18\x01 \x03(\x0b\x32,.org.kobe.xbot.Utilities.Entities.Coordinate\"V\n\x0c\x43ontrolPoint\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\x1c\n\x0frotationDegrees\x18\x03 \x01(\x01H\x00\x88\x01\x01\x42\x12\n\x10_rotationDegrees\"T\n\x0b\x42\x65zierCurve\x12\x45\n\rcontrolPoints\x18\x01 \x03(\x0b\x32..org.kobe.xbot.Utilities.Entities.ControlPoint\"\xe4\x02\n\x1fRequestVisionCoprocessorMessage\x12=\n\x05start\x18\x01 \x01(\x0b\x32..org.kobe.xbot.Utilities.Entities.ControlPoint\x12;\n\x03\x65nd\x18\x02 \x01(\x0b\x32..org.kobe.xbot.Utilities.Entities.ControlPoint\x12\x43\n\x07options\x18\x03 \x01(\x0b\x32\x32.org.kobe.xbot.Utilities.Entities.TraversalOptions\x12H\n\targuments\x18\x04 \x01(\x0b\x32\x35.org.kobe.xbot.Utilities.Entities.AdditionalArguments\x12\x1f\n\x12safeDistanceInches\x18\x05 \x01(\x01H\x00\x88\x01\x01\x42\x15\n\x13_safeDistanceInches\"\xcb\x01\n\x1a\x41lignToReefAprilTagOptions\x12\x12\n\naprilTagID\x18\x01 \x01(\r\x12@\n\x06\x63\x61mera\x18\x02 \x01(\x0e\x32\x30.org.kobe.xbot.Utilities.Entities.AprilTagCamera\x12G\n\x0b\x62ranchLevel\x18\x03 \x01(\x0e\x32-.org.kobe.xbot.Utilities.Entities.BranchLevelH\x00\x88\x01\x01\x42\x0e\n\x0c_branchLevel\"\x87\x02\n\x13\x41\x64\x64itionalArguments\x12<\n\x08\x61lliance\x18\x01 \x01(\x0e\x32*.org.kobe.xbot.Utilities.Entities.Alliance\x12!\n\x14goalToBestReefBranch\x18\x02 \x01(\x08H\x00\x88\x01\x01\x12#\n\x16goalToBestCoralStation\x18\x03 \x01(\x08H\x01\x88\x01\x01\x12\x1f\n\x12goalToAlgaeStation\x18\x04 \x01(\x08H\x02\x88\x01\x01\x42\x17\n\x15_goalToBestReefBranchB\x19\n\x17_goalToBestCoralStationB\x15\n\x13_goalToAlgaeStation\"\xca\x01\n\x10TraversalOptions\x12\x1c\n\x0fmetersPerSecond\x18\x01 \x01(\x01H\x00\x88\x01\x01\x12!\n\x14\x66inalRotationDegrees\x18\x02 \x01(\x01H\x01\x88\x01\x01\x12(\n\x1b\x61\x63\x63\x65lerationMetersPerSecond\x18\x03 \x01(\x01H\x02\x88\x01\x01\x42\x12\n\x10_metersPerSecondB\x17\n\x15_finalRotationDegreesB\x1e\n\x1c_accelerationMetersPerSecond\"\xa9\x02\n\x0c\x42\x65zierCurves\x12=\n\x06\x63urves\x18\x01 \x03(\x0b\x32-.org.kobe.xbot.Utilities.Entities.BezierCurve\x12H\n\x07options\x18\x02 \x01(\x0b\x32\x32.org.kobe.xbot.Utilities.Entities.TraversalOptionsH\x00\x88\x01\x01\x12\x65\n\x1a\x61lignToReefAprilTagOptions\x18\x03 \x01(\x0b\x32<.org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptionsH\x01\x88\x01\x01\x42\n\n\x08_optionsB\x1d\n\x1b_alignToReefAprilTagOptions\"M\n\x10\x42\x65zierCurvesList\x12\x39\n\x01v\x18\x01 \x03(\x0b\x32..org.kobe.xbot.Utilities.Entities.BezierCurves\"\x17\n\nDoubleList\x12\t\n\x01v\x18\x01 \x03(\x01\"\x17\n\nStringList\x12\t\n\x01v\x18\x01 \x03(\t\"\x18\n\x0bIntegerList\x12\t\n\x01v\x18\x01 \x03(\x05\"\x16\n\tBytesList\x12\t\n\x01v\x18\x01 \x03(\x0c\"\x15\n\x08LongList\x12\t\n\x01v\x18\x01 \x03(\x03\"\x16\n\tFloatList\x12\t\n\x01v\x18\x01 \x03(\x02\"\x15\n\x08\x42oolList\x12\t\n\x01v\x18\x01 \x03(\x08*%\n\x0eRobotDirection\x12\t\n\x05\x46RONT\x10\x00\x12\x08\n\x04\x42\x41\x43K\x10\x01*;\n\x0e\x41prilTagCamera\x12\x0e\n\nFRONT_LEFT\x10\x00\x12\x0f\n\x0b\x46RONT_RIGHT\x10\x01\x12\x08\n\x04REAR\x10\x02*@\n\x0b\x42ranchLevel\x12\n\n\x06TROUGH\x10\x00\x12\x0b\n\x07LEVEL_2\x10\x01\x12\x0b\n\x07LEVEL_3\x10\x02\x12\x0b\n\x07LEVEL_4\x10\x03*\x1d\n\x08\x41lliance\x12\x08\n\x04\x42LUE\x10\x00\x12\x07\n\x03RED\x10\x01\x32\xa7\x01\n\x11VisionCoprocessor\x12\x91\x01\n\x1cRequestBezierPathWithOptions\x12\x41.org.kobe.xbot.Utilities.Entities.RequestVisionCoprocessorMessage\x1a..org.kobe.xbot.Utilities.Entities.BezierCurvesb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'protos.XTableValues_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_ROBOTDIRECTION']._serialized_start=1871
-  _globals['_ROBOTDIRECTION']._serialized_end=1908
-  _globals['_APRILTAGCAMERA']._serialized_start=1910
-  _globals['_APRILTAGCAMERA']._serialized_end=1969
-  _globals['_ALLIANCE']._serialized_start=1971
-  _globals['_ALLIANCE']._serialized_end=2000
+  _globals['_ROBOTDIRECTION']._serialized_start=1943
+  _globals['_ROBOTDIRECTION']._serialized_end=1980
+  _globals['_APRILTAGCAMERA']._serialized_start=1982
+  _globals['_APRILTAGCAMERA']._serialized_end=2041
+  _globals['_BRANCHLEVEL']._serialized_start=2043
+  _globals['_BRANCHLEVEL']._serialized_end=2107
+  _globals['_ALLIANCE']._serialized_start=2109
+  _globals['_ALLIANCE']._serialized_end=2138
   _globals['_COORDINATE']._serialized_start=63
   _globals['_COORDINATE']._serialized_end=97
   _globals['_COORDINATELIST']._serialized_start=99
@@ -47,30 +49,30 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_BEZIERCURVE']._serialized_end=356
   _globals['_REQUESTVISIONCOPROCESSORMESSAGE']._serialized_start=359
   _globals['_REQUESTVISIONCOPROCESSORMESSAGE']._serialized_end=715
-  _globals['_ALIGNTOREEFAPRILTAGOPTIONS']._serialized_start=717
-  _globals['_ALIGNTOREEFAPRILTAGOPTIONS']._serialized_end=831
-  _globals['_ADDITIONALARGUMENTS']._serialized_start=834
-  _globals['_ADDITIONALARGUMENTS']._serialized_end=1115
-  _globals['_TRAVERSALOPTIONS']._serialized_start=1118
-  _globals['_TRAVERSALOPTIONS']._serialized_end=1320
-  _globals['_BEZIERCURVES']._serialized_start=1323
-  _globals['_BEZIERCURVES']._serialized_end=1620
-  _globals['_BEZIERCURVESLIST']._serialized_start=1622
-  _globals['_BEZIERCURVESLIST']._serialized_end=1699
-  _globals['_DOUBLELIST']._serialized_start=1701
-  _globals['_DOUBLELIST']._serialized_end=1724
-  _globals['_STRINGLIST']._serialized_start=1726
-  _globals['_STRINGLIST']._serialized_end=1749
-  _globals['_INTEGERLIST']._serialized_start=1751
-  _globals['_INTEGERLIST']._serialized_end=1775
-  _globals['_BYTESLIST']._serialized_start=1777
-  _globals['_BYTESLIST']._serialized_end=1799
-  _globals['_LONGLIST']._serialized_start=1801
-  _globals['_LONGLIST']._serialized_end=1822
-  _globals['_FLOATLIST']._serialized_start=1824
-  _globals['_FLOATLIST']._serialized_end=1846
-  _globals['_BOOLLIST']._serialized_start=1848
-  _globals['_BOOLLIST']._serialized_end=1869
-  _globals['_VISIONCOPROCESSOR']._serialized_start=2003
-  _globals['_VISIONCOPROCESSOR']._serialized_end=2170
+  _globals['_ALIGNTOREEFAPRILTAGOPTIONS']._serialized_start=718
+  _globals['_ALIGNTOREEFAPRILTAGOPTIONS']._serialized_end=921
+  _globals['_ADDITIONALARGUMENTS']._serialized_start=924
+  _globals['_ADDITIONALARGUMENTS']._serialized_end=1187
+  _globals['_TRAVERSALOPTIONS']._serialized_start=1190
+  _globals['_TRAVERSALOPTIONS']._serialized_end=1392
+  _globals['_BEZIERCURVES']._serialized_start=1395
+  _globals['_BEZIERCURVES']._serialized_end=1692
+  _globals['_BEZIERCURVESLIST']._serialized_start=1694
+  _globals['_BEZIERCURVESLIST']._serialized_end=1771
+  _globals['_DOUBLELIST']._serialized_start=1773
+  _globals['_DOUBLELIST']._serialized_end=1796
+  _globals['_STRINGLIST']._serialized_start=1798
+  _globals['_STRINGLIST']._serialized_end=1821
+  _globals['_INTEGERLIST']._serialized_start=1823
+  _globals['_INTEGERLIST']._serialized_end=1847
+  _globals['_BYTESLIST']._serialized_start=1849
+  _globals['_BYTESLIST']._serialized_end=1871
+  _globals['_LONGLIST']._serialized_start=1873
+  _globals['_LONGLIST']._serialized_end=1894
+  _globals['_FLOATLIST']._serialized_start=1896
+  _globals['_FLOATLIST']._serialized_end=1918
+  _globals['_BOOLLIST']._serialized_start=1920
+  _globals['_BOOLLIST']._serialized_end=1941
+  _globals['_VISIONCOPROCESSOR']._serialized_start=2141
+  _globals['_VISIONCOPROCESSOR']._serialized_end=2308
 # @@protoc_insertion_point(module_scope)
