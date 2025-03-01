@@ -279,6 +279,23 @@ public class XTablesByteUtils {
         }
     }
 
+    public static XTableValues.AlignToReefAprilTagOptions unpack_align_to_reef_april_tag_options(byte[] bytes) {
+        try {
+            return XTableValues.AlignToReefAprilTagOptions.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static String alignToReefAprilTagToString(XTableValues.AlignToReefAprilTagOptions alignToReefAprilTagOptions) {
+        if (alignToReefAprilTagOptions == null) {
+            return "No Align To April Tag Options Available";
+        }
+
+        return String.format("AlignToReefAprilTagOptions(ID: %1$s, Camera: %2$s, Branch: %3$s", alignToReefAprilTagOptions.getAprilTagID(), alignToReefAprilTagOptions.getCamera(), alignToReefAprilTagOptions.getBranchLevel());
+    }
+    public static String alignToReefAprilTagToString(byte[] bezierCurve) {
+        return alignToReefAprilTagToString(unpack_align_to_reef_april_tag_options(bezierCurve));
+    }
     public static String bezierCurveToString(ByteString bezierCurve) {
         return bezierCurveToString(unpack_bezier_curve(bezierCurve));
     }
@@ -370,6 +387,7 @@ public class XTablesByteUtils {
             case COORDINATES -> new JsonPrimitive(XTablesByteUtils.coordinateListToString(value));
             case BEZIER_CURVES -> new JsonPrimitive(bezierCurvesToString(value));
             case BEZIER_CURVE -> new JsonPrimitive(bezierCurveToString(value));
+            case ALIGN_TO_REEF_APRIL_TAG_OPTIONS -> new JsonPrimitive(alignToReefAprilTagToString(value));
             case INT64 -> new JsonPrimitive(bytesToLong(value));
             case INT32 -> new JsonPrimitive(to_Primitive_Int(value));
             case BOOL -> new JsonPrimitive(value[0] == 0x01);

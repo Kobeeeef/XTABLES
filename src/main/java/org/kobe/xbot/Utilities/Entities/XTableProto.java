@@ -258,6 +258,10 @@ public final class XTableProto {
        * <code>BEZIER_CURVES_LIST = 23;</code>
        */
       BEZIER_CURVES_LIST(23),
+      /**
+       * <code>ALIGN_TO_REEF_APRIL_TAG_OPTIONS = 24;</code>
+       */
+      ALIGN_TO_REEF_APRIL_TAG_OPTIONS(24),
       UNRECOGNIZED(-1),
       ;
 
@@ -353,6 +357,10 @@ public final class XTableProto {
        * <code>BEZIER_CURVES_LIST = 23;</code>
        */
       public static final int BEZIER_CURVES_LIST_VALUE = 23;
+      /**
+       * <code>ALIGN_TO_REEF_APRIL_TAG_OPTIONS = 24;</code>
+       */
+      public static final int ALIGN_TO_REEF_APRIL_TAG_OPTIONS_VALUE = 24;
 
 
       public final int getNumber() {
@@ -402,6 +410,7 @@ public final class XTableProto {
           case 21: return BEZIER_CURVES;
           case 22: return BEZIER_CURVE;
           case 23: return BEZIER_CURVES_LIST;
+          case 24: return ALIGN_TO_REEF_APRIL_TAG_OPTIONS;
           default: return null;
         }
       }
@@ -6343,7 +6352,7 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
   static {
     java.lang.String[] descriptorData = {
       "\n src/main/proto/XTableProto.proto\022 org." +
-      "kobe.xbot.Utilities.Entities\"\326\017\n\rXTableM" +
+      "kobe.xbot.Utilities.Entities\"\373\017\n\rXTableM" +
       "essage\022H\n\007command\030\001 \001(\01627.org.kobe.xbot." +
       "Utilities.Entities.XTableMessage.Command" +
       "\022\020\n\003key\030\002 \001(\tH\000\210\001\001\022\022\n\005value\030\003 \001(\014H\001\210\001\001\022G" +
@@ -6375,7 +6384,7 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
       "fo\022\022\n\nip_address\030\001 \001(\t\022\020\n\010hostname\030\002 \001(\t" +
       "\022\030\n\020operating_system\030\003 \001(\t\022\014\n\004port\030\004 \001(\005" +
       "\022\021\n\tis_active\030\005 \001(\010\022\017\n\007version\030\006 \001(\t\022\022\n\n" +
-      "user_agent\030\007 \001(\t\"\324\002\n\004Type\022\013\n\007UNKNOWN\020\000\022\n" +
+      "user_agent\030\007 \001(\t\"\371\002\n\004Type\022\013\n\007UNKNOWN\020\000\022\n" +
       "\n\006STRING\020\001\022\n\n\006DOUBLE\020\002\022\t\n\005INT32\020\003\022\t\n\005INT" +
       "64\020\005\022\010\n\004BOOL\020\006\022\t\n\005BYTES\020\007\022\010\n\004ENUM\020\010\022\013\n\007M" +
       "ESSAGE\020\t\022\017\n\013DOUBLE_LIST\020\n\022\017\n\013STRING_LIST" +
@@ -6383,18 +6392,19 @@ org.kobe.xbot.Utilities.Entities.XTableProto.XTableMessage.XTablesData defaultVa
       "LONG_LIST\020\016\022\020\n\014BOOLEAN_LIST\020\017\022\016\n\nBYTES_L" +
       "IST\020\020\022\n\n\006OBJECT\020\021\022\n\n\006POSE2D\020\022\022\n\n\006POSE3D\020" +
       "\023\022\017\n\013COORDINATES\020\024\022\021\n\rBEZIER_CURVES\020\025\022\020\n" +
-      "\014BEZIER_CURVE\020\026\022\026\n\022BEZIER_CURVES_LIST\020\027\"" +
-      "\333\002\n\007Command\022\023\n\017UNKNOWN_COMMAND\020\000\022\007\n\003PUT\020" +
-      "\001\022\007\n\003GET\020\002\022\t\n\005DEBUG\020\003\022\016\n\nGET_TABLES\020\004\022\016\n" +
-      "\nRUN_SCRIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE\020" +
-      "\007\022\013\n\007PUBLISH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n\022" +
-      "UNSUBSCRIBE_DELETE\020\n\022\026\n\022UNSUBSCRIBE_UPDA" +
-      "TE\020\013\022\010\n\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DELE" +
-      "TE_EVENT\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFORMAT" +
-      "ION\020\020\022\021\n\rREBOOT_SERVER\020\021\022\014\n\010REGISTRY\020\022\022\t" +
-      "\n\005BATCH\020\023\022\022\n\016GET_PROTO_DATA\020\024B\006\n\004_keyB\010\n" +
-      "\006_valueB\007\n\005_typeB\005\n\003_idB\014\n\n_timestampb\006p" +
-      "roto3"
+      "\014BEZIER_CURVE\020\026\022\026\n\022BEZIER_CURVES_LIST\020\027\022" +
+      "#\n\037ALIGN_TO_REEF_APRIL_TAG_OPTIONS\020\030\"\333\002\n" +
+      "\007Command\022\023\n\017UNKNOWN_COMMAND\020\000\022\007\n\003PUT\020\001\022\007" +
+      "\n\003GET\020\002\022\t\n\005DEBUG\020\003\022\016\n\nGET_TABLES\020\004\022\016\n\nRU" +
+      "N_SCRIPT\020\005\022\016\n\nUPDATE_KEY\020\006\022\n\n\006DELETE\020\007\022\013" +
+      "\n\007PUBLISH\020\010\022\024\n\020SUBSCRIBE_DELETE\020\t\022\026\n\022UNS" +
+      "UBSCRIBE_DELETE\020\n\022\026\n\022UNSUBSCRIBE_UPDATE\020" +
+      "\013\022\010\n\004PING\020\014\022\020\n\014GET_RAW_JSON\020\r\022\020\n\014DELETE_" +
+      "EVENT\020\016\022\020\n\014UPDATE_EVENT\020\017\022\017\n\013INFORMATION" +
+      "\020\020\022\021\n\rREBOOT_SERVER\020\021\022\014\n\010REGISTRY\020\022\022\t\n\005B" +
+      "ATCH\020\023\022\022\n\016GET_PROTO_DATA\020\024B\006\n\004_keyB\010\n\006_v" +
+      "alueB\007\n\005_typeB\005\n\003_idB\014\n\n_timestampb\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

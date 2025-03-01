@@ -137,10 +137,13 @@ public abstract class Requests {
     public boolean putBezierCurves(String key, XTableValues.BezierCurves value) {
         return sendPutMessage(key, value.toByteArray(), XTableProto.XTableMessage.Type.BEZIER_CURVES);
     }
+
     public boolean putBezierCurve(String key, XTableValues.BezierCurve value) {
         return sendPutMessage(key, value.toByteArray(), XTableProto.XTableMessage.Type.BEZIER_CURVE);
     }
-
+    public boolean putAlignToReefAprilTagOptions(String key, XTableValues.AlignToReefAprilTagOptions value) {
+        return sendPutMessage(key, value.toByteArray(), XTableProto.XTableMessage.Type.ALIGN_TO_REEF_APRIL_TAG_OPTIONS);
+    }
 
     /**
      * Sends a PUT request with a `Pose2d` object to the server.
@@ -991,6 +994,24 @@ public abstract class Requests {
             }
         }
         throw new IllegalArgumentException("Expected BEZIER_CURVES_LIST type, but got: " + message.getType());
+    }
+
+    public XTableValues.AlignToReefAprilTagOptions getAlignToReefAprilTagOptions(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.ALIGN_TO_REEF_APRIL_TAG_OPTIONS) {
+            try {
+                return XTableValues.AlignToReefAprilTagOptions.parseFrom(message.getValue().toByteArray());
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected ALIGN_TO_REEF_APRIL_TAG_OPTIONS type, but got: " + message.getType());
     }
     /**
      * Executes a GET request to retrieve a list of coordinates associated with the specified key.

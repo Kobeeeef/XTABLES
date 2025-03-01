@@ -217,6 +217,12 @@ class XTablesByteUtils:
             return None
 
     @staticmethod
+    def unpack_align_to_reef_april_tag_options(list_bytes):
+        try:
+            return XTableValues.AlignToReefAprilTagOptions.FromString(list_bytes)
+        except Exception:
+            return None
+    @staticmethod
     def pack_pose3d(pose):
         """
         Packs a (x, y, z, roll_radians, pitch_radians, yaw_radians) tuple into a byte array.
