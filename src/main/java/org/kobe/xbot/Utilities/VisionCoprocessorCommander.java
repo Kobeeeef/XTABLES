@@ -1,5 +1,6 @@
 package org.kobe.xbot.Utilities;
 
+import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -26,6 +27,16 @@ public class VisionCoprocessorCommander implements AutoCloseable {
         this.channel = ManagedChannelBuilder.forAddress(coprocessor.getQualifiedHostname(), 9281)
                 .usePlaintext()
                 .build();
+        ConnectivityState state = this.channel.getState(true);
+        if (state != ConnectivityState.READY) {
+            channel.notifyWhenStateChanged(state, new Runnable() {
+                @Override
+                public void run() {
+                    // This callback is invoked once the state has changed.
+                    logger.info("Channel connection state changed; now attempting to resolve.");
+                }
+            });
+        }
         this.blockingStub = VisionCoprocessorGrpc.newBlockingV2Stub(channel);
     }
 
