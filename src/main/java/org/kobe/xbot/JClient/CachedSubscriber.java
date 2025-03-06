@@ -112,7 +112,7 @@ public class CachedSubscriber implements AutoCloseable {
 
     public Integer getAsInteger(Integer defaultValue) {
         XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
-        if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
+        if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INT32)) {
             try {
                 return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getInt();
             } catch (Exception e) {
