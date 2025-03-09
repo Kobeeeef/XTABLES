@@ -546,4 +546,8 @@ public class XTablesClient extends QueuedRequests implements Subscriptions {
     public static XTablesClientManager getDefaultClientAsynchronously() {
         return new XTablesClientManager();
     }
+    public static XTablesClientManager getClientAsynchronously(String ip) {
+        return new XTablesClientManager(ip);
+    }
+
 }

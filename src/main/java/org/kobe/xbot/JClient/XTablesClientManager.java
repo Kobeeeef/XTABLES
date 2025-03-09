@@ -25,6 +25,10 @@ public class XTablesClientManager {
         startXTablesClientAsync();
     }
 
+    public XTablesClientManager(String ip) {
+        startXTablesClientAsync(ip);
+    }
+
     /**
      * Starts the XTablesClient asynchronously.
      * <p>
@@ -37,6 +41,20 @@ public class XTablesClientManager {
             clientFuture = CompletableFuture.supplyAsync(() -> {
                 try {
                     return new XTablesClient();
+                } catch (Exception e) {
+                    System.err.println("Error initializing XTablesClient: " + e.getMessage());
+                    throw new RuntimeException("XTablesClient failed to start", e);
+                }
+            });
+        }
+        return clientFuture;
+    }
+
+    private CompletableFuture<XTablesClient> startXTablesClientAsync(String ip) {
+        if (clientFuture == null || clientFuture.isCompletedExceptionally()) {
+            clientFuture = CompletableFuture.supplyAsync(() -> {
+                try {
+                    return new XTablesClient(ip);
                 } catch (Exception e) {
                     System.err.println("Error initializing XTablesClient: " + e.getMessage());
                     throw new RuntimeException("XTablesClient failed to start", e);
