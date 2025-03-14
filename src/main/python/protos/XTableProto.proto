@@ -39,6 +39,7 @@ message XTableMessage {
     BEZIER_CURVE = 22;
     BEZIER_CURVES_LIST = 23;
     ALIGN_TO_REEF_APRIL_TAG_OPTIONS = 24;
+    PROBABILITY_MAPPING = 25;
   }
   enum Command {
     UNKNOWN_COMMAND = 0;
