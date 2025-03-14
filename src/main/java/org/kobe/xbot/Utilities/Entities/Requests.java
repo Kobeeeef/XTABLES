@@ -145,6 +145,10 @@ public abstract class Requests {
         return sendPutMessage(key, value.toByteArray(), XTableProto.XTableMessage.Type.ALIGN_TO_REEF_APRIL_TAG_OPTIONS);
     }
 
+    public boolean putProbabilityMapDetections(String key, XTableValues.ProbabilityMappingDetections value) {
+        return sendPutMessage(key, value.toByteArray(), XTableProto.XTableMessage.Type.PROBABILITY_MAPPING);
+    }
+
     /**
      * Sends a PUT request with a `Pose2d` object to the server.
      * <p>
@@ -1012,6 +1016,24 @@ public abstract class Requests {
             }
         }
         throw new IllegalArgumentException("Expected ALIGN_TO_REEF_APRIL_TAG_OPTIONS type, but got: " + message.getType());
+    }
+
+    public XTableValues.ProbabilityMappingDetections getProbabilityMappingDetections(String key) {
+        XTableProto.XTableMessage message = getXTableMessage(key);
+        if (message == null) {
+            throw new IllegalArgumentException("No message received from the XTABLES server.");
+        }
+        if (!message.hasValue()) {
+            return null;
+        }
+        if (message.getType() == XTableProto.XTableMessage.Type.PROBABILITY_MAPPING) {
+            try {
+                return XTableValues.ProbabilityMappingDetections.parseFrom(message.getValue().toByteArray());
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException("Invalid bytes returned from server: " + Arrays.toString(message.getValue().toByteArray()));
+            }
+        }
+        throw new IllegalArgumentException("Expected PROBABILITY_MAPPING type, but got: " + message.getType());
     }
     /**
      * Executes a GET request to retrieve a list of coordinates associated with the specified key.
