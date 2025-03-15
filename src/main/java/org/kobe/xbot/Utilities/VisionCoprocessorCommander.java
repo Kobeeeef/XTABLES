@@ -1,5 +1,6 @@
 package org.kobe.xbot.Utilities;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -9,7 +10,10 @@ import org.kobe.xbot.Utilities.Entities.VisionCoprocessorGrpc;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 
 public class VisionCoprocessorCommander implements AutoCloseable {
@@ -62,6 +66,31 @@ public class VisionCoprocessorCommander implements AutoCloseable {
             logger.info("RPC failed: " + e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Sends a Bezier path request with options to the server.
+     *
+     * @param options the request options as defined in the proto
+     * @return the server's response, or null if the RPC fails
+     */
+    public void requestBezierPathWithOptionsAsync(XTableValues.RequestVisionCoprocessorMessage options, long timeout, TimeUnit timeUnit, Consumer<XTableValues.BezierCurves> onSuccess, Consumer<Throwable> onError) {
+        VisionCoprocessorGrpc.VisionCoprocessorFutureStub futureStub =
+                VisionCoprocessorGrpc.newFutureStub(channel)
+                        .withDeadlineAfter(timeout, timeUnit)
+                        .withWaitForReady();
+
+        ListenableFuture<XTableValues.BezierCurves> future = futureStub.requestBezierPathWithOptions(options);
+
+        future.addListener(() -> {
+            try {
+                XTableValues.BezierCurves response = future.get();
+                onSuccess.accept(response);
+            } catch (InterruptedException | ExecutionException e) {
+                logger.info("Async RPC failed: " + e.getMessage());
+                onError.accept(e);
+            }
+        }, Executors.newSingleThreadExecutor());
     }
 
     /**
