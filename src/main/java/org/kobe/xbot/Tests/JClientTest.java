@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class JClientTest {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-//        XTablesClient client = new XTablesClient();
+        XTablesClient client = new XTablesClient();
 //        List<XTableValues.Coordinate> coordinates = new ArrayList<>();
 //        coordinates.add(XTableValues.Coordinate.newBuilder()
 //                .setX(3)
@@ -55,12 +55,12 @@ public class JClientTest {
 //        System.out.println(curves);
 
 
-//
-//        while (true) {
-//
-//            client.putPose2d("PoseSubsystem.RobotPose",new Pose2d(4.002, 5.174, Rotation2d.fromDegrees(-60)));
-//            Thread.sleep(10);
-//        }
+
+        while (true) {
+
+            client.putPose2d("PoseSubsystem.RobotPose",new Pose2d(4.002, 5.174, Rotation2d.fromDegrees(-60)));
+
+        }
 
 
 //       Thread.sleep(1000000);
