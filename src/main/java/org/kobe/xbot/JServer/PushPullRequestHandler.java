@@ -74,10 +74,11 @@ public class PushPullRequestHandler extends BaseHandler {
                 if (message.hasKey() && message.hasValue()) {
                     String key = message.getKey();
                     byte[] value = message.getValue().toByteArray();
-                    if (XTablesServer.table.put(key, value, message.getType())) {
+                    long timestamp = System.currentTimeMillis();
+                    if (XTablesServer.table.putWithTimestamp(key, value, message.getType(), timestamp)) {
                         instance.publishQueue.send(XTableProto.XTableMessage.XTableUpdate.newBuilder()
                                 .setType(message.getType())
-                                .setTimestamp(System.currentTimeMillis())
+                                .setTimestamp(timestamp)
                                 .setCategory(XTableProto.XTableMessage.XTableUpdate.Category.UPDATE)
                                 .setKey(key)
                                 .setValue(ByteString.copyFrom(value))

@@ -68,12 +68,13 @@ public class ReplyRequestHandler extends BaseHandler {
                         case GET -> {
                             if (message.hasKey()) {
                                 String key = message.getKey();
-                                Map.Entry<byte[], XTableProto.XTableMessage.Type> response = XTablesServer.table.getWithType(key);
+                                XTablesData.XTableValue response = XTablesServer.table.getWithTypeAndTimestamp(key);
                                 if (response != null)
                                     socket.send(XTableProto.XTableMessage.newBuilder()
                                             .setKey(key)
-                                            .setValue(ByteString.copyFrom(response.getKey()))
-                                            .setType(response.getValue())
+                                            .setValue(ByteString.copyFrom(response.value()))
+                                            .setType(response.type())
+                                            .setTimestamp(response.timestamp())
                                             .build()
                                             .toByteArray(), ZMQ.DONTWAIT);
                                 else socket.send(XTableProto.XTableMessage.newBuilder()
