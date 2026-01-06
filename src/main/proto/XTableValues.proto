@@ -46,12 +46,8 @@ message AlignToReefAprilTagOptions {
 }
 
 enum Alliance {
-  BLUE_1 = 0;
-  BLUE_2 = 1;
-  BLUE_3 = 2;
-  RED_1 = 3;
-  RED_2 = 4;
-  RED_3 = 5;
+  BLUE = 0;
+  RED = 1;
 }
 
 message AdditionalArguments {
