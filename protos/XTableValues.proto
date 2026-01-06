@@ -29,10 +29,10 @@ message TraversalOptions {
   optional double finalRotationDegrees = 2;
   optional double accelerationMetersPerSecond = 3;
   optional bool faceNearestReefAprilTag = 4;
-  optional double faceNearestReefAprilTagPathThresholdPercentage = 5;
+  optional double endFaceNearestReefAprilTagPathThresholdPercentage = 5;
   optional RobotDirection faceNearestReefAprilTagDirection = 6;
   optional double finalRotationTurnSpeedFactor = 7;
-    optional double startAprilTagLockPathThresholdPercentage = 8;
+  optional double startFaceNearestReefAprilTagPathThresholdPercentage = 8;
   optional bool snapToNearestAprilTag = 9;
   optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;
 }
