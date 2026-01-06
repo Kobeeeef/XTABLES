@@ -59,14 +59,14 @@ class VisionCoprocessorServicer(object):
 
 def add_VisionCoprocessorServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'RequestBezierPathWithOptions': grpc.unary_unary_rpc_method_handler(
-                    servicer.RequestBezierPathWithOptions,
-                    request_deserializer=protos_dot_XTableValues__pb2.RequestVisionCoprocessorMessage.FromString,
-                    response_serializer=protos_dot_XTableValues__pb2.BezierCurves.SerializeToString,
-            ),
+        'RequestBezierPathWithOptions': grpc.unary_unary_rpc_method_handler(
+            servicer.RequestBezierPathWithOptions,
+            request_deserializer=protos_dot_XTableValues__pb2.RequestVisionCoprocessorMessage.FromString,
+            response_serializer=protos_dot_XTableValues__pb2.BezierCurves.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'org.kobe.xbot.Utilities.Entities.VisionCoprocessor', rpc_method_handlers)
+        'org.kobe.xbot.Utilities.Entities.VisionCoprocessor', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
     server.add_registered_method_handlers('org.kobe.xbot.Utilities.Entities.VisionCoprocessor', rpc_method_handlers)
 
