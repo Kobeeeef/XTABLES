@@ -32,7 +32,8 @@ message RequestVisionCoprocessorMessage {
   ControlPoint start = 1;
   ControlPoint end = 2;
   TraversalOptions options = 3;
-  optional double safeDistanceInches = 4;
+  AdditionalArguments arguments = 4;
+  optional double safeDistanceInches = 5;
 }
 enum AprilTagCamera {
   FRONT_LEFT = 0;
@@ -68,7 +69,7 @@ message TraversalOptions {
 message BezierCurves {
   repeated BezierCurve curves = 1;
   optional TraversalOptions options = 2;
-  AdditionalArguments arguments = 3;
+  optional AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;
 }
 
 message BezierCurvesList {
