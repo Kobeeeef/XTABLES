@@ -71,21 +71,21 @@ def add_VisionCoprocessorServicer_to_server(servicer, server):
     server.add_registered_method_handlers('org.kobe.xbot.Utilities.Entities.VisionCoprocessor', rpc_method_handlers)
 
 
- # This class is part of an EXPERIMENTAL API.
+# This class is part of an EXPERIMENTAL API.
 class VisionCoprocessor(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def RequestBezierPathWithOptions(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
+                                     target,
+                                     options=(),
+                                     channel_credentials=None,
+                                     call_credentials=None,
+                                     insecure=False,
+                                     compression=None,
+                                     wait_for_ready=None,
+                                     timeout=None,
+                                     metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
