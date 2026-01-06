@@ -52,7 +52,9 @@ message BezierCurves {
   optional TraversalOptions options = 2;
 }
 
-
+message BezierCurvesList {
+  repeated BezierCurves v = 1;
+}
 message DoubleList {
   repeated double v = 1;
 }
