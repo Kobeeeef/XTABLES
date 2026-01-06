@@ -38,7 +38,7 @@ class XTablesClient:
     # ================================================================
     # Instance Variables
     # ================================================================
-    XTABLES_CLIENT_VERSION = "XTABLES JPython Client v5.7.8 | Build Date: 3/14/2025"
+    XTABLES_CLIENT_VERSION = "XTABLES JPython Client v5.7.9 | Build Date: 3/18/2025"
 
     def __init__(self, ip=None, push_port=48800, req_port=48801, sub_port=48802, buffer_size=500, debug_mode=True,
                  ghost=False):
@@ -511,6 +511,21 @@ class XTablesClient:
                 raise ValueError(f"Invalid bytes returned from server: {message.value}")
 
         raise ValueError(f"Expected COORDINATES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+    
+    def getBezierCurves(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.BEZIER_CURVES:
+            try:
+                return XTableValues.BezierCurves.FromString(message.value)
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+
+        raise ValueError(f"Expected BEZIER_CURVES type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getPose2d(self, key):
         message = self._get_xtable_message(key)
