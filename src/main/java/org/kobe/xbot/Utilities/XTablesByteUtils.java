@@ -339,7 +339,7 @@ public class XTablesByteUtils {
                 start != null ? start.getX() : 0, start != null ? start.getY() : 0,
                 goal != null ? goal.getX() : 0, goal != null ? goal.getY() : 0,
                 controlPoints.size(),
-                bezierCurves.hasMetersPerSecondSpeed() ? "MPS: " + bezierCurves.getMetersPerSecondSpeed() : ""
+                bezierCurves.hasMetersPerSecondSpeed() ? ", MPS: " + bezierCurves.getMetersPerSecondSpeed() : ""
         );
     }
 
