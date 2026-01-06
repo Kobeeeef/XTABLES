@@ -46,6 +46,10 @@ public class XTablesClientManager {
         return clientFuture;
     }
 
+    public CompletableFuture<XTablesClient> getClientFuture() {
+        return clientFuture;
+    }
+
     /**
      * Checks whether the client has been successfully initialized.
      *
