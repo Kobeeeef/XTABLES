@@ -83,7 +83,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public XTableProto.XTableMessage.XTableUpdate get(boolean dontClearOnRead) {
-        return this.circularBuffer.read();
+        return this.circularBuffer.read(dontClearOnRead);
     }
 
     public String getAsString(String defaultValue) {
