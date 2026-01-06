@@ -28,6 +28,44 @@ service VisionCoprocessor {
   rpc RequestBezierPathWithOptions (RequestVisionCoprocessorMessage) returns (BezierCurves);
 }
 
+
+message ProbabilityMappingDetections {
+  repeated RobotDetection robots = 1;
+  repeated AlgaeDetection algaes = 2;
+  repeated CoralDetection corals = 3;
+  optional ReefState reef = 4;
+}
+
+message RobotDetection {
+  double probability = 1;
+  ControlPoint pose = 2;
+}
+
+message AlgaeDetection {
+  double probability = 1;
+  ControlPoint pose = 2;
+}
+
+message CoralDetection {
+  double probability = 1;
+  ControlPoint pose = 2;
+}
+
+message BranchCoralState {
+  int32 index = 1;
+  double openness = 2;
+}
+
+message ReefEntry {
+  repeated BranchCoralState branchIndexStates = 1;
+  double algaeOpenness = 2;
+  int32 aprilTagID = 3;
+}
+
+message ReefState {
+  repeated ReefEntry entries = 1;
+}
+
 message RequestVisionCoprocessorMessage {
   ControlPoint start = 1;
   ControlPoint end = 2;
