@@ -21,8 +21,8 @@ _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'protos.XTableValues_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_ROBOTDIRECTION']._serialized_start=1541
-  _globals['_ROBOTDIRECTION']._serialized_end=1578
+  _globals['_ROBOTDIRECTION']._serialized_start=1537
+  _globals['_ROBOTDIRECTION']._serialized_end=1574
   _globals['_COORDINATE']._serialized_start=63
   _globals['_COORDINATE']._serialized_end=97
   _globals['_COORDINATELIST']._serialized_start=99
@@ -32,21 +32,21 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_BEZIERCURVE']._serialized_start=222
   _globals['_BEZIERCURVE']._serialized_end=306
   _globals['_TRAVERSALOPTIONS']._serialized_start=309
-  _globals['_TRAVERSALOPTIONS']._serialized_end=1203
-  _globals['_BEZIERCURVES']._serialized_start=1206
-  _globals['_BEZIERCURVES']._serialized_end=1369
-  _globals['_DOUBLELIST']._serialized_start=1371
-  _globals['_DOUBLELIST']._serialized_end=1394
-  _globals['_STRINGLIST']._serialized_start=1396
-  _globals['_STRINGLIST']._serialized_end=1419
-  _globals['_INTEGERLIST']._serialized_start=1421
-  _globals['_INTEGERLIST']._serialized_end=1445
-  _globals['_BYTESLIST']._serialized_start=1447
-  _globals['_BYTESLIST']._serialized_end=1469
-  _globals['_LONGLIST']._serialized_start=1471
-  _globals['_LONGLIST']._serialized_end=1492
-  _globals['_FLOATLIST']._serialized_start=1494
-  _globals['_FLOATLIST']._serialized_end=1516
-  _globals['_BOOLLIST']._serialized_start=1518
-  _globals['_BOOLLIST']._serialized_end=1539
+  _globals['_TRAVERSALOPTIONS']._serialized_end=1199
+  _globals['_BEZIERCURVES']._serialized_start=1202
+  _globals['_BEZIERCURVES']._serialized_end=1365
+  _globals['_DOUBLELIST']._serialized_start=1367
+  _globals['_DOUBLELIST']._serialized_end=1390
+  _globals['_STRINGLIST']._serialized_start=1392
+  _globals['_STRINGLIST']._serialized_end=1415
+  _globals['_INTEGERLIST']._serialized_start=1417
+  _globals['_INTEGERLIST']._serialized_end=1441
+  _globals['_BYTESLIST']._serialized_start=1443
+  _globals['_BYTESLIST']._serialized_end=1465
+  _globals['_LONGLIST']._serialized_start=1467
+  _globals['_LONGLIST']._serialized_end=1488
+  _globals['_FLOATLIST']._serialized_start=1490
+  _globals['_FLOATLIST']._serialized_end=1512
+  _globals['_BOOLLIST']._serialized_start=1514
+  _globals['_BOOLLIST']._serialized_end=1535
 # @@protoc_insertion_point(module_scope)
