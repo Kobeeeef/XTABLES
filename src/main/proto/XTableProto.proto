@@ -8,6 +8,7 @@ message XTableMessage {
   optional Type type = 4;
   optional bytes id = 5;
   repeated XTableMessage batch = 6;
+  optional uint64 timestamp = 7;
   message XTablesData {
     map<string, XTablesData> data = 1;  // Nested data map
     bytes value = 2;                    // Byte array for storing values
@@ -77,7 +78,7 @@ message XTableMessage {
     Category category = 2;
     bytes value = 3;
     XTableMessage.Type type = 4;
-    optional int64 timestamp = 5;
+    optional uint64 timestamp = 5;
     enum Category {
       UNKNOWN = 0;
       UPDATE = 1;
