@@ -5,6 +5,7 @@ import com.google.protobuf.ByteString;
 import org.kobe.xbot.Utilities.CircularBuffer;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
 import org.kobe.xbot.Utilities.Entities.XTableValues;
+import org.kobe.xbot.Utilities.XTablesByteUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -13,16 +14,24 @@ import java.util.function.Consumer;
 
 import static org.kobe.xbot.JClient.XTablesClient.successByte;
 
-public class CachedSubscriber {
+public class CachedSubscriber implements AutoCloseable {
     private final XTablesClient client;
     private final Consumer<XTableProto.XTableMessage.XTableUpdate> subscriber;
     private final CircularBuffer<XTableProto.XTableMessage.XTableUpdate> circularBuffer;
+    private final String key;
 
     public CachedSubscriber(String key, XTablesClient client, int readQueueSize) {
         this.client = client;
         this.circularBuffer = new CircularBuffer<>(readQueueSize);
         this.subscriber = this.circularBuffer::write;
+        this.key = key;
         client.subscribe(key, this.subscriber);
+    }
+
+
+    @Override
+    public void close() {
+        client.unsubscribe(this.key, this.subscriber);
     }
 
     public XTableProto.XTableMessage.XTableUpdate[] readAll() {
@@ -201,6 +210,18 @@ public class CachedSubscriber {
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.DOUBLE_LIST)) {
             try {
                 return XTableValues.DoubleList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    public XTableValues.BezierCurves getAsBezierCurves(XTableValues.BezierCurves defaultValue) {
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
+        if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BEZIER_CURVES)) {
+            try {
+                return XTablesByteUtils.unpack_bezier_curves(lastUpdate.getValue().toByteArray());
             } catch (Exception e) {
                 return defaultValue;
             }
