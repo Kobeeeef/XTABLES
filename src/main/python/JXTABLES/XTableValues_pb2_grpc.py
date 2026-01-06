@@ -35,7 +35,7 @@ class VisionCoprocessorStub(object):
             channel: A grpc.Channel.
         """
         self.RequestBezierPathWithOptions = channel.unary_unary(
-                '/org.kobe.xbot.Utilities.Entities.VisionCoprocessor/RequestBezierPathWithOptions',
+                '/VisionCoprocessor/RequestBezierPathWithOptions',
                 request_serializer=XTableValues__pb2.RequestVisionCoprocessorMessage.SerializeToString,
                 response_deserializer=XTableValues__pb2.BezierCurves.FromString,
                 _registered_method=True)
