@@ -46,10 +46,11 @@ public class JClientTest {
                                 .setY(2)
                                 .setRotationDegrees(2)
                                 .build())
-                        .setOptions(XTableValues.TraversalOptions.newBuilder().build())
+                        .setOptions(XTableValues.TraversalOptions.newBuilder()
+                                .setStartFaceNearestReefAprilTagPathThresholdPercentage(10).build())
                         .build(), 3, TimeUnit.SECONDS);
 
-        System.out.println(curves   );
+        System.out.println(curves);
 
 
 //
