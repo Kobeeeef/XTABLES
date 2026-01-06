@@ -25,6 +25,8 @@ message BezierCurves {
   repeated BezierCurve curves = 1;
   bool pathFound = 2;
   optional double metersPerSecond = 3;
+  double finalRotationDegrees = 4;
+  optional double accelerationMetersPerSecond= 5;
 }
 
 
