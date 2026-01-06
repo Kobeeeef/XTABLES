@@ -415,7 +415,7 @@ public class XTablesData {
                             throw new RuntimeException("Failed to parse BoolList", e);
                         }
                     }
-                    case BYTES, UNKNOWN, COORDINATES -> {
+                    case BYTES, UNKNOWN, COORDINATES, BEZIER_CURVES -> {
                         JsonArray byteArray = new JsonArray();
                         for (byte b : node.value) {
                             byteArray.add(b);
