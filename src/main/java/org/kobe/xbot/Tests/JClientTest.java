@@ -35,24 +35,24 @@ public class JClientTest {
 
        //
 
-        VisionCoprocessorCommander commander = new VisionCoprocessorCommander(VisionCoprocessor.LOCALHOST);
-        XTableValues.BezierCurves curves = commander
-                .requestBezierPathWithOptions(XTableValues.RequestVisionCoprocessorMessage.newBuilder()
-                        .setStart(XTableValues.ControlPoint.newBuilder()
-                                .setY(3)
-                                .setX(2).build())
-                        .setEnd(XTableValues.ControlPoint.newBuilder()
-                                .setX(Math.random())
-                                .setY(2)
-                                .setRotationDegrees(2)
-                                .build())
-                        .setOptions(XTableValues.TraversalOptions.newBuilder()
-                                .setStartFaceNearestReefAprilTagPathThresholdPercentage(10)
-                                .setSnapToNearestAprilTag(true)
-                                .setEndFaceNearestReefAprilTagPathThresholdPercentage(80).build())
-                        .build(), 5, TimeUnit.SECONDS);
-
-        System.out.println(curves);
+//        VisionCoprocessorCommander commander = new VisionCoprocessorCommander(VisionCoprocessor.LOCALHOST);
+//        XTableValues.BezierCurves curves = commander
+//                .requestBezierPathWithOptions(XTableValues.RequestVisionCoprocessorMessage.newBuilder()
+//                        .setStart(XTableValues.ControlPoint.newBuilder()
+//                                .setY(3)
+//                                .setX(2).build())
+//                        .setEnd(XTableValues.ControlPoint.newBuilder()
+//                                .setX(Math.random())
+//                                .setY(2)
+//                                .setRotationDegrees(2)
+//                                .build())
+//                        .setOptions(XTableValues.TraversalOptions.newBuilder()
+//                                .setStartFaceNearestReefAprilTagPathThresholdPercentage(10)
+//                                .setSnapToNearestAprilTag(true)
+//                                .setEndFaceNearestReefAprilTagPathThresholdPercentage(80).build())
+//                        .build(), 5, TimeUnit.SECONDS);
+//
+//        System.out.println(curves);
 
 
 //
