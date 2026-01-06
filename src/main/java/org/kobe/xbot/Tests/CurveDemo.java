@@ -11,13 +11,13 @@ public class CurveDemo {
 
 
         XTableValues.BezierCurve curve = XTableValues.BezierCurve.newBuilder()
-                .setMetersPerSecond(0.3d)
                 .setTimeToTraverse(30.2)
                 .addAllControlPoints(List.of(XTableValues.ControlPoint.newBuilder().setX(20).setY(20).build()))
                 .build();
 
         XTableValues.BezierCurves byteCurves = XTableValues.BezierCurves.newBuilder()
                 .addCurves(curve)
+                .setMetersPerSecond(20d)
                 .build();
 
         // Get Curves
