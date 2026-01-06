@@ -1,1 +1,0 @@
-import XTableValues_pb2 as XTableValues
