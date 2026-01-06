@@ -19,12 +19,23 @@ message BezierCurve {
   repeated ControlPoint controlPoints = 1;
 }
 
+enum RobotDirection {
+  FRONT = 0;
+  BACK = 1;
+}
+
+message TraversalOptions {
+  optional double metersPerSecond = 1;
+  optional double finalRotationDegrees = 2;
+  optional double accelerationMetersPerSecond = 3;
+  optional bool faceNearestReefAprilTag = 4;
+  optional double faceNearestReefAprilTagPathThresholdPercentage = 5;
+  optional RobotDirection faceNearestReefAprilTagDirection = 6;
+  optional double finalRotationTurnSpeedFactor = 7;
+}
 message BezierCurves {
   repeated BezierCurve curves = 1;
-  bool pathFound = 2;
-  optional double metersPerSecond = 3;
-  double finalRotationDegrees = 4;
-  optional double accelerationMetersPerSecond= 5;
+  optional TraversalOptions options = 2;
 }
 
 
