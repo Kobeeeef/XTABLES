@@ -271,6 +271,101 @@ public class XTablesByteUtils {
         }
     }
 
+    public static XTableValues.ProbabilityMappingDetections unpack_probability_mapping(ByteString bytes) {
+        try {
+            return XTableValues.ProbabilityMappingDetections.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static XTableValues.ProbabilityMappingDetections unpack_probability_mapping(byte[] bytes) {
+        try {
+            return XTableValues.ProbabilityMappingDetections.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+    }
+    public static String probabilityMappingToString(byte[] probabilityMappingDetections) {
+        return probabilityMappingToString(unpack_probability_mapping(probabilityMappingDetections));
+    }
+    public static String probabilityMappingToString(XTableValues.ProbabilityMappingDetections probabilityMappingDetections) {
+        if (probabilityMappingDetections == null) {
+            return "ProbabilityMappingDetections()";
+        }
+
+        StringBuilder sb = new StringBuilder("ProbabilityMappingDetections(");
+
+        // Robots
+        if (!probabilityMappingDetections.getRobotsList().isEmpty()) {
+            sb.append("robots=[");
+            for (XTableValues.RobotDetection robot : probabilityMappingDetections.getRobotsList()) {
+                sb.append(String.format("{probability=%.2f, pose=%s}, ",
+                        robot.getProbability(), controlPointToString(robot.getPose())));
+            }
+            sb.setLength(sb.length() - 2); // Remove last comma and space
+            sb.append("], ");
+        }
+
+        // Algaes
+        if (!probabilityMappingDetections.getAlgaesList().isEmpty()) {
+            sb.append("algaes=[");
+            for (XTableValues.AlgaeDetection algae : probabilityMappingDetections.getAlgaesList()) {
+                sb.append(String.format("{probability=%.2f, pose=%s}, ",
+                        algae.getProbability(), controlPointToString(algae.getPose())));
+            }
+            sb.setLength(sb.length() - 2);
+            sb.append("], ");
+        }
+
+        // Corals
+        if (!probabilityMappingDetections.getCoralsList().isEmpty()) {
+            sb.append("corals=[");
+            for (XTableValues.CoralDetection coral : probabilityMappingDetections.getCoralsList()) {
+                sb.append(String.format("{probability=%.2f, pose=%s}, ",
+                        coral.getProbability(), controlPointToString(coral.getPose())));
+            }
+            sb.setLength(sb.length() - 2);
+            sb.append("], ");
+        }
+
+        // Reef State
+        if (probabilityMappingDetections.hasReef()) {
+            sb.append("reefState=[");
+            for (XTableValues.ReefEntry entry : probabilityMappingDetections.getReef().getEntriesList()) {
+                sb.append(String.format("{aprilTagID=%d, algaeOpenness=%.2f, branches=[",
+                        entry.getAprilTagID(), entry.getAlgaeOpenness()));
+                for (XTableValues.BranchCoralState branch : entry.getBranchIndexStatesList()) {
+                    sb.append(String.format("{index=%d, openness=%.2f}, ",
+                            branch.getIndex(), branch.getOpenness()));
+                }
+                if (!entry.getBranchIndexStatesList().isEmpty()) {
+                    sb.setLength(sb.length() - 2); // Remove last comma and space
+                }
+                sb.append("]}, ");
+            }
+            if (!probabilityMappingDetections.getReef().getEntriesList().isEmpty()) {
+                sb.setLength(sb.length() - 2);
+            }
+            sb.append("], ");
+        }
+
+        if (sb.length() > 25) { // Ensure we don't remove the opening "ProbabilityMappingDetections("
+            sb.setLength(sb.length() - 2); // Remove last comma and space
+        }
+
+        sb.append(")");
+        return sb.toString();
+    }
+
+    // Helper method to convert ControlPoint to a readable string
+    private static String controlPointToString(XTableValues.ControlPoint point) {
+        if (point.hasRotationDegrees()) {
+            return String.format("(x=%.2f, y=%.2f, rotation=%.2f)",
+                    point.getX(), point.getY(), point.getRotationDegrees());
+        }
+        return String.format("(x=%.2f, y=%.2f)", point.getX(), point.getY());
+    }
+
     public static XTableValues.BezierCurve unpack_bezier_curve(byte[] bytes) {
         try {
             return XTableValues.BezierCurve.parseFrom(bytes);
@@ -387,6 +482,7 @@ public class XTablesByteUtils {
             case COORDINATES -> new JsonPrimitive(XTablesByteUtils.coordinateListToString(value));
             case BEZIER_CURVES -> new JsonPrimitive(bezierCurvesToString(value));
             case BEZIER_CURVE -> new JsonPrimitive(bezierCurveToString(value));
+            case PROBABILITY_MAPPING -> new JsonPrimitive(probabilityMappingToString(value));
             case ALIGN_TO_REEF_APRIL_TAG_OPTIONS -> new JsonPrimitive(alignToReefAprilTagToString(value));
             case INT64 -> new JsonPrimitive(bytesToLong(value));
             case INT32 -> new JsonPrimitive(to_Primitive_Int(value));

@@ -3246,6 +3246,6065 @@ public final class XTableValues {
 
   }
 
+  public interface ProbabilityMappingDetectionsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.ProbabilityMappingDetections)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection> 
+        getRobotsList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection getRobots(int index);
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    int getRobotsCount();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder> 
+        getRobotsOrBuilderList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder getRobotsOrBuilder(
+        int index);
+
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection> 
+        getAlgaesList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection getAlgaes(int index);
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    int getAlgaesCount();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder> 
+        getAlgaesOrBuilderList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder getAlgaesOrBuilder(
+        int index);
+
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection> 
+        getCoralsList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection getCorals(int index);
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    int getCoralsCount();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder> 
+        getCoralsOrBuilderList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder getCoralsOrBuilder(
+        int index);
+
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+     * @return Whether the reef field is set.
+     */
+    boolean hasReef();
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+     * @return The reef.
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ReefState getReef();
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ReefStateOrBuilder getReefOrBuilder();
+  }
+  /**
+   * Protobuf type {@code org.kobe.xbot.Utilities.Entities.ProbabilityMappingDetections}
+   */
+  public static final class ProbabilityMappingDetections extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.ProbabilityMappingDetections)
+      ProbabilityMappingDetectionsOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ProbabilityMappingDetections.newBuilder() to construct.
+    private ProbabilityMappingDetections(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ProbabilityMappingDetections() {
+      robots_ = java.util.Collections.emptyList();
+      algaes_ = java.util.Collections.emptyList();
+      corals_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new ProbabilityMappingDetections();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections.class, org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int ROBOTS_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection> robots_;
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection> getRobotsList() {
+      return robots_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder> 
+        getRobotsOrBuilderList() {
+      return robots_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    @java.lang.Override
+    public int getRobotsCount() {
+      return robots_.size();
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection getRobots(int index) {
+      return robots_.get(index);
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder getRobotsOrBuilder(
+        int index) {
+      return robots_.get(index);
+    }
+
+    public static final int ALGAES_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection> algaes_;
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection> getAlgaesList() {
+      return algaes_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder> 
+        getAlgaesOrBuilderList() {
+      return algaes_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    @java.lang.Override
+    public int getAlgaesCount() {
+      return algaes_.size();
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection getAlgaes(int index) {
+      return algaes_.get(index);
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder getAlgaesOrBuilder(
+        int index) {
+      return algaes_.get(index);
+    }
+
+    public static final int CORALS_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection> corals_;
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection> getCoralsList() {
+      return corals_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder> 
+        getCoralsOrBuilderList() {
+      return corals_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    @java.lang.Override
+    public int getCoralsCount() {
+      return corals_.size();
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection getCorals(int index) {
+      return corals_.get(index);
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder getCoralsOrBuilder(
+        int index) {
+      return corals_.get(index);
+    }
+
+    public static final int REEF_FIELD_NUMBER = 4;
+    private org.kobe.xbot.Utilities.Entities.XTableValues.ReefState reef_;
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+     * @return Whether the reef field is set.
+     */
+    @java.lang.Override
+    public boolean hasReef() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+     * @return The reef.
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ReefState getReef() {
+      return reef_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.getDefaultInstance() : reef_;
+    }
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ReefStateOrBuilder getReefOrBuilder() {
+      return reef_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.getDefaultInstance() : reef_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < robots_.size(); i++) {
+        output.writeMessage(1, robots_.get(i));
+      }
+      for (int i = 0; i < algaes_.size(); i++) {
+        output.writeMessage(2, algaes_.get(i));
+      }
+      for (int i = 0; i < corals_.size(); i++) {
+        output.writeMessage(3, corals_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(4, getReef());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < robots_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, robots_.get(i));
+      }
+      for (int i = 0; i < algaes_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, algaes_.get(i));
+      }
+      for (int i = 0; i < corals_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, corals_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getReef());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections)) {
+        return super.equals(obj);
+      }
+      org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections other = (org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections) obj;
+
+      if (!getRobotsList()
+          .equals(other.getRobotsList())) return false;
+      if (!getAlgaesList()
+          .equals(other.getAlgaesList())) return false;
+      if (!getCoralsList()
+          .equals(other.getCoralsList())) return false;
+      if (hasReef() != other.hasReef()) return false;
+      if (hasReef()) {
+        if (!getReef()
+            .equals(other.getReef())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getRobotsCount() > 0) {
+        hash = (37 * hash) + ROBOTS_FIELD_NUMBER;
+        hash = (53 * hash) + getRobotsList().hashCode();
+      }
+      if (getAlgaesCount() > 0) {
+        hash = (37 * hash) + ALGAES_FIELD_NUMBER;
+        hash = (53 * hash) + getAlgaesList().hashCode();
+      }
+      if (getCoralsCount() > 0) {
+        hash = (37 * hash) + CORALS_FIELD_NUMBER;
+        hash = (53 * hash) + getCoralsList().hashCode();
+      }
+      if (hasReef()) {
+        hash = (37 * hash) + REEF_FIELD_NUMBER;
+        hash = (53 * hash) + getReef().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.ProbabilityMappingDetections}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.ProbabilityMappingDetections)
+        org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetectionsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections.class, org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections.Builder.class);
+      }
+
+      // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getRobotsFieldBuilder();
+          getAlgaesFieldBuilder();
+          getCoralsFieldBuilder();
+          getReefFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        if (robotsBuilder_ == null) {
+          robots_ = java.util.Collections.emptyList();
+        } else {
+          robots_ = null;
+          robotsBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        if (algaesBuilder_ == null) {
+          algaes_ = java.util.Collections.emptyList();
+        } else {
+          algaes_ = null;
+          algaesBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        if (coralsBuilder_ == null) {
+          corals_ = java.util.Collections.emptyList();
+        } else {
+          corals_ = null;
+          coralsBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000004);
+        reef_ = null;
+        if (reefBuilder_ != null) {
+          reefBuilder_.dispose();
+          reefBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_descriptor;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections getDefaultInstanceForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections build() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections buildPartial() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections result = new org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections result) {
+        if (robotsBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            robots_ = java.util.Collections.unmodifiableList(robots_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.robots_ = robots_;
+        } else {
+          result.robots_ = robotsBuilder_.build();
+        }
+        if (algaesBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0)) {
+            algaes_ = java.util.Collections.unmodifiableList(algaes_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.algaes_ = algaes_;
+        } else {
+          result.algaes_ = algaesBuilder_.build();
+        }
+        if (coralsBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) != 0)) {
+            corals_ = java.util.Collections.unmodifiableList(corals_);
+            bitField0_ = (bitField0_ & ~0x00000004);
+          }
+          result.corals_ = corals_;
+        } else {
+          result.corals_ = coralsBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections result) {
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.reef_ = reefBuilder_ == null
+              ? reef_
+              : reefBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections) {
+          return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections other) {
+        if (other == org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections.getDefaultInstance()) return this;
+        if (robotsBuilder_ == null) {
+          if (!other.robots_.isEmpty()) {
+            if (robots_.isEmpty()) {
+              robots_ = other.robots_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureRobotsIsMutable();
+              robots_.addAll(other.robots_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.robots_.isEmpty()) {
+            if (robotsBuilder_.isEmpty()) {
+              robotsBuilder_.dispose();
+              robotsBuilder_ = null;
+              robots_ = other.robots_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              robotsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getRobotsFieldBuilder() : null;
+            } else {
+              robotsBuilder_.addAllMessages(other.robots_);
+            }
+          }
+        }
+        if (algaesBuilder_ == null) {
+          if (!other.algaes_.isEmpty()) {
+            if (algaes_.isEmpty()) {
+              algaes_ = other.algaes_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensureAlgaesIsMutable();
+              algaes_.addAll(other.algaes_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.algaes_.isEmpty()) {
+            if (algaesBuilder_.isEmpty()) {
+              algaesBuilder_.dispose();
+              algaesBuilder_ = null;
+              algaes_ = other.algaes_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              algaesBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getAlgaesFieldBuilder() : null;
+            } else {
+              algaesBuilder_.addAllMessages(other.algaes_);
+            }
+          }
+        }
+        if (coralsBuilder_ == null) {
+          if (!other.corals_.isEmpty()) {
+            if (corals_.isEmpty()) {
+              corals_ = other.corals_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+            } else {
+              ensureCoralsIsMutable();
+              corals_.addAll(other.corals_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.corals_.isEmpty()) {
+            if (coralsBuilder_.isEmpty()) {
+              coralsBuilder_.dispose();
+              coralsBuilder_ = null;
+              corals_ = other.corals_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+              coralsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getCoralsFieldBuilder() : null;
+            } else {
+              coralsBuilder_.addAllMessages(other.corals_);
+            }
+          }
+        }
+        if (other.hasReef()) {
+          mergeReef(other.getReef());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection m =
+                    input.readMessage(
+                        org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.parser(),
+                        extensionRegistry);
+                if (robotsBuilder_ == null) {
+                  ensureRobotsIsMutable();
+                  robots_.add(m);
+                } else {
+                  robotsBuilder_.addMessage(m);
+                }
+                break;
+              } // case 10
+              case 18: {
+                org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection m =
+                    input.readMessage(
+                        org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.parser(),
+                        extensionRegistry);
+                if (algaesBuilder_ == null) {
+                  ensureAlgaesIsMutable();
+                  algaes_.add(m);
+                } else {
+                  algaesBuilder_.addMessage(m);
+                }
+                break;
+              } // case 18
+              case 26: {
+                org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection m =
+                    input.readMessage(
+                        org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.parser(),
+                        extensionRegistry);
+                if (coralsBuilder_ == null) {
+                  ensureCoralsIsMutable();
+                  corals_.add(m);
+                } else {
+                  coralsBuilder_.addMessage(m);
+                }
+                break;
+              } // case 26
+              case 34: {
+                input.readMessage(
+                    getReefFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection> robots_ =
+        java.util.Collections.emptyList();
+      private void ensureRobotsIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          robots_ = new java.util.ArrayList<org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection>(robots_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder> robotsBuilder_;
+
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection> getRobotsList() {
+        if (robotsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(robots_);
+        } else {
+          return robotsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public int getRobotsCount() {
+        if (robotsBuilder_ == null) {
+          return robots_.size();
+        } else {
+          return robotsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection getRobots(int index) {
+        if (robotsBuilder_ == null) {
+          return robots_.get(index);
+        } else {
+          return robotsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder setRobots(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection value) {
+        if (robotsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRobotsIsMutable();
+          robots_.set(index, value);
+          onChanged();
+        } else {
+          robotsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder setRobots(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder builderForValue) {
+        if (robotsBuilder_ == null) {
+          ensureRobotsIsMutable();
+          robots_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          robotsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder addRobots(org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection value) {
+        if (robotsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRobotsIsMutable();
+          robots_.add(value);
+          onChanged();
+        } else {
+          robotsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder addRobots(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection value) {
+        if (robotsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRobotsIsMutable();
+          robots_.add(index, value);
+          onChanged();
+        } else {
+          robotsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder addRobots(
+          org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder builderForValue) {
+        if (robotsBuilder_ == null) {
+          ensureRobotsIsMutable();
+          robots_.add(builderForValue.build());
+          onChanged();
+        } else {
+          robotsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder addRobots(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder builderForValue) {
+        if (robotsBuilder_ == null) {
+          ensureRobotsIsMutable();
+          robots_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          robotsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder addAllRobots(
+          java.lang.Iterable<? extends org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection> values) {
+        if (robotsBuilder_ == null) {
+          ensureRobotsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, robots_);
+          onChanged();
+        } else {
+          robotsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder clearRobots() {
+        if (robotsBuilder_ == null) {
+          robots_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          robotsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public Builder removeRobots(int index) {
+        if (robotsBuilder_ == null) {
+          ensureRobotsIsMutable();
+          robots_.remove(index);
+          onChanged();
+        } else {
+          robotsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder getRobotsBuilder(
+          int index) {
+        return getRobotsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder getRobotsOrBuilder(
+          int index) {
+        if (robotsBuilder_ == null) {
+          return robots_.get(index);  } else {
+          return robotsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder> 
+           getRobotsOrBuilderList() {
+        if (robotsBuilder_ != null) {
+          return robotsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(robots_);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder addRobotsBuilder() {
+        return getRobotsFieldBuilder().addBuilder(
+            org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder addRobotsBuilder(
+          int index) {
+        return getRobotsFieldBuilder().addBuilder(
+            index, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.RobotDetection robots = 1;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder> 
+           getRobotsBuilderList() {
+        return getRobotsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder> 
+          getRobotsFieldBuilder() {
+        if (robotsBuilder_ == null) {
+          robotsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder>(
+                  robots_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          robots_ = null;
+        }
+        return robotsBuilder_;
+      }
+
+      private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection> algaes_ =
+        java.util.Collections.emptyList();
+      private void ensureAlgaesIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          algaes_ = new java.util.ArrayList<org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection>(algaes_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder> algaesBuilder_;
+
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection> getAlgaesList() {
+        if (algaesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(algaes_);
+        } else {
+          return algaesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public int getAlgaesCount() {
+        if (algaesBuilder_ == null) {
+          return algaes_.size();
+        } else {
+          return algaesBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection getAlgaes(int index) {
+        if (algaesBuilder_ == null) {
+          return algaes_.get(index);
+        } else {
+          return algaesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder setAlgaes(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection value) {
+        if (algaesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAlgaesIsMutable();
+          algaes_.set(index, value);
+          onChanged();
+        } else {
+          algaesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder setAlgaes(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder builderForValue) {
+        if (algaesBuilder_ == null) {
+          ensureAlgaesIsMutable();
+          algaes_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          algaesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder addAlgaes(org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection value) {
+        if (algaesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAlgaesIsMutable();
+          algaes_.add(value);
+          onChanged();
+        } else {
+          algaesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder addAlgaes(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection value) {
+        if (algaesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAlgaesIsMutable();
+          algaes_.add(index, value);
+          onChanged();
+        } else {
+          algaesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder addAlgaes(
+          org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder builderForValue) {
+        if (algaesBuilder_ == null) {
+          ensureAlgaesIsMutable();
+          algaes_.add(builderForValue.build());
+          onChanged();
+        } else {
+          algaesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder addAlgaes(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder builderForValue) {
+        if (algaesBuilder_ == null) {
+          ensureAlgaesIsMutable();
+          algaes_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          algaesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder addAllAlgaes(
+          java.lang.Iterable<? extends org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection> values) {
+        if (algaesBuilder_ == null) {
+          ensureAlgaesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, algaes_);
+          onChanged();
+        } else {
+          algaesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder clearAlgaes() {
+        if (algaesBuilder_ == null) {
+          algaes_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          algaesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public Builder removeAlgaes(int index) {
+        if (algaesBuilder_ == null) {
+          ensureAlgaesIsMutable();
+          algaes_.remove(index);
+          onChanged();
+        } else {
+          algaesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder getAlgaesBuilder(
+          int index) {
+        return getAlgaesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder getAlgaesOrBuilder(
+          int index) {
+        if (algaesBuilder_ == null) {
+          return algaes_.get(index);  } else {
+          return algaesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder> 
+           getAlgaesOrBuilderList() {
+        if (algaesBuilder_ != null) {
+          return algaesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(algaes_);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder addAlgaesBuilder() {
+        return getAlgaesFieldBuilder().addBuilder(
+            org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder addAlgaesBuilder(
+          int index) {
+        return getAlgaesFieldBuilder().addBuilder(
+            index, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.AlgaeDetection algaes = 2;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder> 
+           getAlgaesBuilderList() {
+        return getAlgaesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder> 
+          getAlgaesFieldBuilder() {
+        if (algaesBuilder_ == null) {
+          algaesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder>(
+                  algaes_,
+                  ((bitField0_ & 0x00000002) != 0),
+                  getParentForChildren(),
+                  isClean());
+          algaes_ = null;
+        }
+        return algaesBuilder_;
+      }
+
+      private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection> corals_ =
+        java.util.Collections.emptyList();
+      private void ensureCoralsIsMutable() {
+        if (!((bitField0_ & 0x00000004) != 0)) {
+          corals_ = new java.util.ArrayList<org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection>(corals_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder> coralsBuilder_;
+
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection> getCoralsList() {
+        if (coralsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(corals_);
+        } else {
+          return coralsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public int getCoralsCount() {
+        if (coralsBuilder_ == null) {
+          return corals_.size();
+        } else {
+          return coralsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection getCorals(int index) {
+        if (coralsBuilder_ == null) {
+          return corals_.get(index);
+        } else {
+          return coralsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder setCorals(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection value) {
+        if (coralsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureCoralsIsMutable();
+          corals_.set(index, value);
+          onChanged();
+        } else {
+          coralsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder setCorals(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder builderForValue) {
+        if (coralsBuilder_ == null) {
+          ensureCoralsIsMutable();
+          corals_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          coralsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder addCorals(org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection value) {
+        if (coralsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureCoralsIsMutable();
+          corals_.add(value);
+          onChanged();
+        } else {
+          coralsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder addCorals(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection value) {
+        if (coralsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureCoralsIsMutable();
+          corals_.add(index, value);
+          onChanged();
+        } else {
+          coralsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder addCorals(
+          org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder builderForValue) {
+        if (coralsBuilder_ == null) {
+          ensureCoralsIsMutable();
+          corals_.add(builderForValue.build());
+          onChanged();
+        } else {
+          coralsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder addCorals(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder builderForValue) {
+        if (coralsBuilder_ == null) {
+          ensureCoralsIsMutable();
+          corals_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          coralsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder addAllCorals(
+          java.lang.Iterable<? extends org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection> values) {
+        if (coralsBuilder_ == null) {
+          ensureCoralsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, corals_);
+          onChanged();
+        } else {
+          coralsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder clearCorals() {
+        if (coralsBuilder_ == null) {
+          corals_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+          onChanged();
+        } else {
+          coralsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public Builder removeCorals(int index) {
+        if (coralsBuilder_ == null) {
+          ensureCoralsIsMutable();
+          corals_.remove(index);
+          onChanged();
+        } else {
+          coralsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder getCoralsBuilder(
+          int index) {
+        return getCoralsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder getCoralsOrBuilder(
+          int index) {
+        if (coralsBuilder_ == null) {
+          return corals_.get(index);  } else {
+          return coralsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder> 
+           getCoralsOrBuilderList() {
+        if (coralsBuilder_ != null) {
+          return coralsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(corals_);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder addCoralsBuilder() {
+        return getCoralsFieldBuilder().addBuilder(
+            org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder addCoralsBuilder(
+          int index) {
+        return getCoralsFieldBuilder().addBuilder(
+            index, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.CoralDetection corals = 3;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder> 
+           getCoralsBuilderList() {
+        return getCoralsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder> 
+          getCoralsFieldBuilder() {
+        if (coralsBuilder_ == null) {
+          coralsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder>(
+                  corals_,
+                  ((bitField0_ & 0x00000004) != 0),
+                  getParentForChildren(),
+                  isClean());
+          corals_ = null;
+        }
+        return coralsBuilder_;
+      }
+
+      private org.kobe.xbot.Utilities.Entities.XTableValues.ReefState reef_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ReefState, org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ReefStateOrBuilder> reefBuilder_;
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       * @return Whether the reef field is set.
+       */
+      public boolean hasReef() {
+        return ((bitField0_ & 0x00000008) != 0);
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       * @return The reef.
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefState getReef() {
+        if (reefBuilder_ == null) {
+          return reef_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.getDefaultInstance() : reef_;
+        } else {
+          return reefBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       */
+      public Builder setReef(org.kobe.xbot.Utilities.Entities.XTableValues.ReefState value) {
+        if (reefBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          reef_ = value;
+        } else {
+          reefBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       */
+      public Builder setReef(
+          org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.Builder builderForValue) {
+        if (reefBuilder_ == null) {
+          reef_ = builderForValue.build();
+        } else {
+          reefBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       */
+      public Builder mergeReef(org.kobe.xbot.Utilities.Entities.XTableValues.ReefState value) {
+        if (reefBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) != 0) &&
+            reef_ != null &&
+            reef_ != org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.getDefaultInstance()) {
+            getReefBuilder().mergeFrom(value);
+          } else {
+            reef_ = value;
+          }
+        } else {
+          reefBuilder_.mergeFrom(value);
+        }
+        if (reef_ != null) {
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       */
+      public Builder clearReef() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        reef_ = null;
+        if (reefBuilder_ != null) {
+          reefBuilder_.dispose();
+          reefBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.Builder getReefBuilder() {
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return getReefFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefStateOrBuilder getReefOrBuilder() {
+        if (reefBuilder_ != null) {
+          return reefBuilder_.getMessageOrBuilder();
+        } else {
+          return reef_ == null ?
+              org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.getDefaultInstance() : reef_;
+        }
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.ReefState reef = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ReefState, org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ReefStateOrBuilder> 
+          getReefFieldBuilder() {
+        if (reefBuilder_ == null) {
+          reefBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.ReefState, org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ReefStateOrBuilder>(
+                  getReef(),
+                  getParentForChildren(),
+                  isClean());
+          reef_ = null;
+        }
+        return reefBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.ProbabilityMappingDetections)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.ProbabilityMappingDetections)
+    private static final org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections();
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ProbabilityMappingDetections>
+        PARSER = new com.google.protobuf.AbstractParser<ProbabilityMappingDetections>() {
+      @java.lang.Override
+      public ProbabilityMappingDetections parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ProbabilityMappingDetections> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ProbabilityMappingDetections> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ProbabilityMappingDetections getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface RobotDetectionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.RobotDetection)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>double probability = 1;</code>
+     * @return The probability.
+     */
+    double getProbability();
+
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return Whether the pose field is set.
+     */
+    boolean hasPose();
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return The pose.
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose();
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder();
+  }
+  /**
+   * Protobuf type {@code org.kobe.xbot.Utilities.Entities.RobotDetection}
+   */
+  public static final class RobotDetection extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.RobotDetection)
+      RobotDetectionOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use RobotDetection.newBuilder() to construct.
+    private RobotDetection(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private RobotDetection() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new RobotDetection();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.class, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int PROBABILITY_FIELD_NUMBER = 1;
+    private double probability_ = 0D;
+    /**
+     * <code>double probability = 1;</code>
+     * @return The probability.
+     */
+    @java.lang.Override
+    public double getProbability() {
+      return probability_;
+    }
+
+    public static final int POSE_FIELD_NUMBER = 2;
+    private org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint pose_;
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return Whether the pose field is set.
+     */
+    @java.lang.Override
+    public boolean hasPose() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return The pose.
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose() {
+      return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+    }
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder() {
+      return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (java.lang.Double.doubleToRawLongBits(probability_) != 0) {
+        output.writeDouble(1, probability_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(2, getPose());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (java.lang.Double.doubleToRawLongBits(probability_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(1, probability_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getPose());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection)) {
+        return super.equals(obj);
+      }
+      org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection other = (org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection) obj;
+
+      if (java.lang.Double.doubleToLongBits(getProbability())
+          != java.lang.Double.doubleToLongBits(
+              other.getProbability())) return false;
+      if (hasPose() != other.hasPose()) return false;
+      if (hasPose()) {
+        if (!getPose()
+            .equals(other.getPose())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + PROBABILITY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getProbability()));
+      if (hasPose()) {
+        hash = (37 * hash) + POSE_FIELD_NUMBER;
+        hash = (53 * hash) + getPose().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.RobotDetection}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.RobotDetection)
+        org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetectionOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.class, org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.Builder.class);
+      }
+
+      // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getPoseFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        probability_ = 0D;
+        pose_ = null;
+        if (poseBuilder_ != null) {
+          poseBuilder_.dispose();
+          poseBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_descriptor;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection getDefaultInstanceForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection build() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection buildPartial() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection result = new org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.probability_ = probability_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.pose_ = poseBuilder_ == null
+              ? pose_
+              : poseBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection) {
+          return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection other) {
+        if (other == org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection.getDefaultInstance()) return this;
+        if (other.getProbability() != 0D) {
+          setProbability(other.getProbability());
+        }
+        if (other.hasPose()) {
+          mergePose(other.getPose());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 9: {
+                probability_ = input.readDouble();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 9
+              case 18: {
+                input.readMessage(
+                    getPoseFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private double probability_ ;
+      /**
+       * <code>double probability = 1;</code>
+       * @return The probability.
+       */
+      @java.lang.Override
+      public double getProbability() {
+        return probability_;
+      }
+      /**
+       * <code>double probability = 1;</code>
+       * @param value The probability to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProbability(double value) {
+
+        probability_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double probability = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProbability() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        probability_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint pose_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> poseBuilder_;
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       * @return Whether the pose field is set.
+       */
+      public boolean hasPose() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       * @return The pose.
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose() {
+        if (poseBuilder_ == null) {
+          return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+        } else {
+          return poseBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder setPose(org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
+        if (poseBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          pose_ = value;
+        } else {
+          poseBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder setPose(
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder builderForValue) {
+        if (poseBuilder_ == null) {
+          pose_ = builderForValue.build();
+        } else {
+          poseBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder mergePose(org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
+        if (poseBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+            pose_ != null &&
+            pose_ != org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance()) {
+            getPoseBuilder().mergeFrom(value);
+          } else {
+            pose_ = value;
+          }
+        } else {
+          poseBuilder_.mergeFrom(value);
+        }
+        if (pose_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder clearPose() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        pose_ = null;
+        if (poseBuilder_ != null) {
+          poseBuilder_.dispose();
+          poseBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder getPoseBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getPoseFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder() {
+        if (poseBuilder_ != null) {
+          return poseBuilder_.getMessageOrBuilder();
+        } else {
+          return pose_ == null ?
+              org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+        }
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> 
+          getPoseFieldBuilder() {
+        if (poseBuilder_ == null) {
+          poseBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder>(
+                  getPose(),
+                  getParentForChildren(),
+                  isClean());
+          pose_ = null;
+        }
+        return poseBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.RobotDetection)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.RobotDetection)
+    private static final org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection();
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RobotDetection>
+        PARSER = new com.google.protobuf.AbstractParser<RobotDetection>() {
+      @java.lang.Override
+      public RobotDetection parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<RobotDetection> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RobotDetection> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.RobotDetection getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface AlgaeDetectionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.AlgaeDetection)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>double probability = 1;</code>
+     * @return The probability.
+     */
+    double getProbability();
+
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return Whether the pose field is set.
+     */
+    boolean hasPose();
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return The pose.
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose();
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder();
+  }
+  /**
+   * Protobuf type {@code org.kobe.xbot.Utilities.Entities.AlgaeDetection}
+   */
+  public static final class AlgaeDetection extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.AlgaeDetection)
+      AlgaeDetectionOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use AlgaeDetection.newBuilder() to construct.
+    private AlgaeDetection(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private AlgaeDetection() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new AlgaeDetection();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.class, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int PROBABILITY_FIELD_NUMBER = 1;
+    private double probability_ = 0D;
+    /**
+     * <code>double probability = 1;</code>
+     * @return The probability.
+     */
+    @java.lang.Override
+    public double getProbability() {
+      return probability_;
+    }
+
+    public static final int POSE_FIELD_NUMBER = 2;
+    private org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint pose_;
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return Whether the pose field is set.
+     */
+    @java.lang.Override
+    public boolean hasPose() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return The pose.
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose() {
+      return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+    }
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder() {
+      return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (java.lang.Double.doubleToRawLongBits(probability_) != 0) {
+        output.writeDouble(1, probability_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(2, getPose());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (java.lang.Double.doubleToRawLongBits(probability_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(1, probability_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getPose());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection)) {
+        return super.equals(obj);
+      }
+      org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection other = (org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection) obj;
+
+      if (java.lang.Double.doubleToLongBits(getProbability())
+          != java.lang.Double.doubleToLongBits(
+              other.getProbability())) return false;
+      if (hasPose() != other.hasPose()) return false;
+      if (hasPose()) {
+        if (!getPose()
+            .equals(other.getPose())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + PROBABILITY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getProbability()));
+      if (hasPose()) {
+        hash = (37 * hash) + POSE_FIELD_NUMBER;
+        hash = (53 * hash) + getPose().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.AlgaeDetection}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.AlgaeDetection)
+        org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetectionOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.class, org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.Builder.class);
+      }
+
+      // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getPoseFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        probability_ = 0D;
+        pose_ = null;
+        if (poseBuilder_ != null) {
+          poseBuilder_.dispose();
+          poseBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_descriptor;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection getDefaultInstanceForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection build() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection buildPartial() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection result = new org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.probability_ = probability_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.pose_ = poseBuilder_ == null
+              ? pose_
+              : poseBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection) {
+          return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection other) {
+        if (other == org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection.getDefaultInstance()) return this;
+        if (other.getProbability() != 0D) {
+          setProbability(other.getProbability());
+        }
+        if (other.hasPose()) {
+          mergePose(other.getPose());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 9: {
+                probability_ = input.readDouble();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 9
+              case 18: {
+                input.readMessage(
+                    getPoseFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private double probability_ ;
+      /**
+       * <code>double probability = 1;</code>
+       * @return The probability.
+       */
+      @java.lang.Override
+      public double getProbability() {
+        return probability_;
+      }
+      /**
+       * <code>double probability = 1;</code>
+       * @param value The probability to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProbability(double value) {
+
+        probability_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double probability = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProbability() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        probability_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint pose_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> poseBuilder_;
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       * @return Whether the pose field is set.
+       */
+      public boolean hasPose() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       * @return The pose.
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose() {
+        if (poseBuilder_ == null) {
+          return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+        } else {
+          return poseBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder setPose(org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
+        if (poseBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          pose_ = value;
+        } else {
+          poseBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder setPose(
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder builderForValue) {
+        if (poseBuilder_ == null) {
+          pose_ = builderForValue.build();
+        } else {
+          poseBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder mergePose(org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
+        if (poseBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+            pose_ != null &&
+            pose_ != org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance()) {
+            getPoseBuilder().mergeFrom(value);
+          } else {
+            pose_ = value;
+          }
+        } else {
+          poseBuilder_.mergeFrom(value);
+        }
+        if (pose_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder clearPose() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        pose_ = null;
+        if (poseBuilder_ != null) {
+          poseBuilder_.dispose();
+          poseBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder getPoseBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getPoseFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder() {
+        if (poseBuilder_ != null) {
+          return poseBuilder_.getMessageOrBuilder();
+        } else {
+          return pose_ == null ?
+              org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+        }
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> 
+          getPoseFieldBuilder() {
+        if (poseBuilder_ == null) {
+          poseBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder>(
+                  getPose(),
+                  getParentForChildren(),
+                  isClean());
+          pose_ = null;
+        }
+        return poseBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.AlgaeDetection)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.AlgaeDetection)
+    private static final org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection();
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<AlgaeDetection>
+        PARSER = new com.google.protobuf.AbstractParser<AlgaeDetection>() {
+      @java.lang.Override
+      public AlgaeDetection parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<AlgaeDetection> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<AlgaeDetection> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.AlgaeDetection getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface CoralDetectionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.CoralDetection)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>double probability = 1;</code>
+     * @return The probability.
+     */
+    double getProbability();
+
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return Whether the pose field is set.
+     */
+    boolean hasPose();
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return The pose.
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose();
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder();
+  }
+  /**
+   * Protobuf type {@code org.kobe.xbot.Utilities.Entities.CoralDetection}
+   */
+  public static final class CoralDetection extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.CoralDetection)
+      CoralDetectionOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use CoralDetection.newBuilder() to construct.
+    private CoralDetection(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private CoralDetection() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new CoralDetection();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.class, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int PROBABILITY_FIELD_NUMBER = 1;
+    private double probability_ = 0D;
+    /**
+     * <code>double probability = 1;</code>
+     * @return The probability.
+     */
+    @java.lang.Override
+    public double getProbability() {
+      return probability_;
+    }
+
+    public static final int POSE_FIELD_NUMBER = 2;
+    private org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint pose_;
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return Whether the pose field is set.
+     */
+    @java.lang.Override
+    public boolean hasPose() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     * @return The pose.
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose() {
+      return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+    }
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder() {
+      return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (java.lang.Double.doubleToRawLongBits(probability_) != 0) {
+        output.writeDouble(1, probability_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(2, getPose());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (java.lang.Double.doubleToRawLongBits(probability_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(1, probability_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getPose());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection)) {
+        return super.equals(obj);
+      }
+      org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection other = (org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection) obj;
+
+      if (java.lang.Double.doubleToLongBits(getProbability())
+          != java.lang.Double.doubleToLongBits(
+              other.getProbability())) return false;
+      if (hasPose() != other.hasPose()) return false;
+      if (hasPose()) {
+        if (!getPose()
+            .equals(other.getPose())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + PROBABILITY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getProbability()));
+      if (hasPose()) {
+        hash = (37 * hash) + POSE_FIELD_NUMBER;
+        hash = (53 * hash) + getPose().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.CoralDetection}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.CoralDetection)
+        org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetectionOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.class, org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.Builder.class);
+      }
+
+      // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getPoseFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        probability_ = 0D;
+        pose_ = null;
+        if (poseBuilder_ != null) {
+          poseBuilder_.dispose();
+          poseBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_descriptor;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection getDefaultInstanceForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection build() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection buildPartial() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection result = new org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.probability_ = probability_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.pose_ = poseBuilder_ == null
+              ? pose_
+              : poseBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection) {
+          return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection other) {
+        if (other == org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection.getDefaultInstance()) return this;
+        if (other.getProbability() != 0D) {
+          setProbability(other.getProbability());
+        }
+        if (other.hasPose()) {
+          mergePose(other.getPose());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 9: {
+                probability_ = input.readDouble();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 9
+              case 18: {
+                input.readMessage(
+                    getPoseFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private double probability_ ;
+      /**
+       * <code>double probability = 1;</code>
+       * @return The probability.
+       */
+      @java.lang.Override
+      public double getProbability() {
+        return probability_;
+      }
+      /**
+       * <code>double probability = 1;</code>
+       * @param value The probability to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProbability(double value) {
+
+        probability_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double probability = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProbability() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        probability_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint pose_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> poseBuilder_;
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       * @return Whether the pose field is set.
+       */
+      public boolean hasPose() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       * @return The pose.
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getPose() {
+        if (poseBuilder_ == null) {
+          return pose_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+        } else {
+          return poseBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder setPose(org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
+        if (poseBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          pose_ = value;
+        } else {
+          poseBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder setPose(
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder builderForValue) {
+        if (poseBuilder_ == null) {
+          pose_ = builderForValue.build();
+        } else {
+          poseBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder mergePose(org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
+        if (poseBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+            pose_ != null &&
+            pose_ != org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance()) {
+            getPoseBuilder().mergeFrom(value);
+          } else {
+            pose_ = value;
+          }
+        } else {
+          poseBuilder_.mergeFrom(value);
+        }
+        if (pose_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public Builder clearPose() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        pose_ = null;
+        if (poseBuilder_ != null) {
+          poseBuilder_.dispose();
+          poseBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder getPoseBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getPoseFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getPoseOrBuilder() {
+        if (poseBuilder_ != null) {
+          return poseBuilder_.getMessageOrBuilder();
+        } else {
+          return pose_ == null ?
+              org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance() : pose_;
+        }
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.ControlPoint pose = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> 
+          getPoseFieldBuilder() {
+        if (poseBuilder_ == null) {
+          poseBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder>(
+                  getPose(),
+                  getParentForChildren(),
+                  isClean());
+          pose_ = null;
+        }
+        return poseBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.CoralDetection)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.CoralDetection)
+    private static final org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection();
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CoralDetection>
+        PARSER = new com.google.protobuf.AbstractParser<CoralDetection>() {
+      @java.lang.Override
+      public CoralDetection parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<CoralDetection> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CoralDetection> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.CoralDetection getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface BranchCoralStateOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.BranchCoralState)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int32 index = 1;</code>
+     * @return The index.
+     */
+    int getIndex();
+
+    /**
+     * <code>double openness = 2;</code>
+     * @return The openness.
+     */
+    double getOpenness();
+  }
+  /**
+   * Protobuf type {@code org.kobe.xbot.Utilities.Entities.BranchCoralState}
+   */
+  public static final class BranchCoralState extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.BranchCoralState)
+      BranchCoralStateOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use BranchCoralState.newBuilder() to construct.
+    private BranchCoralState(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private BranchCoralState() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new BranchCoralState();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.class, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder.class);
+    }
+
+    public static final int INDEX_FIELD_NUMBER = 1;
+    private int index_ = 0;
+    /**
+     * <code>int32 index = 1;</code>
+     * @return The index.
+     */
+    @java.lang.Override
+    public int getIndex() {
+      return index_;
+    }
+
+    public static final int OPENNESS_FIELD_NUMBER = 2;
+    private double openness_ = 0D;
+    /**
+     * <code>double openness = 2;</code>
+     * @return The openness.
+     */
+    @java.lang.Override
+    public double getOpenness() {
+      return openness_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (index_ != 0) {
+        output.writeInt32(1, index_);
+      }
+      if (java.lang.Double.doubleToRawLongBits(openness_) != 0) {
+        output.writeDouble(2, openness_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (index_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, index_);
+      }
+      if (java.lang.Double.doubleToRawLongBits(openness_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(2, openness_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState)) {
+        return super.equals(obj);
+      }
+      org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState other = (org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState) obj;
+
+      if (getIndex()
+          != other.getIndex()) return false;
+      if (java.lang.Double.doubleToLongBits(getOpenness())
+          != java.lang.Double.doubleToLongBits(
+              other.getOpenness())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + INDEX_FIELD_NUMBER;
+      hash = (53 * hash) + getIndex();
+      hash = (37 * hash) + OPENNESS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getOpenness()));
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.BranchCoralState}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.BranchCoralState)
+        org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.class, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder.class);
+      }
+
+      // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        index_ = 0;
+        openness_ = 0D;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_descriptor;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState getDefaultInstanceForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState build() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState buildPartial() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState result = new org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.index_ = index_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.openness_ = openness_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState) {
+          return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState other) {
+        if (other == org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.getDefaultInstance()) return this;
+        if (other.getIndex() != 0) {
+          setIndex(other.getIndex());
+        }
+        if (other.getOpenness() != 0D) {
+          setOpenness(other.getOpenness());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                index_ = input.readInt32();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 17: {
+                openness_ = input.readDouble();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 17
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int index_ ;
+      /**
+       * <code>int32 index = 1;</code>
+       * @return The index.
+       */
+      @java.lang.Override
+      public int getIndex() {
+        return index_;
+      }
+      /**
+       * <code>int32 index = 1;</code>
+       * @param value The index to set.
+       * @return This builder for chaining.
+       */
+      public Builder setIndex(int value) {
+
+        index_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 index = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearIndex() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        index_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private double openness_ ;
+      /**
+       * <code>double openness = 2;</code>
+       * @return The openness.
+       */
+      @java.lang.Override
+      public double getOpenness() {
+        return openness_;
+      }
+      /**
+       * <code>double openness = 2;</code>
+       * @param value The openness to set.
+       * @return This builder for chaining.
+       */
+      public Builder setOpenness(double value) {
+
+        openness_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double openness = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearOpenness() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        openness_ = 0D;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.BranchCoralState)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.BranchCoralState)
+    private static final org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState();
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<BranchCoralState>
+        PARSER = new com.google.protobuf.AbstractParser<BranchCoralState>() {
+      @java.lang.Override
+      public BranchCoralState parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<BranchCoralState> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<BranchCoralState> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ReefEntryOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.ReefEntry)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState> 
+        getBranchIndexStatesList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState getBranchIndexStates(int index);
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    int getBranchIndexStatesCount();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder> 
+        getBranchIndexStatesOrBuilderList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder getBranchIndexStatesOrBuilder(
+        int index);
+
+    /**
+     * <code>double algaeOpenness = 2;</code>
+     * @return The algaeOpenness.
+     */
+    double getAlgaeOpenness();
+
+    /**
+     * <code>int32 aprilTagID = 3;</code>
+     * @return The aprilTagID.
+     */
+    int getAprilTagID();
+  }
+  /**
+   * Protobuf type {@code org.kobe.xbot.Utilities.Entities.ReefEntry}
+   */
+  public static final class ReefEntry extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.ReefEntry)
+      ReefEntryOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ReefEntry.newBuilder() to construct.
+    private ReefEntry(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ReefEntry() {
+      branchIndexStates_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new ReefEntry();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.class, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder.class);
+    }
+
+    public static final int BRANCHINDEXSTATES_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState> branchIndexStates_;
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState> getBranchIndexStatesList() {
+      return branchIndexStates_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder> 
+        getBranchIndexStatesOrBuilderList() {
+      return branchIndexStates_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    @java.lang.Override
+    public int getBranchIndexStatesCount() {
+      return branchIndexStates_.size();
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState getBranchIndexStates(int index) {
+      return branchIndexStates_.get(index);
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder getBranchIndexStatesOrBuilder(
+        int index) {
+      return branchIndexStates_.get(index);
+    }
+
+    public static final int ALGAEOPENNESS_FIELD_NUMBER = 2;
+    private double algaeOpenness_ = 0D;
+    /**
+     * <code>double algaeOpenness = 2;</code>
+     * @return The algaeOpenness.
+     */
+    @java.lang.Override
+    public double getAlgaeOpenness() {
+      return algaeOpenness_;
+    }
+
+    public static final int APRILTAGID_FIELD_NUMBER = 3;
+    private int aprilTagID_ = 0;
+    /**
+     * <code>int32 aprilTagID = 3;</code>
+     * @return The aprilTagID.
+     */
+    @java.lang.Override
+    public int getAprilTagID() {
+      return aprilTagID_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < branchIndexStates_.size(); i++) {
+        output.writeMessage(1, branchIndexStates_.get(i));
+      }
+      if (java.lang.Double.doubleToRawLongBits(algaeOpenness_) != 0) {
+        output.writeDouble(2, algaeOpenness_);
+      }
+      if (aprilTagID_ != 0) {
+        output.writeInt32(3, aprilTagID_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < branchIndexStates_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, branchIndexStates_.get(i));
+      }
+      if (java.lang.Double.doubleToRawLongBits(algaeOpenness_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(2, algaeOpenness_);
+      }
+      if (aprilTagID_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, aprilTagID_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry)) {
+        return super.equals(obj);
+      }
+      org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry other = (org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry) obj;
+
+      if (!getBranchIndexStatesList()
+          .equals(other.getBranchIndexStatesList())) return false;
+      if (java.lang.Double.doubleToLongBits(getAlgaeOpenness())
+          != java.lang.Double.doubleToLongBits(
+              other.getAlgaeOpenness())) return false;
+      if (getAprilTagID()
+          != other.getAprilTagID()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getBranchIndexStatesCount() > 0) {
+        hash = (37 * hash) + BRANCHINDEXSTATES_FIELD_NUMBER;
+        hash = (53 * hash) + getBranchIndexStatesList().hashCode();
+      }
+      hash = (37 * hash) + ALGAEOPENNESS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getAlgaeOpenness()));
+      hash = (37 * hash) + APRILTAGID_FIELD_NUMBER;
+      hash = (53 * hash) + getAprilTagID();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.ReefEntry}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.ReefEntry)
+        org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.class, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder.class);
+      }
+
+      // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        if (branchIndexStatesBuilder_ == null) {
+          branchIndexStates_ = java.util.Collections.emptyList();
+        } else {
+          branchIndexStates_ = null;
+          branchIndexStatesBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        algaeOpenness_ = 0D;
+        aprilTagID_ = 0;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_descriptor;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry getDefaultInstanceForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry build() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry buildPartial() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry result = new org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry result) {
+        if (branchIndexStatesBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            branchIndexStates_ = java.util.Collections.unmodifiableList(branchIndexStates_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.branchIndexStates_ = branchIndexStates_;
+        } else {
+          result.branchIndexStates_ = branchIndexStatesBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.algaeOpenness_ = algaeOpenness_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.aprilTagID_ = aprilTagID_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry) {
+          return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry other) {
+        if (other == org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.getDefaultInstance()) return this;
+        if (branchIndexStatesBuilder_ == null) {
+          if (!other.branchIndexStates_.isEmpty()) {
+            if (branchIndexStates_.isEmpty()) {
+              branchIndexStates_ = other.branchIndexStates_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureBranchIndexStatesIsMutable();
+              branchIndexStates_.addAll(other.branchIndexStates_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.branchIndexStates_.isEmpty()) {
+            if (branchIndexStatesBuilder_.isEmpty()) {
+              branchIndexStatesBuilder_.dispose();
+              branchIndexStatesBuilder_ = null;
+              branchIndexStates_ = other.branchIndexStates_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              branchIndexStatesBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getBranchIndexStatesFieldBuilder() : null;
+            } else {
+              branchIndexStatesBuilder_.addAllMessages(other.branchIndexStates_);
+            }
+          }
+        }
+        if (other.getAlgaeOpenness() != 0D) {
+          setAlgaeOpenness(other.getAlgaeOpenness());
+        }
+        if (other.getAprilTagID() != 0) {
+          setAprilTagID(other.getAprilTagID());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState m =
+                    input.readMessage(
+                        org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.parser(),
+                        extensionRegistry);
+                if (branchIndexStatesBuilder_ == null) {
+                  ensureBranchIndexStatesIsMutable();
+                  branchIndexStates_.add(m);
+                } else {
+                  branchIndexStatesBuilder_.addMessage(m);
+                }
+                break;
+              } // case 10
+              case 17: {
+                algaeOpenness_ = input.readDouble();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 17
+              case 24: {
+                aprilTagID_ = input.readInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState> branchIndexStates_ =
+        java.util.Collections.emptyList();
+      private void ensureBranchIndexStatesIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          branchIndexStates_ = new java.util.ArrayList<org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState>(branchIndexStates_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder> branchIndexStatesBuilder_;
+
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState> getBranchIndexStatesList() {
+        if (branchIndexStatesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(branchIndexStates_);
+        } else {
+          return branchIndexStatesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public int getBranchIndexStatesCount() {
+        if (branchIndexStatesBuilder_ == null) {
+          return branchIndexStates_.size();
+        } else {
+          return branchIndexStatesBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState getBranchIndexStates(int index) {
+        if (branchIndexStatesBuilder_ == null) {
+          return branchIndexStates_.get(index);
+        } else {
+          return branchIndexStatesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder setBranchIndexStates(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState value) {
+        if (branchIndexStatesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureBranchIndexStatesIsMutable();
+          branchIndexStates_.set(index, value);
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder setBranchIndexStates(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder builderForValue) {
+        if (branchIndexStatesBuilder_ == null) {
+          ensureBranchIndexStatesIsMutable();
+          branchIndexStates_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder addBranchIndexStates(org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState value) {
+        if (branchIndexStatesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureBranchIndexStatesIsMutable();
+          branchIndexStates_.add(value);
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder addBranchIndexStates(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState value) {
+        if (branchIndexStatesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureBranchIndexStatesIsMutable();
+          branchIndexStates_.add(index, value);
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder addBranchIndexStates(
+          org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder builderForValue) {
+        if (branchIndexStatesBuilder_ == null) {
+          ensureBranchIndexStatesIsMutable();
+          branchIndexStates_.add(builderForValue.build());
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder addBranchIndexStates(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder builderForValue) {
+        if (branchIndexStatesBuilder_ == null) {
+          ensureBranchIndexStatesIsMutable();
+          branchIndexStates_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder addAllBranchIndexStates(
+          java.lang.Iterable<? extends org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState> values) {
+        if (branchIndexStatesBuilder_ == null) {
+          ensureBranchIndexStatesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, branchIndexStates_);
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder clearBranchIndexStates() {
+        if (branchIndexStatesBuilder_ == null) {
+          branchIndexStates_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public Builder removeBranchIndexStates(int index) {
+        if (branchIndexStatesBuilder_ == null) {
+          ensureBranchIndexStatesIsMutable();
+          branchIndexStates_.remove(index);
+          onChanged();
+        } else {
+          branchIndexStatesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder getBranchIndexStatesBuilder(
+          int index) {
+        return getBranchIndexStatesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder getBranchIndexStatesOrBuilder(
+          int index) {
+        if (branchIndexStatesBuilder_ == null) {
+          return branchIndexStates_.get(index);  } else {
+          return branchIndexStatesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder> 
+           getBranchIndexStatesOrBuilderList() {
+        if (branchIndexStatesBuilder_ != null) {
+          return branchIndexStatesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(branchIndexStates_);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder addBranchIndexStatesBuilder() {
+        return getBranchIndexStatesFieldBuilder().addBuilder(
+            org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder addBranchIndexStatesBuilder(
+          int index) {
+        return getBranchIndexStatesFieldBuilder().addBuilder(
+            index, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.BranchCoralState branchIndexStates = 1;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder> 
+           getBranchIndexStatesBuilderList() {
+        return getBranchIndexStatesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder> 
+          getBranchIndexStatesFieldBuilder() {
+        if (branchIndexStatesBuilder_ == null) {
+          branchIndexStatesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralState.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.BranchCoralStateOrBuilder>(
+                  branchIndexStates_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          branchIndexStates_ = null;
+        }
+        return branchIndexStatesBuilder_;
+      }
+
+      private double algaeOpenness_ ;
+      /**
+       * <code>double algaeOpenness = 2;</code>
+       * @return The algaeOpenness.
+       */
+      @java.lang.Override
+      public double getAlgaeOpenness() {
+        return algaeOpenness_;
+      }
+      /**
+       * <code>double algaeOpenness = 2;</code>
+       * @param value The algaeOpenness to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAlgaeOpenness(double value) {
+
+        algaeOpenness_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double algaeOpenness = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAlgaeOpenness() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        algaeOpenness_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private int aprilTagID_ ;
+      /**
+       * <code>int32 aprilTagID = 3;</code>
+       * @return The aprilTagID.
+       */
+      @java.lang.Override
+      public int getAprilTagID() {
+        return aprilTagID_;
+      }
+      /**
+       * <code>int32 aprilTagID = 3;</code>
+       * @param value The aprilTagID to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAprilTagID(int value) {
+
+        aprilTagID_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 aprilTagID = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAprilTagID() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        aprilTagID_ = 0;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.ReefEntry)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.ReefEntry)
+    private static final org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry();
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ReefEntry>
+        PARSER = new com.google.protobuf.AbstractParser<ReefEntry>() {
+      @java.lang.Override
+      public ReefEntry parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ReefEntry> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ReefEntry> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ReefStateOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.ReefState)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry> 
+        getEntriesList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry getEntries(int index);
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    int getEntriesCount();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder> 
+        getEntriesOrBuilderList();
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder getEntriesOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code org.kobe.xbot.Utilities.Entities.ReefState}
+   */
+  public static final class ReefState extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.kobe.xbot.Utilities.Entities.ReefState)
+      ReefStateOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ReefState.newBuilder() to construct.
+    private ReefState(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ReefState() {
+      entries_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new ReefState();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefState_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefState_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.class, org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.Builder.class);
+    }
+
+    public static final int ENTRIES_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry> entries_;
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry> getEntriesList() {
+      return entries_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder> 
+        getEntriesOrBuilderList() {
+      return entries_;
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    @java.lang.Override
+    public int getEntriesCount() {
+      return entries_.size();
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry getEntries(int index) {
+      return entries_.get(index);
+    }
+    /**
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder getEntriesOrBuilder(
+        int index) {
+      return entries_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < entries_.size(); i++) {
+        output.writeMessage(1, entries_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < entries_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, entries_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.kobe.xbot.Utilities.Entities.XTableValues.ReefState)) {
+        return super.equals(obj);
+      }
+      org.kobe.xbot.Utilities.Entities.XTableValues.ReefState other = (org.kobe.xbot.Utilities.Entities.XTableValues.ReefState) obj;
+
+      if (!getEntriesList()
+          .equals(other.getEntriesList())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getEntriesCount() > 0) {
+        hash = (37 * hash) + ENTRIES_FIELD_NUMBER;
+        hash = (53 * hash) + getEntriesList().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.kobe.xbot.Utilities.Entities.XTableValues.ReefState prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.kobe.xbot.Utilities.Entities.ReefState}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.kobe.xbot.Utilities.Entities.ReefState)
+        org.kobe.xbot.Utilities.Entities.XTableValues.ReefStateOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefState_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefState_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.class, org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.Builder.class);
+      }
+
+      // Construct using org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        if (entriesBuilder_ == null) {
+          entries_ = java.util.Collections.emptyList();
+        } else {
+          entries_ = null;
+          entriesBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.internal_static_org_kobe_xbot_Utilities_Entities_ReefState_descriptor;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefState getDefaultInstanceForType() {
+        return org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefState build() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.ReefState result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefState buildPartial() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.ReefState result = new org.kobe.xbot.Utilities.Entities.XTableValues.ReefState(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(org.kobe.xbot.Utilities.Entities.XTableValues.ReefState result) {
+        if (entriesBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            entries_ = java.util.Collections.unmodifiableList(entries_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.entries_ = entries_;
+        } else {
+          result.entries_ = entriesBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.ReefState result) {
+        int from_bitField0_ = bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.kobe.xbot.Utilities.Entities.XTableValues.ReefState) {
+          return mergeFrom((org.kobe.xbot.Utilities.Entities.XTableValues.ReefState)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.ReefState other) {
+        if (other == org.kobe.xbot.Utilities.Entities.XTableValues.ReefState.getDefaultInstance()) return this;
+        if (entriesBuilder_ == null) {
+          if (!other.entries_.isEmpty()) {
+            if (entries_.isEmpty()) {
+              entries_ = other.entries_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureEntriesIsMutable();
+              entries_.addAll(other.entries_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.entries_.isEmpty()) {
+            if (entriesBuilder_.isEmpty()) {
+              entriesBuilder_.dispose();
+              entriesBuilder_ = null;
+              entries_ = other.entries_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              entriesBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getEntriesFieldBuilder() : null;
+            } else {
+              entriesBuilder_.addAllMessages(other.entries_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry m =
+                    input.readMessage(
+                        org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.parser(),
+                        extensionRegistry);
+                if (entriesBuilder_ == null) {
+                  ensureEntriesIsMutable();
+                  entries_.add(m);
+                } else {
+                  entriesBuilder_.addMessage(m);
+                }
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry> entries_ =
+        java.util.Collections.emptyList();
+      private void ensureEntriesIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          entries_ = new java.util.ArrayList<org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry>(entries_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder> entriesBuilder_;
+
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry> getEntriesList() {
+        if (entriesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(entries_);
+        } else {
+          return entriesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public int getEntriesCount() {
+        if (entriesBuilder_ == null) {
+          return entries_.size();
+        } else {
+          return entriesBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry getEntries(int index) {
+        if (entriesBuilder_ == null) {
+          return entries_.get(index);
+        } else {
+          return entriesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder setEntries(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry value) {
+        if (entriesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEntriesIsMutable();
+          entries_.set(index, value);
+          onChanged();
+        } else {
+          entriesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder setEntries(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder builderForValue) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          entries_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          entriesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder addEntries(org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry value) {
+        if (entriesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEntriesIsMutable();
+          entries_.add(value);
+          onChanged();
+        } else {
+          entriesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder addEntries(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry value) {
+        if (entriesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEntriesIsMutable();
+          entries_.add(index, value);
+          onChanged();
+        } else {
+          entriesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder addEntries(
+          org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder builderForValue) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          entries_.add(builderForValue.build());
+          onChanged();
+        } else {
+          entriesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder addEntries(
+          int index, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder builderForValue) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          entries_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          entriesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder addAllEntries(
+          java.lang.Iterable<? extends org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry> values) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, entries_);
+          onChanged();
+        } else {
+          entriesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder clearEntries() {
+        if (entriesBuilder_ == null) {
+          entries_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          entriesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public Builder removeEntries(int index) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          entries_.remove(index);
+          onChanged();
+        } else {
+          entriesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder getEntriesBuilder(
+          int index) {
+        return getEntriesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder getEntriesOrBuilder(
+          int index) {
+        if (entriesBuilder_ == null) {
+          return entries_.get(index);  } else {
+          return entriesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder> 
+           getEntriesOrBuilderList() {
+        if (entriesBuilder_ != null) {
+          return entriesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(entries_);
+        }
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder addEntriesBuilder() {
+        return getEntriesFieldBuilder().addBuilder(
+            org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder addEntriesBuilder(
+          int index) {
+        return getEntriesFieldBuilder().addBuilder(
+            index, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ReefEntry entries = 1;</code>
+       */
+      public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder> 
+           getEntriesBuilderList() {
+        return getEntriesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder> 
+          getEntriesFieldBuilder() {
+        if (entriesBuilder_ == null) {
+          entriesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntry.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ReefEntryOrBuilder>(
+                  entries_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          entries_ = null;
+        }
+        return entriesBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.kobe.xbot.Utilities.Entities.ReefState)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.kobe.xbot.Utilities.Entities.ReefState)
+    private static final org.kobe.xbot.Utilities.Entities.XTableValues.ReefState DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.kobe.xbot.Utilities.Entities.XTableValues.ReefState();
+    }
+
+    public static org.kobe.xbot.Utilities.Entities.XTableValues.ReefState getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ReefState>
+        PARSER = new com.google.protobuf.AbstractParser<ReefState>() {
+      @java.lang.Override
+      public ReefState parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ReefState> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ReefState> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.ReefState getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface RequestVisionCoprocessorMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:org.kobe.xbot.Utilities.Entities.RequestVisionCoprocessorMessage)
       com.google.protobuf.MessageOrBuilder {
@@ -12974,6 +19033,41 @@ public final class XTableValues {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_org_kobe_xbot_Utilities_Entities_BezierCurve_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_kobe_xbot_Utilities_Entities_ReefState_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_kobe_xbot_Utilities_Entities_ReefState_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_kobe_xbot_Utilities_Entities_RequestVisionCoprocessorMessage_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -13056,56 +19150,77 @@ public final class XTableValues {
       "Degrees\030\003 \001(\001H\000\210\001\001B\022\n\020_rotationDegrees\"T" +
       "\n\013BezierCurve\022E\n\rcontrolPoints\030\001 \003(\0132..o" +
       "rg.kobe.xbot.Utilities.Entities.ControlP" +
-      "oint\"\344\002\n\037RequestVisionCoprocessorMessage" +
-      "\022=\n\005start\030\001 \001(\0132..org.kobe.xbot.Utilitie" +
-      "s.Entities.ControlPoint\022;\n\003end\030\002 \001(\0132..o" +
-      "rg.kobe.xbot.Utilities.Entities.ControlP" +
-      "oint\022C\n\007options\030\003 \001(\01322.org.kobe.xbot.Ut" +
-      "ilities.Entities.TraversalOptions\022H\n\targ" +
-      "uments\030\004 \001(\01325.org.kobe.xbot.Utilities.E" +
-      "ntities.AdditionalArguments\022\037\n\022safeDista" +
-      "nceInches\030\005 \001(\001H\000\210\001\001B\025\n\023_safeDistanceInc" +
-      "hes\"\313\001\n\032AlignToReefAprilTagOptions\022\022\n\nap" +
-      "rilTagID\030\001 \001(\r\022@\n\006camera\030\002 \001(\01620.org.kob" +
-      "e.xbot.Utilities.Entities.AprilTagCamera" +
-      "\022G\n\013branchLevel\030\003 \001(\0162-.org.kobe.xbot.Ut" +
-      "ilities.Entities.BranchLevelH\000\210\001\001B\016\n\014_br" +
-      "anchLevel\"\207\002\n\023AdditionalArguments\022<\n\010all" +
-      "iance\030\001 \001(\0162*.org.kobe.xbot.Utilities.En" +
-      "tities.Alliance\022!\n\024goalToBestReefBranch\030" +
-      "\002 \001(\010H\000\210\001\001\022#\n\026goalToBestCoralStation\030\003 \001" +
-      "(\010H\001\210\001\001\022\037\n\022goalToAlgaeStation\030\004 \001(\010H\002\210\001\001" +
-      "B\027\n\025_goalToBestReefBranchB\031\n\027_goalToBest" +
-      "CoralStationB\025\n\023_goalToAlgaeStation\"\312\001\n\020" +
-      "TraversalOptions\022\034\n\017metersPerSecond\030\001 \001(" +
-      "\001H\000\210\001\001\022!\n\024finalRotationDegrees\030\002 \001(\001H\001\210\001" +
-      "\001\022(\n\033accelerationMetersPerSecond\030\003 \001(\001H\002" +
-      "\210\001\001B\022\n\020_metersPerSecondB\027\n\025_finalRotatio" +
-      "nDegreesB\036\n\034_accelerationMetersPerSecond" +
-      "\"\251\002\n\014BezierCurves\022=\n\006curves\030\001 \003(\0132-.org." +
-      "kobe.xbot.Utilities.Entities.BezierCurve" +
-      "\022H\n\007options\030\002 \001(\01322.org.kobe.xbot.Utilit" +
-      "ies.Entities.TraversalOptionsH\000\210\001\001\022e\n\032al" +
-      "ignToReefAprilTagOptions\030\003 \001(\0132<.org.kob" +
-      "e.xbot.Utilities.Entities.AlignToReefApr" +
-      "ilTagOptionsH\001\210\001\001B\n\n\010_optionsB\035\n\033_alignT" +
-      "oReefAprilTagOptions\"M\n\020BezierCurvesList" +
-      "\0229\n\001v\030\001 \003(\0132..org.kobe.xbot.Utilities.En" +
-      "tities.BezierCurves\"\027\n\nDoubleList\022\t\n\001v\030\001" +
-      " \003(\001\"\027\n\nStringList\022\t\n\001v\030\001 \003(\t\"\030\n\013Integer" +
-      "List\022\t\n\001v\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014\"" +
-      "\025\n\010LongList\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001v" +
-      "\030\001 \003(\002\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010*%\n\016RobotDi" +
-      "rection\022\t\n\005FRONT\020\000\022\010\n\004BACK\020\001*;\n\016AprilTag" +
-      "Camera\022\016\n\nFRONT_LEFT\020\000\022\017\n\013FRONT_RIGHT\020\001\022" +
-      "\010\n\004REAR\020\002*@\n\013BranchLevel\022\n\n\006TROUGH\020\000\022\013\n\007" +
-      "LEVEL_2\020\001\022\013\n\007LEVEL_3\020\002\022\013\n\007LEVEL_4\020\003*\035\n\010A" +
-      "lliance\022\010\n\004BLUE\020\000\022\007\n\003RED\020\0012\247\001\n\021VisionCop" +
-      "rocessor\022\221\001\n\034RequestBezierPathWithOption" +
-      "s\022A.org.kobe.xbot.Utilities.Entities.Req" +
-      "uestVisionCoprocessorMessage\032..org.kobe." +
-      "xbot.Utilities.Entities.BezierCurvesb\006pr" +
-      "oto3"
+      "oint\"\255\002\n\034ProbabilityMappingDetections\022@\n" +
+      "\006robots\030\001 \003(\01320.org.kobe.xbot.Utilities." +
+      "Entities.RobotDetection\022@\n\006algaes\030\002 \003(\0132" +
+      "0.org.kobe.xbot.Utilities.Entities.Algae" +
+      "Detection\022@\n\006corals\030\003 \003(\01320.org.kobe.xbo" +
+      "t.Utilities.Entities.CoralDetection\022>\n\004r" +
+      "eef\030\004 \001(\0132+.org.kobe.xbot.Utilities.Enti" +
+      "ties.ReefStateH\000\210\001\001B\007\n\005_reef\"c\n\016RobotDet" +
+      "ection\022\023\n\013probability\030\001 \001(\001\022<\n\004pose\030\002 \001(" +
+      "\0132..org.kobe.xbot.Utilities.Entities.Con" +
+      "trolPoint\"c\n\016AlgaeDetection\022\023\n\013probabili" +
+      "ty\030\001 \001(\001\022<\n\004pose\030\002 \001(\0132..org.kobe.xbot.U" +
+      "tilities.Entities.ControlPoint\"c\n\016CoralD" +
+      "etection\022\023\n\013probability\030\001 \001(\001\022<\n\004pose\030\002 " +
+      "\001(\0132..org.kobe.xbot.Utilities.Entities.C" +
+      "ontrolPoint\"3\n\020BranchCoralState\022\r\n\005index" +
+      "\030\001 \001(\005\022\020\n\010openness\030\002 \001(\001\"\205\001\n\tReefEntry\022M" +
+      "\n\021branchIndexStates\030\001 \003(\01322.org.kobe.xbo" +
+      "t.Utilities.Entities.BranchCoralState\022\025\n" +
+      "\ralgaeOpenness\030\002 \001(\001\022\022\n\naprilTagID\030\003 \001(\005" +
+      "\"I\n\tReefState\022<\n\007entries\030\001 \003(\0132+.org.kob" +
+      "e.xbot.Utilities.Entities.ReefEntry\"\344\002\n\037" +
+      "RequestVisionCoprocessorMessage\022=\n\005start" +
+      "\030\001 \001(\0132..org.kobe.xbot.Utilities.Entitie" +
+      "s.ControlPoint\022;\n\003end\030\002 \001(\0132..org.kobe.x" +
+      "bot.Utilities.Entities.ControlPoint\022C\n\007o" +
+      "ptions\030\003 \001(\01322.org.kobe.xbot.Utilities.E" +
+      "ntities.TraversalOptions\022H\n\targuments\030\004 " +
+      "\001(\01325.org.kobe.xbot.Utilities.Entities.A" +
+      "dditionalArguments\022\037\n\022safeDistanceInches" +
+      "\030\005 \001(\001H\000\210\001\001B\025\n\023_safeDistanceInches\"\313\001\n\032A" +
+      "lignToReefAprilTagOptions\022\022\n\naprilTagID\030" +
+      "\001 \001(\r\022@\n\006camera\030\002 \001(\01620.org.kobe.xbot.Ut" +
+      "ilities.Entities.AprilTagCamera\022G\n\013branc" +
+      "hLevel\030\003 \001(\0162-.org.kobe.xbot.Utilities.E" +
+      "ntities.BranchLevelH\000\210\001\001B\016\n\014_branchLevel" +
+      "\"\207\002\n\023AdditionalArguments\022<\n\010alliance\030\001 \001" +
+      "(\0162*.org.kobe.xbot.Utilities.Entities.Al" +
+      "liance\022!\n\024goalToBestReefBranch\030\002 \001(\010H\000\210\001" +
+      "\001\022#\n\026goalToBestCoralStation\030\003 \001(\010H\001\210\001\001\022\037" +
+      "\n\022goalToAlgaeStation\030\004 \001(\010H\002\210\001\001B\027\n\025_goal" +
+      "ToBestReefBranchB\031\n\027_goalToBestCoralStat" +
+      "ionB\025\n\023_goalToAlgaeStation\"\312\001\n\020Traversal" +
+      "Options\022\034\n\017metersPerSecond\030\001 \001(\001H\000\210\001\001\022!\n" +
+      "\024finalRotationDegrees\030\002 \001(\001H\001\210\001\001\022(\n\033acce" +
+      "lerationMetersPerSecond\030\003 \001(\001H\002\210\001\001B\022\n\020_m" +
+      "etersPerSecondB\027\n\025_finalRotationDegreesB" +
+      "\036\n\034_accelerationMetersPerSecond\"\251\002\n\014Bezi" +
+      "erCurves\022=\n\006curves\030\001 \003(\0132-.org.kobe.xbot" +
+      ".Utilities.Entities.BezierCurve\022H\n\007optio" +
+      "ns\030\002 \001(\01322.org.kobe.xbot.Utilities.Entit" +
+      "ies.TraversalOptionsH\000\210\001\001\022e\n\032alignToReef" +
+      "AprilTagOptions\030\003 \001(\0132<.org.kobe.xbot.Ut" +
+      "ilities.Entities.AlignToReefAprilTagOpti" +
+      "onsH\001\210\001\001B\n\n\010_optionsB\035\n\033_alignToReefApri" +
+      "lTagOptions\"M\n\020BezierCurvesList\0229\n\001v\030\001 \003" +
+      "(\0132..org.kobe.xbot.Utilities.Entities.Be" +
+      "zierCurves\"\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027\n\nS" +
+      "tringList\022\t\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t\n\001v" +
+      "\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010LongLi" +
+      "st\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002\"\025\n" +
+      "\010BoolList\022\t\n\001v\030\001 \003(\010*%\n\016RobotDirection\022\t" +
+      "\n\005FRONT\020\000\022\010\n\004BACK\020\001*;\n\016AprilTagCamera\022\016\n" +
+      "\nFRONT_LEFT\020\000\022\017\n\013FRONT_RIGHT\020\001\022\010\n\004REAR\020\002" +
+      "*@\n\013BranchLevel\022\n\n\006TROUGH\020\000\022\013\n\007LEVEL_2\020\001" +
+      "\022\013\n\007LEVEL_3\020\002\022\013\n\007LEVEL_4\020\003*\035\n\010Alliance\022\010" +
+      "\n\004BLUE\020\000\022\007\n\003RED\020\0012\247\001\n\021VisionCoprocessor\022" +
+      "\221\001\n\034RequestBezierPathWithOptions\022A.org.k" +
+      "obe.xbot.Utilities.Entities.RequestVisio" +
+      "nCoprocessorMessage\032..org.kobe.xbot.Util" +
+      "ities.Entities.BezierCurvesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -13135,80 +19250,122 @@ public final class XTableValues {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurve_descriptor,
         new java.lang.String[] { "ControlPoints", });
-    internal_static_org_kobe_xbot_Utilities_Entities_RequestVisionCoprocessorMessage_descriptor =
+    internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_descriptor =
       getDescriptor().getMessageTypes().get(4);
+    internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_ProbabilityMappingDetections_descriptor,
+        new java.lang.String[] { "Robots", "Algaes", "Corals", "Reef", });
+    internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_RobotDetection_descriptor,
+        new java.lang.String[] { "Probability", "Pose", });
+    internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_AlgaeDetection_descriptor,
+        new java.lang.String[] { "Probability", "Pose", });
+    internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_CoralDetection_descriptor,
+        new java.lang.String[] { "Probability", "Pose", });
+    internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_BranchCoralState_descriptor,
+        new java.lang.String[] { "Index", "Openness", });
+    internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_ReefEntry_descriptor,
+        new java.lang.String[] { "BranchIndexStates", "AlgaeOpenness", "AprilTagID", });
+    internal_static_org_kobe_xbot_Utilities_Entities_ReefState_descriptor =
+      getDescriptor().getMessageTypes().get(10);
+    internal_static_org_kobe_xbot_Utilities_Entities_ReefState_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_kobe_xbot_Utilities_Entities_ReefState_descriptor,
+        new java.lang.String[] { "Entries", });
+    internal_static_org_kobe_xbot_Utilities_Entities_RequestVisionCoprocessorMessage_descriptor =
+      getDescriptor().getMessageTypes().get(11);
     internal_static_org_kobe_xbot_Utilities_Entities_RequestVisionCoprocessorMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_RequestVisionCoprocessorMessage_descriptor,
         new java.lang.String[] { "Start", "End", "Options", "Arguments", "SafeDistanceInches", });
     internal_static_org_kobe_xbot_Utilities_Entities_AlignToReefAprilTagOptions_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_org_kobe_xbot_Utilities_Entities_AlignToReefAprilTagOptions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_AlignToReefAprilTagOptions_descriptor,
         new java.lang.String[] { "AprilTagID", "Camera", "BranchLevel", });
     internal_static_org_kobe_xbot_Utilities_Entities_AdditionalArguments_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_org_kobe_xbot_Utilities_Entities_AdditionalArguments_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_AdditionalArguments_descriptor,
         new java.lang.String[] { "Alliance", "GoalToBestReefBranch", "GoalToBestCoralStation", "GoalToAlgaeStation", });
     internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor,
         new java.lang.String[] { "MetersPerSecond", "FinalRotationDegrees", "AccelerationMetersPerSecond", });
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor,
         new java.lang.String[] { "Curves", "Options", "AlignToReefAprilTagOptions", });
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurvesList_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurvesList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurvesList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_DoubleList_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_org_kobe_xbot_Utilities_Entities_DoubleList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_DoubleList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_StringList_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_org_kobe_xbot_Utilities_Entities_StringList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_StringList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_IntegerList_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_org_kobe_xbot_Utilities_Entities_IntegerList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_IntegerList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_BytesList_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_org_kobe_xbot_Utilities_Entities_BytesList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BytesList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_LongList_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_org_kobe_xbot_Utilities_Entities_LongList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_LongList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_FloatList_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_org_kobe_xbot_Utilities_Entities_FloatList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_FloatList_descriptor,
         new java.lang.String[] { "V", });
     internal_static_org_kobe_xbot_Utilities_Entities_BoolList_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_org_kobe_xbot_Utilities_Entities_BoolList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BoolList_descriptor,
