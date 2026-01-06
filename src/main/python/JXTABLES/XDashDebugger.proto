@@ -1,5 +1,4 @@
 syntax = "proto3";
-package org.kobe.xbot.Utilities.Entities;
 
 message Message {
   double t = 1;
