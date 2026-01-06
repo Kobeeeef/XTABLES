@@ -241,6 +241,132 @@ public final class XTableValues {
   }
 
   /**
+   * Protobuf enum {@code org.kobe.xbot.Utilities.Entities.BranchLevel}
+   */
+  public enum BranchLevel
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>TROUGH = 0;</code>
+     */
+    TROUGH(0),
+    /**
+     * <code>LEVEL_2 = 1;</code>
+     */
+    LEVEL_2(1),
+    /**
+     * <code>LEVEL_3 = 2;</code>
+     */
+    LEVEL_3(2),
+    /**
+     * <code>LEVEL_4 = 3;</code>
+     */
+    LEVEL_4(3),
+    UNRECOGNIZED(-1),
+    ;
+
+    /**
+     * <code>TROUGH = 0;</code>
+     */
+    public static final int TROUGH_VALUE = 0;
+    /**
+     * <code>LEVEL_2 = 1;</code>
+     */
+    public static final int LEVEL_2_VALUE = 1;
+    /**
+     * <code>LEVEL_3 = 2;</code>
+     */
+    public static final int LEVEL_3_VALUE = 2;
+    /**
+     * <code>LEVEL_4 = 3;</code>
+     */
+    public static final int LEVEL_4_VALUE = 3;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static BranchLevel valueOf(int value) {
+      return forNumber(value);
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     */
+    public static BranchLevel forNumber(int value) {
+      switch (value) {
+        case 0: return TROUGH;
+        case 1: return LEVEL_2;
+        case 2: return LEVEL_3;
+        case 3: return LEVEL_4;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<BranchLevel>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        BranchLevel> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<BranchLevel>() {
+            public BranchLevel findValueByNumber(int number) {
+              return BranchLevel.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalStateException(
+            "Can't get the descriptor of an unrecognized enum value.");
+      }
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return org.kobe.xbot.Utilities.Entities.XTableValues.getDescriptor().getEnumTypes().get(2);
+    }
+
+    private static final BranchLevel[] VALUES = values();
+
+    public static BranchLevel valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private BranchLevel(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:org.kobe.xbot.Utilities.Entities.BranchLevel)
+  }
+
+  /**
    * Protobuf enum {@code org.kobe.xbot.Utilities.Entities.Alliance}
    */
   public enum Alliance
@@ -322,7 +448,7 @@ public final class XTableValues {
     }
     public static final com.google.protobuf.Descriptors.EnumDescriptor
         getDescriptor() {
-      return org.kobe.xbot.Utilities.Entities.XTableValues.getDescriptor().getEnumTypes().get(2);
+      return org.kobe.xbot.Utilities.Entities.XTableValues.getDescriptor().getEnumTypes().get(3);
     }
 
     private static final Alliance[] VALUES = values();
@@ -4453,6 +4579,22 @@ public final class XTableValues {
      * @return The camera.
      */
     org.kobe.xbot.Utilities.Entities.XTableValues.AprilTagCamera getCamera();
+
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+     * @return Whether the branchLevel field is set.
+     */
+    boolean hasBranchLevel();
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+     * @return The enum numeric value on the wire for branchLevel.
+     */
+    int getBranchLevelValue();
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+     * @return The branchLevel.
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel getBranchLevel();
   }
   /**
    * Protobuf type {@code org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions}
@@ -4468,6 +4610,7 @@ public final class XTableValues {
     }
     private AlignToReefAprilTagOptions() {
       camera_ = 0;
+      branchLevel_ = 0;
     }
 
     @java.lang.Override
@@ -4490,6 +4633,7 @@ public final class XTableValues {
               org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.class, org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.Builder.class);
     }
 
+    private int bitField0_;
     public static final int APRILTAGID_FIELD_NUMBER = 1;
     private int aprilTagID_ = 0;
     /**
@@ -4519,6 +4663,31 @@ public final class XTableValues {
       return result == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AprilTagCamera.UNRECOGNIZED : result;
     }
 
+    public static final int BRANCHLEVEL_FIELD_NUMBER = 3;
+    private int branchLevel_ = 0;
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+     * @return Whether the branchLevel field is set.
+     */
+    @java.lang.Override public boolean hasBranchLevel() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+     * @return The enum numeric value on the wire for branchLevel.
+     */
+    @java.lang.Override public int getBranchLevelValue() {
+      return branchLevel_;
+    }
+    /**
+     * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+     * @return The branchLevel.
+     */
+    @java.lang.Override public org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel getBranchLevel() {
+      org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel result = org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel.forNumber(branchLevel_);
+      return result == null ? org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4539,6 +4708,9 @@ public final class XTableValues {
       if (camera_ != org.kobe.xbot.Utilities.Entities.XTableValues.AprilTagCamera.FRONT_LEFT.getNumber()) {
         output.writeEnum(2, camera_);
       }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeEnum(3, branchLevel_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -4555,6 +4727,10 @@ public final class XTableValues {
       if (camera_ != org.kobe.xbot.Utilities.Entities.XTableValues.AprilTagCamera.FRONT_LEFT.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(2, camera_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(3, branchLevel_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -4574,6 +4750,10 @@ public final class XTableValues {
       if (getAprilTagID()
           != other.getAprilTagID()) return false;
       if (camera_ != other.camera_) return false;
+      if (hasBranchLevel() != other.hasBranchLevel()) return false;
+      if (hasBranchLevel()) {
+        if (branchLevel_ != other.branchLevel_) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -4589,6 +4769,10 @@ public final class XTableValues {
       hash = (53 * hash) + getAprilTagID();
       hash = (37 * hash) + CAMERA_FIELD_NUMBER;
       hash = (53 * hash) + camera_;
+      if (hasBranchLevel()) {
+        hash = (37 * hash) + BRANCHLEVEL_FIELD_NUMBER;
+        hash = (53 * hash) + branchLevel_;
+      }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4722,6 +4906,7 @@ public final class XTableValues {
         bitField0_ = 0;
         aprilTagID_ = 0;
         camera_ = 0;
+        branchLevel_ = 0;
         return this;
       }
 
@@ -4761,6 +4946,12 @@ public final class XTableValues {
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.camera_ = camera_;
         }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.branchLevel_ = branchLevel_;
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -4813,6 +5004,9 @@ public final class XTableValues {
         if (other.camera_ != 0) {
           setCameraValue(other.getCameraValue());
         }
+        if (other.hasBranchLevel()) {
+          setBranchLevel(other.getBranchLevel());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -4849,6 +5043,11 @@ public final class XTableValues {
                 bitField0_ |= 0x00000002;
                 break;
               } // case 16
+              case 24: {
+                branchLevel_ = input.readEnum();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -4950,6 +5149,66 @@ public final class XTableValues {
         onChanged();
         return this;
       }
+
+      private int branchLevel_ = 0;
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+       * @return Whether the branchLevel field is set.
+       */
+      @java.lang.Override public boolean hasBranchLevel() {
+        return ((bitField0_ & 0x00000004) != 0);
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+       * @return The enum numeric value on the wire for branchLevel.
+       */
+      @java.lang.Override public int getBranchLevelValue() {
+        return branchLevel_;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+       * @param value The enum numeric value on the wire for branchLevel to set.
+       * @return This builder for chaining.
+       */
+      public Builder setBranchLevelValue(int value) {
+        branchLevel_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+       * @return The branchLevel.
+       */
+      @java.lang.Override
+      public org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel getBranchLevel() {
+        org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel result = org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel.forNumber(branchLevel_);
+        return result == null ? org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+       * @param value The branchLevel to set.
+       * @return This builder for chaining.
+       */
+      public Builder setBranchLevel(org.kobe.xbot.Utilities.Entities.XTableValues.BranchLevel value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000004;
+        branchLevel_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.kobe.xbot.Utilities.Entities.BranchLevel branchLevel = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearBranchLevel() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        branchLevel_ = 0;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -5030,37 +5289,37 @@ public final class XTableValues {
     org.kobe.xbot.Utilities.Entities.XTableValues.Alliance getAlliance();
 
     /**
-     * <code>optional bool setGoalToBestReefBranch = 2;</code>
-     * @return Whether the setGoalToBestReefBranch field is set.
+     * <code>optional bool goalToBestReefBranch = 2;</code>
+     * @return Whether the goalToBestReefBranch field is set.
      */
-    boolean hasSetGoalToBestReefBranch();
+    boolean hasGoalToBestReefBranch();
     /**
-     * <code>optional bool setGoalToBestReefBranch = 2;</code>
-     * @return The setGoalToBestReefBranch.
+     * <code>optional bool goalToBestReefBranch = 2;</code>
+     * @return The goalToBestReefBranch.
      */
-    boolean getSetGoalToBestReefBranch();
+    boolean getGoalToBestReefBranch();
 
     /**
-     * <code>optional bool setGoalToBestCoralStation = 3;</code>
-     * @return Whether the setGoalToBestCoralStation field is set.
+     * <code>optional bool goalToBestCoralStation = 3;</code>
+     * @return Whether the goalToBestCoralStation field is set.
      */
-    boolean hasSetGoalToBestCoralStation();
+    boolean hasGoalToBestCoralStation();
     /**
-     * <code>optional bool setGoalToBestCoralStation = 3;</code>
-     * @return The setGoalToBestCoralStation.
+     * <code>optional bool goalToBestCoralStation = 3;</code>
+     * @return The goalToBestCoralStation.
      */
-    boolean getSetGoalToBestCoralStation();
+    boolean getGoalToBestCoralStation();
 
     /**
-     * <code>optional bool setGoalToAlgaeStation = 4;</code>
-     * @return Whether the setGoalToAlgaeStation field is set.
+     * <code>optional bool goalToAlgaeStation = 4;</code>
+     * @return Whether the goalToAlgaeStation field is set.
      */
-    boolean hasSetGoalToAlgaeStation();
+    boolean hasGoalToAlgaeStation();
     /**
-     * <code>optional bool setGoalToAlgaeStation = 4;</code>
-     * @return The setGoalToAlgaeStation.
+     * <code>optional bool goalToAlgaeStation = 4;</code>
+     * @return The goalToAlgaeStation.
      */
-    boolean getSetGoalToAlgaeStation();
+    boolean getGoalToAlgaeStation();
   }
   /**
    * Protobuf type {@code org.kobe.xbot.Utilities.Entities.AdditionalArguments}
@@ -5117,61 +5376,61 @@ public final class XTableValues {
       return result == null ? org.kobe.xbot.Utilities.Entities.XTableValues.Alliance.UNRECOGNIZED : result;
     }
 
-    public static final int SETGOALTOBESTREEFBRANCH_FIELD_NUMBER = 2;
-    private boolean setGoalToBestReefBranch_ = false;
+    public static final int GOALTOBESTREEFBRANCH_FIELD_NUMBER = 2;
+    private boolean goalToBestReefBranch_ = false;
     /**
-     * <code>optional bool setGoalToBestReefBranch = 2;</code>
-     * @return Whether the setGoalToBestReefBranch field is set.
+     * <code>optional bool goalToBestReefBranch = 2;</code>
+     * @return Whether the goalToBestReefBranch field is set.
      */
     @java.lang.Override
-    public boolean hasSetGoalToBestReefBranch() {
+    public boolean hasGoalToBestReefBranch() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>optional bool setGoalToBestReefBranch = 2;</code>
-     * @return The setGoalToBestReefBranch.
+     * <code>optional bool goalToBestReefBranch = 2;</code>
+     * @return The goalToBestReefBranch.
      */
     @java.lang.Override
-    public boolean getSetGoalToBestReefBranch() {
-      return setGoalToBestReefBranch_;
+    public boolean getGoalToBestReefBranch() {
+      return goalToBestReefBranch_;
     }
 
-    public static final int SETGOALTOBESTCORALSTATION_FIELD_NUMBER = 3;
-    private boolean setGoalToBestCoralStation_ = false;
+    public static final int GOALTOBESTCORALSTATION_FIELD_NUMBER = 3;
+    private boolean goalToBestCoralStation_ = false;
     /**
-     * <code>optional bool setGoalToBestCoralStation = 3;</code>
-     * @return Whether the setGoalToBestCoralStation field is set.
+     * <code>optional bool goalToBestCoralStation = 3;</code>
+     * @return Whether the goalToBestCoralStation field is set.
      */
     @java.lang.Override
-    public boolean hasSetGoalToBestCoralStation() {
+    public boolean hasGoalToBestCoralStation() {
       return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>optional bool setGoalToBestCoralStation = 3;</code>
-     * @return The setGoalToBestCoralStation.
+     * <code>optional bool goalToBestCoralStation = 3;</code>
+     * @return The goalToBestCoralStation.
      */
     @java.lang.Override
-    public boolean getSetGoalToBestCoralStation() {
-      return setGoalToBestCoralStation_;
+    public boolean getGoalToBestCoralStation() {
+      return goalToBestCoralStation_;
     }
 
-    public static final int SETGOALTOALGAESTATION_FIELD_NUMBER = 4;
-    private boolean setGoalToAlgaeStation_ = false;
+    public static final int GOALTOALGAESTATION_FIELD_NUMBER = 4;
+    private boolean goalToAlgaeStation_ = false;
     /**
-     * <code>optional bool setGoalToAlgaeStation = 4;</code>
-     * @return Whether the setGoalToAlgaeStation field is set.
+     * <code>optional bool goalToAlgaeStation = 4;</code>
+     * @return Whether the goalToAlgaeStation field is set.
      */
     @java.lang.Override
-    public boolean hasSetGoalToAlgaeStation() {
+    public boolean hasGoalToAlgaeStation() {
       return ((bitField0_ & 0x00000004) != 0);
     }
     /**
-     * <code>optional bool setGoalToAlgaeStation = 4;</code>
-     * @return The setGoalToAlgaeStation.
+     * <code>optional bool goalToAlgaeStation = 4;</code>
+     * @return The goalToAlgaeStation.
      */
     @java.lang.Override
-    public boolean getSetGoalToAlgaeStation() {
-      return setGoalToAlgaeStation_;
+    public boolean getGoalToAlgaeStation() {
+      return goalToAlgaeStation_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -5192,13 +5451,13 @@ public final class XTableValues {
         output.writeEnum(1, alliance_);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeBool(2, setGoalToBestReefBranch_);
+        output.writeBool(2, goalToBestReefBranch_);
       }
       if (((bitField0_ & 0x00000002) != 0)) {
-        output.writeBool(3, setGoalToBestCoralStation_);
+        output.writeBool(3, goalToBestCoralStation_);
       }
       if (((bitField0_ & 0x00000004) != 0)) {
-        output.writeBool(4, setGoalToAlgaeStation_);
+        output.writeBool(4, goalToAlgaeStation_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -5215,15 +5474,15 @@ public final class XTableValues {
       }
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(2, setGoalToBestReefBranch_);
+          .computeBoolSize(2, goalToBestReefBranch_);
       }
       if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, setGoalToBestCoralStation_);
+          .computeBoolSize(3, goalToBestCoralStation_);
       }
       if (((bitField0_ & 0x00000004) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(4, setGoalToAlgaeStation_);
+          .computeBoolSize(4, goalToAlgaeStation_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -5241,20 +5500,20 @@ public final class XTableValues {
       org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments other = (org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments) obj;
 
       if (alliance_ != other.alliance_) return false;
-      if (hasSetGoalToBestReefBranch() != other.hasSetGoalToBestReefBranch()) return false;
-      if (hasSetGoalToBestReefBranch()) {
-        if (getSetGoalToBestReefBranch()
-            != other.getSetGoalToBestReefBranch()) return false;
+      if (hasGoalToBestReefBranch() != other.hasGoalToBestReefBranch()) return false;
+      if (hasGoalToBestReefBranch()) {
+        if (getGoalToBestReefBranch()
+            != other.getGoalToBestReefBranch()) return false;
       }
-      if (hasSetGoalToBestCoralStation() != other.hasSetGoalToBestCoralStation()) return false;
-      if (hasSetGoalToBestCoralStation()) {
-        if (getSetGoalToBestCoralStation()
-            != other.getSetGoalToBestCoralStation()) return false;
+      if (hasGoalToBestCoralStation() != other.hasGoalToBestCoralStation()) return false;
+      if (hasGoalToBestCoralStation()) {
+        if (getGoalToBestCoralStation()
+            != other.getGoalToBestCoralStation()) return false;
       }
-      if (hasSetGoalToAlgaeStation() != other.hasSetGoalToAlgaeStation()) return false;
-      if (hasSetGoalToAlgaeStation()) {
-        if (getSetGoalToAlgaeStation()
-            != other.getSetGoalToAlgaeStation()) return false;
+      if (hasGoalToAlgaeStation() != other.hasGoalToAlgaeStation()) return false;
+      if (hasGoalToAlgaeStation()) {
+        if (getGoalToAlgaeStation()
+            != other.getGoalToAlgaeStation()) return false;
       }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
@@ -5269,20 +5528,20 @@ public final class XTableValues {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + ALLIANCE_FIELD_NUMBER;
       hash = (53 * hash) + alliance_;
-      if (hasSetGoalToBestReefBranch()) {
-        hash = (37 * hash) + SETGOALTOBESTREEFBRANCH_FIELD_NUMBER;
+      if (hasGoalToBestReefBranch()) {
+        hash = (37 * hash) + GOALTOBESTREEFBRANCH_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-            getSetGoalToBestReefBranch());
+            getGoalToBestReefBranch());
       }
-      if (hasSetGoalToBestCoralStation()) {
-        hash = (37 * hash) + SETGOALTOBESTCORALSTATION_FIELD_NUMBER;
+      if (hasGoalToBestCoralStation()) {
+        hash = (37 * hash) + GOALTOBESTCORALSTATION_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-            getSetGoalToBestCoralStation());
+            getGoalToBestCoralStation());
       }
-      if (hasSetGoalToAlgaeStation()) {
-        hash = (37 * hash) + SETGOALTOALGAESTATION_FIELD_NUMBER;
+      if (hasGoalToAlgaeStation()) {
+        hash = (37 * hash) + GOALTOALGAESTATION_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-            getSetGoalToAlgaeStation());
+            getGoalToAlgaeStation());
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -5416,9 +5675,9 @@ public final class XTableValues {
         super.clear();
         bitField0_ = 0;
         alliance_ = 0;
-        setGoalToBestReefBranch_ = false;
-        setGoalToBestCoralStation_ = false;
-        setGoalToAlgaeStation_ = false;
+        goalToBestReefBranch_ = false;
+        goalToBestCoralStation_ = false;
+        goalToAlgaeStation_ = false;
         return this;
       }
 
@@ -5457,15 +5716,15 @@ public final class XTableValues {
         }
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.setGoalToBestReefBranch_ = setGoalToBestReefBranch_;
+          result.goalToBestReefBranch_ = goalToBestReefBranch_;
           to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.setGoalToBestCoralStation_ = setGoalToBestCoralStation_;
+          result.goalToBestCoralStation_ = goalToBestCoralStation_;
           to_bitField0_ |= 0x00000002;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.setGoalToAlgaeStation_ = setGoalToAlgaeStation_;
+          result.goalToAlgaeStation_ = goalToAlgaeStation_;
           to_bitField0_ |= 0x00000004;
         }
         result.bitField0_ |= to_bitField0_;
@@ -5518,14 +5777,14 @@ public final class XTableValues {
         if (other.alliance_ != 0) {
           setAllianceValue(other.getAllianceValue());
         }
-        if (other.hasSetGoalToBestReefBranch()) {
-          setSetGoalToBestReefBranch(other.getSetGoalToBestReefBranch());
+        if (other.hasGoalToBestReefBranch()) {
+          setGoalToBestReefBranch(other.getGoalToBestReefBranch());
         }
-        if (other.hasSetGoalToBestCoralStation()) {
-          setSetGoalToBestCoralStation(other.getSetGoalToBestCoralStation());
+        if (other.hasGoalToBestCoralStation()) {
+          setGoalToBestCoralStation(other.getGoalToBestCoralStation());
         }
-        if (other.hasSetGoalToAlgaeStation()) {
-          setSetGoalToAlgaeStation(other.getSetGoalToAlgaeStation());
+        if (other.hasGoalToAlgaeStation()) {
+          setGoalToAlgaeStation(other.getGoalToAlgaeStation());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -5559,17 +5818,17 @@ public final class XTableValues {
                 break;
               } // case 8
               case 16: {
-                setGoalToBestReefBranch_ = input.readBool();
+                goalToBestReefBranch_ = input.readBool();
                 bitField0_ |= 0x00000002;
                 break;
               } // case 16
               case 24: {
-                setGoalToBestCoralStation_ = input.readBool();
+                goalToBestCoralStation_ = input.readBool();
                 bitField0_ |= 0x00000004;
                 break;
               } // case 24
               case 32: {
-                setGoalToAlgaeStation_ = input.readBool();
+                goalToAlgaeStation_ = input.readBool();
                 bitField0_ |= 0x00000008;
                 break;
               } // case 32
@@ -5643,122 +5902,122 @@ public final class XTableValues {
         return this;
       }
 
-      private boolean setGoalToBestReefBranch_ ;
+      private boolean goalToBestReefBranch_ ;
       /**
-       * <code>optional bool setGoalToBestReefBranch = 2;</code>
-       * @return Whether the setGoalToBestReefBranch field is set.
+       * <code>optional bool goalToBestReefBranch = 2;</code>
+       * @return Whether the goalToBestReefBranch field is set.
        */
       @java.lang.Override
-      public boolean hasSetGoalToBestReefBranch() {
+      public boolean hasGoalToBestReefBranch() {
         return ((bitField0_ & 0x00000002) != 0);
       }
       /**
-       * <code>optional bool setGoalToBestReefBranch = 2;</code>
-       * @return The setGoalToBestReefBranch.
+       * <code>optional bool goalToBestReefBranch = 2;</code>
+       * @return The goalToBestReefBranch.
        */
       @java.lang.Override
-      public boolean getSetGoalToBestReefBranch() {
-        return setGoalToBestReefBranch_;
+      public boolean getGoalToBestReefBranch() {
+        return goalToBestReefBranch_;
       }
       /**
-       * <code>optional bool setGoalToBestReefBranch = 2;</code>
-       * @param value The setGoalToBestReefBranch to set.
+       * <code>optional bool goalToBestReefBranch = 2;</code>
+       * @param value The goalToBestReefBranch to set.
        * @return This builder for chaining.
        */
-      public Builder setSetGoalToBestReefBranch(boolean value) {
+      public Builder setGoalToBestReefBranch(boolean value) {
 
-        setGoalToBestReefBranch_ = value;
+        goalToBestReefBranch_ = value;
         bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool setGoalToBestReefBranch = 2;</code>
+       * <code>optional bool goalToBestReefBranch = 2;</code>
        * @return This builder for chaining.
        */
-      public Builder clearSetGoalToBestReefBranch() {
+      public Builder clearGoalToBestReefBranch() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        setGoalToBestReefBranch_ = false;
+        goalToBestReefBranch_ = false;
         onChanged();
         return this;
       }
 
-      private boolean setGoalToBestCoralStation_ ;
+      private boolean goalToBestCoralStation_ ;
       /**
-       * <code>optional bool setGoalToBestCoralStation = 3;</code>
-       * @return Whether the setGoalToBestCoralStation field is set.
+       * <code>optional bool goalToBestCoralStation = 3;</code>
+       * @return Whether the goalToBestCoralStation field is set.
        */
       @java.lang.Override
-      public boolean hasSetGoalToBestCoralStation() {
+      public boolean hasGoalToBestCoralStation() {
         return ((bitField0_ & 0x00000004) != 0);
       }
       /**
-       * <code>optional bool setGoalToBestCoralStation = 3;</code>
-       * @return The setGoalToBestCoralStation.
+       * <code>optional bool goalToBestCoralStation = 3;</code>
+       * @return The goalToBestCoralStation.
        */
       @java.lang.Override
-      public boolean getSetGoalToBestCoralStation() {
-        return setGoalToBestCoralStation_;
+      public boolean getGoalToBestCoralStation() {
+        return goalToBestCoralStation_;
       }
       /**
-       * <code>optional bool setGoalToBestCoralStation = 3;</code>
-       * @param value The setGoalToBestCoralStation to set.
+       * <code>optional bool goalToBestCoralStation = 3;</code>
+       * @param value The goalToBestCoralStation to set.
        * @return This builder for chaining.
        */
-      public Builder setSetGoalToBestCoralStation(boolean value) {
+      public Builder setGoalToBestCoralStation(boolean value) {
 
-        setGoalToBestCoralStation_ = value;
+        goalToBestCoralStation_ = value;
         bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool setGoalToBestCoralStation = 3;</code>
+       * <code>optional bool goalToBestCoralStation = 3;</code>
        * @return This builder for chaining.
        */
-      public Builder clearSetGoalToBestCoralStation() {
+      public Builder clearGoalToBestCoralStation() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        setGoalToBestCoralStation_ = false;
+        goalToBestCoralStation_ = false;
         onChanged();
         return this;
       }
 
-      private boolean setGoalToAlgaeStation_ ;
+      private boolean goalToAlgaeStation_ ;
       /**
-       * <code>optional bool setGoalToAlgaeStation = 4;</code>
-       * @return Whether the setGoalToAlgaeStation field is set.
+       * <code>optional bool goalToAlgaeStation = 4;</code>
+       * @return Whether the goalToAlgaeStation field is set.
        */
       @java.lang.Override
-      public boolean hasSetGoalToAlgaeStation() {
+      public boolean hasGoalToAlgaeStation() {
         return ((bitField0_ & 0x00000008) != 0);
       }
       /**
-       * <code>optional bool setGoalToAlgaeStation = 4;</code>
-       * @return The setGoalToAlgaeStation.
+       * <code>optional bool goalToAlgaeStation = 4;</code>
+       * @return The goalToAlgaeStation.
        */
       @java.lang.Override
-      public boolean getSetGoalToAlgaeStation() {
-        return setGoalToAlgaeStation_;
+      public boolean getGoalToAlgaeStation() {
+        return goalToAlgaeStation_;
       }
       /**
-       * <code>optional bool setGoalToAlgaeStation = 4;</code>
-       * @param value The setGoalToAlgaeStation to set.
+       * <code>optional bool goalToAlgaeStation = 4;</code>
+       * @param value The goalToAlgaeStation to set.
        * @return This builder for chaining.
        */
-      public Builder setSetGoalToAlgaeStation(boolean value) {
+      public Builder setGoalToAlgaeStation(boolean value) {
 
-        setGoalToAlgaeStation_ = value;
+        goalToAlgaeStation_ = value;
         bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool setGoalToAlgaeStation = 4;</code>
+       * <code>optional bool goalToAlgaeStation = 4;</code>
        * @return This builder for chaining.
        */
-      public Builder clearSetGoalToAlgaeStation() {
+      public Builder clearGoalToAlgaeStation() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        setGoalToAlgaeStation_ = false;
+        goalToAlgaeStation_ = false;
         onChanged();
         return this;
       }
@@ -12806,43 +13065,47 @@ public final class XTableValues {
       "uments\030\004 \001(\01325.org.kobe.xbot.Utilities.E" +
       "ntities.AdditionalArguments\022\037\n\022safeDista" +
       "nceInches\030\005 \001(\001H\000\210\001\001B\025\n\023_safeDistanceInc" +
-      "hes\"r\n\032AlignToReefAprilTagOptions\022\022\n\napr" +
-      "ilTagID\030\001 \001(\r\022@\n\006camera\030\002 \001(\01620.org.kobe" +
-      ".xbot.Utilities.Entities.AprilTagCamera\"" +
-      "\231\002\n\023AdditionalArguments\022<\n\010alliance\030\001 \001(" +
-      "\0162*.org.kobe.xbot.Utilities.Entities.All" +
-      "iance\022$\n\027setGoalToBestReefBranch\030\002 \001(\010H\000" +
-      "\210\001\001\022&\n\031setGoalToBestCoralStation\030\003 \001(\010H\001" +
-      "\210\001\001\022\"\n\025setGoalToAlgaeStation\030\004 \001(\010H\002\210\001\001B" +
-      "\032\n\030_setGoalToBestReefBranchB\034\n\032_setGoalT" +
-      "oBestCoralStationB\030\n\026_setGoalToAlgaeStat" +
-      "ion\"\312\001\n\020TraversalOptions\022\034\n\017metersPerSec" +
-      "ond\030\001 \001(\001H\000\210\001\001\022!\n\024finalRotationDegrees\030\002" +
-      " \001(\001H\001\210\001\001\022(\n\033accelerationMetersPerSecond" +
-      "\030\003 \001(\001H\002\210\001\001B\022\n\020_metersPerSecondB\027\n\025_fina" +
-      "lRotationDegreesB\036\n\034_accelerationMetersP" +
-      "erSecond\"\251\002\n\014BezierCurves\022=\n\006curves\030\001 \003(" +
-      "\0132-.org.kobe.xbot.Utilities.Entities.Bez" +
-      "ierCurve\022H\n\007options\030\002 \001(\01322.org.kobe.xbo" +
-      "t.Utilities.Entities.TraversalOptionsH\000\210" +
-      "\001\001\022e\n\032alignToReefAprilTagOptions\030\003 \001(\0132<" +
-      ".org.kobe.xbot.Utilities.Entities.AlignT" +
-      "oReefAprilTagOptionsH\001\210\001\001B\n\n\010_optionsB\035\n" +
-      "\033_alignToReefAprilTagOptions\"M\n\020BezierCu" +
-      "rvesList\0229\n\001v\030\001 \003(\0132..org.kobe.xbot.Util" +
-      "ities.Entities.BezierCurves\"\027\n\nDoubleLis" +
-      "t\022\t\n\001v\030\001 \003(\001\"\027\n\nStringList\022\t\n\001v\030\001 \003(\t\"\030\n" +
-      "\013IntegerList\022\t\n\001v\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001" +
-      "v\030\001 \003(\014\"\025\n\010LongList\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatL" +
-      "ist\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010*%\n" +
-      "\016RobotDirection\022\t\n\005FRONT\020\000\022\010\n\004BACK\020\001*;\n\016" +
-      "AprilTagCamera\022\016\n\nFRONT_LEFT\020\000\022\017\n\013FRONT_" +
-      "RIGHT\020\001\022\010\n\004REAR\020\002*\035\n\010Alliance\022\010\n\004BLUE\020\000\022" +
-      "\007\n\003RED\020\0012\247\001\n\021VisionCoprocessor\022\221\001\n\034Reque" +
-      "stBezierPathWithOptions\022A.org.kobe.xbot." +
-      "Utilities.Entities.RequestVisionCoproces" +
-      "sorMessage\032..org.kobe.xbot.Utilities.Ent" +
-      "ities.BezierCurvesb\006proto3"
+      "hes\"\313\001\n\032AlignToReefAprilTagOptions\022\022\n\nap" +
+      "rilTagID\030\001 \001(\r\022@\n\006camera\030\002 \001(\01620.org.kob" +
+      "e.xbot.Utilities.Entities.AprilTagCamera" +
+      "\022G\n\013branchLevel\030\003 \001(\0162-.org.kobe.xbot.Ut" +
+      "ilities.Entities.BranchLevelH\000\210\001\001B\016\n\014_br" +
+      "anchLevel\"\207\002\n\023AdditionalArguments\022<\n\010all" +
+      "iance\030\001 \001(\0162*.org.kobe.xbot.Utilities.En" +
+      "tities.Alliance\022!\n\024goalToBestReefBranch\030" +
+      "\002 \001(\010H\000\210\001\001\022#\n\026goalToBestCoralStation\030\003 \001" +
+      "(\010H\001\210\001\001\022\037\n\022goalToAlgaeStation\030\004 \001(\010H\002\210\001\001" +
+      "B\027\n\025_goalToBestReefBranchB\031\n\027_goalToBest" +
+      "CoralStationB\025\n\023_goalToAlgaeStation\"\312\001\n\020" +
+      "TraversalOptions\022\034\n\017metersPerSecond\030\001 \001(" +
+      "\001H\000\210\001\001\022!\n\024finalRotationDegrees\030\002 \001(\001H\001\210\001" +
+      "\001\022(\n\033accelerationMetersPerSecond\030\003 \001(\001H\002" +
+      "\210\001\001B\022\n\020_metersPerSecondB\027\n\025_finalRotatio" +
+      "nDegreesB\036\n\034_accelerationMetersPerSecond" +
+      "\"\251\002\n\014BezierCurves\022=\n\006curves\030\001 \003(\0132-.org." +
+      "kobe.xbot.Utilities.Entities.BezierCurve" +
+      "\022H\n\007options\030\002 \001(\01322.org.kobe.xbot.Utilit" +
+      "ies.Entities.TraversalOptionsH\000\210\001\001\022e\n\032al" +
+      "ignToReefAprilTagOptions\030\003 \001(\0132<.org.kob" +
+      "e.xbot.Utilities.Entities.AlignToReefApr" +
+      "ilTagOptionsH\001\210\001\001B\n\n\010_optionsB\035\n\033_alignT" +
+      "oReefAprilTagOptions\"M\n\020BezierCurvesList" +
+      "\0229\n\001v\030\001 \003(\0132..org.kobe.xbot.Utilities.En" +
+      "tities.BezierCurves\"\027\n\nDoubleList\022\t\n\001v\030\001" +
+      " \003(\001\"\027\n\nStringList\022\t\n\001v\030\001 \003(\t\"\030\n\013Integer" +
+      "List\022\t\n\001v\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014\"" +
+      "\025\n\010LongList\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001v" +
+      "\030\001 \003(\002\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010*%\n\016RobotDi" +
+      "rection\022\t\n\005FRONT\020\000\022\010\n\004BACK\020\001*;\n\016AprilTag" +
+      "Camera\022\016\n\nFRONT_LEFT\020\000\022\017\n\013FRONT_RIGHT\020\001\022" +
+      "\010\n\004REAR\020\002*@\n\013BranchLevel\022\n\n\006TROUGH\020\000\022\013\n\007" +
+      "LEVEL_2\020\001\022\013\n\007LEVEL_3\020\002\022\013\n\007LEVEL_4\020\003*\035\n\010A" +
+      "lliance\022\010\n\004BLUE\020\000\022\007\n\003RED\020\0012\247\001\n\021VisionCop" +
+      "rocessor\022\221\001\n\034RequestBezierPathWithOption" +
+      "s\022A.org.kobe.xbot.Utilities.Entities.Req" +
+      "uestVisionCoprocessorMessage\032..org.kobe." +
+      "xbot.Utilities.Entities.BezierCurvesb\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -12883,13 +13146,13 @@ public final class XTableValues {
     internal_static_org_kobe_xbot_Utilities_Entities_AlignToReefAprilTagOptions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_AlignToReefAprilTagOptions_descriptor,
-        new java.lang.String[] { "AprilTagID", "Camera", });
+        new java.lang.String[] { "AprilTagID", "Camera", "BranchLevel", });
     internal_static_org_kobe_xbot_Utilities_Entities_AdditionalArguments_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_org_kobe_xbot_Utilities_Entities_AdditionalArguments_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_AdditionalArguments_descriptor,
-        new java.lang.String[] { "Alliance", "SetGoalToBestReefBranch", "SetGoalToBestCoralStation", "SetGoalToAlgaeStation", });
+        new java.lang.String[] { "Alliance", "GoalToBestReefBranch", "GoalToBestCoralStation", "GoalToAlgaeStation", });
     internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_fieldAccessorTable = new
