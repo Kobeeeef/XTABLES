@@ -3206,12 +3206,27 @@ public final class XTableValues {
     org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder getOptionsOrBuilder();
 
     /**
-     * <code>optional double safeDistanceInches = 4;</code>
+     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+     * @return Whether the arguments field is set.
+     */
+    boolean hasArguments();
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+     * @return The arguments.
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments getArguments();
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+     */
+    org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder getArgumentsOrBuilder();
+
+    /**
+     * <code>optional double safeDistanceInches = 5;</code>
      * @return Whether the safeDistanceInches field is set.
      */
     boolean hasSafeDistanceInches();
     /**
-     * <code>optional double safeDistanceInches = 4;</code>
+     * <code>optional double safeDistanceInches = 5;</code>
      * @return The safeDistanceInches.
      */
     double getSafeDistanceInches();
@@ -3330,18 +3345,44 @@ public final class XTableValues {
       return options_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance() : options_;
     }
 
-    public static final int SAFEDISTANCEINCHES_FIELD_NUMBER = 4;
+    public static final int ARGUMENTS_FIELD_NUMBER = 4;
+    private org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments arguments_;
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+     * @return Whether the arguments field is set.
+     */
+    @java.lang.Override
+    public boolean hasArguments() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+     * @return The arguments.
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments getArguments() {
+      return arguments_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance() : arguments_;
+    }
+    /**
+     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+     */
+    @java.lang.Override
+    public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder getArgumentsOrBuilder() {
+      return arguments_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance() : arguments_;
+    }
+
+    public static final int SAFEDISTANCEINCHES_FIELD_NUMBER = 5;
     private double safeDistanceInches_ = 0D;
     /**
-     * <code>optional double safeDistanceInches = 4;</code>
+     * <code>optional double safeDistanceInches = 5;</code>
      * @return Whether the safeDistanceInches field is set.
      */
     @java.lang.Override
     public boolean hasSafeDistanceInches() {
-      return ((bitField0_ & 0x00000008) != 0);
+      return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>optional double safeDistanceInches = 4;</code>
+     * <code>optional double safeDistanceInches = 5;</code>
      * @return The safeDistanceInches.
      */
     @java.lang.Override
@@ -3373,7 +3414,10 @@ public final class XTableValues {
         output.writeMessage(3, getOptions());
       }
       if (((bitField0_ & 0x00000008) != 0)) {
-        output.writeDouble(4, safeDistanceInches_);
+        output.writeMessage(4, getArguments());
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        output.writeDouble(5, safeDistanceInches_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3398,7 +3442,11 @@ public final class XTableValues {
       }
       if (((bitField0_ & 0x00000008) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(4, safeDistanceInches_);
+          .computeMessageSize(4, getArguments());
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(5, safeDistanceInches_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3430,6 +3478,11 @@ public final class XTableValues {
         if (!getOptions()
             .equals(other.getOptions())) return false;
       }
+      if (hasArguments() != other.hasArguments()) return false;
+      if (hasArguments()) {
+        if (!getArguments()
+            .equals(other.getArguments())) return false;
+      }
       if (hasSafeDistanceInches() != other.hasSafeDistanceInches()) return false;
       if (hasSafeDistanceInches()) {
         if (java.lang.Double.doubleToLongBits(getSafeDistanceInches())
@@ -3458,6 +3511,10 @@ public final class XTableValues {
       if (hasOptions()) {
         hash = (37 * hash) + OPTIONS_FIELD_NUMBER;
         hash = (53 * hash) + getOptions().hashCode();
+      }
+      if (hasArguments()) {
+        hash = (37 * hash) + ARGUMENTS_FIELD_NUMBER;
+        hash = (53 * hash) + getArguments().hashCode();
       }
       if (hasSafeDistanceInches()) {
         hash = (37 * hash) + SAFEDISTANCEINCHES_FIELD_NUMBER;
@@ -3597,6 +3654,7 @@ public final class XTableValues {
           getStartFieldBuilder();
           getEndFieldBuilder();
           getOptionsFieldBuilder();
+          getArgumentsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -3617,6 +3675,11 @@ public final class XTableValues {
         if (optionsBuilder_ != null) {
           optionsBuilder_.dispose();
           optionsBuilder_ = null;
+        }
+        arguments_ = null;
+        if (argumentsBuilder_ != null) {
+          argumentsBuilder_.dispose();
+          argumentsBuilder_ = null;
         }
         safeDistanceInches_ = 0D;
         return this;
@@ -3672,8 +3735,14 @@ public final class XTableValues {
           to_bitField0_ |= 0x00000004;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.safeDistanceInches_ = safeDistanceInches_;
+          result.arguments_ = argumentsBuilder_ == null
+              ? arguments_
+              : argumentsBuilder_.build();
           to_bitField0_ |= 0x00000008;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.safeDistanceInches_ = safeDistanceInches_;
+          to_bitField0_ |= 0x00000010;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -3731,6 +3800,9 @@ public final class XTableValues {
         if (other.hasOptions()) {
           mergeOptions(other.getOptions());
         }
+        if (other.hasArguments()) {
+          mergeArguments(other.getArguments());
+        }
         if (other.hasSafeDistanceInches()) {
           setSafeDistanceInches(other.getSafeDistanceInches());
         }
@@ -3781,11 +3853,18 @@ public final class XTableValues {
                 bitField0_ |= 0x00000004;
                 break;
               } // case 26
-              case 33: {
-                safeDistanceInches_ = input.readDouble();
+              case 34: {
+                input.readMessage(
+                    getArgumentsFieldBuilder().getBuilder(),
+                    extensionRegistry);
                 bitField0_ |= 0x00000008;
                 break;
-              } // case 33
+              } // case 34
+              case 41: {
+                safeDistanceInches_ = input.readDouble();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 41
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -4166,17 +4245,138 @@ public final class XTableValues {
         return optionsBuilder_;
       }
 
+      private org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments arguments_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder> argumentsBuilder_;
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       * @return Whether the arguments field is set.
+       */
+      public boolean hasArguments() {
+        return ((bitField0_ & 0x00000008) != 0);
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       * @return The arguments.
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments getArguments() {
+        if (argumentsBuilder_ == null) {
+          return arguments_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance() : arguments_;
+        } else {
+          return argumentsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       */
+      public Builder setArguments(org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments value) {
+        if (argumentsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          arguments_ = value;
+        } else {
+          argumentsBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       */
+      public Builder setArguments(
+          org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder builderForValue) {
+        if (argumentsBuilder_ == null) {
+          arguments_ = builderForValue.build();
+        } else {
+          argumentsBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       */
+      public Builder mergeArguments(org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments value) {
+        if (argumentsBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) != 0) &&
+            arguments_ != null &&
+            arguments_ != org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance()) {
+            getArgumentsBuilder().mergeFrom(value);
+          } else {
+            arguments_ = value;
+          }
+        } else {
+          argumentsBuilder_.mergeFrom(value);
+        }
+        if (arguments_ != null) {
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       */
+      public Builder clearArguments() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        arguments_ = null;
+        if (argumentsBuilder_ != null) {
+          argumentsBuilder_.dispose();
+          argumentsBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder getArgumentsBuilder() {
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return getArgumentsFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       */
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder getArgumentsOrBuilder() {
+        if (argumentsBuilder_ != null) {
+          return argumentsBuilder_.getMessageOrBuilder();
+        } else {
+          return arguments_ == null ?
+              org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance() : arguments_;
+        }
+      }
+      /**
+       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder> 
+          getArgumentsFieldBuilder() {
+        if (argumentsBuilder_ == null) {
+          argumentsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder>(
+                  getArguments(),
+                  getParentForChildren(),
+                  isClean());
+          arguments_ = null;
+        }
+        return argumentsBuilder_;
+      }
+
       private double safeDistanceInches_ ;
       /**
-       * <code>optional double safeDistanceInches = 4;</code>
+       * <code>optional double safeDistanceInches = 5;</code>
        * @return Whether the safeDistanceInches field is set.
        */
       @java.lang.Override
       public boolean hasSafeDistanceInches() {
-        return ((bitField0_ & 0x00000008) != 0);
+        return ((bitField0_ & 0x00000010) != 0);
       }
       /**
-       * <code>optional double safeDistanceInches = 4;</code>
+       * <code>optional double safeDistanceInches = 5;</code>
        * @return The safeDistanceInches.
        */
       @java.lang.Override
@@ -4184,23 +4384,23 @@ public final class XTableValues {
         return safeDistanceInches_;
       }
       /**
-       * <code>optional double safeDistanceInches = 4;</code>
+       * <code>optional double safeDistanceInches = 5;</code>
        * @param value The safeDistanceInches to set.
        * @return This builder for chaining.
        */
       public Builder setSafeDistanceInches(double value) {
 
         safeDistanceInches_ = value;
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         onChanged();
         return this;
       }
       /**
-       * <code>optional double safeDistanceInches = 4;</code>
+       * <code>optional double safeDistanceInches = 5;</code>
        * @return This builder for chaining.
        */
       public Builder clearSafeDistanceInches() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         safeDistanceInches_ = 0D;
         onChanged();
         return this;
@@ -6416,19 +6616,19 @@ public final class XTableValues {
     org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptionsOrBuilder getOptionsOrBuilder();
 
     /**
-     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
-     * @return Whether the arguments field is set.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
+     * @return Whether the alignToReefAprilTagOptions field is set.
      */
-    boolean hasArguments();
+    boolean hasAlignToReefAprilTagOptions();
     /**
-     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
-     * @return The arguments.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
+     * @return The alignToReefAprilTagOptions.
      */
-    org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments getArguments();
+    org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions getAlignToReefAprilTagOptions();
     /**
-     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+     * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
      */
-    org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder getArgumentsOrBuilder();
+    org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptionsOrBuilder getAlignToReefAprilTagOptionsOrBuilder();
   }
   /**
    * Protobuf type {@code org.kobe.xbot.Utilities.Entities.BezierCurves}
@@ -6534,30 +6734,30 @@ public final class XTableValues {
       return options_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.TraversalOptions.getDefaultInstance() : options_;
     }
 
-    public static final int ARGUMENTS_FIELD_NUMBER = 3;
-    private org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments arguments_;
+    public static final int ALIGNTOREEFAPRILTAGOPTIONS_FIELD_NUMBER = 3;
+    private org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions alignToReefAprilTagOptions_;
     /**
-     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
-     * @return Whether the arguments field is set.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
+     * @return Whether the alignToReefAprilTagOptions field is set.
      */
     @java.lang.Override
-    public boolean hasArguments() {
+    public boolean hasAlignToReefAprilTagOptions() {
       return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
-     * @return The arguments.
+     * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
+     * @return The alignToReefAprilTagOptions.
      */
     @java.lang.Override
-    public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments getArguments() {
-      return arguments_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance() : arguments_;
+    public org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions getAlignToReefAprilTagOptions() {
+      return alignToReefAprilTagOptions_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.getDefaultInstance() : alignToReefAprilTagOptions_;
     }
     /**
-     * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+     * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
      */
     @java.lang.Override
-    public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder getArgumentsOrBuilder() {
-      return arguments_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance() : arguments_;
+    public org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptionsOrBuilder getAlignToReefAprilTagOptionsOrBuilder() {
+      return alignToReefAprilTagOptions_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.getDefaultInstance() : alignToReefAprilTagOptions_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -6581,7 +6781,7 @@ public final class XTableValues {
         output.writeMessage(2, getOptions());
       }
       if (((bitField0_ & 0x00000002) != 0)) {
-        output.writeMessage(3, getArguments());
+        output.writeMessage(3, getAlignToReefAprilTagOptions());
       }
       getUnknownFields().writeTo(output);
     }
@@ -6602,7 +6802,7 @@ public final class XTableValues {
       }
       if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getArguments());
+          .computeMessageSize(3, getAlignToReefAprilTagOptions());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -6626,10 +6826,10 @@ public final class XTableValues {
         if (!getOptions()
             .equals(other.getOptions())) return false;
       }
-      if (hasArguments() != other.hasArguments()) return false;
-      if (hasArguments()) {
-        if (!getArguments()
-            .equals(other.getArguments())) return false;
+      if (hasAlignToReefAprilTagOptions() != other.hasAlignToReefAprilTagOptions()) return false;
+      if (hasAlignToReefAprilTagOptions()) {
+        if (!getAlignToReefAprilTagOptions()
+            .equals(other.getAlignToReefAprilTagOptions())) return false;
       }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
@@ -6650,9 +6850,9 @@ public final class XTableValues {
         hash = (37 * hash) + OPTIONS_FIELD_NUMBER;
         hash = (53 * hash) + getOptions().hashCode();
       }
-      if (hasArguments()) {
-        hash = (37 * hash) + ARGUMENTS_FIELD_NUMBER;
-        hash = (53 * hash) + getArguments().hashCode();
+      if (hasAlignToReefAprilTagOptions()) {
+        hash = (37 * hash) + ALIGNTOREEFAPRILTAGOPTIONS_FIELD_NUMBER;
+        hash = (53 * hash) + getAlignToReefAprilTagOptions().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -6786,7 +6986,7 @@ public final class XTableValues {
                 .alwaysUseFieldBuilders) {
           getCurvesFieldBuilder();
           getOptionsFieldBuilder();
-          getArgumentsFieldBuilder();
+          getAlignToReefAprilTagOptionsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -6805,10 +7005,10 @@ public final class XTableValues {
           optionsBuilder_.dispose();
           optionsBuilder_ = null;
         }
-        arguments_ = null;
-        if (argumentsBuilder_ != null) {
-          argumentsBuilder_.dispose();
-          argumentsBuilder_ = null;
+        alignToReefAprilTagOptions_ = null;
+        if (alignToReefAprilTagOptionsBuilder_ != null) {
+          alignToReefAprilTagOptionsBuilder_.dispose();
+          alignToReefAprilTagOptionsBuilder_ = null;
         }
         return this;
       }
@@ -6864,9 +7064,9 @@ public final class XTableValues {
           to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.arguments_ = argumentsBuilder_ == null
-              ? arguments_
-              : argumentsBuilder_.build();
+          result.alignToReefAprilTagOptions_ = alignToReefAprilTagOptionsBuilder_ == null
+              ? alignToReefAprilTagOptions_
+              : alignToReefAprilTagOptionsBuilder_.build();
           to_bitField0_ |= 0x00000002;
         }
         result.bitField0_ |= to_bitField0_;
@@ -6945,8 +7145,8 @@ public final class XTableValues {
         if (other.hasOptions()) {
           mergeOptions(other.getOptions());
         }
-        if (other.hasArguments()) {
-          mergeArguments(other.getArguments());
+        if (other.hasAlignToReefAprilTagOptions()) {
+          mergeAlignToReefAprilTagOptions(other.getAlignToReefAprilTagOptions());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -6996,7 +7196,7 @@ public final class XTableValues {
               } // case 18
               case 26: {
                 input.readMessage(
-                    getArgumentsFieldBuilder().getBuilder(),
+                    getAlignToReefAprilTagOptionsFieldBuilder().getBuilder(),
                     extensionRegistry);
                 bitField0_ |= 0x00000004;
                 break;
@@ -7379,125 +7579,125 @@ public final class XTableValues {
         return optionsBuilder_;
       }
 
-      private org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments arguments_;
+      private org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions alignToReefAprilTagOptions_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder> argumentsBuilder_;
+          org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions, org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptionsOrBuilder> alignToReefAprilTagOptionsBuilder_;
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
-       * @return Whether the arguments field is set.
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
+       * @return Whether the alignToReefAprilTagOptions field is set.
        */
-      public boolean hasArguments() {
+      public boolean hasAlignToReefAprilTagOptions() {
         return ((bitField0_ & 0x00000004) != 0);
       }
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
-       * @return The arguments.
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
+       * @return The alignToReefAprilTagOptions.
        */
-      public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments getArguments() {
-        if (argumentsBuilder_ == null) {
-          return arguments_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance() : arguments_;
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions getAlignToReefAprilTagOptions() {
+        if (alignToReefAprilTagOptionsBuilder_ == null) {
+          return alignToReefAprilTagOptions_ == null ? org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.getDefaultInstance() : alignToReefAprilTagOptions_;
         } else {
-          return argumentsBuilder_.getMessage();
+          return alignToReefAprilTagOptionsBuilder_.getMessage();
         }
       }
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
        */
-      public Builder setArguments(org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments value) {
-        if (argumentsBuilder_ == null) {
+      public Builder setAlignToReefAprilTagOptions(org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions value) {
+        if (alignToReefAprilTagOptionsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          arguments_ = value;
+          alignToReefAprilTagOptions_ = value;
         } else {
-          argumentsBuilder_.setMessage(value);
+          alignToReefAprilTagOptionsBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
        */
-      public Builder setArguments(
-          org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder builderForValue) {
-        if (argumentsBuilder_ == null) {
-          arguments_ = builderForValue.build();
+      public Builder setAlignToReefAprilTagOptions(
+          org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.Builder builderForValue) {
+        if (alignToReefAprilTagOptionsBuilder_ == null) {
+          alignToReefAprilTagOptions_ = builderForValue.build();
         } else {
-          argumentsBuilder_.setMessage(builderForValue.build());
+          alignToReefAprilTagOptionsBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
        */
-      public Builder mergeArguments(org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments value) {
-        if (argumentsBuilder_ == null) {
+      public Builder mergeAlignToReefAprilTagOptions(org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions value) {
+        if (alignToReefAprilTagOptionsBuilder_ == null) {
           if (((bitField0_ & 0x00000004) != 0) &&
-            arguments_ != null &&
-            arguments_ != org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance()) {
-            getArgumentsBuilder().mergeFrom(value);
+            alignToReefAprilTagOptions_ != null &&
+            alignToReefAprilTagOptions_ != org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.getDefaultInstance()) {
+            getAlignToReefAprilTagOptionsBuilder().mergeFrom(value);
           } else {
-            arguments_ = value;
+            alignToReefAprilTagOptions_ = value;
           }
         } else {
-          argumentsBuilder_.mergeFrom(value);
+          alignToReefAprilTagOptionsBuilder_.mergeFrom(value);
         }
-        if (arguments_ != null) {
+        if (alignToReefAprilTagOptions_ != null) {
           bitField0_ |= 0x00000004;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
        */
-      public Builder clearArguments() {
+      public Builder clearAlignToReefAprilTagOptions() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        arguments_ = null;
-        if (argumentsBuilder_ != null) {
-          argumentsBuilder_.dispose();
-          argumentsBuilder_ = null;
+        alignToReefAprilTagOptions_ = null;
+        if (alignToReefAprilTagOptionsBuilder_ != null) {
+          alignToReefAprilTagOptionsBuilder_.dispose();
+          alignToReefAprilTagOptionsBuilder_ = null;
         }
         onChanged();
         return this;
       }
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
        */
-      public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder getArgumentsBuilder() {
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.Builder getAlignToReefAprilTagOptionsBuilder() {
         bitField0_ |= 0x00000004;
         onChanged();
-        return getArgumentsFieldBuilder().getBuilder();
+        return getAlignToReefAprilTagOptionsFieldBuilder().getBuilder();
       }
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
        */
-      public org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder getArgumentsOrBuilder() {
-        if (argumentsBuilder_ != null) {
-          return argumentsBuilder_.getMessageOrBuilder();
+      public org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptionsOrBuilder getAlignToReefAprilTagOptionsOrBuilder() {
+        if (alignToReefAprilTagOptionsBuilder_ != null) {
+          return alignToReefAprilTagOptionsBuilder_.getMessageOrBuilder();
         } else {
-          return arguments_ == null ?
-              org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.getDefaultInstance() : arguments_;
+          return alignToReefAprilTagOptions_ == null ?
+              org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.getDefaultInstance() : alignToReefAprilTagOptions_;
         }
       }
       /**
-       * <code>.org.kobe.xbot.Utilities.Entities.AdditionalArguments arguments = 3;</code>
+       * <code>optional .org.kobe.xbot.Utilities.Entities.AlignToReefAprilTagOptions alignToReefAprilTagOptions = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder> 
-          getArgumentsFieldBuilder() {
-        if (argumentsBuilder_ == null) {
-          argumentsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArguments.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AdditionalArgumentsOrBuilder>(
-                  getArguments(),
+          org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions, org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptionsOrBuilder> 
+          getAlignToReefAprilTagOptionsFieldBuilder() {
+        if (alignToReefAprilTagOptionsBuilder_ == null) {
+          alignToReefAprilTagOptionsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions, org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptions.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.AlignToReefAprilTagOptionsOrBuilder>(
+                  getAlignToReefAprilTagOptions(),
                   getParentForChildren(),
                   isClean());
-          arguments_ = null;
+          alignToReefAprilTagOptions_ = null;
         }
-        return argumentsBuilder_;
+        return alignToReefAprilTagOptionsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -12633,50 +12833,53 @@ public final class XTableValues {
       "Degrees\030\003 \001(\001H\000\210\001\001B\022\n\020_rotationDegrees\"T" +
       "\n\013BezierCurve\022E\n\rcontrolPoints\030\001 \003(\0132..o" +
       "rg.kobe.xbot.Utilities.Entities.ControlP" +
-      "oint\"\232\002\n\037RequestVisionCoprocessorMessage" +
+      "oint\"\344\002\n\037RequestVisionCoprocessorMessage" +
       "\022=\n\005start\030\001 \001(\0132..org.kobe.xbot.Utilitie" +
       "s.Entities.ControlPoint\022;\n\003end\030\002 \001(\0132..o" +
       "rg.kobe.xbot.Utilities.Entities.ControlP" +
       "oint\022C\n\007options\030\003 \001(\01322.org.kobe.xbot.Ut" +
-      "ilities.Entities.TraversalOptions\022\037\n\022saf" +
-      "eDistanceInches\030\004 \001(\001H\000\210\001\001B\025\n\023_safeDista" +
-      "nceInches\"r\n\032AlignToReefAprilTagOptions\022" +
-      "\022\n\naprilTagID\030\001 \001(\r\022@\n\006camera\030\002 \001(\01620.or" +
-      "g.kobe.xbot.Utilities.Entities.AprilTagC" +
-      "amera\"\231\002\n\023AdditionalArguments\022<\n\010allianc" +
-      "e\030\001 \001(\0162*.org.kobe.xbot.Utilities.Entiti" +
-      "es.Alliance\022$\n\027setGoalToBestReefBranch\030\002" +
-      " \001(\010H\000\210\001\001\022&\n\031setGoalToBestCoralStation\030\003" +
-      " \001(\010H\001\210\001\001\022\"\n\025setGoalToAlgaeStation\030\004 \001(\010" +
-      "H\002\210\001\001B\032\n\030_setGoalToBestReefBranchB\034\n\032_se" +
-      "tGoalToBestCoralStationB\030\n\026_setGoalToAlg" +
-      "aeStation\"\312\001\n\020TraversalOptions\022\034\n\017meters" +
-      "PerSecond\030\001 \001(\001H\000\210\001\001\022!\n\024finalRotationDeg" +
-      "rees\030\002 \001(\001H\001\210\001\001\022(\n\033accelerationMetersPer" +
-      "Second\030\003 \001(\001H\002\210\001\001B\022\n\020_metersPerSecondB\027\n" +
-      "\025_finalRotationDegreesB\036\n\034_accelerationM" +
-      "etersPerSecond\"\355\001\n\014BezierCurves\022=\n\006curve" +
-      "s\030\001 \003(\0132-.org.kobe.xbot.Utilities.Entiti" +
-      "es.BezierCurve\022H\n\007options\030\002 \001(\01322.org.ko" +
-      "be.xbot.Utilities.Entities.TraversalOpti" +
-      "onsH\000\210\001\001\022H\n\targuments\030\003 \001(\01325.org.kobe.x" +
-      "bot.Utilities.Entities.AdditionalArgumen" +
-      "tsB\n\n\010_options\"M\n\020BezierCurvesList\0229\n\001v\030" +
-      "\001 \003(\0132..org.kobe.xbot.Utilities.Entities" +
-      ".BezierCurves\"\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027" +
-      "\n\nStringList\022\t\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t" +
-      "\n\001v\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010Lon" +
-      "gList\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002" +
-      "\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010*%\n\016RobotDirectio" +
-      "n\022\t\n\005FRONT\020\000\022\010\n\004BACK\020\001*;\n\016AprilTagCamera" +
-      "\022\016\n\nFRONT_LEFT\020\000\022\017\n\013FRONT_RIGHT\020\001\022\010\n\004REA" +
-      "R\020\002*O\n\010Alliance\022\n\n\006BLUE_1\020\000\022\n\n\006BLUE_2\020\001\022" +
-      "\n\n\006BLUE_3\020\002\022\t\n\005RED_1\020\003\022\t\n\005RED_2\020\004\022\t\n\005RED" +
-      "_3\020\0052\247\001\n\021VisionCoprocessor\022\221\001\n\034RequestBe" +
-      "zierPathWithOptions\022A.org.kobe.xbot.Util" +
-      "ities.Entities.RequestVisionCoprocessorM" +
-      "essage\032..org.kobe.xbot.Utilities.Entitie" +
-      "s.BezierCurvesb\006proto3"
+      "ilities.Entities.TraversalOptions\022H\n\targ" +
+      "uments\030\004 \001(\01325.org.kobe.xbot.Utilities.E" +
+      "ntities.AdditionalArguments\022\037\n\022safeDista" +
+      "nceInches\030\005 \001(\001H\000\210\001\001B\025\n\023_safeDistanceInc" +
+      "hes\"r\n\032AlignToReefAprilTagOptions\022\022\n\napr" +
+      "ilTagID\030\001 \001(\r\022@\n\006camera\030\002 \001(\01620.org.kobe" +
+      ".xbot.Utilities.Entities.AprilTagCamera\"" +
+      "\231\002\n\023AdditionalArguments\022<\n\010alliance\030\001 \001(" +
+      "\0162*.org.kobe.xbot.Utilities.Entities.All" +
+      "iance\022$\n\027setGoalToBestReefBranch\030\002 \001(\010H\000" +
+      "\210\001\001\022&\n\031setGoalToBestCoralStation\030\003 \001(\010H\001" +
+      "\210\001\001\022\"\n\025setGoalToAlgaeStation\030\004 \001(\010H\002\210\001\001B" +
+      "\032\n\030_setGoalToBestReefBranchB\034\n\032_setGoalT" +
+      "oBestCoralStationB\030\n\026_setGoalToAlgaeStat" +
+      "ion\"\312\001\n\020TraversalOptions\022\034\n\017metersPerSec" +
+      "ond\030\001 \001(\001H\000\210\001\001\022!\n\024finalRotationDegrees\030\002" +
+      " \001(\001H\001\210\001\001\022(\n\033accelerationMetersPerSecond" +
+      "\030\003 \001(\001H\002\210\001\001B\022\n\020_metersPerSecondB\027\n\025_fina" +
+      "lRotationDegreesB\036\n\034_accelerationMetersP" +
+      "erSecond\"\251\002\n\014BezierCurves\022=\n\006curves\030\001 \003(" +
+      "\0132-.org.kobe.xbot.Utilities.Entities.Bez" +
+      "ierCurve\022H\n\007options\030\002 \001(\01322.org.kobe.xbo" +
+      "t.Utilities.Entities.TraversalOptionsH\000\210" +
+      "\001\001\022e\n\032alignToReefAprilTagOptions\030\003 \001(\0132<" +
+      ".org.kobe.xbot.Utilities.Entities.AlignT" +
+      "oReefAprilTagOptionsH\001\210\001\001B\n\n\010_optionsB\035\n" +
+      "\033_alignToReefAprilTagOptions\"M\n\020BezierCu" +
+      "rvesList\0229\n\001v\030\001 \003(\0132..org.kobe.xbot.Util" +
+      "ities.Entities.BezierCurves\"\027\n\nDoubleLis" +
+      "t\022\t\n\001v\030\001 \003(\001\"\027\n\nStringList\022\t\n\001v\030\001 \003(\t\"\030\n" +
+      "\013IntegerList\022\t\n\001v\030\001 \003(\005\"\026\n\tBytesList\022\t\n\001" +
+      "v\030\001 \003(\014\"\025\n\010LongList\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatL" +
+      "ist\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolList\022\t\n\001v\030\001 \003(\010*%\n" +
+      "\016RobotDirection\022\t\n\005FRONT\020\000\022\010\n\004BACK\020\001*;\n\016" +
+      "AprilTagCamera\022\016\n\nFRONT_LEFT\020\000\022\017\n\013FRONT_" +
+      "RIGHT\020\001\022\010\n\004REAR\020\002*O\n\010Alliance\022\n\n\006BLUE_1\020" +
+      "\000\022\n\n\006BLUE_2\020\001\022\n\n\006BLUE_3\020\002\022\t\n\005RED_1\020\003\022\t\n\005" +
+      "RED_2\020\004\022\t\n\005RED_3\020\0052\247\001\n\021VisionCoprocessor" +
+      "\022\221\001\n\034RequestBezierPathWithOptions\022A.org." +
+      "kobe.xbot.Utilities.Entities.RequestVisi" +
+      "onCoprocessorMessage\032..org.kobe.xbot.Uti" +
+      "lities.Entities.BezierCurvesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -12711,7 +12914,7 @@ public final class XTableValues {
     internal_static_org_kobe_xbot_Utilities_Entities_RequestVisionCoprocessorMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_RequestVisionCoprocessorMessage_descriptor,
-        new java.lang.String[] { "Start", "End", "Options", "SafeDistanceInches", });
+        new java.lang.String[] { "Start", "End", "Options", "Arguments", "SafeDistanceInches", });
     internal_static_org_kobe_xbot_Utilities_Entities_AlignToReefAprilTagOptions_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_org_kobe_xbot_Utilities_Entities_AlignToReefAprilTagOptions_fieldAccessorTable = new
@@ -12735,7 +12938,7 @@ public final class XTableValues {
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor,
-        new java.lang.String[] { "Curves", "Options", "Arguments", });
+        new java.lang.String[] { "Curves", "Options", "AlignToReefAprilTagOptions", });
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurvesList_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurvesList_fieldAccessorTable = new

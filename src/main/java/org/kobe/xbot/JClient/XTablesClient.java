@@ -5,7 +5,6 @@ import org.kobe.xbot.JClient.Concurrency.ConcurrentPushHandler;
 import org.kobe.xbot.Utilities.Entities.QueuedRequests;
 import org.kobe.xbot.Utilities.Entities.Subscriptions;
 import org.kobe.xbot.Utilities.Entities.XTableProto;
-import org.kobe.xbot.Utilities.Exceptions.XTablesException;
 import org.kobe.xbot.Utilities.Exceptions.XTablesServerNotFound;
 import org.kobe.xbot.Utilities.Logger.XTablesLogger;
 import org.zeromq.SocketType;
