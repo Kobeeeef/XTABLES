@@ -83,7 +83,7 @@ class VisionCoprocessor(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/org.kobe.xbot.Utilities.Entities.VisionCoprocessor/RequestBezierPathWithOptions',
+            '/VisionCoprocessor/RequestBezierPathWithOptions',
             XTableValues__pb2.RequestVisionCoprocessorMessage.SerializeToString,
             XTableValues__pb2.BezierCurves.FromString,
             options,

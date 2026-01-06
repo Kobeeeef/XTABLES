@@ -22,6 +22,7 @@ public class VisionCoprocessorCommander implements AutoCloseable {
      * @param coprocessor the vision host
      */
     public VisionCoprocessorCommander(VisionCoprocessor coprocessor) {
+        System.out.println(coprocessor.getQualifiedHostname());
         // Create a channel to the gRPC server.
         this.channel = ManagedChannelBuilder.forAddress(coprocessor.getQualifiedHostname(), 9281)
                 .usePlaintext()
@@ -39,6 +40,7 @@ public class VisionCoprocessorCommander implements AutoCloseable {
         try {
             return blockingStub.withDeadlineAfter(timeout, timeUnit).withWaitForReady().requestBezierPathWithOptions(options);
         } catch (StatusRuntimeException e) {
+            e.printStackTrace();
             logger.info("RPC failed: " + e.getMessage());
             return null;
         }
