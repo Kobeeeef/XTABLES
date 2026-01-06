@@ -42,7 +42,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public CachedSubscriber setDontClearOnRead(boolean dontClearOnRead) {
-        this.dontClearOnRead = dontClearOnRead;
+         this.dontClearOnRead= dontClearOnRead;
         return this;
     }
 
@@ -82,12 +82,12 @@ public class CachedSubscriber implements AutoCloseable {
         return client.unsubscribe(this.key, this.subscriber);
     }
 
-    public XTableProto.XTableMessage.XTableUpdate get(boolean dontClearOnRead) {
+    public XTableProto.XTableMessage.XTableUpdate get() {
         return this.circularBuffer.read(dontClearOnRead);
     }
 
     public String getAsString(String defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.STRING)) {
             try {
                 return new String(lastUpdate.getValue().toByteArray(), StandardCharsets.UTF_8);
@@ -99,7 +99,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public Boolean getAsBoolean(Boolean defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BOOL)) {
             try {
                 return lastUpdate.getValue().equals(successByte);
@@ -111,7 +111,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public Integer getAsInteger(Integer defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
             try {
                 return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getInt();
@@ -123,7 +123,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public Long getAsLong(Long defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INT64)) {
             try {
                 return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getLong();
@@ -136,7 +136,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public Double getAsDouble(Double defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.DOUBLE)) {
             try {
                 return ByteBuffer.wrap(lastUpdate.getValue().toByteArray()).getDouble();
@@ -148,7 +148,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public List<XTableValues.Coordinate> getAsCoordinates(List<XTableValues.Coordinate> defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && (lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BYTES) || lastUpdate.getType().equals(XTableProto.XTableMessage.Type.UNKNOWN))) {
             try {
                 return XTableValues.CoordinateList.parseFrom(lastUpdate.getValue().toByteArray()).getCoordinatesList();
@@ -160,7 +160,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public List<String> getAsStringList(List<String> defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.STRING_LIST)) {
             try {
                 return XTableValues.StringList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -172,7 +172,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public List<Integer> getAsIntegerList(List<Integer> defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.INTEGER_LIST)) {
             try {
                 return XTableValues.IntegerList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -184,7 +184,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public List<Boolean> getAsBooleanList(List<Boolean> defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BOOLEAN_LIST)) {
             try {
                 return XTableValues.BoolList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -196,7 +196,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public List<Long> getAsLongList(List<Long> defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.LONG_LIST)) {
             try {
                 return XTableValues.LongList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -208,7 +208,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public List<Float> getAsFloatList(List<Float> defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.LONG_LIST)) {
             try {
                 return XTableValues.FloatList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -220,7 +220,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public List<Double> getAsDoubleList(List<Double> defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.DOUBLE_LIST)) {
             try {
                 return XTableValues.DoubleList.parseFrom(lastUpdate.getValue().toByteArray()).getVList();
@@ -232,7 +232,7 @@ public class CachedSubscriber implements AutoCloseable {
     }
 
     public XTableValues.BezierCurves getAsBezierCurves(XTableValues.BezierCurves defaultValue) {
-        XTableProto.XTableMessage.XTableUpdate lastUpdate = get(this.dontClearOnRead);
+        XTableProto.XTableMessage.XTableUpdate lastUpdate = get();
         if (lastUpdate != null && lastUpdate.getType().equals(XTableProto.XTableMessage.Type.BEZIER_CURVES)) {
             try {
                 return XTablesByteUtils.unpack_bezier_curves(lastUpdate.getValue().toByteArray());
