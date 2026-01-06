@@ -128,6 +128,7 @@ public class XTablesByteUtils {
     public static XTableValues.CoordinateList getCoordinateListProto(XTableValues.Coordinate... coordinate) {
         return XTableValues.CoordinateList.newBuilder().addAllCoordinates(List.of(coordinate)).buildPartial();
     }
+
     /**
      * Converts a list of Coordinate protobuf objects into a human-readable string.
      *
@@ -166,6 +167,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static List<String> unpack_string_list(ByteString bytes) {
         try {
             return XTableValues.StringList.parseFrom(bytes).getVList();
@@ -173,6 +175,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static List<Double> unpack_double_list(ByteString bytes) {
         try {
             return XTableValues.DoubleList.parseFrom(bytes).getVList();
@@ -180,6 +183,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static List<Integer> unpack_integer_list(ByteString bytes) {
         try {
             return XTableValues.IntegerList.parseFrom(bytes).getVList();
@@ -187,6 +191,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static List<Long> unpack_long_list(ByteString bytes) {
         try {
             return XTableValues.LongList.parseFrom(bytes).getVList();
@@ -194,6 +199,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static List<Float> unpack_float_list(ByteString bytes) {
         try {
             return XTableValues.FloatList.parseFrom(bytes).getVList();
@@ -201,6 +207,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static List<Boolean> unpack_boolean_list(ByteString bytes) {
         try {
             return XTableValues.BoolList.parseFrom(bytes).getVList();
@@ -208,6 +215,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static List<ByteString> unpack_bytes_list(ByteString bytes) {
         try {
             return XTableValues.BytesList.parseFrom(bytes).getVList();
@@ -215,6 +223,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     /**
      * Converts a byte array into a list of Coordinate objects.
      *
@@ -244,9 +253,11 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static String bezierCurvesToString(ByteString bezierCurves) {
         return bezierCurvesToString(unpack_bezier_curves(bezierCurves));
     }
+
     public static String bezierCurvesToString(byte[] bezierCurves) {
         return bezierCurvesToString(unpack_bezier_curves(bezierCurves));
     }
@@ -267,12 +278,15 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static String bezierCurveToString(ByteString bezierCurve) {
         return bezierCurveToString(unpack_bezier_curve(bezierCurve));
     }
+
     public static String bezierCurveToString(byte[] bezierCurve) {
         return bezierCurveToString(unpack_bezier_curve(bezierCurve));
     }
+
     public static double[][][] bezierCurvesToArray(XTableValues.BezierCurves bezierCurves) {
         if (bezierCurves == null || bezierCurves.getCurvesList().isEmpty()) {
             return new double[0][][];
@@ -321,10 +335,12 @@ public class XTablesByteUtils {
         List<XTableValues.ControlPoint> controlPoints = bezierCurves.getControlPointsList();
         XTableValues.ControlPoint start = controlPoints.get(0);
         XTableValues.ControlPoint goal = controlPoints.get(controlPoints.size() - 1);
-        return String.format("BezierCurves(Start: (X: %.2f, Y: %.2f), Goal: (X: %.2f, Y: %.2f), Points: %d)",
+        return String.format("BezierCurves(Start: (X: %.2f, Y: %.2f), Goal: (X: %.2f, Y: %.2f), Points: %d%s)",
                 start != null ? start.getX() : 0, start != null ? start.getY() : 0,
                 goal != null ? goal.getX() : 0, goal != null ? goal.getY() : 0,
-                controlPoints.size());
+                controlPoints.size(),
+                bezierCurves.hasMetersPerSecondSpeed() ? "MPS: " + bezierCurves.getMetersPerSecondSpeed() : ""
+        );
     }
 
 
@@ -342,6 +358,7 @@ public class XTablesByteUtils {
             return "Invalid CoordinateList Data";
         }
     }
+
     public static String convertTypeValueToJsonString(XTableProto.XTableMessage.Type type, byte[] value) {
         JsonElement jsonElement = switch (type) {
             case STRING -> new JsonPrimitive(new String(value));
@@ -510,6 +527,7 @@ public class XTablesByteUtils {
             return null;
         }
     }
+
     public static Integer toInteger(byte[] byteString) {
         try {
             return ByteBuffer.wrap(byteString).getInt();
@@ -541,7 +559,7 @@ public class XTablesByteUtils {
         }
         try {
             return ByteBuffer.wrap(byteString.toByteArray()).getLong();
-        }catch (Exception e) {
+        } catch (Exception e) {
             return null;
         }
     }
@@ -810,6 +828,7 @@ public class XTablesByteUtils {
             return null; // Return null on failure
         }
     }
+
     /**
      * Packs a Pose2d object into a byte array.
      *
