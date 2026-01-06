@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message Message {
+  double t = 1;
+  Type ty = 2;
+  bytes v = 3;
+  string k = 4;
+  enum Type {
+    IMAGE = 0;
+    LOG = 1;
+  }
+}

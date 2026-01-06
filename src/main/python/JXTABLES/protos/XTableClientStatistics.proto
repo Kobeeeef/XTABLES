@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+// Enum representing health status.
+enum HealthStatus {
+    GOOD = 0;
+    OKAY = 1;
+    STRESSED = 2;
+    OVERLOAD = 3;
+    CRITICAL = 4;
+    UNKNOWN = 5;
+}
+
+// Message representing client statistics.
+message ClientStatistics {
+    int64 nano_time = 1;
+    int64 max_memory_mb = 2;
+    int64 free_memory_mb = 3;
+    int64 used_memory_mb = 4;
+    double process_cpu_load_percentage = 5;
+    int32 available_processors = 6;
+    int64 total_threads = 7;
+    string ip = 8;
+    string hostname = 9;
+    string process_id = 10;
+    string lang_version = 11;
+    string lang_vendor = 12;
+    string jvm_name = 13;
+    HealthStatus health = 14;
+
+    // Optional fields
+    optional string version = 15;
+    optional string type = 16;
+    optional string uuid = 17;
+    optional int32 buffer_size = 18;
+    optional int32 max_buffer_size = 19;
+}
