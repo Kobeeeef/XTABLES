@@ -38,7 +38,7 @@ public class JClientTest {
 
         while (true) {
 
-            client.putPose2d("PoseSubsystem.RobotPose",new Pose2d(0.764, 1.247, Rotation2d.fromDegrees(54.012)));
+            client.putPose2d("PoseSubsystem.RobotPose",new Pose2d(4.002, 5.174, Rotation2d.fromDegrees(-60)));
             Thread.sleep(10);
         }
 
