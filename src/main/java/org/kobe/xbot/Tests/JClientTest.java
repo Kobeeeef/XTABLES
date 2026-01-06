@@ -28,14 +28,7 @@ public class JClientTest {
         int degrees = 0;
 
 
-       XTableValues.BezierCurve curve = XTableValues.BezierCurve.newBuilder()
-                .setTimeToTraverse(30.2)
-                .addAllControlPoints(List.of(XTableValues.ControlPoint.newBuilder().setX(20).setY(20).build()))
-               .build();
 
-       XTableValues.BezierCurves curves = XTableValues.BezierCurves.newBuilder()
-               .addCurves(curve)
-               .build();
 
        //
 

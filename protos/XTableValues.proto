@@ -16,9 +16,7 @@ message ControlPoint {
 }
 
 message BezierCurve {
-  double timeToTraverse = 1;
-  repeated ControlPoint controlPoints = 2;
-  optional double metersPerSecondSpeed = 3;
+  repeated ControlPoint controlPoints = 1;
 }
 
 message BezierCurves {

@@ -1906,45 +1906,28 @@ public final class XTableValues {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>double timeToTraverse = 1;</code>
-     * @return The timeToTraverse.
-     */
-    double getTimeToTraverse();
-
-    /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint> 
         getControlPointsList();
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getControlPoints(int index);
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     int getControlPointsCount();
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> 
         getControlPointsOrBuilderList();
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getControlPointsOrBuilder(
         int index);
-
-    /**
-     * <code>optional double metersPerSecondSpeed = 3;</code>
-     * @return Whether the metersPerSecondSpeed field is set.
-     */
-    boolean hasMetersPerSecondSpeed();
-    /**
-     * <code>optional double metersPerSecondSpeed = 3;</code>
-     * @return The metersPerSecondSpeed.
-     */
-    double getMetersPerSecondSpeed();
   }
   /**
    * Protobuf type {@code org.kobe.xbot.Utilities.Entities.BezierCurve}
@@ -1982,30 +1965,18 @@ public final class XTableValues {
               org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve.class, org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve.Builder.class);
     }
 
-    private int bitField0_;
-    public static final int TIMETOTRAVERSE_FIELD_NUMBER = 1;
-    private double timeToTraverse_ = 0D;
-    /**
-     * <code>double timeToTraverse = 1;</code>
-     * @return The timeToTraverse.
-     */
-    @java.lang.Override
-    public double getTimeToTraverse() {
-      return timeToTraverse_;
-    }
-
-    public static final int CONTROLPOINTS_FIELD_NUMBER = 2;
+    public static final int CONTROLPOINTS_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
     private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint> controlPoints_;
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     @java.lang.Override
     public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint> getControlPointsList() {
       return controlPoints_;
     }
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     @java.lang.Override
     public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> 
@@ -2013,45 +1984,26 @@ public final class XTableValues {
       return controlPoints_;
     }
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     @java.lang.Override
     public int getControlPointsCount() {
       return controlPoints_.size();
     }
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     @java.lang.Override
     public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getControlPoints(int index) {
       return controlPoints_.get(index);
     }
     /**
-     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+     * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
      */
     @java.lang.Override
     public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getControlPointsOrBuilder(
         int index) {
       return controlPoints_.get(index);
-    }
-
-    public static final int METERSPERSECONDSPEED_FIELD_NUMBER = 3;
-    private double metersPerSecondSpeed_ = 0D;
-    /**
-     * <code>optional double metersPerSecondSpeed = 3;</code>
-     * @return Whether the metersPerSecondSpeed field is set.
-     */
-    @java.lang.Override
-    public boolean hasMetersPerSecondSpeed() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>optional double metersPerSecondSpeed = 3;</code>
-     * @return The metersPerSecondSpeed.
-     */
-    @java.lang.Override
-    public double getMetersPerSecondSpeed() {
-      return metersPerSecondSpeed_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2068,14 +2020,8 @@ public final class XTableValues {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (java.lang.Double.doubleToRawLongBits(timeToTraverse_) != 0) {
-        output.writeDouble(1, timeToTraverse_);
-      }
       for (int i = 0; i < controlPoints_.size(); i++) {
-        output.writeMessage(2, controlPoints_.get(i));
-      }
-      if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeDouble(3, metersPerSecondSpeed_);
+        output.writeMessage(1, controlPoints_.get(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -2086,17 +2032,9 @@ public final class XTableValues {
       if (size != -1) return size;
 
       size = 0;
-      if (java.lang.Double.doubleToRawLongBits(timeToTraverse_) != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(1, timeToTraverse_);
-      }
       for (int i = 0; i < controlPoints_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, controlPoints_.get(i));
-      }
-      if (((bitField0_ & 0x00000001) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(3, metersPerSecondSpeed_);
+          .computeMessageSize(1, controlPoints_.get(i));
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -2113,17 +2051,8 @@ public final class XTableValues {
       }
       org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve other = (org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve) obj;
 
-      if (java.lang.Double.doubleToLongBits(getTimeToTraverse())
-          != java.lang.Double.doubleToLongBits(
-              other.getTimeToTraverse())) return false;
       if (!getControlPointsList()
           .equals(other.getControlPointsList())) return false;
-      if (hasMetersPerSecondSpeed() != other.hasMetersPerSecondSpeed()) return false;
-      if (hasMetersPerSecondSpeed()) {
-        if (java.lang.Double.doubleToLongBits(getMetersPerSecondSpeed())
-            != java.lang.Double.doubleToLongBits(
-                other.getMetersPerSecondSpeed())) return false;
-      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -2135,17 +2064,9 @@ public final class XTableValues {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + TIMETOTRAVERSE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          java.lang.Double.doubleToLongBits(getTimeToTraverse()));
       if (getControlPointsCount() > 0) {
         hash = (37 * hash) + CONTROLPOINTS_FIELD_NUMBER;
         hash = (53 * hash) + getControlPointsList().hashCode();
-      }
-      if (hasMetersPerSecondSpeed()) {
-        hash = (37 * hash) + METERSPERSECONDSPEED_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-            java.lang.Double.doubleToLongBits(getMetersPerSecondSpeed()));
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -2278,15 +2199,13 @@ public final class XTableValues {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        timeToTraverse_ = 0D;
         if (controlPointsBuilder_ == null) {
           controlPoints_ = java.util.Collections.emptyList();
         } else {
           controlPoints_ = null;
           controlPointsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
-        metersPerSecondSpeed_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
 
@@ -2321,9 +2240,9 @@ public final class XTableValues {
 
       private void buildPartialRepeatedFields(org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve result) {
         if (controlPointsBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) != 0)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             controlPoints_ = java.util.Collections.unmodifiableList(controlPoints_);
-            bitField0_ = (bitField0_ & ~0x00000002);
+            bitField0_ = (bitField0_ & ~0x00000001);
           }
           result.controlPoints_ = controlPoints_;
         } else {
@@ -2333,15 +2252,6 @@ public final class XTableValues {
 
       private void buildPartial0(org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve result) {
         int from_bitField0_ = bitField0_;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.timeToTraverse_ = timeToTraverse_;
-        }
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.metersPerSecondSpeed_ = metersPerSecondSpeed_;
-          to_bitField0_ |= 0x00000001;
-        }
-        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -2388,14 +2298,11 @@ public final class XTableValues {
 
       public Builder mergeFrom(org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve other) {
         if (other == org.kobe.xbot.Utilities.Entities.XTableValues.BezierCurve.getDefaultInstance()) return this;
-        if (other.getTimeToTraverse() != 0D) {
-          setTimeToTraverse(other.getTimeToTraverse());
-        }
         if (controlPointsBuilder_ == null) {
           if (!other.controlPoints_.isEmpty()) {
             if (controlPoints_.isEmpty()) {
               controlPoints_ = other.controlPoints_;
-              bitField0_ = (bitField0_ & ~0x00000002);
+              bitField0_ = (bitField0_ & ~0x00000001);
             } else {
               ensureControlPointsIsMutable();
               controlPoints_.addAll(other.controlPoints_);
@@ -2408,7 +2315,7 @@ public final class XTableValues {
               controlPointsBuilder_.dispose();
               controlPointsBuilder_ = null;
               controlPoints_ = other.controlPoints_;
-              bitField0_ = (bitField0_ & ~0x00000002);
+              bitField0_ = (bitField0_ & ~0x00000001);
               controlPointsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getControlPointsFieldBuilder() : null;
@@ -2416,9 +2323,6 @@ public final class XTableValues {
               controlPointsBuilder_.addAllMessages(other.controlPoints_);
             }
           }
-        }
-        if (other.hasMetersPerSecondSpeed()) {
-          setMetersPerSecondSpeed(other.getMetersPerSecondSpeed());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -2446,12 +2350,7 @@ public final class XTableValues {
               case 0:
                 done = true;
                 break;
-              case 9: {
-                timeToTraverse_ = input.readDouble();
-                bitField0_ |= 0x00000001;
-                break;
-              } // case 9
-              case 18: {
+              case 10: {
                 org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint m =
                     input.readMessage(
                         org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.parser(),
@@ -2463,12 +2362,7 @@ public final class XTableValues {
                   controlPointsBuilder_.addMessage(m);
                 }
                 break;
-              } // case 18
-              case 25: {
-                metersPerSecondSpeed_ = input.readDouble();
-                bitField0_ |= 0x00000004;
-                break;
-              } // case 25
+              } // case 10
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -2486,44 +2380,12 @@ public final class XTableValues {
       }
       private int bitField0_;
 
-      private double timeToTraverse_ ;
-      /**
-       * <code>double timeToTraverse = 1;</code>
-       * @return The timeToTraverse.
-       */
-      @java.lang.Override
-      public double getTimeToTraverse() {
-        return timeToTraverse_;
-      }
-      /**
-       * <code>double timeToTraverse = 1;</code>
-       * @param value The timeToTraverse to set.
-       * @return This builder for chaining.
-       */
-      public Builder setTimeToTraverse(double value) {
-
-        timeToTraverse_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>double timeToTraverse = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearTimeToTraverse() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        timeToTraverse_ = 0D;
-        onChanged();
-        return this;
-      }
-
       private java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint> controlPoints_ =
         java.util.Collections.emptyList();
       private void ensureControlPointsIsMutable() {
-        if (!((bitField0_ & 0x00000002) != 0)) {
+        if (!((bitField0_ & 0x00000001) != 0)) {
           controlPoints_ = new java.util.ArrayList<org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint>(controlPoints_);
-          bitField0_ |= 0x00000002;
+          bitField0_ |= 0x00000001;
          }
       }
 
@@ -2531,7 +2393,7 @@ public final class XTableValues {
           org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> controlPointsBuilder_;
 
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint> getControlPointsList() {
         if (controlPointsBuilder_ == null) {
@@ -2541,7 +2403,7 @@ public final class XTableValues {
         }
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public int getControlPointsCount() {
         if (controlPointsBuilder_ == null) {
@@ -2551,7 +2413,7 @@ public final class XTableValues {
         }
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint getControlPoints(int index) {
         if (controlPointsBuilder_ == null) {
@@ -2561,7 +2423,7 @@ public final class XTableValues {
         }
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder setControlPoints(
           int index, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
@@ -2578,7 +2440,7 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder setControlPoints(
           int index, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder builderForValue) {
@@ -2592,7 +2454,7 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder addControlPoints(org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
         if (controlPointsBuilder_ == null) {
@@ -2608,7 +2470,7 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder addControlPoints(
           int index, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint value) {
@@ -2625,7 +2487,7 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder addControlPoints(
           org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder builderForValue) {
@@ -2639,7 +2501,7 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder addControlPoints(
           int index, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder builderForValue) {
@@ -2653,7 +2515,7 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder addAllControlPoints(
           java.lang.Iterable<? extends org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint> values) {
@@ -2668,12 +2530,12 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder clearControlPoints() {
         if (controlPointsBuilder_ == null) {
           controlPoints_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
+          bitField0_ = (bitField0_ & ~0x00000001);
           onChanged();
         } else {
           controlPointsBuilder_.clear();
@@ -2681,7 +2543,7 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public Builder removeControlPoints(int index) {
         if (controlPointsBuilder_ == null) {
@@ -2694,14 +2556,14 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder getControlPointsBuilder(
           int index) {
         return getControlPointsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder getControlPointsOrBuilder(
           int index) {
@@ -2711,7 +2573,7 @@ public final class XTableValues {
         }
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public java.util.List<? extends org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder> 
            getControlPointsOrBuilderList() {
@@ -2722,14 +2584,14 @@ public final class XTableValues {
         }
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder addControlPointsBuilder() {
         return getControlPointsFieldBuilder().addBuilder(
             org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance());
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder addControlPointsBuilder(
           int index) {
@@ -2737,7 +2599,7 @@ public final class XTableValues {
             index, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.getDefaultInstance());
       }
       /**
-       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 2;</code>
+       * <code>repeated .org.kobe.xbot.Utilities.Entities.ControlPoint controlPoints = 1;</code>
        */
       public java.util.List<org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder> 
            getControlPointsBuilderList() {
@@ -2750,52 +2612,12 @@ public final class XTableValues {
           controlPointsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPoint.Builder, org.kobe.xbot.Utilities.Entities.XTableValues.ControlPointOrBuilder>(
                   controlPoints_,
-                  ((bitField0_ & 0x00000002) != 0),
+                  ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
                   isClean());
           controlPoints_ = null;
         }
         return controlPointsBuilder_;
-      }
-
-      private double metersPerSecondSpeed_ ;
-      /**
-       * <code>optional double metersPerSecondSpeed = 3;</code>
-       * @return Whether the metersPerSecondSpeed field is set.
-       */
-      @java.lang.Override
-      public boolean hasMetersPerSecondSpeed() {
-        return ((bitField0_ & 0x00000004) != 0);
-      }
-      /**
-       * <code>optional double metersPerSecondSpeed = 3;</code>
-       * @return The metersPerSecondSpeed.
-       */
-      @java.lang.Override
-      public double getMetersPerSecondSpeed() {
-        return metersPerSecondSpeed_;
-      }
-      /**
-       * <code>optional double metersPerSecondSpeed = 3;</code>
-       * @param value The metersPerSecondSpeed to set.
-       * @return This builder for chaining.
-       */
-      public Builder setMetersPerSecondSpeed(double value) {
-
-        metersPerSecondSpeed_ = value;
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional double metersPerSecondSpeed = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearMetersPerSecondSpeed() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        metersPerSecondSpeed_ = 0D;
-        onChanged();
-        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -8254,22 +8076,20 @@ public final class XTableValues {
       "\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\"S\n\016CoordinateList\022A\n\013c" +
       "oordinates\030\001 \003(\0132,.org.kobe.xbot.Utiliti" +
       "es.Entities.Coordinate\"$\n\014ControlPoint\022\t" +
-      "\n\001x\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\"\250\001\n\013BezierCurve\022\026\n\016" +
-      "timeToTraverse\030\001 \001(\001\022E\n\rcontrolPoints\030\002 " +
-      "\003(\0132..org.kobe.xbot.Utilities.Entities.C" +
-      "ontrolPoint\022!\n\024metersPerSecondSpeed\030\003 \001(" +
-      "\001H\000\210\001\001B\027\n\025_metersPerSecondSpeed\"\372\001\n\014Bezi" +
-      "erCurves\022=\n\006curves\030\001 \003(\0132-.org.kobe.xbot" +
-      ".Utilities.Entities.BezierCurve\022\021\n\tpathF" +
-      "ound\030\002 \001(\010\022\034\n\017metersPerSecond\030\003 \001(\001H\000\210\001\001" +
-      "\022\034\n\024finalRotationDegrees\030\004 \001(\001\022(\n\033accele" +
-      "rationMetersPerSecond\030\005 \001(\001H\001\210\001\001B\022\n\020_met" +
-      "ersPerSecondB\036\n\034_accelerationMetersPerSe" +
-      "cond\"\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027\n\nStringL" +
-      "ist\022\t\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t\n\001v\030\001 \003(\005" +
-      "\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010LongList\022\t\n\001" +
-      "v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolL" +
-      "ist\022\t\n\001v\030\001 \003(\010b\006proto3"
+      "\n\001x\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\"T\n\013BezierCurve\022E\n\rc" +
+      "ontrolPoints\030\001 \003(\0132..org.kobe.xbot.Utili" +
+      "ties.Entities.ControlPoint\"\372\001\n\014BezierCur" +
+      "ves\022=\n\006curves\030\001 \003(\0132-.org.kobe.xbot.Util" +
+      "ities.Entities.BezierCurve\022\021\n\tpathFound\030" +
+      "\002 \001(\010\022\034\n\017metersPerSecond\030\003 \001(\001H\000\210\001\001\022\034\n\024f" +
+      "inalRotationDegrees\030\004 \001(\001\022(\n\033acceleratio" +
+      "nMetersPerSecond\030\005 \001(\001H\001\210\001\001B\022\n\020_metersPe" +
+      "rSecondB\036\n\034_accelerationMetersPerSecond\"" +
+      "\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027\n\nStringList\022\t" +
+      "\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t\n\001v\030\001 \003(\005\"\026\n\tB" +
+      "ytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010LongList\022\t\n\001v\030\001 \003" +
+      "(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002\"\025\n\010BoolList\022\t" +
+      "\n\001v\030\001 \003(\010b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -8298,7 +8118,7 @@ public final class XTableValues {
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurve_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_BezierCurve_descriptor,
-        new java.lang.String[] { "TimeToTraverse", "ControlPoints", "MetersPerSecondSpeed", });
+        new java.lang.String[] { "ControlPoints", });
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_fieldAccessorTable = new
