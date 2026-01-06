@@ -217,6 +217,19 @@ class XTablesByteUtils:
             return None
 
     @staticmethod
+    def unpack_probability_mapping_detections(list_bytes):
+        """
+        Converts a byte array into a list of Coordinate objects.
+
+        :param list_bytes: The byte array representing a serialized CoordinateList.
+        :return: A list of Coordinate objects, or None if parsing fails.
+        """
+        try:
+            return XTableValues.ProbabilityMappingDetections.FromString(list_bytes)
+        except Exception:
+            return None
+
+    @staticmethod
     def unpack_align_to_reef_april_tag_options(list_bytes):
         try:
             return XTableValues.AlignToReefAprilTagOptions.FromString(list_bytes)

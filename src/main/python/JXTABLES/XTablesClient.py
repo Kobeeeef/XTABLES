@@ -38,7 +38,7 @@ class XTablesClient:
     # ================================================================
     # Instance Variables
     # ================================================================
-    XTABLES_CLIENT_VERSION = "XTABLES JPython Client v5.7.7 | Build Date: 2/28/2025"
+    XTABLES_CLIENT_VERSION = "XTABLES JPython Client v5.7.8 | Build Date: 3/14/2025"
 
     def __init__(self, ip=None, push_port=48800, req_port=48801, sub_port=48802, buffer_size=500, debug_mode=True,
                  ghost=False):
@@ -377,12 +377,12 @@ class XTablesClient:
     def putCoordinates(self, key, value):
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
                                       XTableValues.CoordinateList(coordinates=value).SerializeToString(),
-                                      XTableProto.XTableMessage.Type.BYTES)
-
-    def putCoordinates(self, key, value):
-        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
-                                      XTableValues.CoordinateList(coordinates=value).SerializeToString(),
                                       XTableProto.XTableMessage.Type.COORDINATES)
+
+    def putProbabilityMappingDetections(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      value.SerializeToString(),
+                                      XTableProto.XTableMessage.Type.PROBABILITY_MAPPING)
 
     def putPose2d(self, key, tuple):
         """
@@ -521,6 +521,21 @@ class XTablesClient:
                 raise ValueError(f"Invalid bytes returned from server: {message.value}")
 
         raise ValueError(f"Expected POSE2D type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
+    
+    def getProbabilityMappingDetections(self, key):
+        message = self._get_xtable_message(key)
+        if message is None:
+            raise ValueError("No message received from the XTABLES server.")
+        if not message.HasField("value"):
+            return None
+        if message.type == XTableProto.XTableMessage.Type.PROBABILITY_MAPPING:
+            try:
+                return XTablesByteUtils.unpack_probability_mapping_detections(message.value)
+            except Exception:
+                traceback.print_exc()
+                raise ValueError(f"Invalid bytes returned from server: {message.value}")
+
+        raise ValueError(f"Expected PROBABILITY_MAPPING type, but got: {XTableProto.XTableMessage.Type.Name(message.type)}")
 
     def getPose3d(self, key):
         message = self._get_xtable_message(key)
