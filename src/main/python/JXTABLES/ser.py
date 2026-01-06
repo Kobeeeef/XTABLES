@@ -1,5 +1,6 @@
 import grpc
 from concurrent import futures
+import XTableValues_pb2_grpc as XTableGRPC
 
 class VisionCoprocessorServicer(XTableGRPC.VisionCoprocessorServicer):
     def RequestBezierPathWithOptions(self, request, context):
