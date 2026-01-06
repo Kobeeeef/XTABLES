@@ -3,7 +3,12 @@
 import grpc
 import warnings
 
-import XTableValues_pb2 as XTableValues__pb2
+try:
+    # Package-level imports
+    from . import XTableValues_pb2 as protos_dot_XTableValues__pb2
+except ImportError:
+    # Standalone script imports
+    import XTableValues_pb2 as protos_dot_XTableValues__pb2
 
 GRPC_GENERATED_VERSION = '1.70.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +23,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in XTableValues_pb2_grpc.py depends on'
+        + f' but the generated code in protos/XTableValues_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -35,9 +40,9 @@ class VisionCoprocessorStub(object):
             channel: A grpc.Channel.
         """
         self.RequestBezierPathWithOptions = channel.unary_unary(
-                '/JXTABLES.VisionCoprocessor/RequestBezierPathWithOptions',
-                request_serializer=XTableValues__pb2.RequestVisionCoprocessorMessage.SerializeToString,
-                response_deserializer=XTableValues__pb2.BezierCurves.FromString,
+                '/VisionCoprocessor/RequestBezierPathWithOptions',
+                request_serializer=protos_dot_XTableValues__pb2.RequestVisionCoprocessorMessage.SerializeToString,
+                response_deserializer=protos_dot_XTableValues__pb2.BezierCurves.FromString,
                 _registered_method=True)
 
 
@@ -55,14 +60,14 @@ def add_VisionCoprocessorServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'RequestBezierPathWithOptions': grpc.unary_unary_rpc_method_handler(
                     servicer.RequestBezierPathWithOptions,
-                    request_deserializer=XTableValues__pb2.RequestVisionCoprocessorMessage.FromString,
-                    response_serializer=XTableValues__pb2.BezierCurves.SerializeToString,
+                    request_deserializer=protos_dot_XTableValues__pb2.RequestVisionCoprocessorMessage.FromString,
+                    response_serializer=protos_dot_XTableValues__pb2.BezierCurves.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'JXTABLES.VisionCoprocessor', rpc_method_handlers)
+            'VisionCoprocessor', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('JXTABLES.VisionCoprocessor', rpc_method_handlers)
+    server.add_registered_method_handlers('VisionCoprocessor', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -83,9 +88,9 @@ class VisionCoprocessor(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/JXTABLES.VisionCoprocessor/RequestBezierPathWithOptions',
-            XTableValues__pb2.RequestVisionCoprocessorMessage.SerializeToString,
-            XTableValues__pb2.BezierCurves.FromString,
+            '/VisionCoprocessor/RequestBezierPathWithOptions',
+            protos_dot_XTableValues__pb2.RequestVisionCoprocessorMessage.SerializeToString,
+            protos_dot_XTableValues__pb2.BezierCurves.FromString,
             options,
             channel_credentials,
             insecure,
