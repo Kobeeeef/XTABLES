@@ -31,8 +31,8 @@ _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'protos.XTableValues_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_ROBOTDIRECTION']._serialized_start=1816
-  _globals['_ROBOTDIRECTION']._serialized_end=1853
+  _globals['_ROBOTDIRECTION']._serialized_start=1872
+  _globals['_ROBOTDIRECTION']._serialized_end=1909
   _globals['_COORDINATE']._serialized_start=63
   _globals['_COORDINATE']._serialized_end=97
   _globals['_COORDINATELIST']._serialized_start=99
@@ -42,25 +42,25 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_BEZIERCURVE']._serialized_start=272
   _globals['_BEZIERCURVE']._serialized_end=356
   _globals['_REQUESTVISIONCOPROCESSORMESSAGE']._serialized_start=359
-  _globals['_REQUESTVISIONCOPROCESSORMESSAGE']._serialized_end=585
-  _globals['_TRAVERSALOPTIONS']._serialized_start=588
-  _globals['_TRAVERSALOPTIONS']._serialized_end=1478
-  _globals['_BEZIERCURVES']._serialized_start=1481
-  _globals['_BEZIERCURVES']._serialized_end=1644
-  _globals['_DOUBLELIST']._serialized_start=1646
-  _globals['_DOUBLELIST']._serialized_end=1669
-  _globals['_STRINGLIST']._serialized_start=1671
-  _globals['_STRINGLIST']._serialized_end=1694
-  _globals['_INTEGERLIST']._serialized_start=1696
-  _globals['_INTEGERLIST']._serialized_end=1720
-  _globals['_BYTESLIST']._serialized_start=1722
-  _globals['_BYTESLIST']._serialized_end=1744
-  _globals['_LONGLIST']._serialized_start=1746
-  _globals['_LONGLIST']._serialized_end=1767
-  _globals['_FLOATLIST']._serialized_start=1769
-  _globals['_FLOATLIST']._serialized_end=1791
-  _globals['_BOOLLIST']._serialized_start=1793
-  _globals['_BOOLLIST']._serialized_end=1814
-  _globals['_VISIONCOPROCESSOR']._serialized_start=1856
-  _globals['_VISIONCOPROCESSOR']._serialized_end=2023
+  _globals['_REQUESTVISIONCOPROCESSORMESSAGE']._serialized_end=641
+  _globals['_TRAVERSALOPTIONS']._serialized_start=644
+  _globals['_TRAVERSALOPTIONS']._serialized_end=1534
+  _globals['_BEZIERCURVES']._serialized_start=1537
+  _globals['_BEZIERCURVES']._serialized_end=1700
+  _globals['_DOUBLELIST']._serialized_start=1702
+  _globals['_DOUBLELIST']._serialized_end=1725
+  _globals['_STRINGLIST']._serialized_start=1727
+  _globals['_STRINGLIST']._serialized_end=1750
+  _globals['_INTEGERLIST']._serialized_start=1752
+  _globals['_INTEGERLIST']._serialized_end=1776
+  _globals['_BYTESLIST']._serialized_start=1778
+  _globals['_BYTESLIST']._serialized_end=1800
+  _globals['_LONGLIST']._serialized_start=1802
+  _globals['_LONGLIST']._serialized_end=1823
+  _globals['_FLOATLIST']._serialized_start=1825
+  _globals['_FLOATLIST']._serialized_end=1847
+  _globals['_BOOLLIST']._serialized_start=1849
+  _globals['_BOOLLIST']._serialized_end=1870
+  _globals['_VISIONCOPROCESSOR']._serialized_start=1912
+  _globals['_VISIONCOPROCESSOR']._serialized_end=2079
 # @@protoc_insertion_point(module_scope)
