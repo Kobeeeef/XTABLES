@@ -60,9 +60,9 @@ def add_VisionCoprocessorServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'VisionCoprocessor', rpc_method_handlers)
+            'org.kobe.xbot.Utilities.Entities.VisionCoprocessor', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('VisionCoprocessor', rpc_method_handlers)
+    server.add_registered_method_handlers('org.kobe.xbot.Utilities.Entities.VisionCoprocessor', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -83,7 +83,7 @@ class VisionCoprocessor(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/VisionCoprocessor/RequestBezierPathWithOptions',
+            '/org.kobe.xbot.Utilities.Entities.VisionCoprocessor/RequestBezierPathWithOptions',
             protos_dot_XTableValues__pb2.RequestVisionCoprocessorMessage.SerializeToString,
             protos_dot_XTableValues__pb2.BezierCurves.FromString,
             options,
