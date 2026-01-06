@@ -26,6 +26,60 @@ enum RobotDirection {
 }
 service VisionCoprocessor {
   rpc RequestBezierPathWithOptions (RequestVisionCoprocessorMessage) returns (BezierCurves);
+  rpc RequestPartialAprilTagAlignment (AprilTagAlignmentRequest) returns (AprilTagAlignmentMessage);
+}
+
+message AprilTagAlignmentMessage {
+  double offsetErrorAngleRadians = 1;
+  bool isCenteredConfidently = 2;
+  int64 offsetPixelsError = 3;
+  AprilTagAlignmentRequest originalRequest = 4;
+}
+
+message AprilTagAlignmentRequest {
+  int64 threshold_centimeters = 1;
+}
+
+message ProbMapDetections {
+  repeated RobotDetection robots = 1;
+  repeated AlgaeDetection algaes = 2;
+  repeated CoralDetection corals = 3;
+  optional ReefDetection reef = 4;
+}
+
+message RobotDetection {
+  double probability = 1;
+  ControlPoint pose = 2;
+}
+
+message AlgaeDetection {
+  double probability = 1;
+  ControlPoint pose = 2;
+}
+
+message CoralDetection {
+  double probability = 1;
+  ControlPoint pose = 2;
+}
+
+message ReefDetection {
+  optional ReefState close = 1;
+  optional ReefState close_left = 2;
+  optional ReefState close_right = 3;
+  optional ReefState far = 4;
+  optional ReefState far_right = 5;
+  optional ReefState far_left = 6;
+}
+
+message ReefState {
+  optional BranchState branchA = 1;
+  optional BranchState branchB = 2;
+}
+
+message BranchState {
+  double level_2_probability = 1;
+  double level_3_probability = 2;
+  double level_4_probability = 3;
 }
 
 message RequestVisionCoprocessorMessage {

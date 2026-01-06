@@ -17,10 +17,10 @@ public enum VisionCoprocessor {
 
     VisionCoprocessor(String hostname, boolean isHostname) {
         this.hostname = hostname;
-        this.isHostname = true;
+        this.isHostname = isHostname;
     }
 
     public String getQualifiedHostname() {
-        return this.isHostname ? this.equals(LOCALHOST) ? hostname : hostname + ".local": hostname;
+        return this.isHostname ? (this.equals(LOCALHOST) ? hostname : hostname + ".local") : hostname;
     }
 }
