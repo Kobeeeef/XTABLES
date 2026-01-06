@@ -2900,15 +2900,15 @@ public final class XTableValues {
     boolean getSnapToNearestAprilTag();
 
     /**
-     * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;</code>
-     * @return Whether the aprilTagRotationDegreesTurnSpeedFactorPerSecond field is set.
+     * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;</code>
+     * @return Whether the aprilTagRotationDegreesTurnSpeedFactorPerStep field is set.
      */
-    boolean hasAprilTagRotationDegreesTurnSpeedFactorPerSecond();
+    boolean hasAprilTagRotationDegreesTurnSpeedFactorPerStep();
     /**
-     * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;</code>
-     * @return The aprilTagRotationDegreesTurnSpeedFactorPerSecond.
+     * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;</code>
+     * @return The aprilTagRotationDegreesTurnSpeedFactorPerStep.
      */
-    double getAprilTagRotationDegreesTurnSpeedFactorPerSecond();
+    double getAprilTagRotationDegreesTurnSpeedFactorPerStep();
   }
   /**
    * Protobuf type {@code org.kobe.xbot.Utilities.Entities.TraversalOptions}
@@ -3124,23 +3124,23 @@ public final class XTableValues {
       return snapToNearestAprilTag_;
     }
 
-    public static final int APRILTAGROTATIONDEGREESTURNSPEEDFACTORPERSECOND_FIELD_NUMBER = 10;
-    private double aprilTagRotationDegreesTurnSpeedFactorPerSecond_ = 0D;
+    public static final int APRILTAGROTATIONDEGREESTURNSPEEDFACTORPERSTEP_FIELD_NUMBER = 10;
+    private double aprilTagRotationDegreesTurnSpeedFactorPerStep_ = 0D;
     /**
-     * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;</code>
-     * @return Whether the aprilTagRotationDegreesTurnSpeedFactorPerSecond field is set.
+     * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;</code>
+     * @return Whether the aprilTagRotationDegreesTurnSpeedFactorPerStep field is set.
      */
     @java.lang.Override
-    public boolean hasAprilTagRotationDegreesTurnSpeedFactorPerSecond() {
+    public boolean hasAprilTagRotationDegreesTurnSpeedFactorPerStep() {
       return ((bitField0_ & 0x00000200) != 0);
     }
     /**
-     * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;</code>
-     * @return The aprilTagRotationDegreesTurnSpeedFactorPerSecond.
+     * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;</code>
+     * @return The aprilTagRotationDegreesTurnSpeedFactorPerStep.
      */
     @java.lang.Override
-    public double getAprilTagRotationDegreesTurnSpeedFactorPerSecond() {
-      return aprilTagRotationDegreesTurnSpeedFactorPerSecond_;
+    public double getAprilTagRotationDegreesTurnSpeedFactorPerStep() {
+      return aprilTagRotationDegreesTurnSpeedFactorPerStep_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3185,7 +3185,7 @@ public final class XTableValues {
         output.writeBool(9, snapToNearestAprilTag_);
       }
       if (((bitField0_ & 0x00000200) != 0)) {
-        output.writeDouble(10, aprilTagRotationDegreesTurnSpeedFactorPerSecond_);
+        output.writeDouble(10, aprilTagRotationDegreesTurnSpeedFactorPerStep_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3234,7 +3234,7 @@ public final class XTableValues {
       }
       if (((bitField0_ & 0x00000200) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(10, aprilTagRotationDegreesTurnSpeedFactorPerSecond_);
+          .computeDoubleSize(10, aprilTagRotationDegreesTurnSpeedFactorPerStep_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3301,11 +3301,11 @@ public final class XTableValues {
         if (getSnapToNearestAprilTag()
             != other.getSnapToNearestAprilTag()) return false;
       }
-      if (hasAprilTagRotationDegreesTurnSpeedFactorPerSecond() != other.hasAprilTagRotationDegreesTurnSpeedFactorPerSecond()) return false;
-      if (hasAprilTagRotationDegreesTurnSpeedFactorPerSecond()) {
-        if (java.lang.Double.doubleToLongBits(getAprilTagRotationDegreesTurnSpeedFactorPerSecond())
+      if (hasAprilTagRotationDegreesTurnSpeedFactorPerStep() != other.hasAprilTagRotationDegreesTurnSpeedFactorPerStep()) return false;
+      if (hasAprilTagRotationDegreesTurnSpeedFactorPerStep()) {
+        if (java.lang.Double.doubleToLongBits(getAprilTagRotationDegreesTurnSpeedFactorPerStep())
             != java.lang.Double.doubleToLongBits(
-                other.getAprilTagRotationDegreesTurnSpeedFactorPerSecond())) return false;
+                other.getAprilTagRotationDegreesTurnSpeedFactorPerStep())) return false;
       }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
@@ -3362,10 +3362,10 @@ public final class XTableValues {
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
             getSnapToNearestAprilTag());
       }
-      if (hasAprilTagRotationDegreesTurnSpeedFactorPerSecond()) {
-        hash = (37 * hash) + APRILTAGROTATIONDEGREESTURNSPEEDFACTORPERSECOND_FIELD_NUMBER;
+      if (hasAprilTagRotationDegreesTurnSpeedFactorPerStep()) {
+        hash = (37 * hash) + APRILTAGROTATIONDEGREESTURNSPEEDFACTORPERSTEP_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-            java.lang.Double.doubleToLongBits(getAprilTagRotationDegreesTurnSpeedFactorPerSecond()));
+            java.lang.Double.doubleToLongBits(getAprilTagRotationDegreesTurnSpeedFactorPerStep()));
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -3507,7 +3507,7 @@ public final class XTableValues {
         finalRotationTurnSpeedFactor_ = 0D;
         startFaceNearestReefAprilTagPathThresholdPercentage_ = 0D;
         snapToNearestAprilTag_ = false;
-        aprilTagRotationDegreesTurnSpeedFactorPerSecond_ = 0D;
+        aprilTagRotationDegreesTurnSpeedFactorPerStep_ = 0D;
         return this;
       }
 
@@ -3579,7 +3579,7 @@ public final class XTableValues {
           to_bitField0_ |= 0x00000100;
         }
         if (((from_bitField0_ & 0x00000200) != 0)) {
-          result.aprilTagRotationDegreesTurnSpeedFactorPerSecond_ = aprilTagRotationDegreesTurnSpeedFactorPerSecond_;
+          result.aprilTagRotationDegreesTurnSpeedFactorPerStep_ = aprilTagRotationDegreesTurnSpeedFactorPerStep_;
           to_bitField0_ |= 0x00000200;
         }
         result.bitField0_ |= to_bitField0_;
@@ -3656,8 +3656,8 @@ public final class XTableValues {
         if (other.hasSnapToNearestAprilTag()) {
           setSnapToNearestAprilTag(other.getSnapToNearestAprilTag());
         }
-        if (other.hasAprilTagRotationDegreesTurnSpeedFactorPerSecond()) {
-          setAprilTagRotationDegreesTurnSpeedFactorPerSecond(other.getAprilTagRotationDegreesTurnSpeedFactorPerSecond());
+        if (other.hasAprilTagRotationDegreesTurnSpeedFactorPerStep()) {
+          setAprilTagRotationDegreesTurnSpeedFactorPerStep(other.getAprilTagRotationDegreesTurnSpeedFactorPerStep());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -3731,7 +3731,7 @@ public final class XTableValues {
                 break;
               } // case 72
               case 81: {
-                aprilTagRotationDegreesTurnSpeedFactorPerSecond_ = input.readDouble();
+                aprilTagRotationDegreesTurnSpeedFactorPerStep_ = input.readDouble();
                 bitField0_ |= 0x00000200;
                 break;
               } // case 81
@@ -4132,42 +4132,42 @@ public final class XTableValues {
         return this;
       }
 
-      private double aprilTagRotationDegreesTurnSpeedFactorPerSecond_ ;
+      private double aprilTagRotationDegreesTurnSpeedFactorPerStep_ ;
       /**
-       * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;</code>
-       * @return Whether the aprilTagRotationDegreesTurnSpeedFactorPerSecond field is set.
+       * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;</code>
+       * @return Whether the aprilTagRotationDegreesTurnSpeedFactorPerStep field is set.
        */
       @java.lang.Override
-      public boolean hasAprilTagRotationDegreesTurnSpeedFactorPerSecond() {
+      public boolean hasAprilTagRotationDegreesTurnSpeedFactorPerStep() {
         return ((bitField0_ & 0x00000200) != 0);
       }
       /**
-       * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;</code>
-       * @return The aprilTagRotationDegreesTurnSpeedFactorPerSecond.
+       * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;</code>
+       * @return The aprilTagRotationDegreesTurnSpeedFactorPerStep.
        */
       @java.lang.Override
-      public double getAprilTagRotationDegreesTurnSpeedFactorPerSecond() {
-        return aprilTagRotationDegreesTurnSpeedFactorPerSecond_;
+      public double getAprilTagRotationDegreesTurnSpeedFactorPerStep() {
+        return aprilTagRotationDegreesTurnSpeedFactorPerStep_;
       }
       /**
-       * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;</code>
-       * @param value The aprilTagRotationDegreesTurnSpeedFactorPerSecond to set.
+       * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;</code>
+       * @param value The aprilTagRotationDegreesTurnSpeedFactorPerStep to set.
        * @return This builder for chaining.
        */
-      public Builder setAprilTagRotationDegreesTurnSpeedFactorPerSecond(double value) {
+      public Builder setAprilTagRotationDegreesTurnSpeedFactorPerStep(double value) {
 
-        aprilTagRotationDegreesTurnSpeedFactorPerSecond_ = value;
+        aprilTagRotationDegreesTurnSpeedFactorPerStep_ = value;
         bitField0_ |= 0x00000200;
         onChanged();
         return this;
       }
       /**
-       * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerSecond = 10;</code>
+       * <code>optional double aprilTagRotationDegreesTurnSpeedFactorPerStep = 10;</code>
        * @return This builder for chaining.
        */
-      public Builder clearAprilTagRotationDegreesTurnSpeedFactorPerSecond() {
+      public Builder clearAprilTagRotationDegreesTurnSpeedFactorPerStep() {
         bitField0_ = (bitField0_ & ~0x00000200);
-        aprilTagRotationDegreesTurnSpeedFactorPerSecond_ = 0D;
+        aprilTagRotationDegreesTurnSpeedFactorPerStep_ = 0D;
         onChanged();
         return this;
       }
@@ -9492,7 +9492,7 @@ public final class XTableValues {
       "es.Entities.Coordinate\"$\n\014ControlPoint\022\t" +
       "\n\001x\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\"T\n\013BezierCurve\022E\n\rc" +
       "ontrolPoints\030\001 \003(\0132..org.kobe.xbot.Utili" +
-      "ties.Entities.ControlPoint\"\376\006\n\020Traversal" +
+      "ties.Entities.ControlPoint\"\372\006\n\020Traversal" +
       "Options\022\034\n\017metersPerSecond\030\001 \001(\001H\000\210\001\001\022!\n" +
       "\024finalRotationDegrees\030\002 \001(\001H\001\210\001\001\022(\n\033acce" +
       "lerationMetersPerSecond\030\003 \001(\001H\002\210\001\001\022$\n\027fa" +
@@ -9504,27 +9504,27 @@ public final class XTableValues {
       "alRotationTurnSpeedFactor\030\007 \001(\001H\006\210\001\001\022@\n3" +
       "startFaceNearestReefAprilTagPathThreshol" +
       "dPercentage\030\010 \001(\001H\007\210\001\001\022\"\n\025snapToNearestA" +
-      "prilTag\030\t \001(\010H\010\210\001\001\022<\n/aprilTagRotationDe" +
-      "greesTurnSpeedFactorPerSecond\030\n \001(\001H\t\210\001\001" +
-      "B\022\n\020_metersPerSecondB\027\n\025_finalRotationDe" +
-      "greesB\036\n\034_accelerationMetersPerSecondB\032\n" +
-      "\030_faceNearestReefAprilTagB4\n2_endFaceNea" +
-      "restReefAprilTagPathThresholdPercentageB" +
-      "#\n!_faceNearestReefAprilTagDirectionB\037\n\035" +
-      "_finalRotationTurnSpeedFactorB6\n4_startF" +
-      "aceNearestReefAprilTagPathThresholdPerce" +
-      "ntageB\030\n\026_snapToNearestAprilTagB2\n0_apri" +
-      "lTagRotationDegreesTurnSpeedFactorPerSec" +
-      "ond\"\243\001\n\014BezierCurves\022=\n\006curves\030\001 \003(\0132-.o" +
-      "rg.kobe.xbot.Utilities.Entities.BezierCu" +
-      "rve\022H\n\007options\030\002 \001(\01322.org.kobe.xbot.Uti" +
-      "lities.Entities.TraversalOptionsH\000\210\001\001B\n\n" +
-      "\010_options\"\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027\n\nSt" +
-      "ringList\022\t\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t\n\001v\030" +
-      "\001 \003(\005\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010LongLis" +
-      "t\022\t\n\001v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002\"\025\n\010" +
-      "BoolList\022\t\n\001v\030\001 \003(\010*%\n\016RobotDirection\022\t\n" +
-      "\005FRONT\020\000\022\010\n\004BACK\020\001b\006proto3"
+      "prilTag\030\t \001(\010H\010\210\001\001\022:\n-aprilTagRotationDe" +
+      "greesTurnSpeedFactorPerStep\030\n \001(\001H\t\210\001\001B\022" +
+      "\n\020_metersPerSecondB\027\n\025_finalRotationDegr" +
+      "eesB\036\n\034_accelerationMetersPerSecondB\032\n\030_" +
+      "faceNearestReefAprilTagB4\n2_endFaceNeare" +
+      "stReefAprilTagPathThresholdPercentageB#\n" +
+      "!_faceNearestReefAprilTagDirectionB\037\n\035_f" +
+      "inalRotationTurnSpeedFactorB6\n4_startFac" +
+      "eNearestReefAprilTagPathThresholdPercent" +
+      "ageB\030\n\026_snapToNearestAprilTagB0\n._aprilT" +
+      "agRotationDegreesTurnSpeedFactorPerStep\"" +
+      "\243\001\n\014BezierCurves\022=\n\006curves\030\001 \003(\0132-.org.k" +
+      "obe.xbot.Utilities.Entities.BezierCurve\022" +
+      "H\n\007options\030\002 \001(\01322.org.kobe.xbot.Utiliti" +
+      "es.Entities.TraversalOptionsH\000\210\001\001B\n\n\010_op" +
+      "tions\"\027\n\nDoubleList\022\t\n\001v\030\001 \003(\001\"\027\n\nString" +
+      "List\022\t\n\001v\030\001 \003(\t\"\030\n\013IntegerList\022\t\n\001v\030\001 \003(" +
+      "\005\"\026\n\tBytesList\022\t\n\001v\030\001 \003(\014\"\025\n\010LongList\022\t\n" +
+      "\001v\030\001 \003(\003\"\026\n\tFloatList\022\t\n\001v\030\001 \003(\002\"\025\n\010Bool" +
+      "List\022\t\n\001v\030\001 \003(\010*%\n\016RobotDirection\022\t\n\005FRO" +
+      "NT\020\000\022\010\n\004BACK\020\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -9559,7 +9559,7 @@ public final class XTableValues {
     internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_kobe_xbot_Utilities_Entities_TraversalOptions_descriptor,
-        new java.lang.String[] { "MetersPerSecond", "FinalRotationDegrees", "AccelerationMetersPerSecond", "FaceNearestReefAprilTag", "EndFaceNearestReefAprilTagPathThresholdPercentage", "FaceNearestReefAprilTagDirection", "FinalRotationTurnSpeedFactor", "StartFaceNearestReefAprilTagPathThresholdPercentage", "SnapToNearestAprilTag", "AprilTagRotationDegreesTurnSpeedFactorPerSecond", });
+        new java.lang.String[] { "MetersPerSecond", "FinalRotationDegrees", "AccelerationMetersPerSecond", "FaceNearestReefAprilTag", "EndFaceNearestReefAprilTagPathThresholdPercentage", "FaceNearestReefAprilTagDirection", "FinalRotationTurnSpeedFactor", "StartFaceNearestReefAprilTagPathThresholdPercentage", "SnapToNearestAprilTag", "AprilTagRotationDegreesTurnSpeedFactorPerStep", });
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_org_kobe_xbot_Utilities_Entities_BezierCurves_fieldAccessorTable = new
