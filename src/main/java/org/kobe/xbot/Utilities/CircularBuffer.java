@@ -113,6 +113,26 @@ public class CircularBuffer<T> {
             lock.unlock();
         }
     }
+    public T read(boolean dontClear) {
+        lock.lock();
+        try {
+            if (size == 0) {
+                return null;
+            }
+            // Read the data in FIFO order
+            int readIndex = (writeIndex - size + capacity) % capacity;
+            T data = (T) buffer[readIndex];
+
+            if (!dontClear) {
+                buffer[readIndex] = null;
+                size--;
+            }
+
+            return data;
+        } finally {
+            lock.unlock();
+        }
+    }
 
     // Read the latest data and clear the buffer based on the removal function
     public T readLatestAndClearOnFunction() {
