@@ -10,7 +10,6 @@ except ImportError:
     # Standalone script imports
     import XTableValues_pb2 as protos_dot_XTableValues__pb2
 
-
 GRPC_GENERATED_VERSION = '1.70.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
