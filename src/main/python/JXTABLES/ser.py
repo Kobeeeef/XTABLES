@@ -1,2 +1,1 @@
-import XTableValues_pb2_grpc as XTableGRPC
 import XTableValues_pb2 as XTableValues
