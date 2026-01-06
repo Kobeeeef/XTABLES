@@ -24,7 +24,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_XTABLEMESSAGE_XTABLESDATA_DATAENTRY']._options = None
   _globals['_XTABLEMESSAGE_XTABLESDATA_DATAENTRY']._serialized_options = b'8\001'
   _globals['_XTABLEMESSAGE']._serialized_start=63
-  _globals['_XTABLEMESSAGE']._serialized_end=2106
+  _globals['_XTABLEMESSAGE']._serialized_end=2131
   _globals['_XTABLEMESSAGE_XTABLESDATA']._serialized_start=371
   _globals['_XTABLEMESSAGE_XTABLESDATA']._serialized_end=658
   _globals['_XTABLEMESSAGE_XTABLESDATA_DATAENTRY']._serialized_start=554
@@ -40,7 +40,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_XTABLEMESSAGE_CLIENTINFO']._serialized_start=1182
   _globals['_XTABLEMESSAGE_CLIENTINFO']._serialized_end=1328
   _globals['_XTABLEMESSAGE_TYPE']._serialized_start=1331
-  _globals['_XTABLEMESSAGE_TYPE']._serialized_end=1708
-  _globals['_XTABLEMESSAGE_COMMAND']._serialized_start=1711
-  _globals['_XTABLEMESSAGE_COMMAND']._serialized_end=2058
+  _globals['_XTABLEMESSAGE_TYPE']._serialized_end=1733
+  _globals['_XTABLEMESSAGE_COMMAND']._serialized_start=1736
+  _globals['_XTABLEMESSAGE_COMMAND']._serialized_end=2083
 # @@protoc_insertion_point(module_scope)
