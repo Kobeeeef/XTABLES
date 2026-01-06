@@ -2878,15 +2878,15 @@ public final class XTableValues {
     double getFinalRotationTurnSpeedFactor();
 
     /**
-     * <code>optional bool startAprilTagLockPathThresholdPercentage = 8;</code>
+     * <code>optional double startAprilTagLockPathThresholdPercentage = 8;</code>
      * @return Whether the startAprilTagLockPathThresholdPercentage field is set.
      */
     boolean hasStartAprilTagLockPathThresholdPercentage();
     /**
-     * <code>optional bool startAprilTagLockPathThresholdPercentage = 8;</code>
+     * <code>optional double startAprilTagLockPathThresholdPercentage = 8;</code>
      * @return The startAprilTagLockPathThresholdPercentage.
      */
-    boolean getStartAprilTagLockPathThresholdPercentage();
+    double getStartAprilTagLockPathThresholdPercentage();
 
     /**
      * <code>optional bool snapToNearestAprilTag = 9;</code>
@@ -3087,9 +3087,9 @@ public final class XTableValues {
     }
 
     public static final int STARTAPRILTAGLOCKPATHTHRESHOLDPERCENTAGE_FIELD_NUMBER = 8;
-    private boolean startAprilTagLockPathThresholdPercentage_ = false;
+    private double startAprilTagLockPathThresholdPercentage_ = 0D;
     /**
-     * <code>optional bool startAprilTagLockPathThresholdPercentage = 8;</code>
+     * <code>optional double startAprilTagLockPathThresholdPercentage = 8;</code>
      * @return Whether the startAprilTagLockPathThresholdPercentage field is set.
      */
     @java.lang.Override
@@ -3097,11 +3097,11 @@ public final class XTableValues {
       return ((bitField0_ & 0x00000080) != 0);
     }
     /**
-     * <code>optional bool startAprilTagLockPathThresholdPercentage = 8;</code>
+     * <code>optional double startAprilTagLockPathThresholdPercentage = 8;</code>
      * @return The startAprilTagLockPathThresholdPercentage.
      */
     @java.lang.Override
-    public boolean getStartAprilTagLockPathThresholdPercentage() {
+    public double getStartAprilTagLockPathThresholdPercentage() {
       return startAprilTagLockPathThresholdPercentage_;
     }
 
@@ -3179,7 +3179,7 @@ public final class XTableValues {
         output.writeDouble(7, finalRotationTurnSpeedFactor_);
       }
       if (((bitField0_ & 0x00000080) != 0)) {
-        output.writeBool(8, startAprilTagLockPathThresholdPercentage_);
+        output.writeDouble(8, startAprilTagLockPathThresholdPercentage_);
       }
       if (((bitField0_ & 0x00000100) != 0)) {
         output.writeBool(9, snapToNearestAprilTag_);
@@ -3226,7 +3226,7 @@ public final class XTableValues {
       }
       if (((bitField0_ & 0x00000080) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(8, startAprilTagLockPathThresholdPercentage_);
+          .computeDoubleSize(8, startAprilTagLockPathThresholdPercentage_);
       }
       if (((bitField0_ & 0x00000100) != 0)) {
         size += com.google.protobuf.CodedOutputStream
@@ -3292,8 +3292,9 @@ public final class XTableValues {
       }
       if (hasStartAprilTagLockPathThresholdPercentage() != other.hasStartAprilTagLockPathThresholdPercentage()) return false;
       if (hasStartAprilTagLockPathThresholdPercentage()) {
-        if (getStartAprilTagLockPathThresholdPercentage()
-            != other.getStartAprilTagLockPathThresholdPercentage()) return false;
+        if (java.lang.Double.doubleToLongBits(getStartAprilTagLockPathThresholdPercentage())
+            != java.lang.Double.doubleToLongBits(
+                other.getStartAprilTagLockPathThresholdPercentage())) return false;
       }
       if (hasSnapToNearestAprilTag() != other.hasSnapToNearestAprilTag()) return false;
       if (hasSnapToNearestAprilTag()) {
@@ -3353,8 +3354,8 @@ public final class XTableValues {
       }
       if (hasStartAprilTagLockPathThresholdPercentage()) {
         hash = (37 * hash) + STARTAPRILTAGLOCKPATHTHRESHOLDPERCENTAGE_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-            getStartAprilTagLockPathThresholdPercentage());
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getStartAprilTagLockPathThresholdPercentage()));
       }
       if (hasSnapToNearestAprilTag()) {
         hash = (37 * hash) + SNAPTONEARESTAPRILTAG_FIELD_NUMBER;
@@ -3504,7 +3505,7 @@ public final class XTableValues {
         faceNearestReefAprilTagPathThresholdPercentage_ = 0D;
         faceNearestReefAprilTagDirection_ = 0;
         finalRotationTurnSpeedFactor_ = 0D;
-        startAprilTagLockPathThresholdPercentage_ = false;
+        startAprilTagLockPathThresholdPercentage_ = 0D;
         snapToNearestAprilTag_ = false;
         aprilTagRotationDegreesTurnSpeedFactorPerSecond_ = 0D;
         return this;
@@ -3719,11 +3720,11 @@ public final class XTableValues {
                 bitField0_ |= 0x00000040;
                 break;
               } // case 57
-              case 64: {
-                startAprilTagLockPathThresholdPercentage_ = input.readBool();
+              case 65: {
+                startAprilTagLockPathThresholdPercentage_ = input.readDouble();
                 bitField0_ |= 0x00000080;
                 break;
-              } // case 64
+              } // case 65
               case 72: {
                 snapToNearestAprilTag_ = input.readBool();
                 bitField0_ |= 0x00000100;
@@ -4051,9 +4052,9 @@ public final class XTableValues {
         return this;
       }
 
-      private boolean startAprilTagLockPathThresholdPercentage_ ;
+      private double startAprilTagLockPathThresholdPercentage_ ;
       /**
-       * <code>optional bool startAprilTagLockPathThresholdPercentage = 8;</code>
+       * <code>optional double startAprilTagLockPathThresholdPercentage = 8;</code>
        * @return Whether the startAprilTagLockPathThresholdPercentage field is set.
        */
       @java.lang.Override
@@ -4061,19 +4062,19 @@ public final class XTableValues {
         return ((bitField0_ & 0x00000080) != 0);
       }
       /**
-       * <code>optional bool startAprilTagLockPathThresholdPercentage = 8;</code>
+       * <code>optional double startAprilTagLockPathThresholdPercentage = 8;</code>
        * @return The startAprilTagLockPathThresholdPercentage.
        */
       @java.lang.Override
-      public boolean getStartAprilTagLockPathThresholdPercentage() {
+      public double getStartAprilTagLockPathThresholdPercentage() {
         return startAprilTagLockPathThresholdPercentage_;
       }
       /**
-       * <code>optional bool startAprilTagLockPathThresholdPercentage = 8;</code>
+       * <code>optional double startAprilTagLockPathThresholdPercentage = 8;</code>
        * @param value The startAprilTagLockPathThresholdPercentage to set.
        * @return This builder for chaining.
        */
-      public Builder setStartAprilTagLockPathThresholdPercentage(boolean value) {
+      public Builder setStartAprilTagLockPathThresholdPercentage(double value) {
 
         startAprilTagLockPathThresholdPercentage_ = value;
         bitField0_ |= 0x00000080;
@@ -4081,12 +4082,12 @@ public final class XTableValues {
         return this;
       }
       /**
-       * <code>optional bool startAprilTagLockPathThresholdPercentage = 8;</code>
+       * <code>optional double startAprilTagLockPathThresholdPercentage = 8;</code>
        * @return This builder for chaining.
        */
       public Builder clearStartAprilTagLockPathThresholdPercentage() {
         bitField0_ = (bitField0_ & ~0x00000080);
-        startAprilTagLockPathThresholdPercentage_ = false;
+        startAprilTagLockPathThresholdPercentage_ = 0D;
         onChanged();
         return this;
       }
@@ -9502,7 +9503,7 @@ public final class XTableValues {
       "s.Entities.RobotDirectionH\005\210\001\001\022)\n\034finalR" +
       "otationTurnSpeedFactor\030\007 \001(\001H\006\210\001\001\0225\n(sta" +
       "rtAprilTagLockPathThresholdPercentage\030\010 " +
-      "\001(\010H\007\210\001\001\022\"\n\025snapToNearestAprilTag\030\t \001(\010H" +
+      "\001(\001H\007\210\001\001\022\"\n\025snapToNearestAprilTag\030\t \001(\010H" +
       "\010\210\001\001\022<\n/aprilTagRotationDegreesTurnSpeed" +
       "FactorPerSecond\030\n \001(\001H\t\210\001\001B\022\n\020_metersPer" +
       "SecondB\027\n\025_finalRotationDegreesB\036\n\034_acce" +
