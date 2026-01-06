@@ -378,6 +378,11 @@ class XTablesClient:
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
                                       XTableValues.CoordinateList(coordinates=value).SerializeToString(),
                                       XTableProto.XTableMessage.Type.COORDINATES)
+    
+    def putBezierCurves(self, key, value):
+        return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
+                                      value.SerializeToString(),
+                                      XTableProto.XTableMessage.Type.BEZIER_CURVES)
 
     def putProbabilityMappingDetections(self, key, value):
         return self.send_push_message(XTableProto.XTableMessage.Command.PUT, key,
