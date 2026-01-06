@@ -34,6 +34,14 @@ public class JClientTest {
                 .addAllControlPoints(List.of(XTableValues.ControlPoint.newBuilder().setX(20).setY(20).build()))
                .build();
 
+       XTableValues.BezierCurves curves = XTableValues.BezierCurves.newBuilder()
+               .addCurves(curve)
+               .build();
+
+       //
+
+
+
 
 
         while (true) {
