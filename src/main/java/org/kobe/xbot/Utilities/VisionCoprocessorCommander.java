@@ -29,6 +29,14 @@ public class VisionCoprocessorCommander implements AutoCloseable {
         this.blockingStub = VisionCoprocessorGrpc.newBlockingV2Stub(channel);
     }
 
+    public VisionCoprocessorCommander(String hostname) {
+        // Create a channel to the gRPC server.
+        this.channel = ManagedChannelBuilder.forAddress(hostname, 9281)
+                .usePlaintext()
+                .build();
+        this.blockingStub = VisionCoprocessorGrpc.newBlockingV2Stub(channel);
+    }
+
     /**
      * Sends a Bezier path request with options to the server.
      *
